@@ -1,0 +1,14 @@
+<div id="sidebar">
+    <aside class="sidebar">
+        <h2><a href="/">Два.ч</a></h2>
+        {% for group in navigation %}
+        {% if not group.is_hidden %}
+        <h4 id="sect-group{{group.id}}">{{group.name}}</h4>
+        <ul id="list-group{{group.id}}" class="group">
+            {% for section in group.sections %}
+            <li><a href="/{{section.slug}}/" title="{{section.description}}">{{section.name}}</a></li>{% endfor %}
+        </ul>
+        {% endif %}
+        {% endfor %}
+    </aside>
+</div>

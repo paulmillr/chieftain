@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Настройки{% endblock %}
+
+{% block content %}
+<form>
+    <fieldset class="settings">
+        <dl>
+            <dt>
+                <label for="ustyle">Стиль</label>
+            </dt>
+            <dd>
+                <select name="ustyle" id="ustyle" size="1">
+                    <option value="photon">Photon</option>
+                    <option value="klipton">Klipton</option>
+                </select>
+            </dd>
+        </dl>
+        <dl>
+            <dt>
+                <label for="oldInsert">Старый способ ссылок на сообщения</label>
+            </dt>
+            <dd><input type="checkbox" name="oldInsert" id="oldInsert"></dd>
+        </dl>
+        <dl>
+            <dt>
+                <label for="hideSidebar">Скрыть боковую панель</label>
+            </dt>
+            <dd><input type="checkbox" name="hideSidebar" id="hideSidebar"></dd>
+        </dl>
+        <dl>
+            <dt>
+                <label for="hideNav">Скрыть списки разделов</label>
+            </dt>
+            <dd><input type="checkbox" name="hideNav" id="hideNav"></dd>
+        </dl>
+        <dl>
+            <dt>
+                <label for="hideSectBanner">Скрыть баннеры разделов</label>
+            </dt>
+            <dd><input type="checkbox" name="hideSectBanner" id="hideSectBanner"></dd>
+        </dl>
+
+    </fieldset>
+</form>
+{% endblock %}

@@ -1,0 +1,7 @@
+/klipped.conf
+/settings.py
+*.pyc
+*.pyo
+.DS_Store
+.htpasswd
+.htaccess

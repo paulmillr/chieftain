@@ -1,0 +1,17 @@
+<nav class="clearfix">
+    <ul class="group">
+        <li><a href="./" title="">Главная</a></li>
+        <li><a href="/faq" title="">ЧАВО</a></li>
+        <li><a href="#nsfw" id="nsfw" title="Понизить / повысить прозрачность у всех картинок. Хорошо подходит когда за спиной сидит кто-то, кому не хотелось бы показывать контент имиджборды.">NSFW</a></li>
+        <li><a href="/settings" title="">Настройки</a></li>
+        <li><a href="#bookmarks" id="bookmarks" title="">Закладки</a></li>
+    </ul>
+    {% for group in navigation %}
+    {% if not group.is_hidden %}
+    <ul id="nav-group{{group.id}}" class="group">
+        {% for section in group.sections %}
+        <li><a href="/{{section.slug}}/" title="{{section.description}}">{{section.slug}}</a></li>{% endfor %}
+    </ul>
+    {% endif %}
+    {% endfor %}
+</nav>
