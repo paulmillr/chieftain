@@ -133,18 +133,11 @@ def section(section, page=1):
     else:
         filt.update({'section' : section})
     
-    op_posts = Post.objects.filter(**filt).order_by('id')
+    op_posts = Post.objects.filter(**filt).order_by('id')[:onpage]
     threads = []
     for post in op_posts:
         t = Thread.objects.get(id=post.thread_id)
-        ps = t.post_set
-        stop = ps.count()
-        if stop <= lp: # if we got thread with less posts than lp
-            threads.append(t)
-        else:
-            start = stop - lp
-            all = ps.all()
-            threads.append([all[0]] + list(all[start:stop])) # select last 5 posts
+        threads.append(t)
     return threads
     
 def thread(op_post, section):

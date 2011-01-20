@@ -74,7 +74,7 @@ $.extend({
     /**
      * Canvas color picker class.
      * 
-     * Copyright (c) 2011, Paul Bagwell <about.me/b0n3Z>.
+     * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
      * Dual licensed under the MIT and GPL licenses:
      * http://www.opensource.org/licenses/mit-license.php
      * http://www.gnu.org/licenses/gpl.html
@@ -121,7 +121,7 @@ $.extend({
     /**
      * Canvas drawer class.
      * 
-     * Copyright (c) 2011, Paul Bagwell <about.me/b0n3Z>.
+     * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
      * Dual licensed under the MIT and GPL licenses:
      * http://www.opensource.org/licenses/mit-license.php
      * http://www.gnu.org/licenses/gpl.html

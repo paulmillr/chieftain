@@ -1,4 +1,4 @@
-<!DOCTYPE html>  
+{% load cache %}{% cache 3600 header %}<!DOCTYPE html>  
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
@@ -20,24 +20,21 @@
 <body>
     <div id="container">
         <div id="container-wrap">
-            <div>
-                <header class="clearfix">
-                    {% include "navigation.html" %}
-                    <div class="logo"><h1><a href="./">Два.ч — Бред</a></h1></div>
-                    <div class="menu"></div> <!-- Floated right -->
-                    <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{ MEDIA_URL }}images/aa.png" alt="/aa/"></a></div>
-                </header>
-                <div id="main" role="main">
-
-                {% block content %}{% endblock %}
-                </div>
-                <footer>
-                    {% include "navigation.html" %}
-                </footer>
+            <header class="clearfix">
+                {% include "navigation.html" %}
+                <div class="logo"><h1><a href="./">Два.ч — Бред</a></h1></div>
+                <div class="menu"></div>
+                <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{ MEDIA_URL }}images/aa.png" alt="/aa/"></a></div>
+            </header>
+            <div id="main" role="main">
+            {% endcache %}{% block content %}{% endblock %}{% cache 3600 footer %}
             </div>
+            <footer>
+                {% include "navigation.html" %}
+                <!-- STATS: <div class="stats">Всего: %(totTime).2f Питон: %(pyTime).2f База: %(dbTime).2f Запросов: %(queries)d</div> -->
+            </footer>
         </div>
-        {% include "sidebar.html" %}
-        <!-- STATS: <div class="stats">Total: %(totTime).2f Python: %(pyTime).2f DB: %(dbTime).2f Queries: %(queries)d</div> -->
+        <div id="sidebar">{% include "sidebar.html" %}</div>
     </div> <!-- end of #container -->
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>-->
     <script>!window.jQuery && document.write(unescape('%3Cscript src="{{ MEDIA_URL }}js/libs/jquery-1.4.4.js"%3E%3C/script%3E'))</script>
@@ -57,4 +54,4 @@
       })(document, 'script');
     </script>-->
 </body>
-</html></html>
+</html>{% endcache %}

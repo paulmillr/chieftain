@@ -37,7 +37,7 @@ class StatsMiddleware(object):
             'pyTime': pyTime,
             'dbTime': dbTime,
             'queries': queries,
-            }
+        }
 
         # replace the comment if found            
         if response and response.content:

@@ -166,8 +166,8 @@ input:invalid, textarea:invalid {
 /* These selection declarations have to be separate.
    No text-shadow: twitter.com/miketaylr/status/12228805301
    Also: hot pink. */
-::-moz-selection{ /*background: #FF5E99; color:#fff; */text-shadow: none; }
-::selection { /*background:#FF5E99; color:#fff; */text-shadow: none; }
+::-moz-selection{ background: #FF5E99; color:#fff; text-shadow: none; }
+::selection { background:#FF5E99; color:#fff; text-shadow: none; }
 
 /*  j.mp/webkit-tap-highlight-color */
 a:link { -webkit-tap-highlight-color: #FF5E99; }
@@ -230,7 +230,6 @@ body {
     font: normal normal 300 14px/18px HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', sans-serif;
 }
 a:link, a:visited { text-decoration: none; }
-/*#container {margin: 0 15px;}*/
 h1 {font-size: 2.5em; line-height: 1.5;}
 h2 {font-size: 2em; line-height: 1.4;}
 em {font-style: italic;}
@@ -263,10 +262,11 @@ nav li:after {content: " •";}
 nav li:last-child:after {content: "]";}
 nav a {font-size: 1em; padding: 0 0 0 1em; white-space: nowrap; line-height: 2em; text-decoration: none; font-weight: bold; }
 
-#container-wrap {float: left; width: 100%; }
-#container-wrap > div {margin-left: 200px;}
-#sidebar {width: 200px; float: left; margin-left: -100%; font-size: 1.1em;}
+#container-wrap {float: left; width: 100%;}
+#container-wrap > * {margin-left: 200px;}
+#sidebar {width: 200px; float: left; font-size: 1.1em; margin-left: -100%;}
 #sidebar h2 {margin-bottom: 10px;}
+#sidebar h4 {margin-bottom: 1px;}
 #sidebar li {list-style: none;}
 #sidebar aside {margin: 0 1em;}
 #sidebar .group {margin-left: 1em; padding-left: 0.5em;}

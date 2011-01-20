@@ -6,7 +6,7 @@ from denorm import CountField
 class Thread(models.Model):
     """Represents topic"""
     # op_post = models.ForeignKey('Post', related_name='-')
-    posts = CountField('post_set')
+    #posts = CountField('post_set')
     bump = models.DateTimeField(blank=True)
     is_pinned = models.BooleanField(default=False)
     is_closed = models.BooleanField(default=False)
@@ -16,12 +16,12 @@ class Thread(models.Model):
         lp = 5
         ps = self.post_set
         stop = ps.count()
-        start = stop - lp
+        all = ps.all()
         if stop <= lp: # if we got thread with less posts than lp
-            threads.append(t)
+            return all
         else:
-            all = ps.all()
-            threads.append([all[0]] + list(all[start:stop])) # select last 5 posts
+            start = stop - lp
+            return [all[0]] + list(all[start:stop]) # select last 5 posts
         
     def __unicode__(self):
         return unicode(self.id)

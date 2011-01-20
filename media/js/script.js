@@ -1,4 +1,4 @@
-/* Author: b0n3Z
+/* Author: pbagwl
 
 */
 
@@ -46,7 +46,7 @@ function getSelText() {
 /**
  * Simple color container class.
  * 
- * Copyright (c) 2011, Paul Bagwell <about.me/b0n3Z>.
+ * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
@@ -315,7 +315,7 @@ function initSettings() {
             var margin = (x) ? '10px' : '200px';
             
             $('#sidebar').toggle(0, null, function(x) {
-                $('#container-wrap > div').css({'marginLeft' : margin});
+                $('#container-wrap > *').css({'marginLeft' : margin});
             });
         }],
         
