@@ -254,13 +254,15 @@ em {font-style: italic;}
 
 /* Navigation panel */
 nav ul {display: inline;}
-nav li {margin-left: -0.6em; float: left; display: inline;}
-nav li:first-child {margin-left: 0}
-nav li:first-child:before {content: " ["; padding-left: 2px;}
-nav li:first-child a { padding: 0; }
-nav li:after {content: " •";}
-nav li:last-child:after {content: "]";}
-nav a {font-size: 1em; padding: 0 0 0 1em; white-space: nowrap; line-height: 2em; text-decoration: none; font-weight: bold; }
+nav li {float: left;}
+.group, nav li {margin-left: 0;}
+.group li {display: inline; margin-left: -0.6em;}
+.group li:first-child {margin-left: 0}
+.group li:first-child:before {content: " ["; padding-left: 2px;}
+.group li:first-child a, .group li:first-child span { padding: 0; }
+.group li:after {content: " •";}
+.group li:last-child:after {content: "]";}
+.group a, .group span {font-size: 1em; padding: 0 0 0 1em; white-space: nowrap; line-height: 2em; text-decoration: none; font-weight: bold; }
 
 #container-wrap {float: left; width: 100%;}
 #container-wrap > * {margin-left: 200px;}
@@ -269,7 +271,7 @@ nav a {font-size: 1em; padding: 0 0 0 1em; white-space: nowrap; line-height: 2em
 #sidebar h4 {margin-bottom: 1px;}
 #sidebar li {list-style: none;}
 #sidebar aside {margin: 0 1em;}
-#sidebar .group {margin-left: 1em; padding-left: 0.5em;}
+#sidebar ul {margin-left: 1em; padding-left: 0.5em;}
 
 /* Main content */
 #main {font-size: 1.1em;}

@@ -65,33 +65,18 @@
                 </fieldset>
             </form>
             {% endcache %}
-            {% for thread in threads %}
-                <section class="thread" id="thread{{thread.id}}">
-                    {% for post in thread.last_posts %}
-                    <article class="post clearfix" id="post{{post.pid}}">
-                        <div class="post-wrapper">
-                            <header class="clearfix">
-                                <div class="info-wrapper">
-                                    <span class="number" data-id="{{post.id}}">{{post.pid}}</span>
-                                    <time datetime="2010-11-24T09:38:51-03:00" pubdate>{{post.date}}</time>
-                                    <span class="name" data-default="true">{{post.poster}}</span>
-                                    <span class="title">{{post.topic}}</span>
-                                </div>
-                            </header>
-                            <div class="content">
-                                <!--<div class="image">
-                                    <div class="image-info">
-                                        <a target="_blank" href="{{ MEDIA_URL }}images/post.jpg">144492.png</a>
-                                        (<em>7Кб, 150x149</em>)
-                                        <a href="#image-edit" class="edit">G</a>
-                                    </div>
-                                    <a href="{{ MEDIA_URL }}images/post.jpg" onclick="resize"><img src="{{ MEDIA_URL }}images/post.jpg" alt="" class="image"></a>
-                                </div>-->
-                                <p class="text">{{post.message}}</p>
-                            </div>
-                        </div>
-                    </article>
-                    {% endfor %}
-                </section>
-            {% endfor %}
+            {% for thread in threads.object_list %}{% endfor %}
+            {% cache 86400 paginator request.page %}
+            <div class="paginator">
+                <ul class="group">
+                {% for p in threads.paginator.page_range %}
+                    {% if p != threads.number %}
+                        <li><a href="page{{p}}">{{p}}</a></li>
+                    {% else %}
+                        <li><span>{{p}}</span></li>
+                    {% endif %}
+                {% endfor %}
+                </ul>
+            </div>
+            {% endcache %}
 {% endblock %}

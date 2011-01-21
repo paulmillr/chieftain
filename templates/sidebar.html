@@ -3,7 +3,7 @@
     {% for group in navigation %}
     {% if not group.is_hidden %}
     <h4 id="sect-group{{group.id}}">{{group.name}}</h4>
-    <ul id="list-group{{group.id}}" class="group">
+    <ul id="list-group{{group.id}}">
         {% for section in group.sections %}
         <li><a href="/{{section.slug}}/" title="{{section.description}}">{{section.name}}</a></li>{% endfor %}
     </ul>

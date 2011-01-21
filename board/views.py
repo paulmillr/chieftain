@@ -1,9 +1,11 @@
 from django.core.paginator import Paginator
 from django.shortcuts import render_to_response
 from django.template import RequestContext
+from django.template.loader import render_to_string
 from django.views.decorators.cache import cache_page
 from functools import partial
-import api.views as api
+from board import api
+from board.models import *
 
 def rtr(template, request, dictionary={}):
     dictionary.update({'navigation' : api.sections(True)})
@@ -35,13 +37,14 @@ def ip_posts(request, ip, key, board=''):
 def post(request, pid, section=''):
     """Gets post"""
     pass
-        
+
 def section(request, section, page=1):
     """
     Gets 20 threads from current section with
     OP post and last 5 posts in each thread
     """
-    return rtr('section.html', request, {'threads' : api.section(section, page)})
+    s = Section.objects.get(name__exact=section)
+    return rtr('section.html', request, {'threads' : s.page_threads(page), 'request' : {'page' : page}})
 
 def thread(request, section, op_post):
     """Gets thread and its posts"""

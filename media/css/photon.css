@@ -7,7 +7,7 @@ a:link, a:visited {color: #f60;}
 a:hover {color:#06f;}
 
 #sidebar h4 {background: #ddd; border: 1px solid #ccc; border-radius: 5px; -moz-border-radius: 5px; -webkit-border-radius: 5px;}
-#sidebar .group {border-left: 1px solid #ccc;}
+#sidebar ul {border-left: 1px solid #ccc;}
 
 /* New post */
 .new-post {

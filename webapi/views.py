@@ -1,7 +1,7 @@
-import api.views as api
 import json
 from django.http import HttpResponse
 from django.core import serializers
+from board import api
 from board.models import *
 
 def index(request):

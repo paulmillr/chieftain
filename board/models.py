@@ -1,17 +1,43 @@
 # coding: utf-8
 from django.db import models, connection
 from django.db.models.query import QuerySet
-from denorm import CountField
+from django.core.paginator import Paginator
+from django.core.cache import cache
+from hashlib import sha1
+
+def cached(seconds = 900):
+    """
+        Cache the result of a function call for the specified number of seconds, 
+        using Django's caching mechanism.
+    """
+    def doCache(f):
+        def x(*args, **kwargs):
+                key = sha1(str(f.__module__) + str(f.__name__) + str(args) + str(kwargs)).hexdigest()
+                result = cache.get(key)
+                if result is None:
+                    result = f(*args, **kwargs)
+                    cache.set(key, result, seconds)
+                return result
+        return x
+    return doCache
+
+class SectionManager(models.Manager):
+    """Section methods"""
+    def by_slug(self, slug):
+        return self.get(slug__iexact=slug)
+        
 
 class Thread(models.Model):
-    """Represents topic"""
-    # op_post = models.ForeignKey('Post', related_name='-')
-    #posts = CountField('post_set')
+    """Groups of posts."""
+    section = models.ForeignKey('Section')
     bump = models.DateTimeField(blank=True)
     is_pinned = models.BooleanField(default=False)
     is_closed = models.BooleanField(default=False)
+    page_html = models.TextField(blank=True)
     def posts(self):
-        return Post.objects.filter(thread=self.id)
+        return self.post_set.filter(thread=self.id)
+    def postcount(self):
+        return self.posts.count()
     def last_posts(self):
         lp = 5
         ps = self.post_set
@@ -27,8 +53,7 @@ class Thread(models.Model):
         return unicode(self.id)
 
 class Post(models.Model):
-    """Represents post"""
-    section = models.ForeignKey('Section')
+    """Represents post."""
     pid = models.PositiveIntegerField()
     thread = models.ForeignKey('Thread', blank=True)
     is_op_post = models.BooleanField(default=False)
@@ -42,10 +67,10 @@ class Post(models.Model):
     password = models.CharField(max_length=32, blank=True)
     message = models.TextField(blank=True)
     def __unicode__(self):
-        return self.section.slug+'/'+unicode(self.id)
+        return unicode(self.id)
 
 class File(models.Model):
-    """Represents files at the board"""
+    """Represents files at the board."""
     post = models.ForeignKey('Post')
     name = models.CharField(max_length=64) # original file name
     mime = models.ForeignKey('FileType')
@@ -74,7 +99,7 @@ class FileType(models.Model):
 
 class Section(models.Model):
     """Board section"""
-    slug = models.SlugField(max_length=5)
+    slug = models.SlugField(max_length=5, unique=True)
     name = models.CharField(max_length=64)
     description = models.TextField(blank=False)
     group = models.ForeignKey('SectionGroup')
@@ -84,6 +109,13 @@ class Section(models.Model):
     filetypes = models.ManyToManyField(FileCategory)
     bumplimit = models.PositiveSmallIntegerField(default=500)
     threadlimit = models.PositiveSmallIntegerField(default=10)
+    objects = SectionManager()
+    def threads(self):
+        return self.thread_set.filter(section=self.id)
+    def page_threads(self, page=1):
+        onpage = 20
+        threads = Paginator(Thread.objects.filter(section=self.id), onpage)
+        return threads.page(page)
     def __unicode__(self):
         return self.slug
 
