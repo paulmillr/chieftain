@@ -1,4 +1,4 @@
-from django.core.paginator import Paginator
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -46,9 +46,10 @@ def section(request, section, page=1):
     """
     try:
         s = Section.objects.get(slug__exact=section)
-    except Section.DoesNotExist:
+        t = s.page_threads(page)
+    except (Section.DoesNotExist, InvalidPage, EmptyPage):
         raise Http404
-    return rtr('section.html', request, {'threads' : s.page_threads(page), 'request' : {'page' : page}})
+    return rtr('section.html', request, {'threads' : t, 'request' : {'page' : page}})
 
 def thread(request, section, op_post):
     """Gets thread and its posts"""

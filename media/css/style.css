@@ -286,9 +286,9 @@ nav li {float: left;}
 .post .title {font-weight: bold;}
 .post .text {display: inline-block; margin-top: 20px;}
 .post .text, .post .text * {vertical-align:top;}
-.post .image {margin-right: 10px; float:left; max-width: 200px; max-height: 200px;}
-.image-info a:link, .image-info a:hover {text-decoration: underline;}
-.image-info {color: #666; font-size: 0.9em;}
+.post .file {margin-right: 10px; float:left; max-width: 200px; max-height: 200px;}
+.file-info a:link, .file-info a:hover {text-decoration: underline;}
+.file-info {color: #666; font-size: 0.9em;}
 
 .info-wrapper {float: left;}
 .info-wrapper > * {float: left; margin: 0 0 0 4px;}

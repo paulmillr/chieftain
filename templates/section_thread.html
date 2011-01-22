@@ -11,21 +11,24 @@
                 </div>
             </header>
             <div class="content">
-                <!--<div class="image">
-                    <div class="image-info">
+                {% if post.file_count > 0 %}
+                {% for f in post.file_set %}
+                <div class="file">
+                    <div class="file-info"> <!-- TODO: EDIT ME -->
                         <a target="_blank" href="{{ MEDIA_URL }}images/post.jpg">144492.png</a>
                         (<em>7Кб, 150x149</em>)
                         <a href="#image-edit" class="edit">G</a>
                     </div>
-                    <a href="{{ MEDIA_URL }}images/post.jpg" onclick="resize"><img src="{{ MEDIA_URL }}images/post.jpg" alt="" class="image"></a>
-                </div>-->
+                    <a href="{{ MEDIA_URL }}images/post.jpg" onclick="resize"><img src="{{ MEDIA_URL }}images/post.jpg" alt="Image"></a>
+                </div>
+                {% endfor %}
+                {% endif %}
                 <p class="text">{{post.message}}</p>
             </div>
         </div>
     </article>
     {% if post.is_op_post %}
-    <div class="skipped">Пропущено {{answers.skipped}} ответов, из них {{answers.skiped_images}} с изображениями. 
-    Нажмите "ответ", чтобы увидеть тред целиком.</div>
+    <div class="skipped">Пропущено ответов: {{thread.count.skipped}}, из них {{thread.count.skipped_files}} с файлами.</div>
     {% endif %}
     {% endfor %}
 </section>
