@@ -28,3 +28,5 @@ def generate(threads=100, posts=200):
             }
             post = Post(**args)
             post.save()
+        tr.page_html = render_to_string('section_thread.html', {'thread' : tr})
+        tr.save()
