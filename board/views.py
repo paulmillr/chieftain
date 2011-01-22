@@ -1,4 +1,5 @@
 from django.core.paginator import Paginator
+from django.http import Http404
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.template.loader import render_to_string
@@ -43,7 +44,10 @@ def section(request, section, page=1):
     Gets 20 threads from current section with
     OP post and last 5 posts in each thread
     """
-    s = Section.objects.get(name__exact=section)
+    try:
+        s = Section.objects.get(slug__exact=section)
+    except Section.DoesNotExist:
+        raise Http404
     return rtr('section.html', request, {'threads' : s.page_threads(page), 'request' : {'page' : page}})
 
 def thread(request, section, op_post):

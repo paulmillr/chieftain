@@ -65,7 +65,11 @@
                 </fieldset>
             </form>
             {% endcache %}
-            {% for thread in threads.object_list %}{% endfor %}
+            {% autoescape off %}
+            {% for thread in threads.object_list %}
+                {{thread.page_html}}
+            {% endfor %}
+            {% endautoescape %}
             {% cache 86400 paginator request.page %}
             <div class="paginator">
                 <ul class="group">

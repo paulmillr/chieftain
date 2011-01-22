@@ -25,7 +25,6 @@ class SectionManager(models.Manager):
     """Section methods"""
     def by_slug(self, slug):
         return self.get(slug__iexact=slug)
-        
 
 class Thread(models.Model):
     """Groups of posts."""
@@ -38,16 +37,25 @@ class Thread(models.Model):
         return self.post_set.filter(thread=self.id)
     def postcount(self):
         return self.posts.count()
-    def last_posts(self):
+    def count(self):
         lp = 5
         ps = self.post_set
         stop = ps.count()
-        all = ps.all()
         if stop <= lp: # if we got thread with less posts than lp
-            return all
+            return {'total' : stop, 'skipped' : 0, 'skipped_files' : 0}
         else:
             start = stop - lp
-            return [all[0]] + list(all[start:stop]) # select last 5 posts
+            return {'total' : stop, 'start' : start, 'stop' : stop,
+                'skipped' : start - 1, 'skipped_files' : ps.filter(file_count__gt=0).count()}
+    def last_posts(self):
+        c = self.count()
+        s = self.post_set
+        all = s.all()
+        if c['skipped'] == 0:
+            return all
+        else:
+            start, stop = c['start'], c['stop']
+            return [s.all()[0]] + list(all[start:stop]) # select last 5 posts
         
     def __unicode__(self):
         return unicode(self.id)
@@ -58,7 +66,8 @@ class Post(models.Model):
     thread = models.ForeignKey('Thread', blank=True)
     is_op_post = models.BooleanField(default=False)
     date = models.DateTimeField(auto_now_add=True)
-    is_deleted = models.BooleanField(blank=True)
+    is_deleted = models.BooleanField(default=False)
+    file_count = models.SmallIntegerField(default=0)
     ip = models.IPAddressField()
     poster = models.CharField(max_length=32, blank=True)
     tripcode = models.CharField(max_length=32, blank=True)
@@ -66,6 +75,7 @@ class Post(models.Model):
     topic = models.CharField(max_length=48, blank=True)
     password = models.CharField(max_length=32, blank=True)
     message = models.TextField(blank=True)
+    html = models.TextField(blank=True)
     def __unicode__(self):
         return unicode(self.id)
 
