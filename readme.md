@@ -9,13 +9,12 @@ There's not much documentation yet. Use the source, Luke.
 ## Dependencies
 
 1. [django](http://www.djangoproject.com/download/)
-2. [django-denorm](https://github.com/initcrash/django-denorm)
-3. [memcached](http://memcached.org/)
-4. [py-memcached](http://pypi.python.org/pypi/python-memcached/)
+2. [memcached](http://memcached.org/)
+3. [py-memcached](http://pypi.python.org/pypi/python-memcached/)
 
 ## Licensing
 
-Copyright (c) 2011 Paul Bagwell, http://github.com/pbagwl/klipped.
+Copyright (c) 2011 Paul Bagwell, http://pbagwl.github.com/klipped/.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
