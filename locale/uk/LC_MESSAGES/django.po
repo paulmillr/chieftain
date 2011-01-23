@@ -1,0 +1,194 @@
+# Russian translation for klipped imageboard.
+# Copyright (C) 2011 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the klipped package.
+# FIRST AUTHOR <pbagwl@gmail.com>, 2011.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-01-23 19:52+0200\n"
+"PO-Revision-Date: 2011-01-23 19:52+0200\n"
+"Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
+"Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
+"Language: Ukrainian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: board/models.py:75
+msgid "thread_bump_date"
+msgstr "Дата бампу"
+
+#: board/models.py:77
+msgid "thread_is_pinned"
+msgstr "Прикріплений"
+
+#: board/models.py:79
+msgid "thread_is_closed"
+msgstr "Закритий"
+
+#: board/models.py:80
+msgid "thread_html"
+msgstr "HTML кеш"
+
+#: board/models.py:126
+msgid "post_thread"
+msgstr "Тред"
+
+#: board/models.py:128
+msgid "post_is_op_post"
+msgstr "Перший пост у треді"
+
+#: board/models.py:129
+msgid "post_date"
+msgstr "Дата"
+
+#: board/models.py:131
+msgid "post_is_deleted"
+msgstr "Видалений"
+
+#: board/models.py:134
+msgid "post_ip"
+msgstr "IP"
+
+#: board/models.py:136
+msgid "post_poster"
+msgstr "Автор"
+
+#: board/models.py:138
+msgid "post_tripcode"
+msgstr "Тріпкод"
+
+#: board/models.py:140
+msgid "post_email"
+msgstr "Емейл"
+
+#: board/models.py:142
+msgid "post_topic"
+msgstr "Тема"
+
+#: board/models.py:144
+msgid "post_password"
+msgstr "Пароль"
+
+#: board/models.py:145
+msgid "post_message"
+msgstr "Текст"
+
+#: board/models.py:146
+msgid "post_html"
+msgstr "HTML кеш"
+
+#: board/models.py:158
+msgid "file_post"
+msgstr "Пост"
+
+#: board/models.py:160
+msgid "file_original_name"
+msgstr "Оригінальна назва"
+
+#: board/models.py:161
+msgid "file_mime"
+msgstr "MIME-тип"
+
+#: board/models.py:162
+msgid "file_size"
+msgstr "Розмір"
+
+#: board/models.py:164
+msgid "file_is_deleted"
+msgstr "Видален"
+
+#: board/models.py:166
+msgid "file_image_width"
+msgstr "Ширина зображення"
+
+#: board/models.py:168
+msgid "file_image_height"
+msgstr "Висота зображення"
+
+#: board/models.py:171
+msgid "file_hash"
+msgstr "Хеш"
+
+#: board/models.py:174
+msgid "file_location"
+msgstr "Розташування"
+
+#: board/models.py:178
+msgid "filecat_name"
+msgstr "Назва"
+
+#: board/models.py:185
+msgid "filetype_extension"
+msgstr "Розширення"
+
+#: board/models.py:187
+msgid "filetype_mime"
+msgstr "MIME тип"
+
+#: board/models.py:189
+msgid "filetype_category"
+msgstr "Категорія"
+
+#: board/models.py:196
+msgid "section_slug"
+msgstr "Слаг"
+
+#: board/models.py:198
+msgid "section_name"
+msgstr "Назва"
+
+#: board/models.py:200
+msgid "section_description"
+msgstr "Опис"
+
+#: board/models.py:202
+msgid "section_group"
+msgstr "Группа"
+
+#: board/models.py:204
+msgid "section_filesize_limit"
+msgstr "Ліміт розміру файлів"
+
+#: board/models.py:206
+msgid "section_force_anonymity"
+msgstr "Форсувати анонімність"
+
+#: board/models.py:208
+msgid "section_default_poster_name"
+msgstr "Типове ім'я постеру"
+
+#: board/models.py:210
+msgid "section_allowed_filetypes"
+msgstr "Дозволені типи файлів"
+
+#: board/models.py:212
+msgid "section_bumplimit"
+msgstr "Бампліміт"
+
+#: board/models.py:214
+msgid "section_threadlimit"
+msgstr "Ліміт тредів"
+
+#: board/models.py:247
+msgid "sectiongroup_name"
+msgstr "Назва"
+
+#: board/models.py:248
+msgid "sectiongroup_order"
+msgstr "Порядок"
+
+#: board/models.py:258
+msgid "user_username"
+msgstr "Ім'я"
+
+#: board/models.py:260
+msgid "user_password"
+msgstr "Модключ"
+
+#: board/models.py:263
+msgid "user_owned_sections"
+msgstr "Секції, які модеруються"
