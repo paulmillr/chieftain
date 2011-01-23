@@ -72,10 +72,12 @@ class SectionGroupManager(models.Manager):
 class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
-    bump = models.DateTimeField(blank=True, verbose_name=_('bump_date'))
-    is_pinned = models.BooleanField(default=False, verbose_name=_('is_pinned'))
-    is_closed = models.BooleanField(default=False, verbose_name=_('is_closed'))
-    html = models.TextField(blank=True, verbose_name=_('html'))
+    bump = models.DateTimeField(blank=True, verbose_name=_('thread_bump_date'))
+    is_pinned = models.BooleanField(default=False, 
+        verbose_name=_('thread_is_pinned'))
+    is_closed = models.BooleanField(default=False, 
+        verbose_name=_('thread_is_closed'))
+    html = models.TextField(blank=True, verbose_name=_('thread_html'))
     def posts_html(self):
         return self.post_set.values('html')
         
@@ -120,19 +122,28 @@ class Thread(models.Model):
 class Post(models.Model):
     """Represents post."""
     pid = models.PositiveIntegerField()
-    thread = models.ForeignKey('Thread', blank=True)
-    is_op_post = models.BooleanField(default=False)
-    date = models.DateTimeField(auto_now_add=True)
-    is_deleted = models.BooleanField(default=False)
-    file_count = models.SmallIntegerField(default=0)
-    ip = models.IPAddressField()
-    poster = models.CharField(max_length=32, blank=True)
-    tripcode = models.CharField(max_length=32, blank=True)
-    email = models.CharField(max_length=32, blank=True)
-    topic = models.CharField(max_length=48, blank=True)
-    password = models.CharField(max_length=32, blank=True)
-    message = models.TextField()
-    html = models.TextField(blank=True)
+    thread = models.ForeignKey('Thread', blank=True, 
+        verbose_name=_('post_thread'))
+    is_op_post = models.BooleanField(default=False, 
+        verbose_name=_('post_is_op_post'))
+    date = models.DateTimeField(auto_now_add=True, verbose_name=_('post_date'))
+    is_deleted = models.BooleanField(default=False,
+        verbose_name=_('post_is_deleted'))
+    file_count = models.SmallIntegerField(default=0,
+        verbose_name=-('post_file_count'))
+    ip = models.IPAddressField(verbose_name=_('post_ip'))
+    poster = models.CharField(max_length=32, blank=True,
+        verbose_name=_('post_poster'))
+    tripcode = models.CharField(max_length=32, blank=True,
+        verbose_name=_('post_tripcode'))
+    email = models.CharField(max_length=32, blank=True,
+        verbose_name=_('post_email'))
+    topic = models.CharField(max_length=48, blank=True,
+        verbose_name=_('post_topic'))
+    password = models.CharField(max_length=32, blank=True,
+        verbose_name=_('post_password'))
+    message = models.TextField(verbose_name=_('post_message'))
+    html = models.TextField(blank=True, verbose_name=_('post_html'))
     objects = PostManager()
     def refresh_cache(self):
         """Regenerates html cache of post."""
@@ -144,44 +155,63 @@ class Post(models.Model):
 
 class File(models.Model):
     """Represents files at the board."""
-    post = models.ForeignKey('Post')
-    name = models.CharField(max_length=64) # original file name
-    mime = models.ForeignKey('FileType')
-    size = models.PositiveIntegerField()
-    is_deleted = models.BooleanField(blank=False)
-    image_width = models.PositiveSmallIntegerField(blank=False)
-    image_height = models.PositiveSmallIntegerField(blank=False)
+    post = models.ForeignKey('Post', verbose_name=_('file_post'))
+    name = models.CharField(max_length=64, 
+        verbose_name=_('file_original_name')) # original file name
+    mime = models.ForeignKey('FileType', verbose_name=_('file_mime'))
+    size = models.PositiveIntegerField(verbose_name=_('file_size'))
+    is_deleted = models.BooleanField(blank=False, 
+        verbose_name=_('file_is_deleted'))
+    image_width = models.PositiveSmallIntegerField(blank=False,
+        verbose_name=_('file_image_width'))
+    image_height = models.PositiveSmallIntegerField(blank=False,
+        verbose_name=_('file_image_height'))
     #meta = models.TextField()
-    hash = models.CharField(max_length=32, blank=False)
+    hash = models.CharField(max_length=32, blank=False,
+        verbose_name=_('file_hash'))
     file = models.FileField(upload_to=lambda *x: \
-        '{.board}/{.thread}/{.pid}.{.mime.extension}'.format(*x))
+        '{.board}/{.thread}/{.pid}.{.mime.extension}'.format(*x),
+        verbose_name=_('file_location'))
 
 class FileCategory(models.Model):
     """Category of files"""
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, verbose_name=_('filecat_name'))
     def __unicode__(self):
         return self.name
 
 class FileType(models.Model):
     """File type"""
-    extension = models.CharField(max_length=10, unique=True)
-    mime = models.CharField(max_length=250, blank=False)
-    category = models.ForeignKey('FileCategory')
+    extension = models.CharField(max_length=10, unique=True,
+        verbose_name=_('filetype_extension'))
+    mime = models.CharField(max_length=250, blank=False,
+        verbose_name=_('filetype_mime'))
+    category = models.ForeignKey('FileCategory',
+        verbose_name=_('filetype_category'))
     def __unicode__(self):
         return self.extension
 
 class Section(models.Model):
     """Board section"""
-    slug = models.SlugField(max_length=5, unique=True)
-    name = models.CharField(max_length=64)
-    description = models.TextField(blank=False)
-    group = models.ForeignKey('SectionGroup')
-    filesize_limit = models.PositiveIntegerField(default=5*2**20) # 5mb
-    anonymity = models.BooleanField(default=False)
-    default_name = models.CharField(max_length=64, default='Anonymous')
-    filetypes = models.ManyToManyField(FileCategory)
-    bumplimit = models.PositiveSmallIntegerField(default=500)
-    threadlimit = models.PositiveSmallIntegerField(default=10)
+    slug = models.SlugField(max_length=5, unique=True, 
+        verbose_name=_('section_slug'))
+    name = models.CharField(max_length=64,
+        verbose_name=_('section_name'))
+    description = models.TextField(blank=False,
+        verbose_name=_('section_description'))
+    group = models.ForeignKey('SectionGroup',
+        verbose_name=_('section_group'))
+    filesize_limit = models.PositiveIntegerField(default=5*2**20, # 5mb
+        verbose_name=_('section_filesize_limit')) 
+    anonymity = models.BooleanField(default=False,
+        verbose_name=_('section_force_anonymity'))
+    default_name = models.CharField(max_length=64, default='Anonymous',
+        verbose_name=_('section_default_poster_name'))
+    filetypes = models.ManyToManyField(FileCategory,
+        verbose_name=_('section_allowed_filetypes'))
+    bumplimit = models.PositiveSmallIntegerField(default=500,
+        verbose_name=_('section_bumplimit'))
+    threadlimit = models.PositiveSmallIntegerField(default=10,
+        verbose_name=_('section_threadlimit'))
     objects = SectionManager()
     def page_threads(self, page=1):
         onpage = 20
@@ -213,8 +243,9 @@ class Section(models.Model):
 
 class SectionGroup(models.Model):
     """Group of board sections. Example: [b / d / s] [a / aa] """
-    name = models.CharField(max_length=64, blank=False)
-    order = models.SmallIntegerField()
+    name = models.CharField(max_length=64, blank=False,
+        verbose_name=_('sectiongroup_name'))
+    order = models.SmallIntegerField(verbose_name=_('sectiongroup_order'))
     objects = SectionGroupManager()
     # determine if section hidden from menu or not
     is_hidden = models.BooleanField(default=False)
@@ -223,13 +254,15 @@ class SectionGroup(models.Model):
 
 class User(models.Model):
     """User (moderator etc.)"""
-    username = models.CharField(max_length=32, unique=True)
-    password = models.CharField(max_length=32)
+    username = models.CharField(max_length=32, unique=True,
+        verbose_name=_('user_username'))
+    password = models.CharField(max_length=32,
+        verbose_name=_('user_password'))
     # sections, modded by user
-    sections = models.ManyToManyField('Section', blank=False)
+    sections = models.ManyToManyField('Section', blank=False,
+        verbose_name=_('user_owned_sections'))
     def __unicode__(self):
         return self.username
-
 
 class PostForm(ModelForm):
     class Meta:

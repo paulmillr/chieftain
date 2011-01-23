@@ -1,27 +1,199 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Russian translation for klipped imageboard.
+# Copyright (C) 2011 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the klipped package.
+# FIRST AUTHOR <pbagwl@gmail.com>, 2011.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-23 15:59+0200\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
-"Language: \n"
+"POT-Creation-Date: 2011-01-23 19:23+0200\n"
+"PO-Revision-Date: 2011-01-23 19:23+0200\n"
+"Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
+"Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
+"Language: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: board/models.py:72
-msgid "bump_date"
+#: board/models.py:75
+#, fuzzy
+msgid "thread_bump_date"
+msgstr "Дата последнего бампа"
+
+#: board/models.py:77
+#, fuzzy
+msgid "thread_is_pinned"
+msgstr "Прикреплен"
+
+#: board/models.py:79
+msgid "thread_is_closed"
+msgstr "Закрыт"
+
+#: board/models.py:80
+msgid "thread_html"
+msgstr "HTML-кэш"
+
+#: board/models.py:126
+msgid "post_thread"
+msgstr "Тред"
+
+#: board/models.py:128
+msgid "post_is_op_post"
+msgstr "Стартует тред"
+
+#: board/models.py:129
+#, fuzzy
+msgid "post_date"
 msgstr "Дата бампа"
 
-#: board/models.py:73
-msgid "is_pinned"
-msgstr "Прикреплен ли?"
+#: board/models.py:131
+msgid "post_is_deleted"
+msgstr "Удален"
+
+#: board/models.py:134
+msgid "post_ip"
+msgstr "IP-адрес"
+
+#: board/models.py:136
+msgid "post_poster"
+msgstr "Автор"
+
+#: board/models.py:138
+msgid "post_tripcode"
+msgstr "Трипкод"
+
+#: board/models.py:140
+msgid "post_email"
+msgstr "Электропочта"
+
+#: board/models.py:142
+msgid "post_topic"
+msgstr "Тема"
+
+#: board/models.py:144
+msgid "post_password"
+msgstr "Пароль"
+
+#: board/models.py:145
+msgid "post_message"
+msgstr "Текст"
+
+#: board/models.py:146
+msgid "post_html"
+msgstr "HTML-кэш"
+
+#: board/models.py:158
+msgid "file_post"
+msgstr "Сообщение"
+
+#: board/models.py:160
+msgid "file_original_name"
+msgstr "Оригинальное имя"
+
+#: board/models.py:161
+msgid "file_mime"
+msgstr "MIME-тип"
+
+#: board/models.py:162
+msgid "file_size"
+msgstr "Размер"
+
+#: board/models.py:164
+msgid "file_is_deleted"
+msgstr "Удален"
+
+#: board/models.py:166
+msgid "file_image_width"
+msgstr "Ширина изображения"
+
+#: board/models.py:168
+msgid "file_image_height"
+msgstr "Высота изображения"
+
+#: board/models.py:171
+msgid "file_hash"
+msgstr "Хэш"
+
+#: board/models.py:174
+msgid "file_location"
+msgstr "Расположение"
+
+#: board/models.py:178
+msgid "filecat_name"
+msgstr "Название"
+
+#: board/models.py:185
+msgid "filetype_extension"
+msgstr "Расширение"
+
+#: board/models.py:187
+msgid "filetype_mime"
+msgstr "MIME-тип"
+
+#: board/models.py:189
+msgid "filetype_category"
+msgstr "Категория"
+
+#: board/models.py:196
+msgid "section_slug"
+msgstr "Адрес"
+
+#: board/models.py:198
+msgid "section_name"
+msgstr "Название"
+
+#: board/models.py:200
+msgid "section_description"
+msgstr "Описание"
+
+#: board/models.py:202
+msgid "section_group"
+msgstr "Группа"
+
+#: board/models.py:204
+msgid "section_filesize_limit"
+msgstr "Лимит на размер файлов"
+
+#: board/models.py:206
+msgid "section_force_anonymity"
+msgstr "Принудительная анонимность"
+
+#: board/models.py:208
+msgid "section_default_poster_name"
+msgstr "Имя автора по-умолчанию"
+
+#: board/models.py:210
+msgid "section_allowed_filetypes"
+msgstr "Разрешенные типы файлов"
+
+#: board/models.py:212
+msgid "section_bumplimit"
+msgstr "Бамплимит"
+
+#: board/models.py:214
+msgid "section_threadlimit"
+msgstr "Лимит тредов в разделе"
+
+#: board/models.py:247
+msgid "sectiongroup_name"
+msgstr ""
+
+#: board/models.py:248
+msgid "sectiongroup_order"
+msgstr "Название"
+
+#: board/models.py:258
+msgid "user_username"
+msgstr "Имя пользователя"
+
+#: board/models.py:260
+msgid "user_password"
+msgstr "Модключ"
+
+#: board/models.py:263
+msgid "user_owned_sections"
+msgstr "Модерируемые секции"
