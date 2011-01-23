@@ -1,9 +1,12 @@
 {% extends 'base.html' %}
-{% block title %}Секция{% endblock %}
+{% block title %}{% endblock %}
 {% block content %}
 {% load cache %}
+{% if not threads %}<a href="./">Назад</a>{% endif %}
 {% cache 86400 form %}
-            <form>
+            <form novalidate method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                {{formset.management_form}}
                 <fieldset class="new-post">
                     <dl class="username-d">
                         <dt><label for="username">Имя</label></dt>
@@ -15,7 +18,7 @@
 
                     <dl class="email-d">
                         <dt><label for="email">Электропочта</label></dt>
-                        <dd><input type="text" name="email" id="email" size="16" maxlength="32"></dd>
+                        <dd><input type="email" name="email" id="email" size="16" maxlength="32"></dd>
                     </dl>
                     
                     <dl class="topic-d">
@@ -40,8 +43,8 @@
                                 <a href="#" class="sub" title="Сабскрипт">Sub</a>
                                 <a href="#" class="code" title="Код">Код</a>
                             </div>
-                            <textarea name="message" id="message" class="message" rows="8" cols="40"></textarea>
-                            <input name="gb2" value="thread" type="hidden">
+                            <textarea name="message" id="message" class="message" rows="8" cols="40" required></textarea>
+                            {% if thread %}<input name="thread" id="thread" value="{{thread.id}}" type="hidden">{% endif %}
                         </dd>
                     </dl>
 
@@ -65,22 +68,28 @@
                 </fieldset>
             </form>
             {% endcache %}
-            {% autoescape off %}
-            {% for thread in threads.object_list %}
-                {{thread.page_html}}
-            {% endfor %}
-            {% endautoescape %}
-            {% cache 86400 paginator request.page %}
-            <div class="paginator">
-                <ul class="group">
-                {% for p in threads.paginator.page_range %}
-                    {% if p != threads.number %}
-                        <li><a href="page{{p}}">{{p}}</a></li>
-                    {% else %}
-                        <li><span>{{p}}</span></li>
-                    {% endif %}
-                {% endfor %}
-                </ul>
-            </div>
-            {% endcache %}
+            {{section.description}}
+            
+            {% if threads %}
+                {% autoescape off %}
+                <div class="threads">
+                    {% for thread in threads.object_list %}
+                        {{thread.html}}
+                    {% endfor %}
+                </div>
+                {% endautoescape %}
+                <div class="paginator">
+                    <ul class="group">
+                    {% for p in threads.paginator.page_range %}
+                        {% if p != threads.number %}
+                            <li><a href="page{{p}}">{{p}}</a></li>
+                        {% else %}
+                            <li><span>{{p}}</span></li>
+                        {% endif %}
+                    {% endfor %}
+                    </ul>
+                </div>
+            {% else %}
+                {% autoescape off %}{% block thread %}{% endblock %}{% endautoescape %}
+            {% endif %}
 {% endblock %}

@@ -240,6 +240,7 @@ em {font-style: italic;}
 .right {float: right;}
 .dashed { border: 1px dashed; }
 
+
 /* yeah */
 #container > b { display: block; position: fixed; top: 50%; left: -1em; width: 1em; height: 100%; z-index: -1; background: #f60; -webkit-transform: scale(1.5) rotate(-45deg); -webkit-transform-origin: 20% 0%; -moz-transform: scale(1.5) rotate(-45deg); -moz-transform-origin: 20% 0%; border: 1px dotted #f60; }
 #container > b.border-b { -webkit-transform: scale(1.5) rotate(45deg); -webkit-transform-origin: 80% 0%; -moz-transform: scale(1.5) rotate(45deg); -moz-transform-origin: 80% 0%; left: auto; right: -1em; }
@@ -248,7 +249,7 @@ em {font-style: italic;}
 
 /* Top */
 #container header {border-bottom: 1px solid #aaa; margin-bottom: 5px; padding-bottom: 5px;}
-.logo {max-width: 400px; float: left;}
+.logo {display: table; margin: 0 auto;}
 .section-banner {width: 300px; height: 100px; margin: 0 auto;}
 .search {float:right; width: 215px;}
 
@@ -265,8 +266,9 @@ nav li {float: left;}
 .group a, .group span {font-size: 1em; padding: 0 0 0 1em; white-space: nowrap; line-height: 2em; text-decoration: none; font-weight: bold; }
 
 #container-wrap {float: left; width: 100%;}
-#container-wrap > * {margin-left: 200px;}
+#container-wrap > * {margin-left: 200px; margin-right: 10px;}
 #sidebar {width: 200px; float: left; font-size: 1.1em; margin-left: -100%;}
+#sidebar .hidebutton {float: right;}
 #sidebar h2 {margin-bottom: 10px;}
 #sidebar h4 {margin-bottom: 1px;}
 #sidebar li {list-style: none;}
@@ -282,7 +284,8 @@ nav li {float: left;}
 .post:after {clear: both;}
 .post .number:before {content: "№";}
 .post .number {font-weight: bold;}
-.post .number:hover {color: #06f; cursor: pointer;}
+.post .number a, .post .number a:visited {color: inherit;}
+.post .number a:hover {color: #06f;}
 .post .title {font-weight: bold;}
 .post .text {display: inline-block; margin-top: 20px;}
 .post .text, .post .text * {vertical-align:top;}
@@ -312,6 +315,9 @@ fieldset dt {width: 150px; font-weight: bold;}
 
 fieldset.settings dt {width: auto;}
 
+footer .copyright {text-align: center;}
+footer .copyright a {text-decoration: underline;}
+
 /*
  * media queries for responsive design
  * these follow after primary styles so they will successfully override.
@@ -333,6 +339,7 @@ fieldset.settings dt {width: auto;}
     /* j.mp/textsizeadjust
     html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } */
     .section-banner {display: none;}
+    .fieldset dl {display: none;}
 }
 
 /*

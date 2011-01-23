@@ -36,12 +36,6 @@ def new_post(**kwargs):
     """Creates new post"""
     pass
 
-def is_op_post(post):
-    """Checks if current post starts thread"""
-    if isinstance(post, str):
-        post = Post.objects.get(pk=post)
-    return post.is_op_post
-
 def del_post(id, key):
     """Removes some post."""
     p = Post.objects.get(pk=id)
@@ -53,37 +47,3 @@ def del_post(id, key):
     else:
         raise InvalidKeyError
 
-@cached(60*60*24)
-def sections(categories=False):
-    """Gets list of board sections."""
-    if not categories:
-        return Section.objects.all().order_by('slug')
-    obj = SectionGroup.objects.all().order_by('order')
-    data = [] # http://goo.gl/CpPq6
-    for g in obj:
-        d = {
-            'id' : g.id,
-            'name' : g.name, 
-            'order' : g.order, 
-            'is_hidden' : g.is_hidden,
-            'sections' : list(g.sections())
-        }
-        data.append(d)
-    return data
-
-def post(id, section_slug=''):
-    """Gets post by its primary key.
-    
-       There can be two variants:
-       - Getting by primary key:
-       >>> post(r, 85930)
-       - Getting by board slug and board post id
-       >>> post(r, 40200, 'b')
-    """
-    args = {}
-    if section_slug:
-        args['section__slug__iexact'] = section_slug
-        args['pid'] = id
-    else:
-        args['pk'] = id
-    return Post.objects.get(**args)

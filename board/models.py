@@ -3,7 +3,12 @@ from django.db import models, connection
 from django.db.models.query import QuerySet
 from django.core.paginator import Paginator
 from django.core.cache import cache
+from django.forms import ModelForm
+from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
+
+DAY = 86400 # seconds in day
 
 def cached(seconds = 900):
     """
@@ -21,22 +26,62 @@ def cached(seconds = 900):
         return x
     return doCache
 
+class PostManager(models.Manager):
+    @cached(3 * DAY)
+    def thread_id(self, slug, op_post):
+        """Gets thread id by slug and op_post pid."""
+        try:
+            t = self.get(thread__section__slug=slug, pid=op_post, 
+                is_op_post=True).thread.id
+        except (Post.DoesNotExist), e:
+            raise e
+        else:
+            return t
+
 class SectionManager(models.Manager):
-    """Section methods"""
-    def by_slug(self, slug):
-        return self.get(slug__iexact=slug)
+    @cached(DAY)
+    def sections(self):
+        """Gets list of board sections.
+
+           We're not using QuerySet because they cannot be cached.
+        """
+        return Section.objects.all().order_by('slug')
+
+class SectionGroupManager(models.Manager):
+    """docstring for SectionGroupManager"""
+    @cached(DAY)
+    def sections(self):
+        """Gets list of board sections.
+
+           We're not using QuerySet because they cannot be cached.
+        """
+        groups = SectionGroup.objects.all().order_by('order')
+        data = [] # http://goo.gl/CpPq6
+        for group in groups:
+            d = {
+                'id' : group.id,
+                'name' : group.name, 
+                'order' : group.order, 
+                'is_hidden' : group.is_hidden,
+                'sections' : list(group.section_set.values())
+            }
+            data.append(d)
+        return data
+        
 
 class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
-    bump = models.DateTimeField(blank=True)
-    is_pinned = models.BooleanField(default=False)
-    is_closed = models.BooleanField(default=False)
-    page_html = models.TextField(blank=True)
-    def posts(self):
-        return self.post_set.filter(thread=self.id)
+    bump = models.DateTimeField(blank=True, verbose_name=_('bump_date'))
+    is_pinned = models.BooleanField(default=False, verbose_name=_('is_pinned'))
+    is_closed = models.BooleanField(default=False, verbose_name=_('is_closed'))
+    html = models.TextField(blank=True, verbose_name=_('html'))
+    def posts_html(self):
+        return self.post_set.values('html')
+        
     def postcount(self):
-        return self.posts.count()
+        return self.post_set.count()
+        
     def count(self):
         lp = 5
         ps = self.post_set
@@ -45,18 +90,30 @@ class Thread(models.Model):
             return {'total' : stop, 'skipped' : 0, 'skipped_files' : 0}
         else:
             start = stop - lp
-            return {'total' : stop, 'start' : start, 'stop' : stop,
-                'skipped' : start - 1, 'skipped_files' : ps.filter(file_count__gt=0).count()}
+            return {
+                'total' : stop, 'start' : start, 'stop' : stop,
+                'skipped' : start - 1, 
+                'skipped_files' : ps.filter(file_count__gt=0).count()
+            }
+    
+    def op_post(self):
+        return self.post_set.all()[0]
+        
     def last_posts(self):
         c = self.count()
         s = self.post_set
         all = s.all()
         if c['skipped'] == 0:
             return all
-        else:
+        else: # select first one and last 5 posts
             start, stop = c['start'], c['stop']
-            return [s.all()[0]] + list(all[start:stop]) # select last 5 posts
-        
+            return [s.all()[0]] + list(all[start:stop])
+    
+    def refresh_cache(self):
+        """Regenerates cache of OP-post and last 5."""
+        self.html = render_to_string('section_thread.html', {'thread' : self})
+        self.save()
+    
     def __unicode__(self):
         return unicode(self.id)
 
@@ -74,8 +131,14 @@ class Post(models.Model):
     email = models.CharField(max_length=32, blank=True)
     topic = models.CharField(max_length=48, blank=True)
     password = models.CharField(max_length=32, blank=True)
-    message = models.TextField(blank=True)
+    message = models.TextField()
     html = models.TextField(blank=True)
+    objects = PostManager()
+    def refresh_cache(self):
+        """Regenerates html cache of post."""
+        self.html = render_to_string('post.html', {'post' : self})
+        self.save()
+        
     def __unicode__(self):
         return unicode(self.id)
 
@@ -120,12 +183,31 @@ class Section(models.Model):
     bumplimit = models.PositiveSmallIntegerField(default=500)
     threadlimit = models.PositiveSmallIntegerField(default=10)
     objects = SectionManager()
-    def threads(self):
-        return self.thread_set.filter(section=self.id)
     def page_threads(self, page=1):
         onpage = 20
-        threads = Paginator(Thread.objects.filter(section=self.id), onpage)
+        threads = Paginator(self.thread_set.all(), onpage)
         return threads.page(page)
+    
+    def get_cache_key(self):
+        return 'section_last_{slug}'.format(slug=self.slug)
+    
+    def last_post_pid(self):
+        """
+           Gets last post pid. Pid is unique to section. 
+           This method is cached.
+        """
+        d = cache.get(self.get_cache_key())
+        if d is not None:
+            return d
+        return self.refresh_cache()
+    
+    def refresh_cache(self):
+        """Refreshes cache of section-last_post_pid."""
+        p = Post.objects.filter(thread__section=self.id)
+        pid = p[p.count()-1].pid # get last post
+        cache.set(self.get_cache_key(), pid)
+        return pid
+        
     def __unicode__(self):
         return self.slug
 
@@ -133,8 +215,7 @@ class SectionGroup(models.Model):
     """Group of board sections. Example: [b / d / s] [a / aa] """
     name = models.CharField(max_length=64, blank=False)
     order = models.SmallIntegerField()
-    def sections(self):
-        return self.section_set.values()
+    objects = SectionGroupManager()
     # determine if section hidden from menu or not
     is_hidden = models.BooleanField(default=False)
     def __unicode__(self):
@@ -148,3 +229,8 @@ class User(models.Model):
     sections = models.ManyToManyField('Section', blank=False)
     def __unicode__(self):
         return self.username
+
+
+class PostForm(ModelForm):
+    class Meta:
+        model = Post

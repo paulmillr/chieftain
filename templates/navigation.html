@@ -4,7 +4,9 @@
         <li><a href="/faq" title="">ЧАВО</a></li>
         <li><a href="#nsfw" id="nsfw" title="Понизить / повысить прозрачность у всех картинок. Хорошо подходит когда за спиной сидит кто-то, кому не хотелось бы показывать контент имиджборды.">NSFW</a></li>
         <li><a href="/settings" title="">Настройки</a></li>
-        <li><a href="#bookmarks" id="bookmarks" title="">Закладки</a></li>
+        <li><a href="/settings?hideSidebar=on" class="hideSidebar">Боковая панель</a></li>
+        <li><a href="/mobile/">Мобильная версия</a></li>
+        <!--<li><a href="#bookmarks" id="bookmarks" title="">Закладки</a></li>-->
     </ul>
     {% for group in navigation %}
     {% if not group.is_hidden %}

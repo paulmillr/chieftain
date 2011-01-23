@@ -226,9 +226,20 @@ function init() {
         textArea.wrap(this.className);
     });
     
-    $('.thread').delegate('.edit', 'click', function(event) {
+    $('#main > .thread').delegate('.edit', 'click', function(event) {
         event.preventDefault();
         var c = new Canvas;
+    });
+    
+    $('#main > .thread').delegate('.number', 'click', function(e) {
+        e.preventDefault();
+        textArea.insert('>>' + e.srcElement.innerHTML)
+        
+        if (!$.settings('oldInsert')) {
+            var n = $('#post'+$(this).text()),
+                f = $('.new-post').remove();
+            f.insertAfter(n);
+        }
     });
     
     // sidebar-related
@@ -236,6 +247,7 @@ function init() {
         return false;
     }
     set = set.split(',');
+    
     for (var i = 0; i < set.length; i++) {
         $('#list-group' + set[i]).slideToggle(0);
     }
@@ -245,7 +257,28 @@ function initSettings() {
     // those things depend on cookie settings
     var s = parseQs(), 
         settings = $('.settings dd').find('select, input'),
-        changes;
+        changes = { // description of all functions on settings pages
+            'hideSidebar' : function(x) {
+                var margin = (x) ? '10px' : '200px';
+
+                $('#sidebar').toggle(0, null, function(x) {
+                    $('#container-wrap > *').css({'marginLeft' : margin});
+                });
+            },
+
+            'hideNav' : function(x) {
+                $('nav').toggle();
+            },
+
+            'hideGroups' : function(x) {
+                //x.split(',') // 1:y
+                //hideSectGroup()
+            },
+
+            'hideSectBanner' : function(x) {
+                $('.section-banner').toggle();
+            },
+        };
         
     for (var x in s) {
         $.settings(x, s[x]);
@@ -268,7 +301,7 @@ function initSettings() {
                 this.checked = s
             }
         }
-    })
+    });
     
     
     settings.change(function(event) {
@@ -278,6 +311,15 @@ function initSettings() {
         }
         console.log('Setting "' + this.id + '" changed to ', value);
         $.settings(this.id, value);
+    });
+    
+    $('.hideSidebar').click(function(e) {
+        e.preventDefault();
+        var k = 'hideSidebar',
+            c = $.settings(k),
+            v = c == '' ? 'on' : '',
+            f = changes[k];
+        f($.settings('hideSidebar', v));
     });
     
     $('#sidebar h4').click(function(e) {
@@ -298,42 +340,17 @@ function initSettings() {
         ul.slideToggle(500);
     });
     
-    $('.thread').delegate('.post .number', 'click', function(e) {
-        e.preventDefault();
-        textArea.insert('>>' + e.srcElement.innerHTML)
-        
-        if (!$.settings('oldInsert')) {
-            var n = $('#post'+$(this).text()),
-                f = $('.new-post').remove();
-            f.insertAfter(n);
+    for (var id in changes) {
+        var func = changes[id],
+            c = $.settings(id);
+        regChangeEvent(id, func);
+        if (c) {
+            console.log($('#'+id));
+            func(id);
         }
-    });
+    }
     
-    // description of all functions on settings pages
-    changes = [
-        ['hideSidebar', function(x) {
-            var margin = (x) ? '10px' : '200px';
-            
-            $('#sidebar').toggle(0, null, function(x) {
-                $('#container-wrap > *').css({'marginLeft' : margin});
-            });
-        }],
-        
-        ['hideNav', function(x) {
-            $('nav').toggle();
-        }],
-        
-        ['hideGroups', function(x) {
-            //x.split(',') // 1:y
-            //hideSectGroup()
-        }],
-        
-        ['hideSectBanner', function(x) {
-            $('.section-banner').toggle();
-        }],
-    ];
-    
-    for (var i=0; i < changes.length; i++) {
+    /*for (var i=0; i < changes.length; i++) {
         var t = changes[i], 
             id = t[0],
             func = t[1];
@@ -344,7 +361,7 @@ function initSettings() {
             console.log($('#'+id))
             func(t);
         }
-    }
+    }*/
 }
 
 function initStyle() {

@@ -1,0 +1,12 @@
+{% extends "section.html" %}
+{% block title %}Тред {{thread.op_post.pid}}{% endblock %}
+
+{% block thread %}
+
+<section class="thread" id="thread{{thread.id}}">
+    {% for post in thread.posts_html %}
+        {{post.html}}
+    {% endfor %}
+</section>
+
+{% endblock %}

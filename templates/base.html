@@ -1,4 +1,4 @@
-{% load cache %}{% cache 3600 header %}<!DOCTYPE html>  
+{% load cache %}{% cache 86400 header %}<!DOCTYPE html>  
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
@@ -6,7 +6,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>Говно</title>
+    <title>Два.ч 2.0</title>
     <meta name="description" content="Два.ч - система анонимных форумов.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ MEDIA_URL }}favicon.ico">
@@ -22,16 +22,16 @@
         <div id="container-wrap">
             <header class="clearfix">
                 {% include "navigation.html" %}
-                <div class="logo"><h1><a href="./">Два.ч — Бред</a></h1></div>
+                <div class="logo"><h1><a href="./">Два.ч&nbsp;&mdash; {% block title %}{% endblock %}</a></h1></div>
                 <div class="menu"></div>
                 <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{ MEDIA_URL }}images/aa.png" alt="/aa/"></a></div>
             </header>
-            <div id="main" role="main">
-            {% endcache %}{% block content %}{% endblock %}{% cache 3600 footer %}
+            <div id="main" role="main">{% endcache %}
+            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Всего: %(totTime).2f Питон: %(pyTime).2f База: %(dbTime).2f Запросов: %(queries)d</div> -->{% cache 86400 footer %}
             </div>
             <footer>
                 {% include "navigation.html" %}
-                <!-- STATS: <div class="stats">Всего: %(totTime).2f Питон: %(pyTime).2f База: %(dbTime).2f Запросов: %(queries)d</div> -->
+                <p class="copyright">Бегает на <a href="http://github.com/pbagwl/klipped">klipped 1.0</a>.</p>
             </footer>
         </div>
         <div id="sidebar">{% include "sidebar.html" %}</div>
@@ -39,7 +39,7 @@
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>-->
     <script>!window.jQuery && document.write(unescape('%3Cscript src="{{ MEDIA_URL }}js/libs/jquery-1.4.4.js"%3E%3C/script%3E'))</script>
     <script src="{{ MEDIA_URL }}js/plugins.js"></script>
-    <script src="{{ MEDIA_URL }}js/script.js?v=1"></script>
+    <script src="{{ MEDIA_URL }}js/script.js?v=2"></script>
     <!--[if lt IE 7 ]>
       <script src="{{ MEDIA_URL }}js/libs/dd_belatedpng.js"></script>
       <script>DD_belatedPNG.fix('img, .png_bg'); // Fix any <img> or .png_bg bg-images. Also, please read goo.gl/mZiyb </script>

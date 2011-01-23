@@ -4,8 +4,8 @@
         <div class="post-wrapper">
             <header class="clearfix">
                 <div class="info-wrapper">
-                    <span class="number" data-id="{{post.id}}">{{post.pid}}</span>
-                    <time datetime="2010-11-24T09:38:51-03:00" pubdate>{{post.date}}</time>
+                    <span class="number" data-id="{{post.id}}"><a href="{{thread.op_post.pid}}{% if not post.is_op_post %}#post{{post.pid}}{% endif %}">{{post.pid}}</a></span>
+                    <time datetime="{{post.date|date:'Y-m-d H:i:s'}}" pubdate>{{post.date}}</time>
                     <span class="name" data-default="true">{{post.poster}}</span>
                     <span class="title">{{post.topic}}</span>
                 </div>
