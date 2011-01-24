@@ -1,4 +1,4 @@
-{% load cache %}{% cache 86400 header %}<!DOCTYPE html>  
+{% load cache %}{% load i18n %}{% cache 86400 header %}<!DOCTYPE html>  
 <!--[if lt IE 7 ]> <html lang="en" class="no-js ie6"> <![endif]-->
 <!--[if IE 7 ]>    <html lang="en" class="no-js ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" class="no-js ie8"> <![endif]-->
@@ -27,11 +27,11 @@
                 <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{ MEDIA_URL }}images/aa.png" alt="/aa/"></a></div>
             </header>
             <div id="main" role="main">{% endcache %}
-            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Всего: %(totTime).2f Питон: %(pyTime).2f База: %(dbTime).2f Запросов: %(queries)d</div> -->{% cache 86400 footer %}
+            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Всего: %(totTime).2f Питон: %(pyTime).2f База: %(dbTime).2f Запросов: %(queries)d</div> -->
             </div>
             <footer>
                 {% include "navigation.html" %}
-                <p class="copyright">Бегает на <a href="http://github.com/pbagwl/klipped">klipped 1.0</a>.</p>
+                <p class="copyright">{% trans "Runs on" %} <a href="http://pbagwl.github.com/klipped/">klipped</a> &copy; Paul Bagwell</p>
             </footer>
         </div>
         <div id="sidebar">{% include "sidebar.html" %}</div>
@@ -54,4 +54,4 @@
       })(document, 'script');
     </script>-->
 </body>
-</html>{% endcache %}
+</html>

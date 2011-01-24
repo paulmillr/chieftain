@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-23 20:51+0200\n"
+"POT-Creation-Date: 2011-01-24 02:20+0200\n"
 "PO-Revision-Date: 2011-01-23 20:51+0200\n"
 "Last-Translator: Anonymous <nomad@ag.ru>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -19,179 +19,314 @@ msgstr ""
 
 #: board/models.py:75
 #, fuzzy
-msgid "thread_bump_date"
-msgstr "最後のバンプのスレッド" # saigo no banpu no sureddo
+msgid "Thread bump date"
+msgstr "最後のバンプのスレッド"
 
+# saigo no banpu no sureddo
 #: board/models.py:77
 #, fuzzy
-msgid "thread_is_pinned"
-msgstr "スレッドが固定されている" # sureddo ga kotei sa rete iru
+msgid "Thread is pinned"
+msgstr "スレッドが固定されている"
 
+# sureddo ga kotei sa rete iru
 #: board/models.py:79
-msgid "thread_is_closed"
-msgstr "スレッドが閉じている" # sureddo ga tojite iru
+msgid "Thread is closed"
+msgstr "スレッドが閉じている"
 
+# sureddo ga tojite iru
 #: board/models.py:80
-msgid "thread_html"
-msgstr "HTMLベースのキャッシュ" # HTML bēsu no kyasshu
+msgid "Thread html"
+msgstr "HTMLベースのキャッシュ"
 
+# HTML bēsu no kyasshu
 #: board/models.py:126
-msgid "post_thread"
-msgstr "スレッド" # sureddo
+msgid "Post thread"
+msgstr "スレッド"
 
+# sureddo
 #: board/models.py:128
-msgid "post_is_op_post"
-msgstr "スレッドが開始" # sureddo ga kaishi
+msgid "Post is op post"
+msgstr "スレッドが開始"
 
+# sureddo ga kaishi
 #: board/models.py:129
 #, fuzzy
-msgid "post_date"
-msgstr "メッセージの日付" # messēji no hizuke
+msgid "Post bump date"
+msgstr "メッセージの日付"
 
+# messēji no hizuke
 #: board/models.py:131
-msgid "post_is_deleted"
-msgstr "ポストは削除されます" # posuto wa sakujo sa remasu
+msgid "Post is deleted"
+msgstr "ポストは削除されます"
 
+# sureddo
+#: board/models.py:133
+#, fuzzy
+msgid "Post file count"
+msgstr "スレッドが開始"
+
+# posuto wa sakujo sa remasu
 #: board/models.py:134
-msgid "post_ip"
-msgstr "IPアドレス" # IP-adoresu
+msgid "Post ip"
+msgstr "IPアドレス"
 
+# IP-adoresu
 #: board/models.py:136
-msgid "post_poster"
-msgstr "著者" # chosha
+msgid "Post poster"
+msgstr "著者"
 
+# chosha
 #: board/models.py:138
-msgid "post_tripcode"
-msgstr "ポスト旅行コード"　# posuto no ryokō kōdo?
+msgid "Post tripcode"
+msgstr "ポスト旅行コード"
 
 #: board/models.py:140
-msgid "post_email"
-msgstr "ポストの電子メール" # posuto no denshi mēru
+msgid "Post email"
+msgstr "ポストの電子メール"
 
+# posuto no denshi mēru
 #: board/models.py:142
-msgid "post_topic"
-msgstr "ポストのトピック" # posuto no topikku
+msgid "Post topic"
+msgstr "ポストのトピック"
 
+# posuto no topikku
 #: board/models.py:144
-msgid "post_password"
-msgstr "投稿のパスワード" # tōkō no pasuwādo
+msgid "Post password"
+msgstr "投稿のパスワード"
 
+# tōkō no pasuwādo
 #: board/models.py:145
-msgid "post_message"
-msgstr "ポストのメッセージ" # posuto no messēji
+msgid "Post message"
+msgstr "ポストのメッセージ"
 
+# posuto no messēji
 #: board/models.py:146
-msgid "post_html"
-msgstr "ポストのHTML" # posuto no HTML
+msgid "Post html"
+msgstr "ポストのHTML"
 
+# posuto no HTML
 #: board/models.py:158
-msgid "file_post"
-msgstr "ポストのファイル" # posuto no fairu
+msgid "File post"
+msgstr "ポストのファイル"
 
+# posuto no fairu
 #: board/models.py:160
-msgid "file_original_name"
-msgstr "ファイル名" # fairu-mei
+msgid "File original name"
+msgstr "ファイル名"
 
+# fairu-mei
 #: board/models.py:161
-msgid "file_mime"
-msgstr "MIMEタイプ" # MIME taipu
+msgid "File MIME"
+msgstr "MIMEタイプ"
 
+# MIME taipu
 #: board/models.py:162
 msgid "file_size"
-msgstr "ファイルサイズ" # fairusaizu
+msgstr "ファイルサイズ"
 
+# fairusaizu
 #: board/models.py:164
-msgid "file_is_deleted"
-msgstr "ファイルが削除されます" # fairu ga sakujo sa remasu
+msgid "File is deleted"
+msgstr "ファイルが削除されます"
 
+# fairu ga sakujo sa remasu
 #: board/models.py:166
-msgid "file_image_width"
-msgstr "幅" # haba
+msgid "File image width"
+msgstr "幅"
 
+# haba
 #: board/models.py:168
-msgid "file_image_height"
-msgstr "高さ" # taka-sa
+msgid "File image height"
+msgstr "高さ"
 
+# taka-sa
 #: board/models.py:171
-msgid "file_hash"
-msgstr "ファイルのハッシュ" # fairu no hashhu
+msgid "File hash"
+msgstr "ファイルのハッシュ"
 
+# fairu no hashhu
 #: board/models.py:174
-msgid "file_location"
-msgstr "ファイルの場所" # fairu no basho
+msgid "File location"
+msgstr "ファイルの場所"
 
+# fairu no basho
 #: board/models.py:178
-msgid "filecat_name"
-msgstr "ネーム" # nēmu
+msgid "File category name"
+msgstr "ネーム"
 
+# nēmu
 #: board/models.py:185
-msgid "filetype_extension"
-msgstr "拡張子" # kakuchō-ko
+msgid "File type extension"
+msgstr "拡張子"
 
+# kakuchō-ko
 #: board/models.py:187
-msgid "filetype_mime"
+msgid "File type MIME"
 msgstr "MIMEタイプ"
 
 #: board/models.py:189
-msgid "filetype_category"
-msgstr "カテゴリ" # categori
+msgid "File type category"
+msgstr "カテゴリ"
 
+# categori
 #: board/models.py:196
-msgid "section_slug"
-msgstr "ナメクジ" # namekuji
+msgid "Section slug"
+msgstr "ナメクジ"
 
+# namekuji
 #: board/models.py:198
-msgid "section_name"
-msgstr "名" # na
+msgid "Section name"
+msgstr "名"
 
+# na
 #: board/models.py:200
-msgid "section_description"
-msgstr "説明" # setsumei
+msgid "Section description"
+msgstr "説明"
 
+# setsumei
 #: board/models.py:202
-msgid "section_group"
-msgstr "グループ" # gurūpu
+msgid "Section group"
+msgstr "グループ"
 
+# gurūpu
 #: board/models.py:204
-msgid "section_filesize_limit"
-msgstr "ファイルのサイズ制限" # fairu no saizu seigen
+msgid "Section filesize limit"
+msgstr "ファイルのサイズ制限"
 
+# fairu no saizu seigen
 #: board/models.py:206
-msgid "section_force_anonymity"
-msgstr "力匿名" # chikara tokumei
+msgid "Section force anonymity"
+msgstr "力匿名"
 
+# chikara tokumei
 #: board/models.py:208
-msgid "section_default_poster_name"
-msgstr "デフォルトの作成者の名前" # deforuto no sakusei-sha no namae
+msgid "Section default poster name"
+msgstr "デフォルトの作成者の名前"
 
+# deforuto no sakusei-sha no namae
 #: board/models.py:210
-msgid "section_allowed_filetypes"
-msgstr "許可されたファイルの種類" # kyoka sa reta fairu no shurui
+msgid "Section allowed filetypes"
+msgstr "許可されたファイルの種類"
 
+# kyoka sa reta fairu no shurui
 #: board/models.py:212
-msgid "section_bumplimit"
-msgstr "制限バンプ" # seigen bampu
+msgid "Section bumplimit"
+msgstr "制限バンプ"
 
+# seigen bampu
 #: board/models.py:214
-msgid "section_threadlimit"
-msgstr "スレッドは制限" # surredo wa seigen
+msgid "Section thread limit"
+msgstr "スレッドは制限"
 
+# surredo wa seigen
 #: board/models.py:247
-msgid "sectiongroup_name"
-msgstr "名" # na
+msgid "Section group name"
+msgstr "名"
 
+# na
 #: board/models.py:248
-msgid "sectiongroup_order"
-msgstr "順序" # junjo
+msgid "Section group order"
+msgstr "順序"
 
+# junjo
 #: board/models.py:258
-msgid "user_username"
-msgstr "ユーザー名" # yūzā-mei
+msgid "User name"
+msgstr "ユーザー名"
 
+# yūzā-mei
 #: board/models.py:260
-msgid "user_password"
-msgstr "パスワード" # pasuwādo
+msgid "User password"
+msgstr "パスワード"
 
+# pasuwādo
 #: board/models.py:263
-msgid "user_owned_sections"
-msgstr "中古セクション" # Chūko sekushon
+msgid "User owned sections"
+msgstr "中古セクション"
+
+#: templates/base.html:34
+msgid "Runs on"
+msgstr ""
+
+#: templates/index.html:6
+msgid "Welcome back"
+msgstr ""
+
+#: templates/index.html:7
+msgid "Welcome text"
+msgstr ""
+
+#: templates/navigation.html:4
+msgid "Main page"
+msgstr ""
+
+#: templates/navigation.html:5
+msgid "FAQ"
+msgstr ""
+
+#: templates/navigation.html:6
+msgid "Not Safe For Work"
+msgstr ""
+
+#: templates/navigation.html:6
+msgid "NSFW"
+msgstr ""
+
+#: templates/navigation.html:7 templates/settings.html:3
+msgid "Settings"
+msgstr ""
+
+#: templates/navigation.html:8
+msgid "Sidebar"
+msgstr ""
+
+#: templates/navigation.html:9
+msgid "Mobile version"
+msgstr ""
+
+#: templates/section.html:8
+msgid "Go back"
+msgstr ""
+
+#: templates/section.html:16
+msgid "Left this field empty"
+msgstr ""
+
+# posuto no HTML
+#: templates/section.html:53
+#, fuzzy
+msgid "File"
+msgstr "ポストのファイル"
+
+#: templates/section.html:58
+msgid "Captcha"
+msgstr ""
+
+#: templates/settings.html:10
+msgid "Board style"
+msgstr ""
+
+#: templates/settings.html:21
+msgid "Old posting way"
+msgstr ""
+
+#: templates/settings.html:27
+msgid "Hide sidebar"
+msgstr ""
+
+#: templates/settings.html:33
+msgid "Hide navigation"
+msgstr ""
+
+#: templates/settings.html:39
+msgid "Hide sections banner"
+msgstr ""
+
+#: templates/sidebar.html:3
+msgid "Dva.ch"
+msgstr ""
+
+# sureddo ga tojite iru
+#: templates/thread.html:3
+#, fuzzy
+msgid "Thread title"
+msgstr "HTMLベースのキャッシュ"

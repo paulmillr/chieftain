@@ -1,28 +1,29 @@
 {% extends 'base.html' %}
 {% block title %}{% endblock %}
-{% block content %}
+
 {% load cache %}
-{% if not threads %}<a href="./">Назад</a>{% endif %}
-{% cache 86400 form %}
+{% load i18n %}
+
+{% block content %}
+{% if not threads %}<a href="./">{% trans "Go back" %}</a>{% endif %}
             <form novalidate method="post" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{formset.management_form}}
                 <fieldset class="new-post">
                     <dl class="username-d">
-                        <dt><label for="username">Имя</label></dt>
+                        <dt><label for="username">{{form.poster.label}}</label></dt>
                         <dd>
                             <input type="text" name="poster" id="username" size="16" maxlength="32">
-                            <span class="empty">(оставьте это поле пустым)</span>
+                            <span class="empty">{% trans "Left this field empty" %}</span>
                         </dd>
                     </dl>
 
                     <dl class="email-d">
-                        <dt><label for="email">Электропочта</label></dt>
+                        <dt><label for="email">{{form.email.label}}</label></dt>
                         <dd><input type="email" name="email" id="email" size="16" maxlength="32"></dd>
                     </dl>
                     
                     <dl class="topic-d">
-                        <dt><label for="topic">Тема</label></dt>
+                        <dt><label for="topic">{{form.topic.label}}</label></dt>
                         <dd>
                             <input type="text" name="topic" id="topic" size="16" maxlength="48">
                             <input type="submit" value="Написать">
@@ -30,7 +31,7 @@
                     </dl>
                     
                     <dl class="message-d">
-                        <dt><label for="message">Комментарий</label></dt>
+                        <dt><label for="message">{{form.message.label}}</label></dt>
                         <dd>
                             <div class="bbcode">
                                 <a href="#" class="b" title="Жирный">Ж</a>
@@ -49,12 +50,12 @@
                     </dl>
 
                     <dl class="file-d">
-                        <dt><label for="file">Файл</label></dt>
+                        <dt><label for="file">{% trans "File" %}</label></dt>
                         <dd><input type="file" name="file" id="file"></dd>
                     </dl>
 
                     <dl class="captcha-d">
-                        <dt><label for="captcha">Подтверждение</label></dt>
+                        <dt><label for="captcha">{% trans "Captcha" %}</label></dt>
                         <dd>
                             <img src="{{ MEDIA_URL }}images/captcha.jpg" alt="" class="captcha-img">
                             <p><input type="text" name="captcha" id="captcha" size="16" maxlength="32"></p>
@@ -62,12 +63,11 @@
                     </dl>
                     
                     <dl class="password-d">
-                        <dt><label for="password">Пароль</label></dt>
+                        <dt><label for="password">{{form.password.label}}</label></dt>
                         <dd><input type="password" name="password" value="password" id="password" size="16" maxlength="32"></dd>
                     </dl>
                 </fieldset>
             </form>
-            {% endcache %}
             {{section.description}}
             
             {% if threads %}

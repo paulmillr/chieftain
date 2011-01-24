@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-23 19:52+0200\n"
+"POT-Creation-Date: 2011-01-24 02:20+0200\n"
 "PO-Revision-Date: 2011-01-23 19:52+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -18,79 +18,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: board/models.py:75
-msgid "thread_bump_date"
+msgid "Thread bump date"
 msgstr "Дата бампу"
 
 #: board/models.py:77
-msgid "thread_is_pinned"
+msgid "Thread is pinned"
 msgstr "Прикріплений"
 
 #: board/models.py:79
-msgid "thread_is_closed"
+msgid "Thread is closed"
 msgstr "Закритий"
 
 #: board/models.py:80
-msgid "thread_html"
+msgid "Thread html"
 msgstr "HTML кеш"
 
 #: board/models.py:126
-msgid "post_thread"
+msgid "Post thread"
 msgstr "Тред"
 
 #: board/models.py:128
-msgid "post_is_op_post"
+msgid "Post is op post"
 msgstr "Перший пост у треді"
 
 #: board/models.py:129
-msgid "post_date"
+msgid "Post bump date"
 msgstr "Дата"
 
 #: board/models.py:131
-msgid "post_is_deleted"
+msgid "Post is deleted"
 msgstr "Видалений"
 
+#: board/models.py:133
+msgid "Post file count"
+msgstr "Кількість файлів"
+
 #: board/models.py:134
-msgid "post_ip"
+msgid "Post ip"
 msgstr "IP"
 
 #: board/models.py:136
-msgid "post_poster"
+msgid "Post poster"
 msgstr "Автор"
 
 #: board/models.py:138
-msgid "post_tripcode"
+msgid "Post tripcode"
 msgstr "Тріпкод"
 
 #: board/models.py:140
-msgid "post_email"
+msgid "Post email"
 msgstr "Емейл"
 
 #: board/models.py:142
-msgid "post_topic"
+msgid "Post topic"
 msgstr "Тема"
 
 #: board/models.py:144
-msgid "post_password"
+msgid "Post password"
 msgstr "Пароль"
 
 #: board/models.py:145
-msgid "post_message"
+msgid "Post message"
 msgstr "Текст"
 
 #: board/models.py:146
-msgid "post_html"
+msgid "Post html"
 msgstr "HTML кеш"
 
 #: board/models.py:158
-msgid "file_post"
+msgid "File post"
 msgstr "Пост"
 
 #: board/models.py:160
-msgid "file_original_name"
+msgid "File original name"
 msgstr "Оригінальна назва"
 
 #: board/models.py:161
-msgid "file_mime"
+msgid "File MIME"
 msgstr "MIME-тип"
 
 #: board/models.py:162
@@ -98,97 +102,181 @@ msgid "file_size"
 msgstr "Розмір"
 
 #: board/models.py:164
-msgid "file_is_deleted"
+msgid "File is deleted"
 msgstr "Видален"
 
 #: board/models.py:166
-msgid "file_image_width"
+msgid "File image width"
 msgstr "Ширина зображення"
 
 #: board/models.py:168
-msgid "file_image_height"
+msgid "File image height"
 msgstr "Висота зображення"
 
 #: board/models.py:171
-msgid "file_hash"
+msgid "File hash"
 msgstr "Хеш"
 
 #: board/models.py:174
-msgid "file_location"
+msgid "File location"
 msgstr "Розташування"
 
 #: board/models.py:178
-msgid "filecat_name"
+msgid "File category name"
 msgstr "Назва"
 
 #: board/models.py:185
-msgid "filetype_extension"
+msgid "File type extension"
 msgstr "Розширення"
 
 #: board/models.py:187
-msgid "filetype_mime"
+msgid "File type MIME"
 msgstr "MIME тип"
 
 #: board/models.py:189
-msgid "filetype_category"
+msgid "File type category"
 msgstr "Категорія"
 
 #: board/models.py:196
-msgid "section_slug"
+msgid "Section slug"
 msgstr "Слаг"
 
 #: board/models.py:198
-msgid "section_name"
+msgid "Section name"
 msgstr "Назва"
 
 #: board/models.py:200
-msgid "section_description"
+msgid "Section description"
 msgstr "Опис"
 
 #: board/models.py:202
-msgid "section_group"
+msgid "Section group"
 msgstr "Группа"
 
 #: board/models.py:204
-msgid "section_filesize_limit"
+msgid "Section filesize limit"
 msgstr "Ліміт розміру файлів"
 
 #: board/models.py:206
-msgid "section_force_anonymity"
+msgid "Section force anonymity"
 msgstr "Форсувати анонімність"
 
 #: board/models.py:208
-msgid "section_default_poster_name"
+msgid "Section default poster name"
 msgstr "Типове ім'я постеру"
 
 #: board/models.py:210
-msgid "section_allowed_filetypes"
+msgid "Section allowed filetypes"
 msgstr "Дозволені типи файлів"
 
 #: board/models.py:212
-msgid "section_bumplimit"
+msgid "Section bumplimit"
 msgstr "Бампліміт"
 
 #: board/models.py:214
-msgid "section_threadlimit"
+msgid "Section thread limit"
 msgstr "Ліміт тредів"
 
 #: board/models.py:247
-msgid "sectiongroup_name"
+msgid "Section group name"
 msgstr "Назва"
 
 #: board/models.py:248
-msgid "sectiongroup_order"
+msgid "Section group order"
 msgstr "Порядок"
 
 #: board/models.py:258
-msgid "user_username"
+msgid "User name"
 msgstr "Ім'я"
 
 #: board/models.py:260
-msgid "user_password"
+msgid "User password"
 msgstr "Модключ"
 
 #: board/models.py:263
-msgid "user_owned_sections"
+msgid "User owned sections"
 msgstr "Секції, які модеруються"
+
+#: templates/base.html:34
+msgid "Runs on"
+msgstr "Бігає на"
+
+#: templates/index.html:6
+msgid "Welcome back"
+msgstr "Вітаємо. Знову."
+
+#: templates/index.html:7
+msgid "Welcome text"
+msgstr "Двач - це система форумів"
+
+#: templates/navigation.html:4
+msgid "Main page"
+msgstr "Головна"
+
+#: templates/navigation.html:5
+msgid "FAQ"
+msgstr "Питання та відповіді"
+
+#: templates/navigation.html:6
+msgid "Not Safe For Work"
+msgstr "Понизити рівень прозорості у зображеннях. Корисно, коли за спиною сидить хтось, кому не дуже хочеться показувати іміджборду."
+
+#: templates/navigation.html:6
+msgid "NSFW"
+msgstr "NSFW"
+
+#: templates/navigation.html:7 templates/settings.html:3
+msgid "Settings"
+msgstr "Налаштування"
+
+#: templates/navigation.html:8
+msgid "Sidebar"
+msgstr "Бокова панель"
+
+#: templates/navigation.html:9
+msgid "Mobile version"
+msgstr "Мобільна версія"
+
+#: templates/section.html:8
+msgid "Go back"
+msgstr "Повернутись"
+
+#: templates/section.html:16
+msgid "Left this field empty"
+msgstr "(залишіть це поле пустим)"
+
+#: templates/section.html:53
+msgid "File"
+msgstr "Файл"
+
+#: templates/section.html:58
+msgid "Captcha"
+msgstr "Підтвердження"
+
+#: templates/settings.html:10
+msgid "Board style"
+msgstr "Стиль"
+
+#: templates/settings.html:21
+msgid "Old posting way"
+msgstr "Старий спосіб постингу"
+
+#: templates/settings.html:27
+msgid "Hide sidebar"
+msgstr "Скрити бокову панель"
+
+#: templates/settings.html:33
+msgid "Hide navigation"
+msgstr "Скрити списки розділів"
+
+#: templates/settings.html:39
+msgid "Hide sections banner"
+msgstr "Скрити баннер секцій"
+
+#: templates/sidebar.html:3
+msgid "Dva.ch"
+msgstr "Два.ч"
+
+#: templates/thread.html:3
+msgid "Thread title"
+msgstr "Тред"

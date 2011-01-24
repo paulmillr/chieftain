@@ -1,13 +1,13 @@
 {% extends "base.html" %}
-
-{% block title %}Настройки{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Settings" %}{% endblock %}
 
 {% block content %}
 <form>
     <fieldset class="settings">
         <dl>
             <dt>
-                <label for="ustyle">Стиль</label>
+                <label for="ustyle">{% trans "Board style" %}</label>
             </dt>
             <dd>
                 <select name="ustyle" id="ustyle" size="1">
@@ -18,25 +18,25 @@
         </dl>
         <dl>
             <dt>
-                <label for="oldInsert">Старый способ ссылок на сообщения</label>
+                <label for="oldInsert">{% trans "Old posting way" %}</label>
             </dt>
             <dd><input type="checkbox" name="oldInsert" id="oldInsert"></dd>
         </dl>
         <dl>
             <dt>
-                <label for="hideSidebar">Скрыть боковую панель</label>
+                <label for="hideSidebar">{% trans "Hide sidebar" %}</label>
             </dt>
             <dd><input type="checkbox" name="hideSidebar" id="hideSidebar"></dd>
         </dl>
         <dl>
             <dt>
-                <label for="hideNav">Скрыть списки разделов</label>
+                <label for="hideNav">{% trans "Hide navigation" %}</label>
             </dt>
             <dd><input type="checkbox" name="hideNav" id="hideNav"></dd>
         </dl>
         <dl>
             <dt>
-                <label for="hideSectBanner">Скрыть баннеры разделов</label>
+                <label for="hideSectBanner">{% trans "Hide sections banner" %}</label>
             </dt>
             <dd><input type="checkbox" name="hideSectBanner" id="hideSectBanner"></dd>
         </dl>

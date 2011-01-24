@@ -28,7 +28,7 @@
         </div>
     </article>
     {% if post.is_op_post %}
-    <div class="skipped">Пропущено ответов: {{thread.count.skipped}}, из них {{thread.count.skipped_files}} с файлами.</div>
+    <div class="skipped">Пропущено ответов: {{thread.count.skipped}}, из них {{thread.count.skipped_files}} с файлами.</div> <!-- TODO: l10n -->
     {% endif %}
     {% endfor %}
 </section>

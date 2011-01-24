@@ -1,5 +1,6 @@
+{% load i18n %}
 <aside class="sidebar">
-    <h2><a href="/">Два.ч</a></h2>
+    <h2><a href="/">{% trans "Dva.ch" %}</a></h2>
     
     {% for group in navigation %}
     {% if not group.is_hidden %}

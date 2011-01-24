@@ -1,6 +1,6 @@
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.forms.models import modelformset_factory
-from django.http import Http404
+from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.template.loader import render_to_string
@@ -52,10 +52,11 @@ def section(request, section, page=1):
     try:
         s = Section.objects.get(slug__exact=section)
         t = s.page_threads(page)
+        form = PostForm()
     except (Section.DoesNotExist, InvalidPage, EmptyPage):
         raise Http404
     return rtr('section.html', request, {'threads' : t, 'section' : s, 
-        'request' : {'page' : page}})
+        'form' : form})
 
 def thread(request, section, op_post):
     """Gets thread and its posts"""
@@ -76,21 +77,25 @@ def thread(request, section, op_post):
                 t.section, t.op_post().pid, post))
     if request.method == 'POST':
         t = Thread.objects.get(id=request.POST['thread'])
-        t.section_id
-        r = {
-            'ip' : '127.0.0.1', 
-            'pid' : Post.objects.filter(thread__section=1),
-        }
-        if 'REMOTE_ADDR' in request.META:
-            r['ip'] = request.META['REMOTE_ADDR']
-        
-        formset = PostForm(request.POST, request.FILES)
-        if formset.is_valid():
-            #formset.save()
-            return redirect('./{0}'.format(t.op_post().pid))
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            model = form.save(commit=False)
+            if 'REMOTE_ADDR' in request.META:
+                model.ip = request.META['REMOTE_ADDR']
+            model.pid = t.section.last_post_pid() + 1
+            model.file_count = len(request.FILES)
+            model.is_op_post = False
+            model.save() # also saves form
+            model.refresh_cache()
+            if model.email != 'sage':
+                t.bump = model.date
+                t.save()
+            t.refresh_cache()
+            t.section.refresh_cache()
+            return HttpResponseRedirect('{0}#post{1}'.format(
+                t.op_post().pid, model.pid))
         else:
-            # print [i for i in e]
-            return rtr('error.html', request, {'errors' : formset.errors})
+            return rtr('error.html', request, {'errors' : form.errors})
     else:
-        formset = PostForm()
-    return rtr('thread.html', request, {'thread' : t, 'formset' : formset})
+        form = PostForm()
+    return rtr('thread.html', request, {'thread' : t, 'form' : form})
