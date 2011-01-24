@@ -52,9 +52,29 @@ def section(request, section, page=1):
     try:
         s = Section.objects.get(slug__exact=section)
         t = s.page_threads(page)
-        form = PostForm()
     except (Section.DoesNotExist, InvalidPage, EmptyPage):
         raise Http404
+    if request.method == 'POST':
+        form = PostForm(request.POST, request.FILES)
+        if form.is_valid():
+            model = form.save(commit=False)
+            if 'REMOTE_ADDR' in request.META:
+                model.ip = request.META['REMOTE_ADDR']
+            model.file_count = len(request.FILES)
+            model.is_op_post = True
+            model.date = datetime.now()
+            t = Thread(section_id=request.POST['section'], bump=model.date)
+            model.pid = t.section.incr_cache()
+            t.save(no_cache_rebuild=True)
+            model.thread = t
+            model.save()
+            t.save() # rebuild cache
+            return HttpResponseRedirect('{0}#post{1}'.format(
+                model.pid, model.pid))
+        else:
+            return rtr('error.html', request, {'errors' : form.errors})
+                
+    form = PostForm()
     return rtr('section.html', request, {'threads' : t, 'section' : s, 
         'form' : form})
 
@@ -76,22 +96,20 @@ def thread(request, section, op_post):
             return redirect('/{0}/{1}#post{2}'.format(\
                 t.section, t.op_post().pid, post))
     if request.method == 'POST':
-        t = Thread.objects.get(id=request.POST['thread'])
         form = PostForm(request.POST, request.FILES)
         if form.is_valid():
             model = form.save(commit=False)
+            t = Thread.objects.get(id=request.POST['thread'])
             if 'REMOTE_ADDR' in request.META:
                 model.ip = request.META['REMOTE_ADDR']
-            model.pid = t.section.last_post_pid() + 1
+            model.pid = t.section.incr_cache()
             model.file_count = len(request.FILES)
             model.is_op_post = False
-            model.save() # also saves form
-            model.refresh_cache()
+            model.date = datetime.now()
+            model.save()
             if model.email != 'sage':
                 t.bump = model.date
                 t.save()
-            t.refresh_cache()
-            t.section.refresh_cache()
             return HttpResponseRedirect('{0}#post{1}'.format(
                 t.op_post().pid, model.pid))
         else:

@@ -1,8 +1,9 @@
 # coding: utf-8
-from django.db import models, connection
-from django.db.models.query import QuerySet
+from datetime import datetime
 from django.core.paginator import Paginator
 from django.core.cache import cache
+from django.db import models, connection
+from django.db.models.query import QuerySet
 from django.forms import ModelForm
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
@@ -41,18 +42,14 @@ class PostManager(models.Manager):
 class SectionManager(models.Manager):
     @cached(DAY)
     def sections(self):
-        """Gets list of board sections.
-
-           We're not using QuerySet because they cannot be cached.
-        """
         return Section.objects.all().order_by('slug')
 
 class SectionGroupManager(models.Manager):
     """docstring for SectionGroupManager"""
     @cached(DAY)
     def sections(self):
-        """Gets list of board sections.
-
+        """
+           Gets list of board sections.
            We're not using QuerySet because they cannot be cached.
         """
         groups = SectionGroup.objects.all().order_by('order')
@@ -114,19 +111,30 @@ class Thread(models.Model):
     def refresh_cache(self):
         """Regenerates cache of OP-post and last 5."""
         self.html = render_to_string('section_thread.html', {'thread' : self})
-        self.save()
+    
+    def save(self, no_cache_rebuild=False):
+        """docstring for save"""
+        if not no_cache_rebuild:
+            self.refresh_cache()
+        super(Thread, self).save()
     
     def __unicode__(self):
         return unicode(self.id)
+    
+    class Meta:
+        get_latest_by = "bump"
+        ordering = ['-bump', '-id']
+            
 
 class Post(models.Model):
     """Represents post."""
     pid = models.PositiveIntegerField(blank=True)
-    thread = models.ForeignKey('Thread', blank=True, 
+    thread = models.ForeignKey('Thread', blank=True, null=True,
         verbose_name=_('Post thread'))
     is_op_post = models.BooleanField(default=False, 
         verbose_name=_('Post is op post'))
-    date = models.DateTimeField(auto_now_add=True, verbose_name=_('Post bump date'))
+    date = models.DateTimeField(default=datetime.now, blank=True,
+        verbose_name=_('Post bump date'))
     is_deleted = models.BooleanField(default=False,
         verbose_name=_('Post is deleted'))
     file_count = models.SmallIntegerField(default=0,
@@ -148,10 +156,15 @@ class Post(models.Model):
     def refresh_cache(self):
         """Regenerates html cache of post."""
         self.html = render_to_string('post.html', {'post' : self})
-        self.save()
-        
+    
+    def save(self):
+        """docstring for save"""
+        self.refresh_cache()
+        super(Post, self).save()
+    
     def __unicode__(self):
         return unicode(self.id)
+        
 
 class File(models.Model):
     """Represents files at the board."""
@@ -218,7 +231,7 @@ class Section(models.Model):
         threads = Paginator(self.thread_set.all(), onpage)
         return threads.page(page)
     
-    def get_cache_key(self):
+    def get_key(self):
         return 'section_last_{slug}'.format(slug=self.slug)
     
     def last_post_pid(self):
@@ -226,17 +239,31 @@ class Section(models.Model):
            Gets last post pid. Pid is unique to section. 
            This method is cached.
         """
-        d = cache.get(self.get_cache_key())
+        key = self.get_key()
+        d = cache.get(key)
         if d is not None:
             return d
         return self.refresh_cache()
     
     def refresh_cache(self):
         """Refreshes cache of section-last_post_pid."""
+        key = self.get_key()
         p = Post.objects.filter(thread__section=self.id)
-        pid = p[p.count()-1].pid # get last post
-        cache.set(self.get_cache_key(), pid)
+        n = p.count() - 1
+        if n < 0:
+            pid = 0 # first post in section
+        else:
+            pid = p[n].pid # get last post
+        
+        cache.set(key, pid)
         return pid
+    
+    def incr_cache(self):
+        """Increments cache value if it exists."""
+        key = self.get_key()
+        if cache.get(key) is None:
+            self.refresh_cache()
+        return cache.incr(key)
         
     def __unicode__(self):
         return self.slug
@@ -267,3 +294,7 @@ class User(models.Model):
 class PostForm(ModelForm):
     class Meta:
         model = Post
+
+class ThreadForm(ModelForm):
+    class Meta:
+        model = Thread
