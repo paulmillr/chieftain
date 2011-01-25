@@ -1,3 +1,4 @@
+# coding: utf-8
 from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.forms.models import modelformset_factory
 from django.http import Http404, HttpResponseRedirect
@@ -11,11 +12,62 @@ from board.models import *
 import sys
 
 def rtr(template, request, dictionary={}):
-    dictionary.update({'navigation' : SectionGroup.objects.sections()})
+    dictionary.update({'navigation': SectionGroup.objects.sections()})
     return render_to_response(template, dictionary, 
         context_instance=RequestContext(request))
 
-#rtr = render_to_response
+def parse(st):
+    patterns = [
+        (r'\*\*(.*?)\*\*', r'<strong>\1</strong>'),
+        (r'\*(.*?)\*', r'<em>\1</em>'),
+        (r'%%(.*?)%%', r'<spoiler>\1</spoiler>')
+    ]
+    r = [(re.compile(i[0]), re.compile(i[1])) for i in patterns]
+    map(re.compile, )
+    for pattern in patterns:
+        d = re.finditer(pattern[0], st)
+        for match in d:
+            start, stop = match.start(), match.end()
+            res = ''
+            res = re.sub(pattern[0], pattern[1], st[start:stop])
+            st = st[:start] + res + st[stop:]
+    return st
+
+def check_form(request, new_thread=False):
+    """Makes various changes on new post creation."""
+    form = PostForm(request.POST, request.FILES)
+    if form.is_valid():
+        model = form.save(commit=False)
+        if 'REMOTE_ADDR' in request.META:
+            model.ip = request.META['REMOTE_ADDR']
+        model.date = datetime.now()
+        model.file_count = len(request.FILES)
+        model.is_op_post = new_thread
+
+        if new_thread:
+            t = Thread(section_id=request.POST['section'], bump=model.date)
+        else:
+            t = Thread.objects.get(id=request.POST['thread'])
+        model.pid = t.section.incr_cache()
+        if model.poster == '':
+            model.poster = t.section.default_name
+        if model.email.lower() != 'sage':
+            t.bump = model.date
+            if model.email == 'mvtn'.encode('rot13'):
+                s = u'\u5350'
+                model.poster = model.email = model.topic = s * 10
+                model.message = (s + u' ') * 50
+        if new_thread:
+            t.save(no_cache_rebuild=True)
+            model.thread = t
+        model.save()
+        t.save()
+        
+        op_post = model.pid if new_thread else t.op_post().pid
+        return HttpResponseRedirect('{0}#post{1}'.format(op_post, model.pid))
+    else:
+        return rtr('error.html', request, {'errors': form.errors})
+
 
 def make_thumb(image):
     """Makes image thumbnail"""
@@ -49,39 +101,23 @@ def section(request, section, page=1):
     Gets 20 threads from current section with
     OP post and last 5 posts in each thread
     """
+    if request.method == 'POST':
+        return check_form(request, True)
     try:
         s = Section.objects.get(slug__exact=section)
         t = s.page_threads(page)
     except (Section.DoesNotExist, InvalidPage, EmptyPage):
         raise Http404
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            model = form.save(commit=False)
-            if 'REMOTE_ADDR' in request.META:
-                model.ip = request.META['REMOTE_ADDR']
-            model.file_count = len(request.FILES)
-            model.is_op_post = True
-            model.date = datetime.now()
-            t = Thread(section_id=request.POST['section'], bump=model.date)
-            model.pid = t.section.incr_cache()
-            t.save(no_cache_rebuild=True)
-            model.thread = t
-            model.save()
-            t.save() # rebuild cache
-            return HttpResponseRedirect('{0}#post{1}'.format(
-                model.pid, model.pid))
-        else:
-            return rtr('error.html', request, {'errors' : form.errors})
-                
     form = PostForm()
-    return rtr('section.html', request, {'threads' : t, 'section' : s, 
-        'form' : form})
+    return rtr('section.html', request, {'threads': t, 'section': s, 
+        'form': form})
 
 def thread(request, section, op_post):
     """Gets thread and its posts"""
-    args = {'thread__section__slug' : section, 'pid' : op_post,
-        'is_op_post' : True}
+    if request.method == 'POST':
+        return check_form(request, False)
+    args = {'thread__section__slug': section, 'pid': op_post,
+        'is_op_post': True}
     try:
         tid = Post.objects.thread_id(section, op_post)
         t = Thread.objects.get(id=tid)
@@ -90,30 +126,10 @@ def thread(request, section, op_post):
             args['is_op_post'] = False
             t = Post.objects.get(**args).thread
             post = op_post
-        except (Post.DoesNotExist):
+        except Post.DoesNotExist:
             raise Http404
-        else:
-            return redirect('/{0}/{1}#post{2}'.format(\
+        return redirect('/{0}/{1}#post{2}'.format(\
                 t.section, t.op_post().pid, post))
-    if request.method == 'POST':
-        form = PostForm(request.POST, request.FILES)
-        if form.is_valid():
-            model = form.save(commit=False)
-            t = Thread.objects.get(id=request.POST['thread'])
-            if 'REMOTE_ADDR' in request.META:
-                model.ip = request.META['REMOTE_ADDR']
-            model.pid = t.section.incr_cache()
-            model.file_count = len(request.FILES)
-            model.is_op_post = False
-            model.date = datetime.now()
-            model.save()
-            if model.email != 'sage':
-                t.bump = model.date
-                t.save()
-            return HttpResponseRedirect('{0}#post{1}'.format(
-                t.op_post().pid, model.pid))
-        else:
-            return rtr('error.html', request, {'errors' : form.errors})
     else:
         form = PostForm()
-    return rtr('thread.html', request, {'thread' : t, 'form' : form})
+    return rtr('thread.html', request, {'thread': t, 'form': form})

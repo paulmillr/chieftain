@@ -8,9 +8,13 @@ There's not much documentation yet. Use the source, Luke.
 
 ## Dependencies
 
-1. [django](http://www.djangoproject.com/download/)
-2. [memcached](http://memcached.org/)
-3. [py-memcached](http://pypi.python.org/pypi/python-memcached/)
+* [django](http://www.djangoproject.com/download/)
+* [memcached](http://memcached.org/)
+* [py-memcached](http://pypi.python.org/pypi/python-memcached/)
+* [django-sphinx](https://github.com/dcramer/django-sphinx.git)
+* Any supported by django SQL database binding (MySQLdb, postgresql, sqlite3,
+Oracle)
+* [postmarkup](http://code.google.com/p/postmarkup/)
 
 ## Licensing
 

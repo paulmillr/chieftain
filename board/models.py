@@ -1,4 +1,5 @@
 # coding: utf-8
+import re
 from datetime import datetime
 from django.core.paginator import Paginator
 from django.core.cache import cache
@@ -8,17 +9,19 @@ from django.forms import ModelForm
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
+from markdown import markdown
 
 DAY = 86400 # seconds in day
 
 def cached(seconds = 900):
     """
-        Cache the result of a function call for the specified number of seconds, 
-        using Django's caching mechanism.
+        Cache the result of a function call for the specified number of
+        seconds, using Django's caching mechanism.
     """
     def doCache(f):
         def x(*args, **kwargs):
-                key = sha1(str(f.__module__) + str(f.__name__) + str(args) + str(kwargs)).hexdigest()
+                key = sha1(f.__module__ + f.__name__ + 
+                    str(args) + str(kwargs)).hexdigest()
                 result = cache.get(key)
                 if result is None:
                     result = f(*args, **kwargs)
@@ -27,6 +30,14 @@ def cached(seconds = 900):
         return x
     return doCache
 
+class InsufficientRightsError(Exception):
+    """Raises if user has insufficient rights for current operation."""
+    pass
+
+class InvalidKeyError(Exception):
+    """Raises if user has entered invalid modkey or deletion password."""
+    pass
+
 class PostManager(models.Manager):
     @cached(3 * DAY)
     def thread_id(self, slug, op_post):
@@ -34,7 +45,7 @@ class PostManager(models.Manager):
         try:
             t = self.get(thread__section__slug=slug, pid=op_post, 
                 is_op_post=True).thread.id
-        except (Post.DoesNotExist), e:
+        except Post.DoesNotExist as e:
             raise e
         else:
             return t
@@ -56,11 +67,11 @@ class SectionGroupManager(models.Manager):
         data = [] # http://goo.gl/CpPq6
         for group in groups:
             d = {
-                'id' : group.id,
-                'name' : group.name, 
-                'order' : group.order, 
-                'is_hidden' : group.is_hidden,
-                'sections' : list(group.section_set.values())
+                'id': group.id,
+                'name': group.name, 
+                'order': group.order, 
+                'is_hidden': group.is_hidden,
+                'sections': list(group.section_set.values())
             }
             data.append(d)
         return data
@@ -86,13 +97,13 @@ class Thread(models.Model):
         ps = self.post_set
         stop = ps.count()
         if stop <= lp: # if we got thread with less posts than lp
-            return {'total' : stop, 'skipped' : 0, 'skipped_files' : 0}
+            return {'total': stop, 'skipped': 0, 'skipped_files': 0}
         else:
             start = stop - lp
             return {
-                'total' : stop, 'start' : start, 'stop' : stop,
-                'skipped' : start - 1, 
-                'skipped_files' : ps.filter(file_count__gt=0).count()
+                'total': stop, 'start': start, 'stop': stop,
+                'skipped': start - 1, 
+                'skipped_files': ps.filter(file_count__gt=0).count()
             }
     
     def op_post(self):
@@ -102,7 +113,7 @@ class Thread(models.Model):
         c = self.count()
         s = self.post_set
         all = s.all()
-        if c['skipped'] == 0:
+        if not c['skipped']:
             return all
         else: # select first one and last 5 posts
             start, stop = c['start'], c['stop']
@@ -110,7 +121,7 @@ class Thread(models.Model):
     
     def refresh_cache(self):
         """Regenerates cache of OP-post and last 5."""
-        self.html = render_to_string('section_thread.html', {'thread' : self})
+        self.html = render_to_string('section_thread.html', {'thread': self})
     
     def save(self, no_cache_rebuild=False):
         """docstring for save"""
@@ -155,7 +166,15 @@ class Post(models.Model):
     objects = PostManager()
     def refresh_cache(self):
         """Regenerates html cache of post."""
-        self.html = render_to_string('post.html', {'post' : self})
+        text = markdown(self.message, ['codehilite', 'klipd'], 'escape')
+        self.html = render_to_string('post.html', {'post': self, 'text' : text})
+    
+    def parse(self):
+        """Parses current post text for videos etc."""
+        text = self.message
+        tags = Mark.objects.all()
+        for t in tags:
+            text = re.sub(t.tag, t.html, text)
     
     def save(self):
         """docstring for save"""
@@ -188,7 +207,8 @@ class File(models.Model):
 
 class FileCategory(models.Model):
     """Category of files"""
-    name = models.CharField(max_length=32, verbose_name=_('File category name'))
+    name = models.CharField(max_length=32, 
+        verbose_name=_('File category name'))
     def __unicode__(self):
         return self.name
 
@@ -278,6 +298,16 @@ class SectionGroup(models.Model):
     is_hidden = models.BooleanField(default=False)
     def __unicode__(self):
         return unicode(self.name) + ', ' + unicode(self.order)
+
+
+class Mark(models.Model):
+    """Post mark."""
+    name = models.CharField(max_length=32, verbose_name=_('Tag name'))
+    tag = models.TextField(verbose_name=_('Tag'))
+    replace = models.TextField(verbose_name=_('HTML replace'))
+    def __unicode__(self):
+        return self.name
+
 
 class User(models.Model):
     """User (moderator etc.)"""

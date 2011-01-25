@@ -22,18 +22,25 @@ function Newpost(element) { // listens textarea and adds some methods to it
     	}
     }
 
-    this.wrap = function(code) {
+    this.wrap = function(tagStart, tagEnd, eachLine) {
         var textarea = this.textarea,
-            tagStart = "["+code+"]",
-            tagEnd = "[/"+code+"]", 
-            size = (tagStart+tagEnd).length;
-
+            size = (tagStart + tagEnd).length;
+        
+        
         if (typeof textarea.selectionStart != "undefined") {
             var begin = textarea.value.substr(0, textarea.selectionStart),
                 selection = textarea.value.substr(textarea.selectionStart, textarea.selectionEnd - textarea.selectionStart),
                 end = textarea.value.substr(textarea.selectionEnd);
-            textarea.selectionEnd = textarea.selectionEnd+size;
-            textarea.value = begin+tagStart+selection+tagEnd+end;
+            textarea.selectionEnd = textarea.selectionEnd + size; 
+            if (eachLine) {
+                selection = selection.split('\n')
+                selection = $.map(selection, function(x) {
+                    return tagStart + x;
+                }).join('\n')
+                textarea.value = begin+selection+end;
+            } else {
+                textarea.value = begin+tagStart+selection+tagEnd+end;
+            }
         }
         textarea.focus();
     }
@@ -223,7 +230,15 @@ function init() {
     
     $('.bbcode a').click(function(e) {
         e.preventDefault();
-        textArea.wrap(this.className);
+        var t = $(this),
+            start = $(this).data('tag'),
+            end = $(this).data('tagEnd'),
+            code = t.attr('class') == 'code';
+        if (end == undefined) {
+            end = start;
+        }
+        
+        textArea.wrap(start, end, code);
     });
     
     $('#main > .thread').delegate('.edit', 'click', function(event) {
@@ -231,7 +246,7 @@ function init() {
         var c = new Canvas;
     });
     
-    $('#main > .thread').delegate('.number', 'click', function(e) {
+    $('#main > .thread').delegate('.number > a', 'click', function(e) {
         e.preventDefault();
         textArea.insert('>>' + e.srcElement.innerHTML)
         
