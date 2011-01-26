@@ -6,6 +6,7 @@ views.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+from datetime import datetime
 from django.core.paginator import InvalidPage, EmptyPage
 from django.http import Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, redirect
