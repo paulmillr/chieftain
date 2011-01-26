@@ -14,7 +14,6 @@ There's not much documentation yet. Use the source, Luke.
 * [django-sphinx](https://github.com/dcramer/django-sphinx.git)
 * Any supported by django SQL database binding (MySQLdb, postgresql, sqlite3,
 Oracle)
-* [postmarkup](http://code.google.com/p/postmarkup/)
 
 ## Licensing
 

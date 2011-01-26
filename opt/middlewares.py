@@ -1,3 +1,11 @@
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+middlewares.py
+
+Created by Paul Bagwell on 2011-01-22.
+Copyright (c) 2011 Paul Bagwell. All rights reserved.
+"""
 import re
 from operator import add
 from time import time
@@ -10,14 +18,25 @@ from django.conf import settings
 # Log all SQL statements direct to the console (when running in DEBUG)
 # Intended for use with the django development server.
 #
+__all__ = ['SQLLogToConsoleMiddleware', 'StatsMiddleware']
+
 
 class SQLLogToConsoleMiddleware:
-    def process_response(self, request, response): 
+    def process_response(self, request, response):
         if settings.DEBUG and connection.queries:
-            time = sum([float(q['time']) for q in connection.queries])        
-            t = Template("{{count}} quer{{count|pluralize:\"y,ies\"}} in {{time}} seconds:\n\n{% for sql in sqllog %}[{{forloop.counter}}] {{sql.time}}s: {{sql.sql|safe}}{% if not forloop.last %}\n\n{% endif %}{% endfor %}")
-            print t.render(Context({'sqllog':connection.queries,'count':len(connection.queries),'time':time}))                
+            time = sum([float(q['time']) for q in connection.queries])
+            t = Template("{{count}} quer{{count|pluralize:\"y,ies\"}} "
+                "in {{time}} seconds:\n\n{% for sql in sqllog %}"
+                "[{{forloop.counter}}] {{sql.time}}s: {{sql.sql|safe}}"
+                "{% if not forloop.last %}\n\n{% endif %}{% endfor %}"
+            )
+            print t.render(Context({
+                'sqllog': connection.queries,
+                'count': len(connection.queries),
+                'time': time
+            }))
         return response
+
 
 class StatsMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
@@ -37,7 +56,7 @@ class StatsMiddleware(object):
         # compute the db time for the queries just run
         queries = len(connection.queries) - n
         if queries:
-            dbTime = reduce(add, [float(q['time']) 
+            dbTime = reduce(add, [float(q['time'])
                                   for q in connection.queries[n:]])
         else:
             dbTime = 0.0
@@ -55,7 +74,7 @@ class StatsMiddleware(object):
             'queries': queries,
         }
 
-        # replace the comment if found            
+        # replace the comment if found
         if response and response.content:
             s = response.content
             regexp = re.compile(r'(?P<cmt><!--\s*STATS:(?P<fmt>.*?)-->)')

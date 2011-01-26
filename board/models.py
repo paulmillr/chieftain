@@ -1,26 +1,41 @@
-# coding: utf-8
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+models.py
+
+Created by Paul Bagwell on 2011-01-13.
+Copyright (c) 2011 Paul Bagwell. All rights reserved.
+"""
 import re
 from datetime import datetime
 from django.core.paginator import Paginator
 from django.core.cache import cache
-from django.db import models, connection
-from django.db.models.query import QuerySet
+from django.db import models
 from django.forms import ModelForm
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
 from markdown import markdown
 
-DAY = 86400 # seconds in day
+__all__ = [
+    'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
+    'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
+    'File', 'FileCategory', 'FileType', 'Section', 'SectionGroup', 'User',
+    'PostForm', 'ThreadForm',
+]
 
-def cached(seconds = 900):
+DAY = 86400  # seconds in day
+MEGABYTE = 2 ** 20
+
+
+def cached(seconds=900):
     """
         Cache the result of a function call for the specified number of
         seconds, using Django's caching mechanism.
     """
     def doCache(f):
         def x(*args, **kwargs):
-                key = sha1(f.__module__ + f.__name__ + 
+                key = sha1(f.__module__ + f.__name__ +
                     str(args) + str(kwargs)).hexdigest()
                 result = cache.get(key)
                 if result is None:
@@ -30,30 +45,35 @@ def cached(seconds = 900):
         return x
     return doCache
 
+
 class InsufficientRightsError(Exception):
     """Raises if user has insufficient rights for current operation."""
     pass
 
+
 class InvalidKeyError(Exception):
     """Raises if user has entered invalid modkey or deletion password."""
     pass
+
 
 class PostManager(models.Manager):
     @cached(3 * DAY)
     def thread_id(self, slug, op_post):
         """Gets thread id by slug and op_post pid."""
         try:
-            t = self.get(thread__section__slug=slug, pid=op_post, 
+            t = self.get(thread__section__slug=slug, pid=op_post,
                 is_op_post=True).thread.id
         except Post.DoesNotExist as e:
             raise e
         else:
             return t
 
+
 class SectionManager(models.Manager):
     @cached(DAY)
     def sections(self):
         return Section.objects.all().order_by('slug')
+
 
 class SectionGroupManager(models.Manager):
     """docstring for SectionGroupManager"""
@@ -64,85 +84,88 @@ class SectionGroupManager(models.Manager):
            We're not using QuerySet because they cannot be cached.
         """
         groups = SectionGroup.objects.all().order_by('order')
-        data = [] # http://goo.gl/CpPq6
+        data = []  # http://goo.gl/CpPq6
         for group in groups:
             d = {
                 'id': group.id,
-                'name': group.name, 
-                'order': group.order, 
+                'name': group.name,
+                'order': group.order,
                 'is_hidden': group.is_hidden,
                 'sections': list(group.section_set.values())
             }
             data.append(d)
         return data
-        
+
 
 class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
     bump = models.DateTimeField(blank=True, verbose_name=_('Thread bump date'))
-    is_pinned = models.BooleanField(default=False, 
+    is_pinned = models.BooleanField(default=False,
         verbose_name=_('Thread is pinned'))
-    is_closed = models.BooleanField(default=False, 
+    is_closed = models.BooleanField(default=False,
         verbose_name=_('Thread is closed'))
     html = models.TextField(blank=True, verbose_name=_('Thread html'))
+
+    @property
     def posts_html(self):
         return self.post_set.values('html')
-        
+
     def postcount(self):
         return self.post_set.count()
-        
+
     def count(self):
         lp = 5
         ps = self.post_set
         stop = ps.count()
-        if stop <= lp: # if we got thread with less posts than lp
+        if stop <= lp:  # if we got thread with less posts than lp
             return {'total': stop, 'skipped': 0, 'skipped_files': 0}
         else:
             start = stop - lp
             return {
                 'total': stop, 'start': start, 'stop': stop,
-                'skipped': start - 1, 
+                'skipped': start - 1,
                 'skipped_files': ps.filter(file_count__gt=0).count()
             }
-    
+
+    @property
     def op_post(self):
         return self.post_set.all()[0]
-        
+
     def last_posts(self):
         c = self.count()
         s = self.post_set
         all = s.all()
         if not c['skipped']:
             return all
-        else: # select first one and last 5 posts
+        else:  # select first one and last 5 posts
             start, stop = c['start'], c['stop']
             return [s.all()[0]] + list(all[start:stop])
-    
+
     def refresh_cache(self):
         """Regenerates cache of OP-post and last 5."""
         self.html = render_to_string('section_thread.html', {'thread': self})
-    
+
     def save(self, no_cache_rebuild=False):
         """docstring for save"""
         if not no_cache_rebuild:
             self.refresh_cache()
         super(Thread, self).save()
-    
+
     def __unicode__(self):
         return unicode(self.id)
-    
+
     class Meta:
         get_latest_by = "bump"
         ordering = ['-bump', '-id']
-            
+
 
 class Post(models.Model):
     """Represents post."""
     pid = models.PositiveIntegerField(blank=True)
     thread = models.ForeignKey('Thread', blank=True, null=True,
         verbose_name=_('Post thread'))
-    is_op_post = models.BooleanField(default=False, 
+    is_op_post = models.BooleanField(default=False,
         verbose_name=_('Post is op post'))
     date = models.DateTimeField(default=datetime.now, blank=True,
         verbose_name=_('Post bump date'))
@@ -164,35 +187,36 @@ class Post(models.Model):
     message = models.TextField(verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
+
     def refresh_cache(self):
         """Regenerates html cache of post."""
         text = markdown(self.message, ['codehilite', 'klipd'], 'escape')
-        self.html = render_to_string('post.html', {'post': self, 'text' : text})
-    
+        self.html = render_to_string('post.html', {'post': self, 'text': text})
+
     def parse(self):
         """Parses current post text for videos etc."""
         text = self.message
         tags = Mark.objects.all()
         for t in tags:
             text = re.sub(t.tag, t.html, text)
-    
+
     def save(self):
         """docstring for save"""
         self.refresh_cache()
         super(Post, self).save()
-    
+
     def __unicode__(self):
         return unicode(self.id)
-        
+
 
 class File(models.Model):
     """Represents files at the board."""
     post = models.ForeignKey('Post', verbose_name=_('File post'))
-    name = models.CharField(max_length=64, 
-        verbose_name=_('File original name')) # original file name
+    name = models.CharField(max_length=64,
+        verbose_name=_('File original name'))
     mime = models.ForeignKey('FileType', verbose_name=_('File MIME'))
     size = models.PositiveIntegerField(verbose_name=_('file_size'))
-    is_deleted = models.BooleanField(blank=False, 
+    is_deleted = models.BooleanField(blank=False,
         verbose_name=_('File is deleted'))
     image_width = models.PositiveSmallIntegerField(blank=False,
         verbose_name=_('File image width'))
@@ -205,12 +229,15 @@ class File(models.Model):
         '{.board}/{.thread}/{.pid}.{.mime.extension}'.format(*x),
         verbose_name=_('File location'))
 
+
 class FileCategory(models.Model):
     """Category of files"""
-    name = models.CharField(max_length=32, 
+    name = models.CharField(max_length=32,
         verbose_name=_('File category name'))
+
     def __unicode__(self):
         return self.name
+
 
 class FileType(models.Model):
     """File type"""
@@ -220,12 +247,14 @@ class FileType(models.Model):
         verbose_name=_('File type MIME'))
     category = models.ForeignKey('FileCategory',
         verbose_name=_('File type category'))
+
     def __unicode__(self):
         return self.extension
 
+
 class Section(models.Model):
     """Board section"""
-    slug = models.SlugField(max_length=5, unique=True, 
+    slug = models.SlugField(max_length=5, unique=True,
         verbose_name=_('Section slug'))
     name = models.CharField(max_length=64,
         verbose_name=_('Section name'))
@@ -233,8 +262,8 @@ class Section(models.Model):
         verbose_name=_('Section description'))
     group = models.ForeignKey('SectionGroup',
         verbose_name=_('Section group'))
-    filesize_limit = models.PositiveIntegerField(default=5*2**20, # 5mb
-        verbose_name=_('Section filesize limit')) 
+    filesize_limit = models.PositiveIntegerField(default=MEGABYTE * 5,
+        verbose_name=_('Section filesize limit'))
     anonymity = models.BooleanField(default=False,
         verbose_name=_('Section force anonymity'))
     default_name = models.CharField(max_length=64, default='Anonymous',
@@ -246,47 +275,47 @@ class Section(models.Model):
     threadlimit = models.PositiveSmallIntegerField(default=10,
         verbose_name=_('Section thread limit'))
     objects = SectionManager()
+
     def page_threads(self, page=1):
         onpage = 20
         threads = Paginator(self.thread_set.all(), onpage)
         return threads.page(page)
-    
-    def get_key(self):
+
+    @property
+    def key(self):
         return 'section_last_{slug}'.format(slug=self.slug)
-    
+
     def last_post_pid(self):
         """
-           Gets last post pid. Pid is unique to section. 
+           Gets last post pid. Pid is unique to section.
            This method is cached.
         """
-        key = self.get_key()
-        d = cache.get(key)
+        d = cache.get(self.key)
         if d is not None:
             return d
         return self.refresh_cache()
-    
+
     def refresh_cache(self):
         """Refreshes cache of section-last_post_pid."""
-        key = self.get_key()
         p = Post.objects.filter(thread__section=self.id)
         n = p.count() - 1
         if n < 0:
-            pid = 0 # first post in section
+            pid = 0  # first post in section
         else:
-            pid = p[n].pid # get last post
-        
-        cache.set(key, pid)
+            pid = p[n].pid  # get last post
+
+        cache.set(self.key, pid)
         return pid
-    
+
     def incr_cache(self):
         """Increments cache value if it exists."""
-        key = self.get_key()
-        if cache.get(key) is None:
+        if cache.get(self.key) is None:
             self.refresh_cache()
-        return cache.incr(key)
-        
+        return cache.incr(self.key)
+
     def __unicode__(self):
         return self.slug
+
 
 class SectionGroup(models.Model):
     """Group of board sections. Example: [b / d / s] [a / aa] """
@@ -296,17 +325,9 @@ class SectionGroup(models.Model):
     objects = SectionGroupManager()
     # determine if section hidden from menu or not
     is_hidden = models.BooleanField(default=False)
+
     def __unicode__(self):
         return unicode(self.name) + ', ' + unicode(self.order)
-
-
-class Mark(models.Model):
-    """Post mark."""
-    name = models.CharField(max_length=32, verbose_name=_('Tag name'))
-    tag = models.TextField(verbose_name=_('Tag'))
-    replace = models.TextField(verbose_name=_('HTML replace'))
-    def __unicode__(self):
-        return self.name
 
 
 class User(models.Model):
@@ -318,12 +339,15 @@ class User(models.Model):
     # sections, modded by user
     sections = models.ManyToManyField('Section', blank=False,
         verbose_name=_('User owned sections'))
+
     def __unicode__(self):
         return self.username
+
 
 class PostForm(ModelForm):
     class Meta:
         model = Post
+
 
 class ThreadForm(ModelForm):
     class Meta:
