@@ -193,13 +193,6 @@ class Post(models.Model):
         text = markdown(self.message, ['codehilite', 'klipd'], 'escape')
         self.html = render_to_string('post.html', {'post': self, 'text': text})
 
-    def parse(self):
-        """Parses current post text for videos etc."""
-        text = self.message
-        tags = Mark.objects.all()
-        for t in tags:
-            text = re.sub(t.tag, t.html, text)
-
     def save(self):
         """docstring for save"""
         self.refresh_cache()
