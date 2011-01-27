@@ -12,7 +12,7 @@
             <dd>
                 <select name="ustyle" id="ustyle" size="1">
                     <option value="photon">Photon</option>
-                    <option value="klipton">Klipton</option>
+                    <option value="neutron">Neutron</option>
                 </select>
             </dd>
         </dl>
@@ -29,18 +29,27 @@
             <dd><input type="checkbox" name="hideSidebar" id="hideSidebar"></dd>
         </dl>
         <dl>
-            <dt>
-                <label for="hideNav">{% trans "Hide navigation" %}</label>
-            </dt>
+            <dt><label for="hideNav">{% trans "Hide navigation" %}</label></dt>
             <dd><input type="checkbox" name="hideNav" id="hideNav"></dd>
         </dl>
         <dl>
-            <dt>
-                <label for="hideSectBanner">{% trans "Hide sections banner" %}</label>
-            </dt>
+            <dt><label for="hideSectBanner">{% trans "Hide sections banner" %}</label></dt>
             <dd><input type="checkbox" name="hideSectBanner" id="hideSectBanner"></dd>
         </dl>
-
+        <dl>
+            <dt><label for="dontLogVisits">{% trans "Don't log visited threads" %} (<a href="?clear" class="clearVisitedThreads">{% trans "clear" %}</a>)</label></dt>
+            <dd><input type="checkbox" name="dontLogVisits" id="dontLogVisits"></dd>
+        </dl>
     </fieldset>
 </form>
+
+<div class="visitedThreads" style="display: none;">
+    <h2>{% trans "Visited threads" %}</h2>
+    <h3>{% trans "Sorted by the" %}
+        <select name="visitedThreadsSort" id="visitedThreadsSort" size="1">
+            <option value="time">{% trans "time of first visit" %}</option>
+            <option value="visits">{% trans "visits count" %}</option></select>
+    </h3>
+    <ul></ul>
+</div>
 {% endblock %}

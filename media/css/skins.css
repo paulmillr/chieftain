@@ -1,0 +1,105 @@
+/* photon style */
+#photon body{color:#333;background:#eee;font-family:"Trebuchet MS",Trebuchet,tahoma,serif;}
+#photon a:link,
+#photon a:visited{color:#f60;}
+#photon a:hover{color:#06f;}
+#photon #sidebar h4{background:#ddd;border:1px solid #ccc;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
+#photon #sidebar ul{border-left:1px solid #ccc;}
+/* New post */
+#photon .new-post dl{clear:both;padding:5px 0;font-size:1.1em;}
+#photon .new-post dt,
+#photon .new-post dd{display:block;float:left;}
+#photon .new-post dt{color:#024;}
+#photon .new-post input,
+#photon .new-post textarea{font-size:0.8em;}
+#photon .new-post textarea{width:34em;height:10em;}
+#photon .new-post .empty{font-style:italic;}
+#photon .new-post .captcha-img{width:300px;}
+#photon .new-post .bbcode{padding-bottom:5px;font-size:1em;}
+#photon .message-d > dt{padding-top:80px;}
+#photon .captcha-d > dt{padding-top:30px;}
+/* Threads and posts */
+#photon .thread{border-top-color:#ccc;}
+#photon .post{background:none;padding:0;margin-bottom:5px;}
+#photon .post-wrapper{display:inline-block;background:#DDD;padding:5px;border-radius:5px;border:1px solid #ccc;}
+#photon .post .name{margin-left:0;}
+#photon .post .number a, 
+#photon .post .number a:visited {color: inherit;}
+#photon .post .number,
+#photon .post time{float:right;}
+@media screen and (max-device-width:640px){/* j.mp/textsizeadjust
+#photon html{-webkit-text-size-adjust:none;-ms-text-size-adjust:none;}*/
+}
+
+
+
+/* Neutron Rewrited for klipped v 0.21 */
+#neutron body{background:none #212121;color:#698CC0;}
+#neutron a, 
+#neutron .number{color:#C9BE89;text-shadow:#FFD200 0px 0px 12px;}
+#neutron a:hover,
+#neutron number:hover{color:#EEFEBB;text-shadow:#FFDE22 0px 0px 15px;}
+#neutron ul.group a,
+#neutron .image-info a,
+#neutron .bbcode a,
+#neutron .sidebar a{text-shadow:none;}
+#neutron
+#neutron .thread{border-width:3px 0px 0px;/*-moz-border-image:url(http://2-ch.ru/icons/line.png) 3 0 0 stretch;-webkit-border-image:url(http://2-ch.ru/icons/line.png) 3 0 0 stretch;border-image:url(http://2-ch.ru/icons/line.png) 3 0 0 stretch;*/}
+#neutron #container > header,
+#neutron #container-wrap > header.clearfix{border-width:0px 0px 3px;-moz-border-image:url(http://2-ch.ru/icons/line.png) 0 0 3 27 stretch repeat;-webkit-border-image:url(http://2-ch.ru/icons/line.png) 0 0 3 27 stretch repeat;border-image:url(http://2-ch.ru/icons/line.png) 0 0 3 27 stretch repeat;}
+#neutron .post-wrapper{background:url(http://enoz.ru/olanet/images/booru/7531081bc6b34cfccf525cb573f31c7d.png) right bottom no-repeat #2C2C2C;padding:0;border:solid 1px #454545;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;}
+#neutron .post-wrapper header.clearfix{background-color:#151515;background:-moz-linear-gradient(100% 100% 90deg,#2C2C2C,#151515) repeat scroll 0 0;background:-webkit-gradient(linear,left top,left bottom,color-stop(0,#151515),color-stop(0.65,#2C2C2C));color:#999999;padding:4px;border:solid 0px transparent;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;}
+#neutron .post-wrapper .content{color:#698CC0;}
+#neutron .name{color:#787878;font-weight:bold;}
+#neutron .title{color:#6EBCFF;font-weight:bold;}
+#neutron .image-info{color:#999999;background:#212121;border:solid 1px #454545;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;padding:2px;margin:4px;}
+#neutron .image-info a{color:#789922;}
+#neutron img.image{border:none;margin:4px;}
+#neutron .text{padding:2px;margin:0.5em;}
+#neutron .new-post dt{color:#0061AA;text-shadow:#000000 0px 0px 8px;}
+#neutron .bbcode a{text-decoration:none;}
+#neutron .bbcode a.b{font-size:0;}
+#neutron .bbcode a.b:before{content:url(http://enoz.ru/olanet/images/booru/8508c00894bb0ff3d0df548b07b9e846.png);}
+#neutron .bbcode a.i{font-size:0;}
+#neutron .bbcode a.i:before{content:url(http://enoz.ru/olanet/images/booru/654d49ac3c7c419e0643c3577114e4a6.png);}
+#neutron .bbcode a.s{font-size:0;}
+#neutron .bbcode a.s:before{content:url(http://enoz.ru/olanet/images/booru/665886bbe02aa2311417d0275278d029.png);}
+#neutron .bbcode a.u{font-size:0;}
+#neutron .bbcode a.u:before{content:url(http://enoz.ru/olanet/images/booru/e38ec89b202566d4c388527118b3a56e.png);}
+#neutron .bbcode a.spoiler{font-size:0;}
+#neutron .bbcode a.spoiler:before{content:url(http://enoz.ru/olanet/images/booru/e9d94d32a3d04f3e639e3a8ec436407d.png);}
+#neutron .bbcode a.hide{font-size:0;}
+#neutron .bbcode a.hide:before{content:url(http://enoz.ru/olanet/images/booru/5481d951e7b50f2ff69943411f55825d.png);}
+#neutron .bbcode a.sup{font-size:0;}
+#neutron .bbcode a.sup:before{content:url(http://enoz.ru/olanet/images/booru/4240c9b8f2bc6bc695a32651d961ace6.png);}
+#neutron .bbcode a.sub{font-size:0;}
+#neutron .bbcode a.sub:before{content:url(http://enoz.ru/olanet/images/booru/49bbb32f460c743c003912093e739710.png);}
+#neutron .bbcode a.code{font-size:0;}
+#neutron .bbcode a.code:before{content:url(http://enoz.ru/olanet/images/booru/d9a2c573a87a394aab38c2e5ca57a878.png);}
+#neutron input#username,
+#neutron input#email,
+#neutron input#topic,
+#neutron input#captcha,
+#neutron input#password{-moz-appearance:none;-webkit-appearance:none;appearance:none;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;box-sizing:content-box;color:#BBBBBB;border:2px solid #545454;background-color:#111111;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;}
+#neutron input#username:hover,
+#neutron input#email:hover,
+#neutron input#topic:hover,
+#neutron input#captcha:hover,
+#neutron input#password:hover,
+#neutron input#username:focus,
+#neutron input#email:focus,
+#neutron input#topic:focus,
+#neutron input#captcha:focus,
+#neutron input#password:focus{background-color:#151515;color:#AAAAFF;}
+#neutron input#captcha{padding:2px;}
+#neutron img.captcha-img{margin:0 0 5px;}
+#neutron textarea{-moz-box-sizing:content-box;-webkit-box-sizing:content-box;box-sizing:content-box;-moz-appearance:none;-webkit-appearance:none;appearance:none;background-color:#111111;color:#CCCCCC;border:2px solid #545454;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;}
+#neutron textarea:hover,
+#neutron textarea:focus{background-color:#151515;color:#EEEEEE;}
+#neutron input#file{background-color:#111111;-moz-box-sizing:content-box;-webkit-box-sizing:content-box;box-sizing:content-box;-moz-appearance:none;-webkit-appearance:none;appearance:none;}
+#neutron .sidebar h4{background-color:#111111;border:1px solid #545454;padding:2px;}
+#neutron #sidebar ul{border-left:1px solid #545454;}
+#neutron #sidebar h2 a{color:#EEFEBB;text-shadow:#FFDE22 0px 0px 15px;}
+#neutron #sidebar li:hover{background-color:#303030;}
+#neutron #sidebar li:hover a{color:#EEFEBB;}
+#neutron aside.sidebar{padding-right:5px;border-right:2px solid #121212;}

@@ -208,17 +208,16 @@ class File(models.Model):
         verbose_name=_('File original name'))
     mime = models.ForeignKey('FileType', verbose_name=_('File MIME'))
     size = models.PositiveIntegerField(verbose_name=_('file_size'))
-    is_deleted = models.BooleanField(blank=False,
+    is_deleted = models.BooleanField(default=False,
         verbose_name=_('File is deleted'))
-    image_width = models.PositiveSmallIntegerField(blank=False,
+    image_width = models.PositiveSmallIntegerField(blank=True,
         verbose_name=_('File image width'))
-    image_height = models.PositiveSmallIntegerField(blank=False,
+    image_height = models.PositiveSmallIntegerField(blank=True,
         verbose_name=_('File image height'))
     #meta = models.TextField()
-    hash = models.CharField(max_length=32, blank=False,
+    hash = models.CharField(max_length=32, blank=True,
         verbose_name=_('File hash'))
-    file = models.FileField(upload_to=lambda *x: \
-        '{.board}/{.thread}/{.pid}.{.mime.extension}'.format(*x),
+    file = models.FileField(upload_to='test/{}',
         verbose_name=_('File location'))
 
 

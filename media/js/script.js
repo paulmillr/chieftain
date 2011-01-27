@@ -2,6 +2,41 @@
 
 */
 
+currentPage = (function() { // page detector
+    var pageType,
+        loc = window.location.href.split('/').slice('3'),
+        re = /(\d+)(?:.+)?/,
+        l, section, thread, op_post;
+    if (loc[1] == null) { // main, settings or faq
+        l = loc[0];
+        pages = ['settings', 'faq'];
+        for (var i=0; i < pages.length; i++) {
+            var c = pages[i]
+            if (l.substr(0, c.length) === c) {
+                pageType = c;
+            }
+        }
+        pageType = pageType ? pageType : 'main';
+    } else { // section or thread
+        section = loc[0];
+        l = loc[1];
+        if (l) {
+            pageType = 'thread';
+            thread = $('.thread').attr('id').match(re)[1];
+            op_post = l.match(re)[1];
+        } else {
+            pageType = 'section';
+        }
+    }
+    
+    return {
+        'type' : pageType,
+        'section' : section,
+        'thread' : thread,
+        'op_post' : op_post,
+    }
+})();
+
 function Newpost(element) { // listens textarea and adds some methods to it
     this.textarea = element;
     this.insert = function(text) {
@@ -273,6 +308,10 @@ function initSettings() {
     var s = parseQs(), 
         settings = $('.settings dd').find('select, input'),
         changes = { // description of all functions on settings pages
+            'ustyle' : function(x) {
+                $('html').attr('id', x);
+            },
+            
             'hideSidebar' : function(x) {
                 var margin = (x) ? '10px' : '200px';
 
@@ -364,64 +403,84 @@ function initSettings() {
             func(id);
         }
     }
-    
-    /*for (var i=0; i < changes.length; i++) {
-        var t = changes[i], 
-            id = t[0],
-            func = t[1];
-        
-        regChangeEvent(id, func);
-            
-        if (!!(t = $.settings(id))) {
-            console.log($('#'+id))
-            func(t);
-        }
-    }*/
 }
 
 function initStyle() {
     var key = 'ustyle',
-        cookie = $.settings(key),
-        styles = $('.'+key),
-        re = /(?:.*\/)(.+)(?:\.css.*)/, // get stylesheet name
-        found = false;
+        cookie = $.settings(key);
+    console.log(cookie);
     
     if (!cookie) {
         return false;
     }
     
-    function disableStylesExcept(styles, style) {
-        var s;
-        for (var i=0; i < styles.length; i++) {
-            s = styles[i];
-            if (s.href.indexOf(style) === -1) {
-                s.disabled = true;
-            }
-        }
-    }
-    
-    // check if selected style is valid one
-    for (var i=0; i < styles.length; i++) {
-        if (styles[i].href.indexOf(cookie) !== -1) {
-            found = true;
-            break;
-        }
-    }
-    
-    if (found) {
-        for (var i=0; i < styles.length; i++) {
-            style = styles[i]
-            if (style.href.indexOf(cookie) !== -1 && style.disabled) {
-                style.disabled = false;
-                disableStylesExcept(styles, cookie);
-                styleDOM(cookie);
-            }
-        };
-    }
+    $('html').attr('id', cookie);
     
     return true;
+}
+
+function initStorage() {
+    var status = ('localStorage' in window && window['localStorage'] !== null),
+        key = 'visitedThreads', 
+        visitedList = $('.' + key),
+        thread, storage, elem, tpl, ul, div;
+    
+    $('#dontLogVisits').click(function(event) {
+        visitedList.slideToggle();
+    });
+    
+    if (!status || $.settings('dontLogVisits')) {
+        return false;
+    }
+    
+    storage = $.storage(key) ? $.storage(key) : {};
+    
+    function getId(element) {
+        return element.attr('id').match(/(\d+)/)[1];
+    }
+    
+    if (currentPage.type == 'thread') {
+        thread = currentPage.thread;
+        if (!(thread in storage)) {
+            storage[thread] = { 
+                'op_post': currentPage.op_post, 
+                'section': currentPage.section,
+                'visits': 1,
+                'title': $('article:first-child .title').text(),
+                'description': $.trim($('article:first-child .text').text())
+                              .substring(0, 100) + '...',
+            };
+        } else {
+            storage[thread]['visits']++;
+        }
+        $.storage('visitedThreads', storage);
+    } else if (currentPage.type == 'settings') {
+        ul = visitedList.find('ul');
+        visitedList.show();
+        for (var i in storage) {
+            var a = $('<a/>');
+            item = storage[i];
+            elem = $('<li/>');
+            // elem.data('visits', item.visits);
+            tpl = '/'+item.section+'/'+item.op_post;
+            a.attr('href', tpl);
+            a.text(tpl + ': ' + item.description);
+            ul.append(elem.append(a));
+        }
+        $('.sortVisitedThreads').click(function(event) {
+            
+        });
+        $('.clearVisitedThreads').click(function(event) {
+            event.preventDefault();
+            $.storage(key, 0, true); // flush storage
+            ul.find('li').slideUp('normal', function() {
+                $(this).remove();
+            });
+        });
+    }
 }
 
 $(init);
 $(initSettings);
 $(initStyle);
+$(initStorage);

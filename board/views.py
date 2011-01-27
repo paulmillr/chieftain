@@ -26,6 +26,16 @@ def rtr(template, request, dictionary={}):  # wrapper around render_to_response
         context_instance=RequestContext(request))
 
 
+def handle_uploaded_file(f, section, thread, post):
+    tpl = '{media_root}{section}/{thread}/{post}'.format(
+        media_root=MEDIA_ROOT, section=section, thread=thread, post=post
+    )
+    destination = open(tpl, 'wb+')
+    for chunk in f.chunks():
+        destination.write(chunk)
+    destination.close()
+
+
 def check_form(request, new_thread=False):
     """Makes various changes on new post creation."""
     form = PostForm(request.POST, request.FILES)
@@ -52,6 +62,10 @@ def check_form(request, new_thread=False):
         if new_thread:
             t.save(no_cache_rebuild=True)
             model.thread = t
+        if request.FILES:
+            pass
+            #handle_uploaded_file(request.FILES['file'], t.section, t, model.pid)
+            #f = File(post=model, mime='image/jpeg')
         model.save()
         t.save()
         op_post = model.pid if new_thread else t.op_post.pid

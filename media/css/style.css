@@ -168,8 +168,8 @@ input:invalid, textarea:invalid {
 /* These selection declarations have to be separate.
    No text-shadow: twitter.com/miketaylr/status/12228805301
    Also: hot pink. */
-::-moz-selection{ background: #FF5E99; color:#fff; text-shadow: none; }
-::selection { background:#FF5E99; color:#fff; text-shadow: none; }
+::-moz-selection{ background: #F14A29; color:#fff; text-shadow: none; }
+::selection { background:#F14A29; color:#fff; text-shadow: none; }
 
 /*  j.mp/webkit-tap-highlight-color */
 a:link { -webkit-tap-highlight-color: #FF5E99; }
@@ -280,8 +280,11 @@ nav li {float: left;}
 /* Main content */
 #main {font-size: 1.1em;}
 
+/* New post */
+.new-post fieldset {margin:0px auto 10px auto;width:620px;}
+
 /* Threads and posts */
-.thread {border-top: 1px solid; padding-top: 5px;}
+.thread {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
 .post {background: #ddd; padding: 5px; margin-bottom: 5px;}
 .post:after {clear: both;}
 .post .number:before {content: "№";}
@@ -319,11 +322,12 @@ fieldset dl { font-size: 1.1em;}
 fieldset dt {width: 150px; font-weight: bold;}
 .new-post .captcha-img {vertical-align: bottom; margin:0; padding:0;}
 
+#main {margin-bottom: 20px;}
 fieldset.settings dt {width: auto;}
 
 footer .copyright {text-align: center;}
 footer .copyright a {text-decoration: underline;}
-
+.petux {background: red;}
 /* Code highlight */
 .codehilite pre {
     padding: .5em;
