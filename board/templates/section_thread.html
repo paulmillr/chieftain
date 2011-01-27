@@ -1,32 +1,6 @@
 <section class="thread" id="thread{{thread.id}}">
     {% for post in thread.last_posts %}
-    <article class="post clearfix" id="post{{post.pid}}">
-        <div class="post-wrapper">
-            <header class="clearfix">
-                <div class="info-wrapper">
-                    <span class="number" data-id="{{post.id}}"><a href="{{thread.op_post.pid}}{% if not post.is_op_post %}#post{{post.pid}}{% endif %}">{{post.pid}}</a></span>
-                    <time datetime="{{post.date|date:'Y-m-d H:i:s'}}" pubdate>{{post.date}}</time>
-                    <span class="name" data-default="true">{{post.poster}}</span>
-                    <span class="title">{{post.topic}}</span>
-                </div>
-            </header>
-            <div class="content">
-                {% if post.file_count > 0 %}
-                {% for f in post.file_set %}
-                <div class="file">
-                    <div class="file-info"> <!-- TODO: EDIT ME -->
-                        <a target="_blank" href="{{ MEDIA_URL }}images/post.jpg">144492.png</a>
-                        (<em>7Кб, 150x149</em>)
-                        <a href="#image-edit" class="edit">G</a>
-                    </div>
-                    <a href="{{ MEDIA_URL }}images/post.jpg" onclick="resize"><img src="{{ MEDIA_URL }}images/post.jpg" alt="Image"></a>
-                </div>
-                {% endfor %}
-                {% endif %}
-                <p class="text">{{post.message}}</p>
-            </div>
-        </div>
-    </article>
+    {% include "post.html" %}
     {% if post.is_op_post and thread.count.skipped > 0 %}
     <div class="skipped">Пропущено ответов: {{thread.count.skipped}}, из них {{thread.count.skipped_files}} с файлами.</div> <!-- TODO: l10n -->
     {% endif %}

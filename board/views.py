@@ -6,6 +6,7 @@ views.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+import sys
 from datetime import datetime
 from django.core.paginator import InvalidPage, EmptyPage
 from django.http import Http404, HttpResponseRedirect
@@ -13,7 +14,10 @@ from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from board.models import *
-import sys
+
+__all__ = ['rtr', 'check_form', 'index', 'settings', 
+    'faq', 'section', 'thread',
+]
 
 
 def rtr(template, request, dictionary={}):  # wrapper around render_to_response
@@ -32,13 +36,12 @@ def check_form(request, new_thread=False):
         model.date = datetime.now()
         model.file_count = len(request.FILES)
         model.is_op_post = new_thread
-
         if new_thread:
             t = Thread(section_id=request.POST['section'], bump=model.date)
         else:
             t = Thread.objects.get(id=request.POST['thread'])
         model.pid = t.section.incr_cache()
-        if model.poster == '':
+        if not model.poster:
             model.poster = t.section.default_name
         if model.email.lower() != 'sage':
             t.bump = model.date
@@ -51,13 +54,12 @@ def check_form(request, new_thread=False):
             model.thread = t
         model.save()
         t.save()
-
-        op_post = model.pid if new_thread else t.op_post().pid
+        op_post = model.pid if new_thread else t.op_post.pid
         return HttpResponseRedirect('{0}#post{1}'.format(op_post, model.pid))
     else:
         return rtr('error.html', request, {'errors': form.errors})
 
-
+#@cache_page(DAY)
 def index(request):
     """Main imageboard page"""
     return rtr('index.html', request)
@@ -95,20 +97,17 @@ def thread(request, section, op_post):
     """Gets thread and its posts"""
     if request.method == 'POST':
         return check_form(request, False)
-    args = {'thread__section__slug': section, 'pid': op_post,
-        'is_op_post': True}
     try:
         tid = Post.objects.thread_id(section, op_post)
         t = Thread.objects.get(id=tid)
     except (Post.DoesNotExist):
         try:
-            args['is_op_post'] = False
-            t = Post.objects.get(**args).thread
+            t = Post.objects.get(thread__section__slug=section, 
+                pid=op_post, is_op_post=False).thread  # optimize this
             post = op_post
         except Post.DoesNotExist:
             raise Http404
         return redirect('/{0}/{1}#post{2}'.format(\
-                t.section, t.op_post().pid, post))
-    else:
-        form = PostForm()
+                t.section, t.op_post.pid, post))
+    form = PostForm()
     return rtr('thread.html', request, {'thread': t, 'form': form})

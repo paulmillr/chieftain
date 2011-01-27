@@ -292,6 +292,9 @@ nav li {float: left;}
 .post .text {display: inline-block; margin-top: 20px;}
 .post .text, .post .text * {vertical-align:top;}
 .post .text ins {background: none; text-decoration: underline; font-weight: normal; color: inherit;}
+.post .underlined {border-bottom: 1px dashed;}
+.post blockquote {color: #789922; clear: both;}
+.post blockquote > p {display: inline;}
 .post .file {margin-right: 10px; float:left; max-width: 200px; max-height: 200px;}
 .file-info a:link, .file-info a:hover {text-decoration: underline;}
 .file-info {color: #666; font-size: 0.9em;}

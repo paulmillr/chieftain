@@ -15,7 +15,6 @@ from django.forms import ModelForm
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
-from markdown import markdown
 
 __all__ = [
     'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
@@ -132,6 +131,7 @@ class Thread(models.Model):
     def op_post(self):
         return self.post_set.all()[0]
 
+    @property
     def last_posts(self):
         c = self.count()
         s = self.post_set
@@ -190,8 +190,7 @@ class Post(models.Model):
 
     def refresh_cache(self):
         """Regenerates html cache of post."""
-        text = markdown(self.message, ['codehilite', 'klipd'], 'escape')
-        self.html = render_to_string('post.html', {'post': self, 'text': text})
+        self.html = render_to_string('post.html', {'post': self})
 
     def save(self):
         """docstring for save"""
@@ -278,6 +277,7 @@ class Section(models.Model):
     def key(self):
         return 'section_last_{slug}'.format(slug=self.slug)
 
+    @property
     def last_post_pid(self):
         """
            Gets last post pid. Pid is unique to section.
