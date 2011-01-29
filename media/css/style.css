@@ -289,7 +289,8 @@ fieldset dt {width: 150px; font-weight: bold;}
 .new-post textarea{width:34em;height:10em;}
 .new-style fieldset {width: 400px;}
 .new-style dt {display: none;}
-.new-style .message-d > dd {width: 390px; padding: 0 0 5px 0;}
+.new-style .message-d > dd {width: 390px; padding: 5px 0;}
+.new-style .bbcode {margin-top: 0;}
 .new-style textarea {width: 100%;}
 .new-style input[type="submit"] {margin-left: 5px;}
 .new-post .captcha-img {vertical-align: bottom; margin:0; padding:0;}
