@@ -57,15 +57,14 @@ class InvalidKeyError(Exception):
 
 class PostManager(models.Manager):
     @cached(3 * DAY)
-    def thread_id(self, slug, op_post):
-        """Gets thread id by slug and op_post pid."""
+    def by_section(self, slug, pid):
+        """Gets post by its pid and section slug."""
         try:
-            t = self.get(thread__section__slug=slug, pid=op_post,
-                is_op_post=True).thread.id
+            post = self.get(thread__section__slug=slug, pid=pid)
         except Post.DoesNotExist as e:
             raise e
         else:
-            return t
+            return post
 
 
 class SectionManager(models.Manager):
@@ -108,7 +107,7 @@ class Thread(models.Model):
 
     @property
     def posts_html(self):
-        return self.post_set.values('html')
+        return self.post_set.filter(is_deleted=False).values('html')
 
     def postcount(self):
         return self.post_set.count()
@@ -187,7 +186,7 @@ class Post(models.Model):
     message = models.TextField(verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
-
+    
     def refresh_cache(self):
         """Regenerates html cache of post."""
         self.html = render_to_string('post.html', {'post': self})

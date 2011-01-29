@@ -278,10 +278,24 @@ nav li {float: left;}
 #sidebar ul {margin-left: 1em; padding-left: 0.5em;}
 
 /* Main content */
-#main {font-size: 1.1em;}
+#main {font-size: 1.1em;margin-bottom: 20px;}
 
 /* New post */
-.new-post fieldset {margin:0px auto 10px auto;width:620px;}
+#main > .new-post fieldset {margin: 0px auto 10px auto;}
+section fieldset dl:last-child > dd {margin-bottom: 10px;}
+fieldset {width: 620px;}
+fieldset dl {font-size: 1.1em;}
+fieldset dt {width: 150px; font-weight: bold;}
+.new-post textarea{width:34em;height:10em;}
+.new-style fieldset {width: 400px;}
+.new-style dt {display: none;}
+.new-style .message-d > dd {width: 390px; padding: 0 0 5px 0;}
+.new-style textarea {width: 100%;}
+.new-style input[type="submit"] {margin-left: 5px;}
+.new-post .captcha-img {vertical-align: bottom; margin:0; padding:0;}
+.new-style .username-d, .new-style .topic-d {float: left;}
+.new-style .email-d, .new-style .password-d {float: right;}
+.settings dt {width: auto;}
 
 /* Threads and posts */
 .thread {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
@@ -316,14 +330,6 @@ nav li {float: left;}
 .bbcode > .i {font-style: italic;}
 .bbcode > .u {text-decoration: underline;}
 .bbcode > .s {text-decoration: line-through;}
-
-fieldset  {width: 100%;}
-fieldset dl { font-size: 1.1em;}
-fieldset dt {width: 150px; font-weight: bold;}
-.new-post .captcha-img {vertical-align: bottom; margin:0; padding:0;}
-
-#main {margin-bottom: 20px;}
-fieldset.settings dt {width: auto;}
 
 footer .copyright {text-align: center;}
 footer .copyright a {text-decoration: underline;}
@@ -377,7 +383,6 @@ footer .copyright a {text-decoration: underline;}
 
 @media all and (orientation:portrait) {
     /* style adjustments for portrait mode goes here */
-
 }
 
 @media all and (orientation:landscape) {
@@ -392,6 +397,7 @@ footer .copyright a {text-decoration: underline;}
     html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } */
     .section-banner {display: none;}
     .fieldset dl {display: none;}
+    .new-style fieldset {width: 330px;}
 }
 
 /*

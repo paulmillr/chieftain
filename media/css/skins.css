@@ -12,12 +12,12 @@
 #photon .new-post dt{color:#024;}
 #photon .new-post input,
 #photon .new-post textarea{font-size:0.8em;}
-#photon .new-post textarea{width:34em;height:10em;}
 #photon .new-post .empty{font-style:italic;}
 #photon .new-post .captcha-img{width:300px;}
 #photon .new-post .bbcode{padding-bottom:5px;font-size:1em;}
-#photon .message-d > dt{padding-top:80px;}
-#photon .captcha-d > dt{padding-top:30px;}
+#photon .new-style dl {clear: none;}
+#photon .new-style dt {display: none;}
+
 /* Threads and posts */
 #photon .thread{border-top-color:#ccc;}
 #photon .post{background:none;padding:0;margin-bottom:5px;}
@@ -27,11 +27,6 @@
 #photon .post .number a:visited {color: inherit;}
 #photon .post .number,
 #photon .post time{float:right;}
-@media screen and (max-device-width:640px){/* j.mp/textsizeadjust
-#photon html{-webkit-text-size-adjust:none;-ms-text-size-adjust:none;}*/
-}
-
-
 
 /* Neutron Rewrited for klipped v 0.21 */
 #neutron body{background:none #212121;color:#698CC0;}

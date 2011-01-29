@@ -53,6 +53,7 @@ function Newpost(element) { // listens textarea and adds some methods to it
     		} else {
     			textarea.value += text+" ";
     		}
+    		console.log(2)
     		textarea.focus();
     	}
     }
@@ -189,6 +190,7 @@ function labelsToPlaceholders(list) {
     for (var i=0; i < list.length; i++) {
         var x = list[i],
             t = $('label[for="'+x+'"]').text(),
+            dt = $('.' + x + '-d').find('dt').remove(),
             dd = $('#'+x);
         dd.attr('placeholder', t);
     }
@@ -216,18 +218,7 @@ function manipulator(arr) { // manipulates elements. Used for custom user styles
 
 // make page changes, that can't be afforded through CSS
 function styleDOM(style) {
-    if (style === 'klipton') {
-        var styleInfo = {
-            after : [
-                ['.new-post input[type="submit"]', '#captcha'],
-                ['.password-d', '.topic-d'],
-                ['.file-d', '.password-d'],
-            ],
-        };
-        
-        labelsToPlaceholders(['username', 'email', 'topic', 'message', 'captcha']);
-        manipulator(styleInfo);
-    }
+
 }
 
 function parseQs(key) { // query string parser
@@ -283,12 +274,10 @@ function init() {
     
     $('#main > .thread').delegate('.number > a', 'click', function(e) {
         e.preventDefault();
-        textArea.insert('>>' + e.srcElement.innerHTML)
-        
         if (!$.settings('oldInsert')) {
-            var n = $('#post'+$(this).text()),
-                f = $('.new-post').remove();
-            f.insertAfter(n);
+            var n = $('#post' + $(this).text());
+            $('.new-post').insertAfter(n);
+            textArea.insert('>>' + e.srcElement.innerHTML + ' ');
         }
     });
     
@@ -324,13 +313,31 @@ function initSettings() {
                 $('nav').toggle();
             },
 
-            'hideGroups' : function(x) {
-                //x.split(',') // 1:y
-                //hideSectGroup()
-            },
-
             'hideSectBanner' : function(x) {
                 $('.section-banner').toggle();
+            },
+            
+            'newForm' : function(x) {
+                if (!x) {
+                    return false;
+                }
+                
+                var styleInfo = {
+                    after : [
+                        ['.new-post input[type="submit"]', '#captcha'],
+                        ['.password-d', '.topic-d'],
+                        ['.file-d', '.password-d'],
+                    ],
+                };
+
+                labelsToPlaceholders(['username', 'email', 'topic', 'message', 'captcha']);
+                $('.new-post').addClass('new-style')
+                $('.empty').remove();
+                manipulator(styleInfo);
+            },
+            
+            'hideBBCodes' : function(x) {
+                $('.bbcode').hide();
             },
         };
         
@@ -399,7 +406,6 @@ function initSettings() {
             c = $.settings(id);
         regChangeEvent(id, func);
         if (c) {
-            console.log($('#'+id));
             func(id);
         }
     }
@@ -408,7 +414,6 @@ function initSettings() {
 function initStyle() {
     var key = 'ustyle',
         cookie = $.settings(key);
-    console.log(cookie);
     
     if (!cookie) {
         return false;
@@ -480,7 +485,15 @@ function initStorage() {
     }
 }
 
+function initHotkeys() {
+    $('.new-post input, .new-post textarea').keydown('shift+return', function(event) {
+        $('.new-post').submit();
+        return false;
+    });
+}
+
 $(init);
 $(initSettings);
 $(initStyle);
 $(initStorage);
+$(initHotkeys);

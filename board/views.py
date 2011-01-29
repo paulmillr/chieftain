@@ -9,14 +9,14 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 import sys
 from datetime import datetime
 from django.core.paginator import InvalidPage, EmptyPage
-from django.http import Http404, HttpResponseRedirect
+from django.http import Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.shortcuts import render_to_response, redirect
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from board.models import *
 
-__all__ = ['rtr', 'check_form', 'index', 'settings', 
-    'faq', 'section', 'thread',
+__all__ = [
+    'rtr', 'check_form', 'index', 'settings', 'faq', 'section', 'thread',
 ]
 
 
@@ -112,16 +112,12 @@ def thread(request, section, op_post):
     if request.method == 'POST':
         return check_form(request, False)
     try:
-        tid = Post.objects.thread_id(section, op_post)
-        t = Thread.objects.get(id=tid)
-    except (Post.DoesNotExist):
-        try:
-            t = Post.objects.get(thread__section__slug=section, 
-                pid=op_post, is_op_post=False).thread  # optimize this
-            post = op_post
-        except Post.DoesNotExist:
-            raise Http404
-        return redirect('/{0}/{1}#post{2}'.format(\
-                t.section, t.op_post.pid, post))
+        post = Post.objects.by_section(section, op_post)
+    except Post.DoesNotExist:
+        raise Http404
+    thread = post.thread
+    if thread.op_post.id != post.id:
+        return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(\
+            thread.section, thread.op_post.pid, post.pid))
     form = PostForm()
-    return rtr('thread.html', request, {'thread': t, 'form': form})
+    return rtr('thread.html', request, {'thread': thread, 'form': form})

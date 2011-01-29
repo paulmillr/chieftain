@@ -2,7 +2,7 @@
     {% for post in thread.last_posts %}
     {% include "post.html" %}
     {% if post.is_op_post and thread.count.skipped > 0 %}
-    <div class="skipped">Пропущено ответов: {{thread.count.skipped}}, из них {{thread.count.skipped_files}} с файлами.</div> <!-- TODO: l10n -->
+    <div class="skipped">Пропущено ответов: {{thread.count.skipped}}, из них с файлами: {{thread.count.skipped_files}}.</div> <!-- TODO: l10n -->
     {% endif %}
     {% endfor %}
 </section>
