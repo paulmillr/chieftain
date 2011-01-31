@@ -7,6 +7,9 @@ Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import sys
+import re
+from string import maketrans
+from crypt import crypt
 from datetime import datetime
 from django.core.paginator import InvalidPage, EmptyPage
 from django.http import Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
@@ -24,16 +27,6 @@ def rtr(template, request, dictionary={}):  # wrapper around render_to_response
     dictionary.update({'navigation': SectionGroup.objects.sections()})
     return render_to_response(template, dictionary,
         context_instance=RequestContext(request))
-
-
-def handle_uploaded_file(f, section, thread, post):
-    tpl = '{media_root}{section}/{thread}/{post}'.format(
-        media_root=MEDIA_ROOT, section=section, thread=thread, post=post
-    )
-    destination = open(tpl, 'wb+')
-    for chunk in f.chunks():
-        destination.write(chunk)
-    destination.close()
 
 
 def check_form(request, new_thread=False):
@@ -81,9 +74,12 @@ def index(request):
 
 #@cache_page(DAY)
 def settings(request):
-    """User settings page"""
+    """User settings page."""
     return rtr('settings.html', request)
 
+def search(request):
+    """Searches on the board."""
+    pass
 
 #@cache_page(DAY / 2)
 def faq(request):

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-29 04:06+0200\n"
+"POT-Creation-Date: 2011-01-31 22:49+0200\n"
 "PO-Revision-Date: 2011-01-23 19:23+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -19,185 +19,273 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: board/models.py:101
+#: board/models.py:29
+msgid "Default"
+msgstr "Обычный"
+
+#: board/models.py:30
+msgid "No images"
+msgstr "Без изображений"
+
+#: board/models.py:31
+msgid "Feed"
+msgstr "Лента"
+
+#: board/models.py:32
+msgid "Premodded"
+msgstr "Премодерируемый"
+
+#: board/models.py:33
+msgid "Chat"
+msgstr "Чат"
+
+#: board/models.py:108
 msgid "Thread bump date"
 msgstr "Дата последнего бампа"
 
-#: board/models.py:103
+#: board/models.py:110
 msgid "Thread is pinned"
 msgstr "Прикреплен"
 
-#: board/models.py:105
+#: board/models.py:112
 msgid "Thread is closed"
 msgstr "Закрыт"
 
-#: board/models.py:106
+#: board/models.py:113
 msgid "Thread html"
 msgstr "HTML-кэш"
 
-#: board/models.py:166
+#: board/models.py:167
+msgid "Thread"
+msgstr "Тема"
+
+#: board/models.py:168
+msgid "Threads"
+msgstr "Темы"
+
+#: board/models.py:175
 msgid "Post thread"
 msgstr "Тред"
 
-#: board/models.py:168
+#: board/models.py:177
 msgid "Post is op post"
 msgstr "Стартует тред"
 
-#: board/models.py:170
+#: board/models.py:179
 msgid "Post bump date"
 msgstr "Дата бампа"
 
-#: board/models.py:172
+#: board/models.py:181
 msgid "Post is deleted"
 msgstr "Удален"
 
-#: board/models.py:174
+#: board/models.py:183
 msgid "Post file count"
 msgstr "Количество файлов"
 
-#: board/models.py:175
+#: board/models.py:184
 msgid "Post ip"
 msgstr "IP-адрес"
 
-#: board/models.py:177
+#: board/models.py:186
 msgid "Post poster"
 msgstr "Имя"
 
-#: board/models.py:179
+#: board/models.py:188
 msgid "Post tripcode"
 msgstr "Трипкод"
 
-#: board/models.py:181
+#: board/models.py:190
 msgid "Post email"
 msgstr "Почта"
 
-#: board/models.py:183
+#: board/models.py:192
 msgid "Post topic"
 msgstr "Тема"
 
-#: board/models.py:185
+#: board/models.py:194
 msgid "Post password"
 msgstr "Пароль"
 
-#: board/models.py:186
+#: board/models.py:195
 msgid "Post message"
 msgstr "Текст"
 
-#: board/models.py:187
+#: board/models.py:196
 msgid "Post html"
 msgstr "HTML-кэш"
 
-#: board/models.py:205
+#: board/models.py:212
+msgid "Post"
+msgstr "Сообщение"
+
+#: board/models.py:213
+msgid "Posts"
+msgstr "Сообщения"
+
+#: board/models.py:218
 msgid "File post"
 msgstr "Сообщение"
 
-#: board/models.py:207
+#: board/models.py:220
 msgid "File original name"
 msgstr "Оригинальное имя"
 
-#: board/models.py:208
+#: board/models.py:221
 msgid "File MIME"
 msgstr "MIME-тип"
 
-#: board/models.py:209
+#: board/models.py:222
 msgid "file_size"
 msgstr "Размер"
 
-#: board/models.py:211
+#: board/models.py:224
 msgid "File is deleted"
 msgstr "Удален"
 
-#: board/models.py:213
+#: board/models.py:226
 msgid "File image width"
 msgstr "Ширина изображения"
 
-#: board/models.py:215
+#: board/models.py:228
 msgid "File image height"
 msgstr "Высота изображения"
 
-#: board/models.py:218
+#: board/models.py:231
 msgid "File hash"
 msgstr "Хэш"
 
-#: board/models.py:220
+#: board/models.py:233
 msgid "File location"
 msgstr "Расположение"
 
-#: board/models.py:226
+#: board/models.py:239 board/templates/form.html:44
+msgid "File"
+msgstr "Файл"
+
+#: board/models.py:240
+msgid "Files"
+msgstr "Файлы"
+
+#: board/models.py:246
 msgid "File category name"
 msgstr "Название"
 
-#: board/models.py:235
+#: board/models.py:252
+msgid "File category"
+msgstr "Категория файлов"
+
+#: board/models.py:253
+msgid "File categories"
+msgstr "Категории файлов"
+
+#: board/models.py:259
 msgid "File type extension"
 msgstr "Расширение"
 
-#: board/models.py:237
+#: board/models.py:261
 msgid "File type MIME"
 msgstr "MIME-тип"
 
-#: board/models.py:239
+#: board/models.py:263
 msgid "File type category"
 msgstr "Категория"
 
-#: board/models.py:248
+#: board/models.py:269
+msgid "File type"
+msgstr "Тип файлов"
+
+#: board/models.py:270
+msgid "File types"
+msgstr "Типы файлов"
+
+#: board/models.py:276
 msgid "Section slug"
 msgstr "Адрес"
 
-#: board/models.py:250
+#: board/models.py:278
 msgid "Section name"
 msgstr "Название"
 
-#: board/models.py:252
+#: board/models.py:280
 msgid "Section description"
 msgstr "Описание"
 
-#: board/models.py:254
+#: board/models.py:282
+msgid "Section type"
+msgstr "Тип раздела"
+
+#: board/models.py:284 board/models.py:357
 msgid "Section group"
 msgstr "Группа"
 
-#: board/models.py:256
+#: board/models.py:286
 msgid "Section filesize limit"
 msgstr "Лимит на размер файлов"
 
-#: board/models.py:258
+#: board/models.py:288
 msgid "Section force anonymity"
 msgstr "Принудительная анонимность"
 
-#: board/models.py:260
+#: board/models.py:290
 msgid "Section default poster name"
 msgstr "Имя автора по-умолчанию"
 
-#: board/models.py:262
+#: board/models.py:292
 msgid "Section allowed filetypes"
 msgstr "Разрешенные типы файлов"
 
-#: board/models.py:264
+#: board/models.py:294
 msgid "Section bumplimit"
 msgstr "Бамплимит"
 
-#: board/models.py:266
+#: board/models.py:296
 msgid "Section thread limit"
 msgstr "Лимит тредов в разделе"
 
-#: board/models.py:314
+#: board/models.py:341
+msgid "Section"
+msgstr "Раздел"
+
+#: board/models.py:342
+msgid "Sections"
+msgstr "Разделы"
+
+#: board/models.py:348
 msgid "Section group name"
 msgstr "Название"
 
-#: board/models.py:315
+#: board/models.py:349
 msgid "Section group order"
 msgstr "Порядок"
 
-#: board/models.py:327
+#: board/models.py:350
+msgid "Is hidden"
+msgstr "Скрыта"
+
+#: board/models.py:358
+msgid "Section groups"
+msgstr "Группы"
+
+#: board/models.py:364
 msgid "User name"
 msgstr "Имя пользователя"
 
-#: board/models.py:329
+#: board/models.py:366
 msgid "User password"
-msgstr "Модключ"
+msgstr "Пароль"
 
-#: board/models.py:332
+#: board/models.py:369
 msgid "User owned sections"
 msgstr "Модерируемые секции"
+
+#: board/models.py:375
+msgid "User"
+msgstr "Пользователь"
+
+#: board/models.py:376
+msgid "Users"
+msgstr "Пользователи"
 
 #: board/templates/base.html:32
 msgid "Runs on"
@@ -206,10 +294,6 @@ msgstr "Бегает на"
 #: board/templates/form.html:8
 msgid "Left this field empty"
 msgstr "(оставьте поле пустым)"
-
-#: board/templates/form.html:44
-msgid "File"
-msgstr "Файл"
 
 #: board/templates/form.html:48
 msgid "Captcha"

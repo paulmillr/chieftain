@@ -8,7 +8,6 @@
 {% if not threads %}<a href="./">{% trans "Go back" %}</a>{% endif %}
             {% include "form.html" %}
             {{section.description}}
-            
             {% if threads %}
                 {% autoescape off %}
                 <div class="threads">

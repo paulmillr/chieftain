@@ -8,7 +8,6 @@ post_handler = Resource(PostHandler)
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
-#    (r'^modpanel/', include('mod.urls')),
-    (r'^api/(?P<id>\d+)', include('board.api.urls')),
+    (r'^api/', include('board.api.urls')),
     (r'^', include('board.urls')),
 )

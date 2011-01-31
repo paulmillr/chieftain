@@ -241,6 +241,7 @@ em {font-style: italic;}
 .left {float: left;}
 .right {float: right;}
 .dashed { border: 1px dashed; }
+.stats {border: 1px dashed; padding: 0 5px;}
 
 
 /* yeah */

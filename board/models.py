@@ -25,6 +25,13 @@ __all__ = [
 
 DAY = 86400  # seconds in day
 MEGABYTE = 2 ** 20
+SECTION_TYPES = (
+    (1, _('Default')),
+    (2, _('No images')),
+    (3, _('Feed')),  # Users, that don't have accounts can't create threads
+    (4, _('Premodded')),  # Each thread needs to be approved
+    (5, _('Chat')),
+)
 
 
 def cached(seconds=900):
@@ -157,6 +164,8 @@ class Thread(models.Model):
     class Meta:
         get_latest_by = "bump"
         ordering = ['-bump', '-id']
+        verbose_name = _('Thread')
+        verbose_name_plural = _('Threads')
 
 
 class Post(models.Model):
@@ -181,7 +190,7 @@ class Post(models.Model):
         verbose_name=_('Post email'))
     topic = models.CharField(max_length=48, blank=True,
         verbose_name=_('Post topic'))
-    password = models.CharField(max_length=32, blank=True,
+    password = models.CharField(max_length=64, blank=True,
         verbose_name=_('Post password'))
     message = models.TextField(verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
@@ -198,6 +207,10 @@ class Post(models.Model):
 
     def __unicode__(self):
         return unicode(self.id)
+    
+    class Meta:
+        verbose_name = _('Post')
+        verbose_name_plural = _('Posts')
 
 
 class File(models.Model):
@@ -218,6 +231,13 @@ class File(models.Model):
         verbose_name=_('File hash'))
     file = models.FileField(upload_to='test/{}',
         verbose_name=_('File location'))
+    
+    def __unicode__(self):
+        return self.post
+    
+    class Meta:
+        verbose_name = _('File')
+        verbose_name_plural = _('Files')
 
 
 class FileCategory(models.Model):
@@ -227,6 +247,10 @@ class FileCategory(models.Model):
 
     def __unicode__(self):
         return self.name
+    
+    class Meta:
+        verbose_name = _('File category')
+        verbose_name_plural = _('File categories')
 
 
 class FileType(models.Model):
@@ -240,6 +264,10 @@ class FileType(models.Model):
 
     def __unicode__(self):
         return self.extension
+    
+    class Meta:
+        verbose_name = _('File type')
+        verbose_name_plural = _('File types')
 
 
 class Section(models.Model):
@@ -250,6 +278,8 @@ class Section(models.Model):
         verbose_name=_('Section name'))
     description = models.TextField(blank=False,
         verbose_name=_('Section description'))
+    type = models.PositiveSmallIntegerField(default=1, choices=SECTION_TYPES,
+        verbose_name=_('Section type'))
     group = models.ForeignKey('SectionGroup',
         verbose_name=_('Section group'))
     filesize_limit = models.PositiveIntegerField(default=MEGABYTE * 5,
@@ -306,6 +336,10 @@ class Section(models.Model):
 
     def __unicode__(self):
         return self.slug
+    
+    class Meta:
+        verbose_name = _('Section')
+        verbose_name_plural = _('Sections')
 
 
 class SectionGroup(models.Model):
@@ -313,19 +347,22 @@ class SectionGroup(models.Model):
     name = models.CharField(max_length=64, blank=False,
         verbose_name=_('Section group name'))
     order = models.SmallIntegerField(verbose_name=_('Section group order'))
+    is_hidden = models.BooleanField(default=False, verbose_name=_('Is hidden'))
     objects = SectionGroupManager()
-    # determine if section hidden from menu or not
-    is_hidden = models.BooleanField(default=False)
 
     def __unicode__(self):
         return unicode(self.name) + ', ' + unicode(self.order)
+    
+    class Meta:
+        verbose_name = _('Section group')
+        verbose_name_plural = _('Section groups')
 
 
 class User(models.Model):
     """User (moderator etc.)"""
     username = models.CharField(max_length=32, unique=True,
         verbose_name=_('User name'))
-    password = models.CharField(max_length=32,
+    password = models.CharField(max_length=64,
         verbose_name=_('User password'))
     # sections, modded by user
     sections = models.ManyToManyField('Section', blank=False,
@@ -333,6 +370,10 @@ class User(models.Model):
 
     def __unicode__(self):
         return self.username
+    
+    class Meta:
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
 
 
 class PostForm(ModelForm):
