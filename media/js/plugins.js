@@ -95,9 +95,8 @@ $.extend({
      * Canvas color picker class.
      * 
      * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
-     * Dual licensed under the MIT and GPL licenses:
+     * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
-     * http://www.gnu.org/licenses/gpl.html
      * @param {String} image Link to the image, that would serve as a picker
      * @param {String} canvas Canvas element ID
      * @param {String} current Background color of this element will change
@@ -142,9 +141,8 @@ $.extend({
      * Canvas drawer class.
      * 
      * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
-     * Dual licensed under the MIT and GPL licenses:
+     * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
-     * http://www.gnu.org/licenses/gpl.html
      */
     drawer : function(canvas, saveButton, saveCallback) {
         var c = document.getElementById(canvas).getContext('2d'),
