@@ -453,7 +453,7 @@ function initStorage() {
                 'visits': 1,
                 'title': $('article:first-child .title').text(),
                 'description': $.trim($('article:first-child .text').text())
-                              .substring(0, 100) + '...',
+                                .substring(0, 100) + '...',
             };
         } else {
             storage[thread]['visits']++;
@@ -492,8 +492,57 @@ function initHotkeys() {
     });
 }
 
+function displayBox(title, text) {
+    var div = $('<div/>');
+    div.append($('<h2/>').text(title)).append(text);
+    div.addClass('notification');
+}
+
+function initAJAX() {
+    $('.new-post').submit(function(event) {
+        event.preventDefault();
+        var data = $(this).serialize(),
+            page = (currentPage.type == 'thread') ? '/api/post/' : '/api/thread/';
+
+        $.post(page, data)
+            .error(function(data) {
+                $.message('error', data.responseText);
+            })
+            .success(function(data) {
+                $.message('notice', 'Ваше сообщение отправлено.');
+                if (currentPage.type == 'thread') {
+                    $(data.html).hide().appendTo('.thread').fadeIn(500);
+                    try {
+                        window.location.hash = 'post' + data.pid;
+                    } catch(e) {}
+                } else {
+                    var s = $('<section/>');
+                    s.attr('class', 'thread')
+                     .attr('id', 'thread' + data.thread.id)
+                     .html(data.html);
+                    s.hide().prependTo('.threads').fadeIn(500);
+                }
+                $('.new-post').find(':input').each(function() {
+                    switch (this.type) {
+                        case 'password':
+                        case 'select-multiple':
+                        case 'select-one':
+                        case 'text':
+                        case 'textarea':
+                            $(this).val('');
+                            break;
+                        case 'checkbox':
+                        case 'radio':
+                            this.checked = false;
+                    }
+                });
+            });
+    });
+}
+
 $(init);
 $(initSettings);
 $(initStyle);
 $(initStorage);
 $(initHotkeys);
+$(initAJAX);

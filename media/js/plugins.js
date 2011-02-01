@@ -201,6 +201,119 @@ $.extend({
         });
     },
     
+    /*
+     * Copyright 2010 akquinet
+     * Licensed under the Apache License, Version 2.0 (the "License");
+     * you may not use this file except in compliance with the License.
+     * You may obtain a copy of the License at
+     * http://www.apache.org/licenses/LICENSE-2.0
+     * Unless required by applicable law or agreed to in writing, software
+     * distributed under the License is distributed on an "AS IS" BASIS,
+     * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+     * See the License for the specific language governing permissions and
+     * limitations under the License.
+     */
+    // Based on code of jquery.toastmessage, modified by Paul Bagwell
+    message : function(type) {
+        var settings = {
+            inEffect: {opacity: 'show'}, // in effect
+            inEffectDuration: 600, // in effect duration in ms
+            stayTime: 3000, // time in miliseconds before the item has to disappear
+            text: '',    // content of the item
+            sticky: false, // should the toast item sticky or not?
+            type: 'notice', // notice, warning, error, success
+            position: 'top-right', // top-right, center, middle-bottom etc
+            closeText: '', // text which will be shown as close button, 
+                           // set to '' when you want to introduce an image via css
+            close: null // callback function when the message is closed
+        };
+
+        var methods = {
+            init : function(options) {
+                if (options) {
+                    $.extend(settings, options);
+                }
+            },
+
+            show : function(options) {
+                var localSettings = {},
+                    toastWrapAll, toastItemOuter, toastItemInner, 
+                    toastItemClose, toastItemImage;
+                $.extend(localSettings, settings, options);
+
+                toastWrapAll = (!$('.toast-container').length) ? 
+                    $('<div/>').addClass('toast-container')
+                    .addClass('toast-position-' + localSettings.position)
+                    .appendTo('body') 
+                    : $('.toast-container');
+
+                toastItemOuter = $('<div/>').addClass('toast-item-wrapper');
+
+                toastItemInner = $('<div/>').hide()
+                    .addClass('toast-item toast-type-' + localSettings.type)
+                    .appendTo(toastWrapAll)
+                    .html('<p>' + localSettings.text + '</p>')
+                    .animate(localSettings.inEffect, localSettings.inEffectDuration)
+                    .wrap(toastItemOuter);
+
+                toastItemClose = $('<div/>').addClass('toast-item-close')
+                    .prependTo(toastItemInner)
+                    .html(localSettings.closeText)
+                    .click(function() { $.message('remove',toastItemInner, localSettings) });
+
+                toastItemImage = $('<div/>').addClass('toast-item-image')
+                    .addClass('toast-item-image-' + localSettings.type)
+                    .prependTo(toastItemInner);
+
+                if (navigator.userAgent.match(/MSIE 6/i)) {
+                    toastWrapAll.css({top: document.documentElement.scrollTop});
+                }
+
+                if (!localSettings.sticky) {
+                    setTimeout(function() {
+                        $.message('remove', toastItemInner, localSettings);
+                    },
+                    localSettings.stayTime);
+                }
+                return toastItemInner;
+            },
+
+            notice : function (message) {
+                return $.message('show', {text: message, type: 'notice'});
+            },
+
+            success : function (message) {
+                return $.message('show', {text: message, type: 'success'});
+            },
+
+            error : function (message) {
+                return $.message('show', {text: message, type: 'error'});
+            },
+
+            warning : function (message) {
+                return $.message('show', {text: message, type: 'warning'});
+            },
+
+            remove: function(obj, options) {
+                obj.animate({opacity: '0'}, 600, function() {
+                    obj.parent().animate({height: '0px'}, 300, function() {
+                        obj.parent().remove();
+                    });
+                });
+                // callback
+                if (options && options.close !== null) {
+                    options.close();
+                }
+            }
+        };
+
+        if (methods[type]) {
+            return methods[type].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof type === 'object' || ! type) {
+            return methods.init.apply(this, arguments);
+        }
+        return methods['notice'].apply(this, Array.prototype.slice.call(arguments, 0));
+    },
 });
 
 /*

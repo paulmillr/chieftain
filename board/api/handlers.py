@@ -6,10 +6,13 @@ handlers.py
 Created by Paul Bagwell on 2011-01-31.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+from board import tools
 from datetime import datetime
-from piston.handler import BaseHandler
+from piston.handler import BaseHandler, AnonymousBaseHandler
 from piston.utils import rc
 from board.models import *
+
+BaseHandler.fields = AnonymousBaseHandler.fields = ()
 
 def check_form(request, new_thread=False):
     """Makes various changes on new post creation."""
@@ -27,7 +30,12 @@ def check_form(request, new_thread=False):
     else:
         t = Thread.objects.get(id=request.POST['thread'])
     model.pid = t.section.incr_cache()
-    if not model.poster:
+    if model.poster:
+        if '#' in model.poster:
+            s = model.poster.split('#')
+            model.tripcode = '#{}'.format(tools.tripcode(s.pop()))
+            model.poster = s[0]
+    else:
         model.poster = t.section.default_name
     if model.email.lower() != 'sage':
         t.bump = model.date
@@ -42,31 +50,38 @@ def check_form(request, new_thread=False):
         pass
     model.save()
     t.save()
-    op_post = model.pid if new_thread else t.op_post.pid
-    return True
+    #op_post = model.pid if new_thread else t.op_post.pid
+    return model
 
 
 class PostHandler(BaseHandler):
     """Handler for board.models.Post."""
     allowed_methods = ('GET', 'POST', 'DELETE')
-    exclude = ('ip', 'password')
+    fields = (
+        'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post', 
+        'date', 'message', 'email', 'html', ('thread', 
+        ('id', ('section', ('id', 'slug'))))
+    )
+    #exclude = ('ip', 'password', ('thread', 'html'))
     model = Post
     
-    def read(self, request, id=None, section=None):
+    def read(self, request, id, section=None):
         """Returns a single post."""
-        if not id:
-            p = Post.objects.filter(is_deleted=False)
-            c = p.count()
-            return p[c-20:]
-        if not section:
-            return Post.objects.get(id=id)
-        return Post.objects.get()
+        try:
+            if not section:
+                return Post.objects.get(id=id)
+            return Post.objects.by_section(section, id)
+        except Post.DoesNotExist:
+            return rc.NOT_FOUND
         
     def create(self, request):
         """Creates new post."""
-        if not check_form(request):
-            return rc.BAD_REQUEST
-        return rc.CREATED
+        f = check_form(request)
+        if not f:
+            r = rc.BAD_REQUEST
+            r.content = 'Please, check your input.'
+            return r
+        return f
     
     def delete(self, request):
         """docstring for delete"""
@@ -88,9 +103,10 @@ class ThreadHandler(BaseHandler):
     
     def create(self, request):
         """Creates new thread."""
-        if not check_form(request, True):
+        p = check_form(request, True)
+        if not p:
             return rc.BAD_REQUEST
-        return rc.CREATED
+        return p
     
     def delete(self, request):
         """Deletes whole thread."""
@@ -102,25 +118,39 @@ class SectionHandler(BaseHandler):
     """Handler for board.models.Section."""
     allowed_methods = ('GET')
     model = Section
+    
+    def read(self, request, id=None):
+        return Section.objects.all()
 
 
 class SectionGroupHandler(BaseHandler):
     """Handler for board.models.SectionGroup."""
     allowed_methods = ('GET', 'POST', 'DELETE')
     model = SectionGroup
+    
+    def read(self, request, id=None):
+        return SectionGroup.objects.all()
 
 
 class FileTypeHandler(BaseHandler):
     """Handler for board.models.FileType."""
     allowed_methods = ('GET')
     model = FileType
+    
+    def read(self, request, id=None):
+        return FileType.objects.all()
 
 class FileCategoryHandler(BaseHandler):
     """Handler for board.models.FileCategory."""
     allowed_methods = ('GET')
     model = FileCategory
+    def read(self, request, id=None):
+        return FileCategory.objects.all()
     
 class UserHandler(BaseHandler):
     """Handler for board.models.User."""
     allowed_methods = ('GET', 'POST', 'DELETE')
     model = User
+    
+    def read(self, request, id=None):
+        return User.objects.all()

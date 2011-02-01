@@ -15,12 +15,18 @@ from django.forms import ModelForm
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
+from django.core.exceptions import ImproperlyConfigured
+try:
+    from ipcalc import Network
+except ImportError:
+    raise ImproperlyConfigured('You must install ipcalc >= 0.1')
+
 
 __all__ = [
     'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
     'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
     'File', 'FileCategory', 'FileType', 'Section', 'SectionGroup', 'User',
-    'PostForm', 'ThreadForm',
+    'PostForm', 'ThreadForm', 'DeniedIP', 'AllowedIP',
 ]
 
 DAY = 86400  # seconds in day
@@ -374,6 +380,31 @@ class User(models.Model):
     class Meta:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
+
+
+class IP(models.Model):
+    ip = models.CharField(_('IP network'), max_length=18,
+            help_text=_('Either IP address or IP network specification'))
+    
+    def __unicode__(self):
+        return self.ip
+
+    def network(self):
+        return Network(self.ip)
+        
+    class Meta:
+        abstract = True
+        
+class DeniedIP(IP):
+    class Meta:
+        verbose_name = _('Denied IP')
+        verbose_name_plural = _('Denied IPs')
+        
+class AllowedIP(IP):
+    class Meta:
+        verbose_name = _('Allowed IP')
+        verbose_name_plural = _('Allowed IPs')
+
 
 
 class PostForm(ModelForm):
