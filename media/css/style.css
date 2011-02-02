@@ -304,6 +304,7 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post .number a, .post .number a:visited {color: inherit;}
 .post .number a:hover {color: #06f;}
 .post .tripcode {color: #228854;}
+.post .tripcode:not(:empty):before {content: "!";}
 .post .title {font-weight: bold;}
 .post .text {display: inline-block; margin-top: 20px;}
 .post .text, .post .text * {vertical-align:top;}

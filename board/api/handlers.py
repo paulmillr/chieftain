@@ -33,7 +33,7 @@ def check_form(request, new_thread=False):
     if model.poster:
         if '#' in model.poster:
             s = model.poster.split('#')
-            model.tripcode = '#{}'.format(tools.tripcode(s.pop()))
+            model.tripcode = tools.tripcode(s.pop())
             model.poster = s[0]
     else:
         model.poster = t.section.default_name
