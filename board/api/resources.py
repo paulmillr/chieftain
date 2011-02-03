@@ -81,6 +81,12 @@ class PostRootResource(RootModelResource):
         'date', 'message', 'email', 'html', 
         ('thread', ('id', ('section', ('id', 'slug')))),
     )
+    
+    def post(self, request, auth, content, *args, **kwargs):
+        instance = check_form(request)
+        if not instance:
+            return Response(status.BAD_REQUEST, _('Please, check your input.'))
+        return Response(status.CREATED, instance)
 
 class PostResource(ModelResource):
     """A read/delete resource for Post."""
@@ -101,6 +107,11 @@ class ThreadRootResource(RootModelResource):
         'id', 'section_id', 'bump', 'is_pinned', 
         'is_closed', 'html',
     )
+    def post(self, request, auth, content, *args, **kwargs):
+        instance = check_form(request, new_thread=True)
+        if not instance:
+            return Response(status.BAD_REQUEST, _('Please, check your input.'))
+        return Response(status.CREATED, instance)
 
 class ThreadResource(ModelResource):
     """A read/delete resource for Thread."""

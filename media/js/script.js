@@ -1,4 +1,4 @@
-/* Author: pbagwl
+/* Author: Paul Bagwell
 
 */
 
@@ -20,7 +20,7 @@ currentPage = (function() { // page detector
     } else { // section or thread
         section = loc[0];
         l = loc[1];
-        if (!l.match(/(?:page\d+)?/)) {
+        if (!l.match(/page\d+/) && l) {
             pageType = 'thread';
             thread = $('.thread').attr('id').match(re)[1];
             op_post = l.match(re)[1];
