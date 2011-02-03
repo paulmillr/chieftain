@@ -29,7 +29,10 @@ def get_ip(request):
     ip = request.META['REMOTE_ADDR']
     if (not ip or ip == '127.0.0.1') and 'HTTP_X_FORWARDED_FOR' in request.META:
         ip = request.META['HTTP_X_FORWARDED_FOR']
-    return ip.replace(',','').split()[0] # choose first of (possibly) multiple values
+    try:
+        return ip.replace(',','').split()[0] # choose first of (possibly) multiple values
+    except IndexError:
+        return request.META['REMOTE_ADDR']
 
 def forbid(request):
     """

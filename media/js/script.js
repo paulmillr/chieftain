@@ -20,7 +20,7 @@ currentPage = (function() { // page detector
     } else { // section or thread
         section = loc[0];
         l = loc[1];
-        if (l) {
+        if (!l.match(/(?:page\d+)?/)) {
             pageType = 'thread';
             thread = $('.thread').attr('id').match(re)[1];
             op_post = l.match(re)[1];
@@ -506,7 +506,8 @@ function initAJAX() {
 
         $.post(page, data)
             .error(function(data) {
-                $.message('error', data.responseText);
+                document.write(data.responseText); // for debugging
+                //$.message('error', data.responseText);
             })
             .success(function(data) {
                 $.message('notice', 'Ваше сообщение отправлено.');

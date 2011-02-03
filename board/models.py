@@ -23,6 +23,7 @@ except ImportError:
 
 
 __all__ = [
+    'cache', 'render_to_string', 
     'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
     'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
     'File', 'FileCategory', 'FileType', 'Section', 'SectionGroup', 'User',
@@ -106,7 +107,6 @@ class SectionGroupManager(models.Manager):
             }
             data.append(d)
         return data
-
 
 class Thread(models.Model):
     """Groups of posts."""

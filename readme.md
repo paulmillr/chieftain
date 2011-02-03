@@ -4,18 +4,42 @@ klipped - new generation imageboard.
 
 ## What?
 
-There's not much documentation yet. Use the source, Luke.
+klipped is a new generation imageboard. It is fastest open source chan. It has plenty of modern features and modular design. klipped is built with HTML5, Python programming language, Django web framework with use of jQuery javascript library and Memcached memory caching system.
+
+## Features
+
+* Lightweight architecture
+* Advanched post validation tools: tripcodes and tripbuttons
+* Mobile and smartphone versions
+* Markdown support with code highlighting
+* Thread archiving
+* REST API with XML and JSON serializers.
+* Comet
+* Canvas drawer
+* Full-text search
+* AJAX
+* Answer maps & previews
+* Customizable styles
+* Advanced moderation and administration tools
+* Internationalization (5 languages are supported currently)
+* Valid HTML5
+
 
 ## Dependencies
 
 * [django](http://www.djangoproject.com/download/)
 * [memcached](http://memcached.org/)
 * [py-memcached](http://pypi.python.org/pypi/python-memcached/)
+* [py-markdown](http://pypi.python.org/pypi/Markdown)
+* [ipcalc](http://pypi.python.org/pypi/ipcalc)
+* [django-rest-framework](https://bitbucket.org/tomchristie/django-rest-framework/)
 * [django-sphinx](https://github.com/dcramer/django-sphinx.git)
 * Any supported by django SQL database binding (MySQLdb, postgresql, sqlite3,
 Oracle)
 
 ## Licensing
+
+Klipped is licensed under MIT license. It means that you can copy, distribute, adapt and transmit the work for free, but the copyright notice and license shall be included in all copies or substantial portions of klipped.
 
 Copyright (c) 2011 Paul Bagwell, http://pbagwl.github.com/klipped/.
 

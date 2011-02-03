@@ -1,4 +1,3 @@
-{% load cache %}{% load i18n %}{% with "http://dvach.cheapsalo.com/media/" as STATIC_URL %}
 <!DOCTYPE html>  
 <!--[if lt IE 8 ]> <html lang="en" id="photon" class="ie6"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" id="photon" class="ie8"> <![endif]-->
@@ -9,6 +8,8 @@
     <title>Два.ч 2.0</title>
     <meta name="description" content="Два.ч - система анонимных форумов.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load cache %}{% load i18n %}
+    {% with "http://dvach.cheapsalo.com/media/" as STATIC_URL %}
     <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css?v=3">
     <link rel="stylesheet" media="handheld" href="{{ STATIC_URL }}css/handheld.css?v=2">
@@ -34,7 +35,7 @@
         </div>
         <div id="sidebar">{% include "sidebar.html" %}</div>
     </div> <!-- end of #container -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5/jquery.js"></script>
+    <script src="//yandex.st/jquery/1.5.0/jquery.min.js"></script>
     <script>!window.jQuery && document.write(unescape('%3Cscript src="{{ STATIC_URL }}js/libs/jquery-1.5.0.min.js"%3E%3C/script%3E'))</script>
     <script src="{{ STATIC_URL }}js/plugins.js"></script>
     <script src="{{ STATIC_URL }}js/script.js?v=2"></script>
