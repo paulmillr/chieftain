@@ -41,7 +41,7 @@ Oracle)
 
 Klipped is licensed under MIT license. It means that you can copy, distribute, adapt and transmit the work for free, but the copyright notice and license shall be included in all copies or substantial portions of klipped.
 
-Copyright (c) 2011 Paul Bagwell, http://pbagwl.github.com/klipped/.
+Copyright (c) 2011 Paul Bagwell, http://klipped.pbagwl.com/.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

@@ -89,7 +89,7 @@ function getSelText() {
 /**
  * Simple color container class.
  * 
- * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
+ * Copyright (c) 2011, Paul Bagwell <pbagwl.com/pbagwl>.
  * Dual licensed under the MIT and GPL licenses:
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html

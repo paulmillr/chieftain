@@ -94,7 +94,7 @@ $.extend({
     /**
      * Canvas color picker class.
      * 
-     * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
+     * Copyright (c) 2011, Paul Bagwell <pbagwl.com/pbagwl>.
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
      * @param {String} image Link to the image, that would serve as a picker
@@ -140,7 +140,7 @@ $.extend({
     /**
      * Canvas drawer class.
      * 
-     * Copyright (c) 2011, Paul Bagwell <about.me/pbagwl>.
+     * Copyright (c) 2011, Paul Bagwell <pbagwl.com/pbagwl>.
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
      */
