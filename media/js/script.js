@@ -20,7 +20,7 @@ var currentPage = (function() { // page detector
     } else { // section or thread
         section = loc[0];
         l = loc[1];
-        if (!l.match(/page\d+/) && l) {
+        if (l.match(/^\d+/)) {
             pageType = 'thread';
             thread = $('.thread').attr('id').match(re)[1];
             op_post = l.match(re)[1];
@@ -323,7 +323,7 @@ function initSettings() {
                 
                 var styleInfo = {
                     after : [
-                        ['.new-post input[type="submit"]', '#captcha'],
+                        ['.new-post input[type="submit"]', '.captcha'],
                         ['.password-d', '.topic-d'],
                         ['.file-d', '.password-d'],
                     ],
@@ -520,18 +520,14 @@ function initAJAX() {
             })
             .success(function(data) {
                 $.message('notice', 'Ваше сообщение отправлено.');
-                if (currentPage.type == 'thread') {
-                    $(data.html).hide().appendTo('.thread').fadeIn(500);
-                    try {
-                        window.location.hash = 'post' + data.pid;
-                    } catch(e) {}
-                } else {
-                    var s = $('<section/>');
-                    s.attr('class', 'thread')
-                     .attr('id', 'thread' + data.thread.id)
-                     .html(data.html);
-                    s.hide().prependTo('.threads').fadeIn(500);
+                if (currentPage.type == 'section') { // redirect
+                    window.location.href += data.pid;
+                    return true;
                 }
+                $(data.html).hide().appendTo('.thread').fadeIn(500);
+                try {
+                    window.location.hash = 'post' + data.pid;
+                } catch(e) {}
                 $('.new-post').find(':input').each(function() {
                     switch (this.type) {
                         case 'password':
