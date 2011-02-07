@@ -8,7 +8,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from djangorestframework.emitters import *
 
-__all__ = ['YAMLEmitter', 'BaseEmitter', ]
+__all__ = ['YAMLEmitter', 'BaseEmitter']
 
 try:
     import yaml

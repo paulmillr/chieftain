@@ -11,15 +11,13 @@ from datetime import datetime
 from django.core.paginator import Paginator
 from django.core.cache import cache
 from django.db import models
-from django.forms import ModelForm
+from django.forms import ModelForm, CharField, IntegerField
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
 from django.core.exceptions import ImproperlyConfigured
-try:
-    from ipcalc import Network
-except ImportError:
-    raise ImproperlyConfigured('You must install ipcalc >= 0.1')
+from ipcalc import Network
+from board import fields
 
 
 __all__ = [
@@ -27,7 +25,7 @@ __all__ = [
     'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
     'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
     'File', 'FileCategory', 'FileType', 'Section', 'SectionGroup', 'User',
-    'PostForm', 'ThreadForm', 'DeniedIP', 'AllowedIP',
+    'PostForm', 'PostFormNoCaptcha', 'ThreadForm', 'DeniedIP', 'AllowedIP',
 ]
 
 DAY = 86400  # seconds in day
@@ -406,10 +404,16 @@ class AllowedIP(IP):
         verbose_name_plural = _('Allowed IPs')
 
 
-
-class PostForm(ModelForm):
+class PostFormNoCaptcha(ModelForm):
+    section = IntegerField(required=False)
     class Meta:
         model = Post
+
+class PostForm(PostFormNoCaptcha):
+    captcha = fields.ReCaptchaField()
+    recaptcha_challenge_field = CharField(required=False)
+    recaptcha_response_field = CharField(required=False)
+
 
 
 class ThreadForm(ModelForm):

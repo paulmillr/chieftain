@@ -47,8 +47,11 @@
         <dl class="captcha-d">
             <dt><label for="captcha">{% trans "Captcha" %}</label></dt>
             <dd>
-                <img src="{{ STATIC_URL }}images/captcha.jpg" alt="" class="captcha-img">
-                <p><input type="text" name="captcha" id="captcha" size="16" maxlength="32"></p>
+                <div id="recaptcha_widget" style="display: none">
+                    <div id="recaptcha_image" onclick="Recaptcha.reload();" class="captcha-img"></div>
+                    <p><input type="text" name="recaptcha_response_field" id="recaptcha_response_field" size="16" maxlength="32"></p>
+                </div>
+                {{form.captcha}}
             </dd>
         </dl>
         

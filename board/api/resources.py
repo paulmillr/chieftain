@@ -14,8 +14,18 @@ from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, status, NoContent
 
+__all__ = [
+    'Resource', 'ModelResource', 'RootModelResource', 'post_validator',
+    'PostRootResource', 'PostResource', 
+    'ThreadRootResource', 'ThreadResource',
+    'SectionRootResource', 'SectionResource',
+    'FileTypeRootResource', 'FileTypeResource', 
+    'FileCategoryRootResource', 'FileCategoryResource',
+    'SectionGroupRootResource', 'SectionGroupResource',
+]
 
 class Resource(Resource):
+    """Replacer for Resource."""
     emitters = [
         emitters.JSONEmitter,
         emitters.XMLEmitter,
@@ -29,53 +39,55 @@ if emitters.YAMLEmitter:
 class ModelResource(ModelResource, Resource):
     pass
 
-class RootModelResource(RootModelResource, Resource):
+class RootModelResource(ModelResource):
     pass
-        
 
-def check_form(request, new_thread=False):
-    """Makes various changes on new post creation."""
-    form = PostForm(request.POST, request.FILES)
+def post_validator(request):
+    """Makes various changes on new post creation.
+    
+       If there is no POST['thread'] specified, it will create
+       new thread.
+    """
+    form = PostFormNoCaptcha(request.POST, request.FILES)
     if not form.is_valid():
         return False
-    model = form.save(commit=False)
-    if 'REMOTE_ADDR' in request.META:
-        model.ip = request.META['REMOTE_ADDR']
-    model.date = datetime.now()
-    model.file_count = len(request.FILES)
-    model.is_op_post = new_thread
+    new_thread = not request.POST.get('thread')
+    post = form.save(commit=False)
+    post.date = datetime.now()
+    post.file_count = len(request.FILES)
+    post.is_op_post = new_thread
+    post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
+    if request.FILES:  # TODO: move to top to prevent errors
+        pass
     if new_thread:
-        t = Thread(section_id=request.POST['section'], bump=model.date)
+        t = Thread(section_id=request.POST['section'], bump=post.date)
     else:
         t = Thread.objects.get(id=request.POST['thread'])
-    model.pid = t.section.incr_cache()
-    if model.poster:
-        if '#' in model.poster:
-            s = model.poster.split('#')
-            model.tripcode = tools.tripcode(s.pop())
-            model.poster = s[0]
-    else:
-        model.poster = t.section.default_name
-    if model.email.lower() != 'sage':
-        t.bump = model.date
-        if model.email == 'mvtn'.encode('rot13'):
+    if not post.poster:
+        post.poster = t.section.default_name
+    if '#' in post.poster:  # make tripcode
+        s = post.poster.split('#')
+        post.tripcode = tools.tripcode(s.pop())
+        post.poster = s[0]
+    if post.email.lower() != 'sage':
+        t.bump = post.date
+        if post.email == 'mvtn'.encode('rot13'):
             s = u'\u5350'
-            model.poster = model.email = model.topic = s * 10
-            model.message = (s + u' ') * 50
+            post.poster = post.email = post.topic = s * 10
+            post.message = (s + u' ') * 50
     if new_thread:
         t.save(no_cache_rebuild=True)
-        model.thread = t
-    if request.FILES:
-        pass
-    model.save()
+        post.thread = t
+    post.pid = t.section.incr_cache()
+    post.save()
     t.save()
-    #op_post = model.pid if new_thread else t.op_post.pid
-    return model
+    return post
 
 class PostRootResource(RootModelResource):
     """A create/list resource for Post."""
     allowed_methods = anon_allowed_methods = ('GET', 'POST')
     model = Post
+    form = PostForm
     fields = (
         'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post', 
         'date', 'message', 'email', 'html', 
@@ -83,10 +95,7 @@ class PostRootResource(RootModelResource):
     )
     
     def post(self, request, auth, content, *args, **kwargs):
-        instance = check_form(request)
-        if not instance:
-            return Response(status.BAD_REQUEST, _('Please, check your input.'))
-        return Response(status.CREATED, instance)
+        return Response(status.CREATED, post_validator(request))
 
 class PostResource(ModelResource):
     """A read/delete resource for Post."""
@@ -101,17 +110,12 @@ class PostResource(ModelResource):
 
 class ThreadRootResource(RootModelResource):
     """A create/list resource for Thread."""
-    allowed_methods = ('GET', 'POST')
+    allowed_methods = ('GET')
     model = Thread
     fields = (
         'id', 'section_id', 'bump', 'is_pinned', 
         'is_closed', 'html',
     )
-    def post(self, request, auth, content, *args, **kwargs):
-        instance = check_form(request, new_thread=True)
-        if not instance:
-            return Response(status.BAD_REQUEST, _('Please, check your input.'))
-        return Response(status.CREATED, instance)
 
 class ThreadResource(ModelResource):
     """A read/delete resource for Thread."""

@@ -2,7 +2,7 @@
 
 */
 
-currentPage = (function() { // page detector
+var currentPage = (function() { // page detector
     var pageType,
         loc = window.location.href.split('/').slice('3'),
         re = /(\d+)(?:.+)?/,
@@ -185,12 +185,11 @@ function previewPost(selector) {
     });
 }
 
-// For klipton style
 function labelsToPlaceholders(list) {
     for (var i=0; i < list.length; i++) {
         var x = list[i],
             t = $('label[for="'+x+'"]').text(),
-            dt = $('.' + x + '-d').find('dt').remove(),
+            dt = $('.' + x + '-d').find('dt').hide(),
             dd = $('#'+x);
         dd.attr('placeholder', t);
     }
@@ -499,15 +498,25 @@ function displayBox(title, text) {
 }
 
 function initAJAX() {
+    if ($.settings('noAJAX')) {
+        return false;
+    }
     $('.new-post').submit(function(event) {
         event.preventDefault();
         var data = $(this).serialize(),
-            page = (currentPage.type == 'thread') ? '/api/post/' : '/api/thread/';
+            page = '/api/post/';
 
         $.post(page, data)
             .error(function(data) {
-                document.write(data.responseText); // for debugging
-                //$.message('error', data.responseText);
+                //document.write(data.responseText); // for debugging
+                var rt = $.parseJSON(data.responseText)['field-errors'],
+                    t = [], l;
+                for (var i in rt) {
+                    // Get label text of current field
+                    l = $('label[for="'+i+'"]').text();
+                    t.push(l + ': ' + rt[i].join(', '));
+                }
+                $.message('error', t.join('<br/>'));
             })
             .success(function(data) {
                 $.message('notice', 'Ваше сообщение отправлено.');
