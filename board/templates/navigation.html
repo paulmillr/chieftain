@@ -12,7 +12,7 @@
     {% for group in navigation %}
     {% if not group.is_hidden %}
     <ul data-id="{{group.id}}" class="group">
-        {% for section in group.sections %}
+        {% for section in group.section_set.all %}
         <li><a href="/{{section.slug}}/" title="{{section.description}}">{{section.slug}}</a></li>{% endfor %}
     </ul>
     {% endif %}

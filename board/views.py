@@ -13,9 +13,10 @@ from crypt import crypt
 from datetime import datetime
 from django.core.paginator import InvalidPage, EmptyPage
 from django.http import Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
-from django.shortcuts import render_to_response, redirect
+from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
+from board import validators
 from board.models import *
 
 __all__ = [
@@ -23,48 +24,14 @@ __all__ = [
 ]
 
 
-def rtr(template, request, dictionary={}):  # wrapper around render_to_response
-    dictionary.update({'navigation': SectionGroup.objects.sections()})
+def rtr(template, request, dictionary={}):
+    """Wrapper around render_to_response.
+    
+       Adds sidebar to all requests.
+    """
+    dictionary.update({'navigation': SectionGroup.objects.all()})
     return render_to_response(template, dictionary,
         context_instance=RequestContext(request))
-
-
-def check_form(request, new_thread=False):
-    """Makes various changes on new post creation."""
-    form = PostForm(request.POST, request.FILES)
-    if form.is_valid():
-        model = form.save(commit=False)
-        if 'REMOTE_ADDR' in request.META:
-            model.ip = request.META['REMOTE_ADDR']
-        model.date = datetime.now()
-        model.file_count = len(request.FILES)
-        model.is_op_post = new_thread
-        if new_thread:
-            t = Thread(section_id=request.POST['section'], bump=model.date)
-        else:
-            t = Thread.objects.get(id=request.POST['thread'])
-        model.pid = t.section.incr_cache()
-        if not model.poster:
-            model.poster = t.section.default_name
-        if model.email.lower() != 'sage':
-            t.bump = model.date
-            if model.email == 'mvtn'.encode('rot13'):
-                s = u'\u5350'
-                model.poster = model.email = model.topic = s * 10
-                model.message = (s + u' ') * 50
-        if new_thread:
-            t.save(no_cache_rebuild=True)
-            model.thread = t
-        if request.FILES:
-            pass
-            #handle_uploaded_file(request.FILES['file'], t.section, t, model.pid)
-            #f = File(post=model, mime='image/jpeg')
-        model.save()
-        t.save()
-        op_post = model.pid if new_thread else t.op_post.pid
-        return HttpResponseRedirect('{0}#post{1}'.format(op_post, model.pid))
-    else:
-        return rtr('error.html', request, {'errors': form.errors})
 
 #@cache_page(DAY)
 def index(request):
@@ -83,16 +50,27 @@ def search(request):
 
 #@cache_page(DAY / 2)
 def faq(request):
+    """Gets FAQ page."""
     return rtr('faq.html', request)
 
+
+def post_router(request, op_post=None):
+    """Routes post creation requests."""
+    p = validators.post(request, False)
+    if not p:  # display error page
+        return rtr('error.html', request, {'errors': PostForm(p).errors})
+    # get op post and created post pids
+    args = [op_post, p.pid] if op_post else [p.pid, p.pid]
+    return HttpResponseRedirect('{0}#post{1}'.format(*args))
+    
 
 def section(request, section, page=1):
     """
     Gets 20 threads from current section with
-    OP post and last 5 posts in each thread
+    OP post and last 5 posts in each thread.
     """
     if request.method == 'POST':
-        return check_form(request, True)
+        return post_router(request)
     try:
         s = Section.objects.get(slug__exact=section)
         t = s.page_threads(page)
@@ -104,16 +82,16 @@ def section(request, section, page=1):
 
 
 def thread(request, section, op_post):
-    """Gets thread and its posts"""
+    """Gets thread and its posts."""
     if request.method == 'POST':
-        return check_form(request, False)
+        return post_router(request, op_post)
     try:
         post = Post.objects.by_section(section, op_post)
     except Post.DoesNotExist:
         raise Http404
     thread = post.thread
     if thread.op_post.id != post.id:
-        return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(\
+        return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
     form = PostForm()
     return rtr('thread.html', request, {'thread': thread, 'form': form})

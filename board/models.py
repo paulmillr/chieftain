@@ -109,7 +109,8 @@ class SectionGroupManager(models.Manager):
 class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
-    bump = models.DateTimeField(blank=True, verbose_name=_('Thread bump date'))
+    bump = models.DateTimeField(blank=True, db_index=True,
+        verbose_name=_('Thread bump date'))
     is_pinned = models.BooleanField(default=False,
         verbose_name=_('Thread is pinned'))
     is_closed = models.BooleanField(default=False,
@@ -167,7 +168,7 @@ class Thread(models.Model):
 
     class Meta:
         get_latest_by = "bump"
-        ordering = ['-bump', '-id']
+        ordering = ['-bump']
         verbose_name = _('Thread')
         verbose_name_plural = _('Threads')
 

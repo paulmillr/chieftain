@@ -1,12 +1,12 @@
 {% load i18n %}
 <aside class="sidebar">
-    <h2><a href="/">{% trans "Dva.ch" %}</a></h2>
+    <h2><a href="/">{{settings.SITE_TITLE}}</a></h2>
     
     {% for group in navigation %}
     {% if not group.is_hidden %}
     <h4 id="sect-group{{group.id}}">{{group.name}}</h4>
     <ul id="list-group{{group.id}}">
-        {% for section in group.sections %}
+        {% for section in group.section_set.all %}
         <li><a href="/{{section.slug}}/" title="{{section.description}}">{{section.name}}</a></li>{% endfor %}
     </ul>
     {% endif %}

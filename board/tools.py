@@ -11,6 +11,8 @@ from hashlib import sha256
 from string import maketrans
 from crypt import crypt
 
+__all__ = ['handle_uploaded_file', 'tripcode', 'key']
+
 
 def handle_uploaded_file(f, section, thread, post):
     """Moves uploaded file to files directory and makes thumb."""
