@@ -9,6 +9,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from board import tools, validators
 from board.api import emitters
 from board.models import *
+from django.utils.translation import ugettext as _
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, status
@@ -70,7 +71,11 @@ class PostResource(ModelResource):
         p = Post.objects.get(id=id)
         k = tools.key(request.GET['password'])
         if p.password != k:
-            return Response(status.FORBIDDEN)
+            detail = u'{0}{1}. {2}'.format(
+                _('Error on deleting post #'), p.pid,
+                _('Password mismatch')
+            )
+            return Response(status.FORBIDDEN, content={'detail': detail})
         p.remove()
         return Response(status.NO_CONTENT)
 

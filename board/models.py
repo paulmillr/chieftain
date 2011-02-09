@@ -112,7 +112,7 @@ class Thread(models.Model):
     bump = models.DateTimeField(blank=True, db_index=True,
         verbose_name=_('Thread bump date'))
     is_deleted = models.BooleanField(default=False,
-        verbose_name=_('Post is deleted'))
+        verbose_name=_('Thread is deleted'))
     is_pinned = models.BooleanField(default=False,
         verbose_name=_('Thread is pinned'))
     is_closed = models.BooleanField(default=False,
@@ -319,7 +319,7 @@ class Section(models.Model):
 
     def page_threads(self, page=1):
         onpage = 20
-        threads = Paginator(self.thread_set.all(), onpage)
+        threads = Paginator(self.thread_set.filter(is_deleted=False), onpage)
         return threads.page(page)
             
     @property

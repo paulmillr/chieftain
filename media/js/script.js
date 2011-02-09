@@ -276,22 +276,9 @@ function init() {
         if (t.attr('class') == 'toggled') {
             t.removeClass('toggled');
             t.addClass('toggle');
-            fn = function(x) {
-                $(this).prev().remove();
-            };
         } else {
             t.removeClass('toggle');
             t.addClass('toggled');
-            fn = function(x) {
-                /*var checkbox = $('<input/>');
-                checkbox.attr({
-                    'type': 'checkbox', 
-                    'name': 'delete', 
-                    'class': 'delete',
-                    'value': $(this).data('id'),
-                });
-                checkbox.insertBefore(this);*/
-            };
         }
         $('.post .number').each(fn);
     });
@@ -300,12 +287,26 @@ function init() {
         if ($('.deleteMode input').attr('class') !== 'toggled') {
             return true;
         }
-        var t = $(this).addClass('deleted'),
-            id = t.data('id');
-            
+        var post = $(this).addClass('deleted'),
+            id = post.data('id');
+        
         $.ajax({
             'url': '/api/post/' + id + '?password=' + $('#password').val(),
             'type': 'DELETE',
+        })
+        .error(function(data) {
+            $.message('error', $.parseJSON(data.responseText)['detail']);
+            post.removeClass('deleted');
+        })
+        .success(function(data) {
+            if (post.data('is_op_post')) {
+                // remove whole thread
+                window.location.href = './';
+                return true;
+            }
+            post.slideUp(500, function() {
+                $(this).remove();
+            });
         });
     });
     

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-09 08:11+0200\n"
+"POT-Creation-Date: 2011-02-09 09:28+0200\n"
 "PO-Revision-Date: 2011-01-23 19:23+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -47,9 +47,9 @@ msgstr "Чат"
 msgid "Thread bump date"
 msgstr "Дата последнего бампа"
 
-#: board/models.py:115 board/models.py:191
-msgid "Post is deleted"
-msgstr "Удален"
+#: board/models.py:115
+msgid "Thread is deleted"
+msgstr "Тема удалена"
 
 #: board/models.py:117
 msgid "Thread is pinned"
@@ -82,6 +82,10 @@ msgstr "Стартует тред"
 #: board/models.py:189
 msgid "Post bump date"
 msgstr "Дата бампа"
+
+#: board/models.py:191
+msgid "Post is deleted"
+msgstr "Удален"
 
 #: board/models.py:193
 msgid "Post file count"
@@ -315,6 +319,14 @@ msgstr "Разрешенный IP"
 msgid "Allowed IPs"
 msgstr "Разрешенные IP"
 
+#: board/api/resources.py:75
+msgid "Error on deleting post #"
+msgstr "Ошибка при удалении сообщения №"
+
+#: board/api/resources.py:76
+msgid "Password mismatch"
+msgstr "Неправильный пароль"
+
 #: board/templates/base.html:35
 msgid "Runs on"
 msgstr "Бегает на"
@@ -439,18 +451,3 @@ msgstr "количеству посещений"
 #: board/templates/thread.html:3
 msgid "Thread title"
 msgstr "Тред"
-
-#~ msgid "Sidebar"
-#~ msgstr "Боковая панель"
-
-#~ msgid "Skipped"
-#~ msgstr "Пропущено"
-
-#~ msgid "posts"
-#~ msgstr "сообщений"
-
-#~ msgid "and with files:"
-#~ msgstr "из них"
-
-#~ msgid "with pictures"
-#~ msgstr "с файлами"

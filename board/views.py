@@ -90,6 +90,8 @@ def thread(request, section, op_post):
     except Post.DoesNotExist:
         raise Http404
     thread = post.thread
+    if thread.is_deleted:
+        raise Http404
     if thread.op_post.id != post.id:
         return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
