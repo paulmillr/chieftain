@@ -16,17 +16,21 @@ from board.widgets import ReCaptcha, captcha
 __all__ = ['ReCaptchaField']
 
 class ReCaptchaField(forms.CharField):
+    """Represents field, protected by Recaptcha."""
     default_error_messages = {
         'captcha_invalid': _(u'Invalid captcha')
     }
 
     def __init__(self, *args, **kwargs):
         self.widget = ReCaptcha
-        self.required = True
+        if not settings.DISABLE_CAPTCHA:
+            self.required = True
         super(ReCaptchaField, self).__init__(*args, **kwargs)
 
     def clean(self, values):
         super(ReCaptchaField, self).clean(values[1])
+        if settings.DISABLE_CAPTCHA:
+            return False
         recaptcha_challenge_value = smart_unicode(values[0])
         recaptcha_response_value = smart_unicode(values[1])
         check_captcha = captcha.submit(recaptcha_challenge_value, 

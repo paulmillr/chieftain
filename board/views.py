@@ -29,7 +29,7 @@ def rtr(template, request, dictionary={}):
     
        Adds sidebar to all requests.
     """
-    dictionary.update({'navigation': SectionGroup.objects.all()})
+    dictionary.update({'navigation': SectionGroup.objects.sections()})
     return render_to_response(template, dictionary,
         context_instance=RequestContext(request))
 

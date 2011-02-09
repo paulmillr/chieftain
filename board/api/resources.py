@@ -64,6 +64,15 @@ class PostResource(ModelResource):
         'date', 'message', 'email', 'html', 
         ('thread', ('id', ('section', ('id', 'slug')))),
     )
+    def delete(self, request, auth, *args, **kwargs):
+        """Deletes post."""
+        id = kwargs['id']
+        p = Post.objects.get(id=id)
+        k = tools.key(request.GET['password'])
+        if p.password != k:
+            return Response(status.FORBIDDEN)
+        p.remove()
+        return Response(status.NO_CONTENT)
 
 class ThreadRootResource(RootModelResource):
     """A create/list resource for Thread."""

@@ -27,6 +27,7 @@
 #photon .post .number a:visited {color: inherit;}
 #photon .post .number,
 #photon .post time{float:right;}
+#photon .deleted .post-wrapper {background: #A66;}
 
 /* Neutron Rewrited for klipped v 0.21 */
 #neutron body{background:none #212121;color:#698CC0;}

@@ -266,6 +266,49 @@ function init() {
         textArea.wrap(start, end, code);
     });
     
+    $('.deleteMode > input').click(function(x) {
+        var tmp = this.value,
+            t = $(this),
+            fn;
+        this.value = t.data('back');
+        t.data('back', tmp);
+        t.next().toggle();
+        if (t.attr('class') == 'toggled') {
+            t.removeClass('toggled');
+            t.addClass('toggle');
+            fn = function(x) {
+                $(this).prev().remove();
+            };
+        } else {
+            t.removeClass('toggle');
+            t.addClass('toggled');
+            fn = function(x) {
+                /*var checkbox = $('<input/>');
+                checkbox.attr({
+                    'type': 'checkbox', 
+                    'name': 'delete', 
+                    'class': 'delete',
+                    'value': $(this).data('id'),
+                });
+                checkbox.insertBefore(this);*/
+            };
+        }
+        $('.post .number').each(fn);
+    });
+    
+    $('#main').delegate('.post', 'click', function(event) {
+        if ($('.deleteMode input').attr('class') !== 'toggled') {
+            return true;
+        }
+        var t = $(this).addClass('deleted'),
+            id = t.data('id');
+            
+        $.ajax({
+            'url': '/api/post/' + id + '?password=' + $('#password').val(),
+            'type': 'DELETE',
+        });
+    });
+    
     $('#main > .thread').delegate('.edit', 'click', function(event) {
         event.preventDefault();
         var c = new Canvas;
@@ -439,10 +482,6 @@ function initStorage() {
     
     storage = $.storage(key) ? $.storage(key) : {};
     
-    function getId(element) {
-        return element.attr('id').match(/(\d+)/)[1];
-    }
-    
     if (currentPage.type == 'thread') {
         thread = currentPage.thread;
         if (!(thread in storage)) {
@@ -528,9 +567,12 @@ function initAJAX() {
                 try {
                     window.location.hash = 'post' + data.pid;
                 } catch(e) {}
+                $('.captcha-img').trigger('click');
+                $('.new-post').insertBefore('.threads');
                 $('.new-post').find(':input').each(function() {
                     switch (this.type) {
-                        case 'password':
+                        case 'email':
+                        case 'file':
                         case 'select-multiple':
                         case 'select-one':
                         case 'text':

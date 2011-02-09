@@ -11,6 +11,10 @@ from datetime import datetime
 from board import tools
 from board.models import Post, Thread, PostFormNoCaptcha, PostForm
 
+
+def attachment(request):
+    pass
+
 def post(request, no_captcha=True):
     """Makes various changes on new post creation.
     
@@ -27,8 +31,10 @@ def post(request, no_captcha=True):
     post.file_count = len(request.FILES)
     post.is_op_post = new_thread
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
+    post.password = tools.key(post.password)
     if request.FILES:  # TODO: move to top to prevent errors
-        pass
+        for name, f in request.FILES.iteritems():
+            pass
     if new_thread:
         t = Thread(section_id=request.POST['section'], bump=post.date)
     else:
@@ -48,7 +54,7 @@ def post(request, no_captcha=True):
     if new_thread:
         t.save(no_cache_rebuild=True)
         post.thread = t
-    post.pid = t.section.incr_cache()
+    post.pid = t.section.pid_incr()
     post.save()
     t.save()
     return post

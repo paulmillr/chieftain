@@ -1,4 +1,4 @@
-{% load cache %}{% load i18n %}{% cache 3600 top %}
+{% load cache %}{% load i18n %}
 <!DOCTYPE html>  
 <!--[if lt IE 8 ]> <html lang="en" id="photon" class="ie6"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" id="photon" class="ie8"> <![endif]-->
@@ -27,8 +27,8 @@
                 <div class="menu"></div>
                 <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{settings.STATIC_URL}}images/aa.png" alt="/aa/"></a></div>
             </header>
-            <div id="main" role="main">{% endcache %}
-            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Total: %(totTime).3fs. Python: %(pyTime).3fs. Database: %(dbTime).3fs. Queries: %(queries)d.</div> -->{% cache 3600 foot %}
+            <div id="main" role="main">
+            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Total: %(totTime).3fs. Python: %(pyTime).3fs. Database: %(dbTime).3fs. Queries: %(queries)d.</div> -->
             </div>
             <footer>
                 {% include "navigation.html" %}
@@ -55,4 +55,4 @@
       })(document, 'script');
     </script>-->
 </body>
-</html>{% endcache %}
+</html>

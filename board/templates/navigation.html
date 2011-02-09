@@ -1,18 +1,17 @@
 {% load i18n %}
 <nav class="clearfix">
     <ul class="group">
-        <li><a href="./" title="">{% trans "Main page" %}</a></li>
+        <li><a href="/" title="">{% trans "Main page" %}</a></li>
         <li><a href="/faq" title="">{% trans "FAQ" %}</a></li>
         <li><a href="#nsfw" class="nsfwButton" title="{% trans 'Not Safe For Work' %}">{% trans "NSFW" %}</a></li>
         <li><a href="/settings" title="">{% trans "Settings" %}</a></li>
-        <li><a href="/settings?hideSidebar=on" class="hideSidebar">{% trans "Sidebar" %}</a></li>
         <li><a href="/mobile/">{% trans "Mobile version" %}</a></li>
         <!--<li><a href="#bookmarks" id="bookmarks" title="">Закладки</a></li>-->
     </ul>
     {% for group in navigation %}
     {% if not group.is_hidden %}
     <ul data-id="{{group.id}}" class="group">
-        {% for section in group.section_set.all %}
+        {% for section in group.sections %}
         <li><a href="/{{section.slug}}/" title="{{section.description}}">{{section.slug}}</a></li>{% endfor %}
     </ul>
     {% endif %}

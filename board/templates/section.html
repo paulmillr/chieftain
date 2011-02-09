@@ -5,29 +5,36 @@
 {% load i18n %}
 
 {% block content %}
-{% if not threads %}<a href="./">{% trans "Go back" %}</a>{% endif %}
-            {% include "form.html" %}
-            {{section.description}}
-            {% if threads %}
-                {% autoescape off %}
-                <div class="threads">
-                    {% for thread in threads.object_list %}
-                        {{thread.html}}
-                    {% endfor %}
-                </div>
-                {% endautoescape %}
-                <div class="paginator">
-                    <ul class="group">
-                    {% for p in threads.paginator.page_range %}
-                        {% if p != threads.number %}
-                            <li><a href="page{{p}}">{{p}}</a></li>
-                        {% else %}
-                            <li><span>{{p}}</span></li>
-                        {% endif %}
-                    {% endfor %}
-                    </ul>
-                </div>
-            {% else %}
-                {% autoescape off %}{% block thread %}{% endblock %}{% endautoescape %}
-            {% endif %}
+    {% if not threads %}
+        <a href="./">{% trans "Go back" %}</a>
+    {% endif %}
+    {% include "form.html" %}
+    {{section.description}}
+    <div class="threads">
+        {% autoescape off %}
+        {% if threads %}
+            {% for thread in threads.object_list %}
+                {{thread.html}}
+            {% endfor %}
+        {% else %}
+            {% block thread %}{% endblock %}
+        {% endif %}
+        {% endautoescape %}
+    </div>
+    {% if threads %}
+        <div class="paginator">
+            <ul class="group">
+            {% for p in threads.paginator.page_range %}
+                {% if p != threads.number %}
+                    <li><a href="page{{p}}">{{p}}</a></li>
+                {% else %}
+                    <li><span>{{p}}</span></li>
+                {% endif %}
+            {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+    <div class="deleteMode">
+        <input type="button" value="{% trans "Delete posts" %}" data-back="{% trans "Cancel" %}" class="toggle">
+    </div>
 {% endblock %}

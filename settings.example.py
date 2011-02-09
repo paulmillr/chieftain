@@ -66,7 +66,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'opt.StatsMiddleware',
-    'opt.SQLLogToConsoleMiddleware',
+    #'opt.SQLLogToConsoleMiddleware',
 )
 
 ROOT_URLCONF = 'klipped.urls'

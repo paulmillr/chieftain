@@ -86,7 +86,7 @@ class SectionManager(models.Manager):
 
 
 class SectionGroupManager(models.Manager):
-    """docstring for SectionGroupManager"""
+    """Manager for SectionGroup."""
     @cached(DAY)
     def sections(self):
         """
@@ -111,6 +111,8 @@ class Thread(models.Model):
     section = models.ForeignKey('Section')
     bump = models.DateTimeField(blank=True, db_index=True,
         verbose_name=_('Thread bump date'))
+    is_deleted = models.BooleanField(default=False,
+        verbose_name=_('Post is deleted'))
     is_pinned = models.BooleanField(default=False,
         verbose_name=_('Thread is pinned'))
     is_closed = models.BooleanField(default=False,
@@ -121,12 +123,9 @@ class Thread(models.Model):
     def posts_html(self):
         return self.post_set.filter(is_deleted=False).values('html')
 
-    def postcount(self):
-        return self.post_set.count()
-
     def count(self):
         lp = 5
-        ps = self.post_set
+        ps = self.post_set.filter(is_deleted=False)
         stop = ps.count()
         if stop <= lp:  # if we got thread with less posts than lp
             return {'total': stop, 'skipped': 0, 'skipped_files': 0}
@@ -145,7 +144,7 @@ class Thread(models.Model):
     @property
     def last_posts(self):
         c = self.count()
-        s = self.post_set
+        s = self.post_set.filter(is_deleted=False)
         all = s.all()
         if not c['skipped']:
             return all
@@ -153,12 +152,18 @@ class Thread(models.Model):
             start, stop = c['start'], c['stop']
             return [s.all()[0]] + list(all[start:stop])
 
+    def remove(self):
+        """Deletes thread."""
+        self.post_set.all().update(is_deleted=True)
+        self.is_deleted = True
+        self.save()
+
     def refresh_cache(self):
         """Regenerates cache of OP-post and last 5."""
         self.html = render_to_string('section_thread.html', {'thread': self})
 
     def save(self, no_cache_rebuild=False):
-        """docstring for save"""
+        """Saves thread and rebuilds cache."""
         if not no_cache_rebuild:
             self.refresh_cache()
         super(Thread, self).save()
@@ -201,12 +206,23 @@ class Post(models.Model):
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
     
+    def remove(self):
+        """Deletes post."""
+        if self.is_op_post:
+            self.thread.remove()
+        self.is_deleted = True
+        self.save()
+        self.thread.save()
+        
+    
     def refresh_cache(self):
         """Regenerates html cache of post."""
         self.html = render_to_string('post.html', {'post': self})
 
     def save(self):
-        """docstring for save"""
+        """Overload of default save method."""
+        if not self.id:
+            super(Post, self).save()
         self.refresh_cache()
         super(Post, self).save()
 
@@ -305,39 +321,37 @@ class Section(models.Model):
         onpage = 20
         threads = Paginator(self.thread_set.all(), onpage)
         return threads.page(page)
-
+            
     @property
     def key(self):
+        """Memcached key name."""
         return 'section_last_{slug}'.format(slug=self.slug)
-
+    
     @property
-    def last_post_pid(self):
-        """
-           Gets last post pid. Pid is unique to section.
-           This method is cached.
-        """
-        d = cache.get(self.key)
-        if d is not None:
-            return d
-        return self.refresh_cache()
+    def pid(self):
+        """Gets section last post PID."""
+        return cache.get(self.key) or self.refresh_cache()
+    
+    @pid.setter
+    def pid(self, value):
+        cache.set(self.key, value)
+        return value
+    
+    def pid_incr(self):
+        try:
+            return cache.incr(self.key)
+        except ValueError:
+            self.refresh_cache()
+            return cache.incr(self.key)
 
     def refresh_cache(self):
         """Refreshes cache of section-last_post_pid."""
-        p = Post.objects.filter(thread__section=self.id)
-        n = p.count() - 1
-        if n < 0:
-            pid = 0  # first post in section
-        else:
-            pid = p[n].pid  # get last post
-
-        cache.set(self.key, pid)
+        try:
+            pid = Post.objects.filter(thread__section=self.id).latest('pid').pid
+        except Post.DoesNotExist:
+            pid = 0
+        self.pid = pid
         return pid
-
-    def incr_cache(self):
-        """Increments cache value if it exists."""
-        if cache.get(self.key) is None:
-            self.refresh_cache()
-        return cache.incr(self.key)
 
     def __unicode__(self):
         return self.slug
@@ -382,6 +396,7 @@ class User(models.Model):
 
 
 class IP(models.Model):
+    """Abstract base class for all ban classes."""
     ip = models.CharField(_('IP network'), max_length=18,
             help_text=_('Either IP address or IP network specification'))
     
@@ -395,23 +410,30 @@ class IP(models.Model):
         abstract = True
         
 class DeniedIP(IP):
+    """Used for bans."""
     class Meta:
         verbose_name = _('Denied IP')
         verbose_name_plural = _('Denied IPs')
         
 class AllowedIP(IP):
+    """Used for bans."""
     class Meta:
         verbose_name = _('Allowed IP')
         verbose_name_plural = _('Allowed IPs')
 
 
 class PostFormNoCaptcha(ModelForm):
+    """Post form with no captcha.
+    
+       Used for disabling double requests to api server.
+    """
     section = IntegerField(required=False)
     class Meta:
         model = Post
 
 class PostForm(PostFormNoCaptcha):
-    captcha = fields.ReCaptchaField()
+    """Simple post form."""
+    captcha = fields.ReCaptchaField(required=False)
     recaptcha_challenge_field = CharField(required=False)
     recaptcha_response_field = CharField(required=False)
 

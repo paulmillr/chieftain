@@ -299,6 +299,7 @@ fieldset dt {width: 150px; font-weight: bold;}
 .thread {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
 .post {background: #ddd; padding: 5px; margin-bottom: 5px;}
 .post:after {clear: both;}
+.post input[type="checkbox"] {margin: 3px 5px 0 4px;}
 .post .number:before {content: "№";}
 .post .number {font-weight: bold;}
 .post .number a, .post .number a:visited {color: inherit;}
@@ -313,6 +314,7 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post blockquote {color: #789922; clear: both;}
 .post blockquote > p {display: inline;}
 .post .file {margin-right: 10px; float:left; max-width: 200px; max-height: 200px;}
+.deleted .post-wrapper {background: #A66;}
 .file-info a:link, .file-info a:hover {text-decoration: underline;}
 .file-info {color: #666; font-size: 0.9em;}
 
@@ -330,6 +332,9 @@ fieldset dt {width: 150px; font-weight: bold;}
 .bbcode > .i {font-style: italic;}
 .bbcode > .u {text-decoration: underline;}
 .bbcode > .s {text-decoration: line-through;}
+
+.deleteMode {margin: 5px 0;}
+.deleteMode > div {display: none;}
 
 footer .copyright {text-align: center;}
 footer .copyright a {text-decoration: underline;}
