@@ -17,6 +17,7 @@ __all__ = ['DenyMiddleware', 'AllowMiddleware']
 METHODS = ('GET', 'POST', 'UPDATE', 'DELETE')
 WHITELIST = ()
 
+
 def ip_in(ip, model):
     """
     Returns True if the given ip address is in one of the ban models
@@ -29,18 +30,21 @@ def ip_in(ip, model):
         pass
     return False
 
+
 def get_ip(request):
-    """
-    Gets the true client IP address of the request
-    Contains proxy handling involving HTTP_X_FORWARDED_FOR and multiple addresses
+    """Gets the true client IP address of the request.
+
+       Contains proxy handling involving HTTP_X_FORWARDED_FOR
+       and multiple addresses.
     """
     ip = request.META['REMOTE_ADDR']
-    if (not ip or ip == '127.0.0.1') and 'HTTP_X_FORWARDED_FOR' in request.META:
+    if not ip or ip == '127.0.0.1' and 'HTTP_X_FORWARDED_FOR' in request.META:
         ip = request.META['HTTP_X_FORWARDED_FOR']
-    try:
-        return ip.replace(',','').split()[0] # choose first of (possibly) multiple values
+    try:  # choose first of (possibly) multiple values
+        return ip.replace(',', '').split()[0]
     except IndexError:
         return request.META['REMOTE_ADDR']
+
 
 def forbid(request):
     """
@@ -53,7 +57,8 @@ def forbid(request):
         del request.session[k]
     return HttpResponseForbidden(render_to_string('banned.html',
                 context_instance=RequestContext(request)))
-    
+
+
 class DenyMiddleware(object):
     """
     Forbids any request if they are in the DeniedIP list
@@ -61,9 +66,10 @@ class DenyMiddleware(object):
     def process_request(self, request):
         ip = get_ip(request)
         if not request.method in METHODS or ip in WHITELIST:
-            return
+            return False
         if ip_in(ip, DeniedIP):
             return forbid(request)
+
 
 class AllowMiddleware(object):
     """
@@ -71,6 +77,6 @@ class AllowMiddleware(object):
     """
     def process_request(self, request):
         if not request.method in METHODS:
-            return        
+            return False
         if not ip_in(get_ip(request), AllowedIP):
             return forbid(request)

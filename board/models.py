@@ -21,7 +21,7 @@ from board import fields
 
 
 __all__ = [
-    'cache', 'render_to_string', 
+    'cache', 'render_to_string',
     'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
     'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
     'File', 'FileCategory', 'FileType', 'Section', 'SectionGroup', 'User',
@@ -105,6 +105,7 @@ class SectionGroupManager(models.Manager):
             }
             data.append(d)
         return data
+
 
 class Thread(models.Model):
     """Groups of posts."""
@@ -205,7 +206,7 @@ class Post(models.Model):
     message = models.TextField(verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
-    
+
     def remove(self):
         """Deletes post."""
         if self.is_op_post:
@@ -213,8 +214,7 @@ class Post(models.Model):
         self.is_deleted = True
         self.save()
         self.thread.save()
-        
-    
+
     def refresh_cache(self):
         """Regenerates html cache of post."""
         self.html = render_to_string('post.html', {'post': self})
@@ -228,7 +228,7 @@ class Post(models.Model):
 
     def __unicode__(self):
         return '{}_{}'.format(self.id, self.pid)
-    
+
     class Meta:
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
@@ -254,10 +254,10 @@ class File(models.Model):
         verbose_name=_('File hash'))
     file = models.FileField(upload_to='test/{}',
         verbose_name=_('File location'))
-    
+
     def __unicode__(self):
         return self.post
-    
+
     class Meta:
         verbose_name = _('File')
         verbose_name_plural = _('Files')
@@ -270,7 +270,7 @@ class FileCategory(models.Model):
 
     def __unicode__(self):
         return self.name
-    
+
     class Meta:
         verbose_name = _('File category')
         verbose_name_plural = _('File categories')
@@ -287,7 +287,7 @@ class FileType(models.Model):
 
     def __unicode__(self):
         return self.extension
-    
+
     class Meta:
         verbose_name = _('File type')
         verbose_name_plural = _('File types')
@@ -317,7 +317,7 @@ class Section(models.Model):
         verbose_name=_('Section bumplimit'))
     threadlimit = models.PositiveSmallIntegerField(default=10,
         verbose_name=_('Section thread limit'))
-    last_pid = models.PositiveIntegerField(blank=True, 
+    last_pid = models.PositiveIntegerField(blank=True,
         verbose_name=_('Section last post pid'))
     objects = SectionManager()
 
@@ -325,23 +325,23 @@ class Section(models.Model):
         onpage = 20
         threads = Paginator(self.thread_set.filter(is_deleted=False), onpage)
         return threads.page(page)
-            
+
     @property
     def key(self):
         """Memcached key name."""
         return 'section_last_{slug}'.format(slug=self.slug)
-    
+
     @property
     def pid(self):
         """Gets section last post PID."""
         return cache.get(self.key) or self.refresh_cache()
-    
+
     @pid.setter
     def pid(self, value):
         """Sets section last post PID cache to value."""
         cache.set(self.key, value)
         return value
-    
+
     def pid_incr(self):
         """Increments section last post PID cache by 1."""
         try:
@@ -361,7 +361,7 @@ class Section(models.Model):
 
     def __unicode__(self):
         return self.slug
-    
+
     class Meta:
         verbose_name = _('Section')
         verbose_name_plural = _('Sections')
@@ -377,7 +377,7 @@ class SectionGroup(models.Model):
 
     def __unicode__(self):
         return unicode(self.name) + ', ' + unicode(self.order)
-    
+
     class Meta:
         verbose_name = _('Section group')
         verbose_name_plural = _('Section groups')
@@ -395,7 +395,7 @@ class User(models.Model):
 
     def __unicode__(self):
         return self.username
-    
+
     class Meta:
         verbose_name = _('User')
         verbose_name_plural = _('Users')
@@ -405,22 +405,24 @@ class IP(models.Model):
     """Abstract base class for all ban classes."""
     ip = models.CharField(_('IP network'), max_length=18,
             help_text=_('Either IP address or IP network specification'))
-    
+
     def __unicode__(self):
         return self.ip
 
     def network(self):
         return Network(self.ip)
-        
+
     class Meta:
         abstract = True
-        
+
+
 class DeniedIP(IP):
     """Used for bans."""
     class Meta:
         verbose_name = _('Denied IP')
         verbose_name_plural = _('Denied IPs')
-        
+
+
 class AllowedIP(IP):
     """Used for bans."""
     class Meta:
@@ -430,19 +432,20 @@ class AllowedIP(IP):
 
 class PostFormNoCaptcha(ModelForm):
     """Post form with no captcha.
-    
+
        Used for disabling double requests to api server.
     """
     section = IntegerField(required=False)
+
     class Meta:
         model = Post
+
 
 class PostForm(PostFormNoCaptcha):
     """Simple post form."""
     captcha = fields.ReCaptchaField(required=False)
     recaptcha_challenge_field = CharField(required=False)
     recaptcha_response_field = CharField(required=False)
-
 
 
 class ThreadForm(ModelForm):

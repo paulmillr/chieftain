@@ -15,9 +15,10 @@ from board.models import Post, Thread, PostFormNoCaptcha, PostForm
 def attachment(request):
     pass
 
+
 def post(request, no_captcha=True):
     """Makes various changes on new post creation.
-    
+
        If there is no POST['thread'] specified, it will create
        new thread.
     """
@@ -32,6 +33,7 @@ def post(request, no_captcha=True):
     post.is_op_post = new_thread
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = tools.key(post.password)
+
     if request.FILES:  # TODO: move to top to prevent errors
         for name, f in request.FILES.iteritems():
             pass

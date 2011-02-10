@@ -12,7 +12,8 @@ from string import maketrans
 from crypt import crypt
 from datetime import datetime
 from django.core.paginator import InvalidPage, EmptyPage
-from django.http import Http404, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import Http404, HttpResponseRedirect,\
+    HttpResponsePermanentRedirect
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
@@ -26,12 +27,13 @@ __all__ = [
 
 def rtr(template, request, dictionary={}):
     """Wrapper around render_to_response.
-    
+
        Adds sidebar to all requests.
     """
     dictionary.update({'navigation': SectionGroup.objects.sections()})
     return render_to_response(template, dictionary,
         context_instance=RequestContext(request))
+
 
 #@cache_page(DAY)
 def index(request):
@@ -44,9 +46,11 @@ def settings(request):
     """User settings page."""
     return rtr('settings.html', request)
 
+
 def search(request):
     """Searches on the board."""
     pass
+
 
 #@cache_page(DAY / 2)
 def faq(request):
@@ -62,7 +66,7 @@ def post_router(request, op_post=None):
     # get op post and created post pids
     args = [op_post, p.pid] if op_post else [p.pid, p.pid]
     return HttpResponseRedirect('{0}#post{1}'.format(*args))
-    
+
 
 def section(request, section, page=1):
     """

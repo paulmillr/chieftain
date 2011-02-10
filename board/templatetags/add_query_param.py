@@ -3,6 +3,7 @@ from urlparse import urlparse, urlunparse
 from urllib import quote
 register = Library()
 
+
 def add_query_param(url, param):
     (key, val) = param.split('=')
     param = '%s=%s' % (key, quote(val))

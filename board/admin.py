@@ -10,6 +10,7 @@ from klipped import settings
 from board.models import *
 from django.contrib import admin
 
+
 class IPAdmin(admin.ModelAdmin):
     search_fields = ('ip',)
 
@@ -25,6 +26,6 @@ admin.site.register(User)
 
 if 'board.middleware.DenyMiddleware' in settings.MIDDLEWARE_CLASSES:
     admin.site.register(DeniedIP, IPAdmin)
-    
+
 if 'board.middleware.AllowMiddleware' in settings.MIDDLEWARE_CLASSES:
     admin.site.register(AllowedIP, IPAdmin)
