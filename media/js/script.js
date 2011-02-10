@@ -280,7 +280,6 @@ function init() {
             t.removeClass('toggle');
             t.addClass('toggled');
         }
-        $('.post .number').each(fn);
     });
     
     $('#main').delegate('.post', 'click', function(event) {
@@ -299,7 +298,7 @@ function init() {
             post.removeClass('deleted');
         })
         .success(function(data) {
-            if (post.data('is_op_post')) {
+            if (post.attr('id') === post.parent().find('.post:first').attr('id')) {
                 // remove whole thread
                 window.location.href = './';
                 return true;
