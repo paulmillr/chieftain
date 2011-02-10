@@ -166,16 +166,16 @@ class Thread(models.Model):
         """Saves thread and rebuilds cache."""
         if not no_cache_rebuild:
             self.refresh_cache()
-        super(Thread, self).save()
+        super(self.__class__, self).save()
 
     def __unicode__(self):
         return unicode(self.id)
 
     class Meta:
-        get_latest_by = "bump"
-        ordering = ['-bump']
         verbose_name = _('Thread')
         verbose_name_plural = _('Threads')
+        get_latest_by = 'bump'
+        ordering = ['-bump']
 
 
 class Post(models.Model):
@@ -222,16 +222,18 @@ class Post(models.Model):
     def save(self):
         """Overload of default save method."""
         if not self.id:
-            super(Post, self).save()
+            super(self.__class__, self).save()
         self.refresh_cache()
-        super(Post, self).save()
+        super(self.__class__, self).save()
 
     def __unicode__(self):
-        return unicode(self.id)
+        return '{}_{}'.format(self.id, self.pid)
     
     class Meta:
         verbose_name = _('Post')
         verbose_name_plural = _('Posts')
+        get_latest_by = 'pid'
+        ordering = ['pid']
 
 
 class File(models.Model):
@@ -315,6 +317,8 @@ class Section(models.Model):
         verbose_name=_('Section bumplimit'))
     threadlimit = models.PositiveSmallIntegerField(default=10,
         verbose_name=_('Section thread limit'))
+    last_pid = models.PositiveIntegerField(blank=True, 
+        verbose_name=_('Section last post pid'))
     objects = SectionManager()
 
     def page_threads(self, page=1):
@@ -334,21 +338,23 @@ class Section(models.Model):
     
     @pid.setter
     def pid(self, value):
+        """Sets section last post PID cache to value."""
         cache.set(self.key, value)
         return value
     
     def pid_incr(self):
+        """Increments section last post PID cache by 1."""
         try:
             return cache.incr(self.key)
         except ValueError:
             self.refresh_cache()
-            return cache.incr(self.key)
+        return cache.incr(self.key)
 
     def refresh_cache(self):
-        """Refreshes cache of section-last_post_pid."""
+        """Refreshes cache of section last post PID."""
         try:
-            pid = Post.objects.filter(thread__section=self.id).latest('pid').pid
-        except Post.DoesNotExist:
+            pid = Post.objects.filter(thread__section=self.id).latest().pid
+        except Post.DoesNotExist:  # no posts in section
             pid = 0
         self.pid = pid
         return pid

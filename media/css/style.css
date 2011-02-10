@@ -230,6 +230,9 @@ body {
 a:link, a:visited { text-decoration: none; }
 h1 {font-size: 2.5em; line-height: 1.5;}
 h2 {font-size: 2em; line-height: 1.4;}
+h3 {font-size: 1.6em; line-height: 1.3;}
+h4 {font-size: 1.3em; line-height: 1.2;}
+h5 {font-size: 1.1em; line-height: 1.1;}
 em {font-style: italic;}
 .search input[type="text"] {width: 5em;}
 
@@ -238,6 +241,7 @@ em {font-style: italic;}
 .right {float: right;}
 .dashed { border: 1px dashed; }
 .stats {border: 1px dashed; padding: 0 5px;}
+#container + iframe {display: none;} /* Recaptcha bug */
 
 
 /* yeah */
@@ -269,7 +273,7 @@ nav li {float: left;}
 #sidebar {width: 200px; float: left; font-size: 1.1em; margin-left: -100%;}
 #sidebar .hidebutton {float: right;}
 #sidebar h2 {margin-bottom: 10px;}
-#sidebar h4 {margin-bottom: 1px;}
+#sidebar h4 {font-size: 1em; margin-bottom: 1px;}
 #sidebar li {list-style: none;}
 #sidebar aside {margin: 0 1em;}
 #sidebar ul {margin-left: 1em; padding-left: 0.5em;}
@@ -296,8 +300,8 @@ fieldset dt {width: 150px; font-weight: bold;}
 .settings dt {width: auto;}
 
 /* Threads and posts */
-.thread {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
-.post {background: #ddd; padding: 5px; margin-bottom: 5px;}
+.thread, .faq {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
+.post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}
 .post:after {clear: both;}
 .post input[type="checkbox"] {margin: 3px 5px 0 4px;}
 .post .number:before {content: "№";}
@@ -335,6 +339,8 @@ fieldset dt {width: 150px; font-weight: bold;}
 
 .deleteMode {margin: 5px 0;}
 .deleteMode > div {display: none;}
+.faq {list-style: none; margin-left: 0;}
+.faq li li {list-style: none;}
 
 footer .copyright {text-align: center;}
 footer .copyright a {text-decoration: underline;}

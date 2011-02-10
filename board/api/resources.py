@@ -57,8 +57,7 @@ class PostRootResource(RootModelResource):
 
 class PostResource(ModelResource):
     """A read/delete resource for Post."""
-    allowed_methods = ('GET', 'DELETE')
-    anon_allowed_methods = ('GET',)
+    allowed_methods = anon_allowed_methods= ('GET', 'DELETE')
     model = Post
     fields = (
         'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post', 

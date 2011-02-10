@@ -1,0 +1,12 @@
+/* TEAM */
+	Chef: Abu
+	Contact: abyo.ab [at] gmail.com
+	Twitter: @2ch_ru
+	From: Moscow, Russia
+
+/* SITE */
+	Last update: 2011/02
+	Language: Russian
+	Doctype: HTML5 with CSS3
+	Tools: Python, Django
+	IDE: Textmate
