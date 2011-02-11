@@ -318,12 +318,13 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post blockquote {color: #789922; clear: both;}
 .post blockquote > p {display: inline;}
 .post .file {margin-right: 10px; float:left; max-width: 200px; max-height: 200px;}
-.deleted .post-wrapper {background: #A66;}
+.post span:empty {margin: 0;}
+.deleted {background: #e44;}
 .file-info a:link, .file-info a:hover {text-decoration: underline;}
 .file-info {color: #666; font-size: 0.9em;}
 
 .info-wrapper {float: left;}
-.info-wrapper > * {float: left; margin: 0 0 0 4px;}
+.info-wrapper > * {float: left; margin: 0 5px 0 0;}
 .buttons {float: right; margin-left: 5px;}
 .buttons .fav:before {content: "F";}
 .buttons .hide:before {content: "X";}

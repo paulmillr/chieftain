@@ -181,7 +181,7 @@ class Thread(models.Model):
 
 class Post(models.Model):
     """Represents post."""
-    pid = models.PositiveIntegerField(blank=True)
+    pid = models.PositiveIntegerField(blank=True, verbose_name=_('PID'))
     thread = models.ForeignKey('Thread', blank=True, null=True,
         verbose_name=_('Post thread'))
     is_op_post = models.BooleanField(default=False,
@@ -206,6 +206,11 @@ class Post(models.Model):
     message = models.TextField(verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
+    
+    @cached(DAY)
+    @property
+    def section(self):
+        return self.thread.section.slug
 
     def remove(self):
         """Deletes post."""
@@ -227,7 +232,7 @@ class Post(models.Model):
         super(self.__class__, self).save()
 
     def __unicode__(self):
-        return '{}_{}'.format(self.id, self.pid)
+        return '{slug}/{pid}'.format(slug=self.thread.section.slug, pid=self.pid)
 
     class Meta:
         verbose_name = _('Post')
@@ -317,8 +322,6 @@ class Section(models.Model):
         verbose_name=_('Section bumplimit'))
     threadlimit = models.PositiveSmallIntegerField(default=10,
         verbose_name=_('Section thread limit'))
-    last_pid = models.PositiveIntegerField(blank=True,
-        verbose_name=_('Section last post pid'))
     objects = SectionManager()
 
     def page_threads(self, page=1):

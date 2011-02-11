@@ -16,7 +16,7 @@ var currentPage = (function() { // page detector
                 pageType = c;
             }
         }
-        pageType = pageType ? pageType : 'main';
+        pageType = pageType || 'main';
     } else { // section or thread
         section = loc[0];
         l = loc[1];
@@ -51,9 +51,8 @@ function Newpost(element) { // listens textarea and adds some methods to it
     			textarea.value = textarea.value.substr(0, start) + text + textarea.value.substr(end);
     			textarea.setSelectionRange(start + text.length, start + text.length);
     		} else {
-    			textarea.value += text+" ";
+    			textarea.value += text + " ";
     		}
-    		console.log(2)
     		textarea.focus();
     	}
     }
@@ -190,7 +189,7 @@ function labelsToPlaceholders(list) {
         var x = list[i],
             t = $('label[for="'+x+'"]').text(),
             dt = $('.' + x + '-d').find('dt').hide(),
-            dd = $('#'+x);
+            dd = $('#' + x);
         dd.attr('placeholder', t);
     }
     if ($('.bbcode').css('display') === 'none') {
@@ -249,6 +248,12 @@ function resetSettings() {
     // TODO
 }
 
+function slideRemove(elem) {
+    elem.slideUp(600, function() {
+        $(this).remove();
+    });
+}
+
 function init() {
     var textArea = new Newpost($('.message')[0]),
         set = $.settings('hideSectGroup');
@@ -282,6 +287,7 @@ function init() {
         }
     });
     
+    // Posts deletion
     $('#main').delegate('.post', 'click', function(event) {
         if ($('.deleteMode input').attr('class') !== 'toggled') {
             return true;
@@ -298,14 +304,20 @@ function init() {
             post.removeClass('deleted');
         })
         .success(function(data) {
-            if (post.attr('id') === post.parent().find('.post:first').attr('id')) {
-                // remove whole thread
+            if (post.prev().length !== 0) {
+                // post is not first in thread
+                slideRemove(post);
+                return true;
+            }
+            
+            // remove whole thread
+            if (currentPage.type === 'thread') {
                 window.location.href = './';
                 return true;
             }
-            post.slideUp(500, function() {
-                $(this).remove();
-            });
+            var thread = post.parent();
+            thread.children().addClass('deleted');
+            slideRemove(thread);
         });
     });
     
@@ -314,12 +326,14 @@ function init() {
         var c = new Canvas;
     });
     
-    $('#main > .thread').delegate('.number > a', 'click', function(e) {
-        e.preventDefault();
-        if (!$.settings('oldInsert')) {
+    $('.threads').delegate('.number > a', 'click', function(e) {
+        if (!$.settings('oldInsert') && currentPage.type != 'section') {
             var n = $('#post' + $(this).text());
             $('.new-post').insertAfter(n);
             textArea.insert('>>' + e.srcElement.innerHTML + ' ');
+            return false
+        } else {
+            return true;
         }
     });
     
@@ -516,7 +530,7 @@ function initStorage() {
         $('.clearVisitedThreads').click(function(event) {
             event.preventDefault();
             $.storage(key, 0, true); // flush storage
-            ul.find('li').slideUp('normal', function() {
+            ul.children('li').slideUp('normal', function() {
                 $(this).remove();
             });
         });
@@ -528,12 +542,6 @@ function initHotkeys() {
         $('.new-post').submit();
         return false;
     });
-}
-
-function displayBox(title, text) {
-    var div = $('<div/>');
-    div.append($('<h2/>').text(title)).append(text);
-    div.addClass('notification');
 }
 
 function initAJAX() {

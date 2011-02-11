@@ -14,8 +14,17 @@ from django.contrib import admin
 class IPAdmin(admin.ModelAdmin):
     search_fields = ('ip',)
 
-admin.site.register(Thread)
-admin.site.register(Post)
+class ThreadAdmin(admin.ModelAdmin):
+    """Admin controller for threads"""
+    exclude = ('html',)
+        
+
+class PostAdmin(admin.ModelAdmin):
+    search_fields = ('pid', 'thread__section__slug')
+    exclude = ('html',)
+
+admin.site.register(Thread, ThreadAdmin)
+admin.site.register(Post, PostAdmin)
 admin.site.register(File)
 admin.site.register(FileCategory)
 admin.site.register(FileType)

@@ -52,7 +52,7 @@ def markdown2(value, arg=''):
 
     if 'safe' in extras:
         del extras['safe']
-        safe_mode = True
+        safe_mode = 'escape'
     else:
         safe_mode = False
 
