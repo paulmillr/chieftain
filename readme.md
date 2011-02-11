@@ -13,7 +13,7 @@ klipped is a new generation imageboard. It is fastest open source chan. It has p
 * Mobile and smartphone versions
 * Markdown support with code highlighting
 * Thread archiving
-* REST API with XML and JSON serializers.
+* REST API with XML, YAML and JSON serializers.
 * Comet
 * Canvas drawer
 * Full-text search
