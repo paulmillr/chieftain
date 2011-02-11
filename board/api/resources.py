@@ -73,15 +73,18 @@ class PostResource(ModelResource):
     def delete(self, request, auth, *args, **kwargs):
         """Deletes post."""
         id = kwargs['id']
-        p = Post.objects.get(id=id)
-        k = tools.key(request.GET['password'])
-        if p.password != k:
+        post = Post.objects.get(id=id)
+        key = request.GET['password']
+        if len(key) < 64:  # make hash if we got plain text password
+            key = tools.key(key)
+        
+        if post.password != key:
             detail = u'{0}{1}. {2}'.format(
-                _('Error on deleting post #'), p.pid,
+                _('Error on deleting post #'), post.pid,
                 _('Password mismatch')
             )
             return Response(status.FORBIDDEN, content={'detail': detail})
-        p.remove()
+        post.remove()
         return Response(status.NO_CONTENT)
 
 
