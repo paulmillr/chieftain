@@ -18,7 +18,7 @@ except ImportError:
 else:
     class YAMLEmitter(BaseEmitter):
         """Emitter which serializes to YAML"""
-        media_type = 'application/x-yaml'
+        media_type = 'text/x-yaml'
 
         def emit(self, output=NoContent, verbose=False):
             if output is NoContent:
