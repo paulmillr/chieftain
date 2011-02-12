@@ -16,7 +16,7 @@ from board.models import Post, Thread, PostFormNoCaptcha, PostForm
 class ValidationError(Exception):
     """Base class for all validation errors"""
     pass
-        
+
 
 class InvalidFileError(ValidationError):
     """Raised when user uploads file with bad type."""
@@ -49,7 +49,7 @@ def post(request, auth, no_captcha=True):
     if not form.is_valid():
         return False
     new_thread = not request.POST.get('thread')
-    with_files = bool(request.FILES)
+    with_files = bool(request.FILES.get('file'))
 
     post = form.save(commit=False)
     post.date = datetime.now()
@@ -63,23 +63,20 @@ def post(request, auth, no_captcha=True):
         thread = Thread.objects.get(id=request.POST['thread'])
     section_is_feed = (thread.section.type == 3)
 
-    if section_is_feed and new_thread:  # if current section is feed
-        if not request.user.is_authenticated():
-            raise NotAuthenticatedError(_(
-                'Authentication required to create threads in this section'
-            ))
     if with_files:
         file = request.FILES['file']
         ext = attachment(f, t.section)
-    if '#' in post.poster:  # make tripcode
+    if section_is_feed and new_thread and not request.user.is_authenticated():
+        raise NotAuthenticatedError(_('Authentication required to create '
+            'threads in this section'))
+    elif post.email.lower() != 'sage':
+        thread.bump = post.date
+    if not post.poster:
+        post.poster = thread.section.default_name
+    elif '#' in post.poster:  # make tripcode
         s = post.poster.split('#')
         post.tripcode = tools.tripcode(s.pop())
         post.poster = s[0]
-    if not post.poster:
-        post.poster = thread.section.default_name
-    if not section_is_feed and new_thread:
-        if post.email.lower() != 'sage':
-            thread.bump = post.date
     if post.email == 'mvtn'.encode('rot13'):
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10
