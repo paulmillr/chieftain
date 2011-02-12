@@ -17,7 +17,7 @@ def rebuild():
     threads = Thread.objects.all()
     posts = Post.objects.all()
     for c, tr in enumerate(threads):
-        tr.html = render_to_string('section_thread.html', {'thread': tr})
+        tr.html = render_to_string('thread.html', {'thread': tr})
         tr.save()
         if c % 50 == 0:
             print 'Rendered thread {0}'.format(c)
@@ -61,5 +61,5 @@ def generate(section='au', threads=100, posts=200):
             }
             post = Post(**args)
             post.save()
-        tr.html = render_to_string('section_thread.html', {'thread': tr})
+        tr.html = render_to_string('thread.html', {'thread': tr})
         tr.save()

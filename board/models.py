@@ -8,14 +8,14 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import re
 from datetime import datetime
-from django.core.paginator import Paginator
 from django.core.cache import cache
+from django.core.paginator import Paginator
+from django.core.exceptions import ImproperlyConfigured
 from django.db import models
 from django.forms import ModelForm, CharField, IntegerField
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
-from django.core.exceptions import ImproperlyConfigured
 from ipcalc import Network
 from board import fields
 
@@ -157,16 +157,16 @@ class Thread(models.Model):
         """Deletes thread."""
         self.post_set.all().update(is_deleted=True)
         self.is_deleted = True
-        self.save()
+        self.save(rebuild_cache=False)
 
-    def refresh_cache(self):
+    def rebuild_cache(self):
         """Regenerates cache of OP-post and last 5."""
-        self.html = render_to_string('section_thread.html', {'thread': self})
+        self.html = render_to_string('thread.html', {'thread': self})
 
-    def save(self, no_cache_rebuild=False):
+    def save(self, rebuild_cache=True):
         """Saves thread and rebuilds cache."""
-        if not no_cache_rebuild:
-            self.refresh_cache()
+        if rebuild_cache:
+            self.rebuild_cache()
         super(self.__class__, self).save()
 
     def __unicode__(self):
@@ -206,7 +206,7 @@ class Post(models.Model):
     message = models.TextField(verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
-    
+
     @cached(DAY)
     @property
     def section(self):
@@ -216,23 +216,25 @@ class Post(models.Model):
         """Deletes post."""
         if self.is_op_post:
             self.thread.remove()
-        self.is_deleted = True
-        self.save()
-        self.thread.save()
+        else:
+            self.is_deleted = True
+            self.save(rebuild_cache=False)
+            self.thread.save()
 
-    def refresh_cache(self):
+    def rebuild_cache(self):
         """Regenerates html cache of post."""
         self.html = render_to_string('post.html', {'post': self})
 
-    def save(self):
+    def save(self, rebuild_cache=True):
         """Overload of default save method."""
-        if not self.id:
-            super(self.__class__, self).save()
-        self.refresh_cache()
+        if rebuild_cache:
+            if not self.id:
+                super(self.__class__, self).save()
+            self.rebuild_cache()
         super(self.__class__, self).save()
 
     def __unicode__(self):
-        return '{slug}/{pid}'.format(slug=self.thread.section.slug, pid=self.pid)
+        return '{0}/{1}'.format(self.thread.section.slug, self.pid)
 
     class Meta:
         verbose_name = _('Post')
@@ -247,7 +249,7 @@ class File(models.Model):
     name = models.CharField(max_length=64,
         verbose_name=_('File original name'))
     mime = models.ForeignKey('FileType', verbose_name=_('File MIME'))
-    size = models.PositiveIntegerField(verbose_name=_('file_size'))
+    size = models.PositiveIntegerField(verbose_name=_('File size'))
     is_deleted = models.BooleanField(default=False,
         verbose_name=_('File is deleted'))
     image_width = models.PositiveSmallIntegerField(blank=True,
@@ -329,6 +331,15 @@ class Section(models.Model):
         threads = Paginator(self.thread_set.filter(is_deleted=False), onpage)
         return threads.page(page)
 
+    #@cached(3 * DAY)
+    def allowed_filetypes(self):
+        """List of allowed MIME types of section."""
+        allowed = []
+        for cat in self.filetypes.all():
+            for filetype in cat.filetype_set.values_list('mime', 'extension'):
+                allowed.append(filetype)
+        return dict(allowed)
+
     @property
     def key(self):
         """Memcached key name."""
@@ -406,7 +417,7 @@ class User(models.Model):
 
 class IP(models.Model):
     """Abstract base class for all ban classes."""
-    ip = models.CharField(_('IP network'), max_length=18,
+    ip = models.CharField(_('IP network'), max_length=18, db_index=True,
             help_text=_('Either IP address or IP network specification'))
 
     def __unicode__(self):

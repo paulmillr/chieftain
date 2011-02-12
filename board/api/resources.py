@@ -57,7 +57,11 @@ class PostRootResource(RootModelResource):
     )
 
     def post(self, request, auth, content, *args, **kwargs):
-        return Response(status.CREATED, validators.post(request))
+        try:
+            instance = validators.post(request)
+        except validators.InvalidFileError as e:
+            return Response(status.BAD_REQUEST, e)
+        return Response(status.CREATED, instance)
 
 
 class PostResource(ModelResource):
@@ -72,12 +76,11 @@ class PostResource(ModelResource):
 
     def delete(self, request, auth, *args, **kwargs):
         """Deletes post."""
-        id = kwargs['id']
-        post = Post.objects.get(id=id)
+        post = Post.objects.get(id=kwargs['id'])
         key = request.GET['password']
         if len(key) < 64:  # make hash if we got plain text password
             key = tools.key(key)
-        
+
         if post.password != key:
             detail = u'{0}{1}. {2}'.format(
                 _('Error on deleting post #'), post.pid,

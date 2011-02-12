@@ -4,9 +4,9 @@
             <div class="info-wrapper">
                 <span class="number"><a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">{{post.pid}}</a></span>
                 <time datetime="{{post.date|date:'c'}}" pubdate>{{post.date|date:'d.m.Y H:i:s'}}</time>
-                <span class="name" data-default="true">{% if post.email %}<a href="mailto:{{post.email}}">{% endif %}{{post.poster}}{% if post.email %}</a>{% endif %}</span>
+                <span class="poster">{% if post.email %}<a href="mailto:{{post.email}}" class="email">{% endif %}{{post.poster}}{% if post.email %}</a>{% endif %}</span>
                 <span class="tripcode">{{post.tripcode}}</span>
-                <span class="title">{{post.topic}}</span>
+                <span class="topic">{{post.topic}}</span>
             </div>
         </header>
         <div class="content">
@@ -14,15 +14,15 @@
             {% for f in post.file_set.all %}
             <div class="file">
                 <div class="file-info"> <!-- TODO: EDIT ME -->
-                    <a target="_blank" href="{{ MEDIA_URL }}images/post.jpg">144492.png</a>
-                    (<em>7Кб, 150x149</em>)
+                    <a target="_blank" href="{{f.file}}">{{post.pid}}.{{f.extension}}</a>
+                    (<em>{{f.size}}, {% if f.image_height %}{{f.image_height}}x{{f.image_width}}{% endif %}</em>)
                     <a href="#image-edit" class="edit">G</a>
                 </div>
-                <a href="{{ MEDIA_URL }}images/post.jpg" onclick="resize"><img src="{{ MEDIA_URL }}images/post.jpg" alt="Image"></a>
+                <a href="{{f.file}}" onclick="resize"><img src="{{f.thumb}}" alt="{{f.hash}}"></a>
             </div>
             {% endfor %}
             {% endif %}
-            <div class="text">
+            <div class="message">
                 {% autoescape off %}
                 {{ post.message|markdown2:"safe,code-friendly,code-color" }}
                 {% endautoescape %}

@@ -37,7 +37,7 @@
 #neutron .number{color:#C9BE89 !important;/* text-shadow:#FFD200 0px 0px 12px;*/}
 #neutron a:hover,
 #neutron .number:hover{color:#EEFEBB !important;/* text-shadow:#FFDE22 0px 0px 15px;*/}
-#neutron /* ul.group a,.image-info a,.bbcode a,.sidebar a,.name a{text-shadow:none;}
+#neutron /* ul.group a,.image-info a,.bbcode a,.sidebar a,.poster a{text-shadow:none;}
 #neutron */
 #neutron #sidebar h2 a{color:#EEFEBB;/* text-shadow:#FFDE22 0px 0px 15px;*/}
 #neutron #sidebar h4{background-color:#111111;border:1px solid #545454;padding:2px;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
@@ -64,10 +64,10 @@
 #neutron .post-wrapper{display:inline-block;background:url(post.png) right bottom no-repeat #2C2C2C;padding:0;border:solid 1px #454545;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;}
 #neutron .post-wrapper header.clearfix{background:url(opera_postheader-fix.png) #2C2C2C repeat-x;background:-moz-linear-gradient(100% 100% 90deg,#2C2C2C,#151515) repeat scroll 0 0;background:-webkit-gradient(linear,left top,left bottom,color-stop(0,#151515),color-stop(0.65,#2C2C2C));color:#999999;padding:4px;border:solid 0px transparent !important;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;}
 #neutron .post-wrapper .content{color:#698CC0;}
-#neutron .post .name{margin-left:10;color:#787878;font-weight:bold;}
+#neutron .post .poster{margin-left:10;color:#787878;font-weight:bold;}
 #neutron .post .number a,
 #neutron .post .number a:visited{color:inherit;}
-#neutron .post .title{color:#6EBCFF;font-weight:bold;}
+#neutron .post .topic{color:#6EBCFF;font-weight:bold;}
 #neutron .post time{margin-right:1em;}
 #neutron .post time:before{content:"#" counter(threadpostcount) " ";color:#789922;}
 #neutron .post .number,
@@ -76,7 +76,7 @@
 #neutron .image-info{color:#999999;background:#212121;border:solid 1px #454545;-moz-border-radius:5px;-webkit-border-radius:5px;border-radius:5px;padding:2px;margin:4px;}
 #neutron .image-info a{color:#789922;}
 #neutron img.image{border:none;margin:4px;}
-#neutron .text{padding:2px;margin:0.5em;}
+#neutron .message{padding:2px;margin:0.5em;}
 #neutron .bbcode a.b{font-size:0;}
 #neutron .bbcode a.b:before{content:url(bold.png);}
 #neutron .bbcode a.i{font-size:0;}
@@ -128,16 +128,16 @@
 #neutron .skipped{font-size:0.9em;color:#999999;padding:4px;}
 #neutron input,
 #neutron textarea{-moz-box-shadow:none !important;-webkit-box-shadow:none !important;box-shadow:none !important;}
-#neutron .text a,
+#neutron .message a,
 #neutron .number a,
 #neutron .number,
 #neutron nav.clearfix a{text-decoration:underline;}
-#neutron .name a[href="sage"],
-#neutron .name a[href="Sage"],
-#neutron .name a[href="SAGE"],
-#neutron .name a[href="sage"]:hover,
-#neutron .name a[href="Sage"]:hover,
-#neutron .name a[href="SAGE"]:hover{color:#CC1212 !important;}
-#neutron .name a[href="sage"]:before,
-#neutron .name a[href="Sage"]:before
-#neutron ,.name a[href="SAGE"]:before{content:url(sage.png);padding-right:2px;}
+#neutron .poster a[href="sage"],
+#neutron .poster a[href="Sage"],
+#neutron .poster a[href="SAGE"],
+#neutron .poster a[href="sage"]:hover,
+#neutron .poster a[href="Sage"]:hover,
+#neutron .poster a[href="SAGE"]:hover{color:#CC1212 !important;}
+#neutron .poster a[href="sage"]:before,
+#neutron .poster a[href="Sage"]:before
+#neutron ,.poster a[href="SAGE"]:before{content:url(sage.png);padding-right:2px;}

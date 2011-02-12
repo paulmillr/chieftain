@@ -12,8 +12,19 @@ from board import tools
 from board.models import Post, Thread, PostFormNoCaptcha, PostForm
 
 
-def attachment(request):
+class InvalidFileError(Exception):
+    """Raised when user uploads file with bad type."""
     pass
+
+
+def attachment(file, section):
+    """Attachment validator."""
+    allowed = section.allowed_filetypes()
+    if file.content_type not in allowed:
+        raise InvalidFileError(_('Invalid file type'))
+    if file.size > section.filesize_limit:
+        raise InvalidFileError(_('Too big file'))
+    return allowed[file.content_type]  # extension
 
 
 def post(request, no_captcha=True):
@@ -27,36 +38,39 @@ def post(request, no_captcha=True):
     if not form.is_valid():
         return False
     new_thread = not request.POST.get('thread')
+    with_files = bool(request.FILES)
+
     post = form.save(commit=False)
     post.date = datetime.now()
     post.file_count = len(request.FILES)
     post.is_op_post = new_thread
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = tools.key(post.password)
-
-    if request.FILES:  # TODO: move to top to prevent errors
-        for name, f in request.FILES.iteritems():
-            pass
     if new_thread:
-        t = Thread(section_id=request.POST['section'], bump=post.date)
+        thread = Thread(section_id=request.POST['section'], bump=post.date)
     else:
-        t = Thread.objects.get(id=request.POST['thread'])
-    if not post.poster:
-        post.poster = t.section.default_name
+        thread = Thread.objects.get(id=request.POST['thread'])
+    if with_files:
+        file = request.FILES['file']
+        ext = attachment(f, t.section)
     if '#' in post.poster:  # make tripcode
         s = post.poster.split('#')
         post.tripcode = tools.tripcode(s.pop())
         post.poster = s[0]
+    if not post.poster:
+        post.poster = thread.section.default_name
     if post.email.lower() != 'sage':
-        t.bump = post.date
+        thread.bump = post.date
         if post.email == 'mvtn'.encode('rot13'):
             s = u'\u5350'
             post.poster = post.email = post.topic = s * 10
             post.message = (s + u' ') * 50
     if new_thread:
-        t.save(no_cache_rebuild=True)
-        post.thread = t
-    post.pid = t.section.pid_incr()
+        thread.save(rebuild_cache=False)
+        post.thread = thread
+    post.pid = thread.section.pid_incr()
+    if with_files:
+        path, thumb_path = tools.handle_uploaded_file(file, ext, post)
     post.save()
-    t.save()
+    thread.save()
     return post

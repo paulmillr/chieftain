@@ -14,10 +14,11 @@ from django.contrib import admin
 class IPAdmin(admin.ModelAdmin):
     search_fields = ('ip',)
 
+
 class ThreadAdmin(admin.ModelAdmin):
     """Admin controller for threads"""
     exclude = ('html',)
-        
+
 
 class PostAdmin(admin.ModelAdmin):
     search_fields = ('pid', 'thread__section__slug')

@@ -96,8 +96,9 @@ def thread(request, section, op_post):
     thread = post.thread
     if thread.is_deleted:
         raise Http404
-    if thread.op_post.id != post.id:
+    if not post.is_op_post:
         return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
     form = PostForm()
-    return rtr('thread.html', request, {'thread': thread, 'form': form})
+    return rtr('section_thread.html', request,
+        {'thread': thread, 'form': form})
