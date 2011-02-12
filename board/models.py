@@ -209,7 +209,6 @@ class Post(models.Model):
     objects = PostManager()
 
     @cached(DAY)
-    @property
     def section(self):
         return self.thread.section.slug
 

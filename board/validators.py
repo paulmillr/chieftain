@@ -33,12 +33,13 @@ def attachment(file, section):
     allowed = section.allowed_filetypes()
     if file.content_type not in allowed:
         raise InvalidFileError(_('Invalid file type'))
-    if file.size > section.filesize_limit:
+    lim = section.filesize_limit
+    if lim != 0 and file.size > lim:
         raise InvalidFileError(_('Too big file'))
     return allowed[file.content_type]  # extension
 
 
-def post(request, auth, no_captcha=True):
+def post(request, section_slug, no_captcha=True):
     """Makes various changes on new post creation.
 
        If there is no POST['thread'] specified, it will create
@@ -58,14 +59,15 @@ def post(request, auth, no_captcha=True):
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = tools.key(post.password)
     if new_thread:
-        thread = Thread(section_id=request.POST['section'], bump=post.date)
+        thread = Thread(section=Section.objects.get(slug=section_slug), 
+            bump=post.date)
     else:
         thread = Thread.objects.get(id=request.POST['thread'])
     section_is_feed = (thread.section.type == 3)
 
-    if with_files:
+    if with_files:  # validate attachments
         file = request.FILES['file']
-        ext = attachment(f, t.section)
+        ext = attachment(file, thread.section)
     if section_is_feed and new_thread and not request.user.is_authenticated():
         raise NotAuthenticatedError(_('Authentication required to create '
             'threads in this section'))
@@ -86,7 +88,8 @@ def post(request, auth, no_captcha=True):
         post.thread = thread
     post.pid = thread.section.pid_incr()
     if with_files:
-        path, thumb_path = tools.handle_uploaded_file(file, ext, post)
+        post.save(rebuild_cache=False)
+        tools.handle_uploaded_file(file, ext, post)
     post.save()
     thread.save()
     return post

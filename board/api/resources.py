@@ -42,7 +42,7 @@ class ModelResource(ModelResource, Resource):
     pass
 
 
-class RootModelResource(ModelResource):
+class RootModelResource(RootModelResource, Resource):
     pass
 
 
@@ -73,6 +73,9 @@ class PostResource(ModelResource):
         'date', 'message', 'email', 'html',
         ('thread', ('id', ('section', ('id', 'slug')))),
     )
+    
+    #def get(self, request, auth, *args, **kwargs):
+    #    self.model.thread
 
     def delete(self, request, auth, *args, **kwargs):
         """Deletes post."""
@@ -134,6 +137,20 @@ class SectionResource(ModelResource):
     )
 
 
+class SectionGroupRootResource(RootModelResource):
+    """A list resource for SectionGroup."""
+    allowed_methods = anon_allowed_methods = ('GET',)
+    model = SectionGroup
+    fields = ('id', 'name', 'order', 'is_hidden')
+
+
+class SectionGroupResource(ModelResource):
+    """A read resource for SectionGroup."""
+    allowed_methods = anon_allowed_methods = ('GET',)
+    model = SectionGroup
+    fields = ('id', 'name', 'order', 'is_hidden')
+
+
 class FileTypeRootResource(RootModelResource):
     """A list resource for FileType."""
     allowed_methods = anon_allowed_methods = ('GET',)
@@ -160,17 +177,3 @@ class FileCategoryResource(ModelResource):
     allowed_methods = anon_allowed_methods = ('GET',)
     model = FileCategory
     fields = ('id', 'name')
-
-
-class SectionGroupRootResource(RootModelResource):
-    """A list resource for SectionGroup."""
-    allowed_methods = anon_allowed_methods = ('GET',)
-    model = SectionGroup
-    fields = ('id', 'name', 'order', 'is_hidden')
-
-
-class SectionGroupResource(ModelResource):
-    """A read resource for SectionGroup."""
-    allowed_methods = anon_allowed_methods = ('GET',)
-    model = SectionGroup
-    fields = ('id', 'name', 'order', 'is_hidden')
