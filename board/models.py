@@ -32,10 +32,11 @@ DAY = 86400  # seconds in day
 MEGABYTE = 2 ** 20
 SECTION_TYPES = (
     (1, _('Default')),
-    (2, _('No images')),
+    (2, _('No files')),
     (3, _('Feed')),  # Users, that don't have accounts can't create threads
-    (4, _('Premodded')),  # Each thread needs to be approved
-    (5, _('Chat')),
+# TODO
+#    (4, _('Premodded')),  # Each thread needs to be approved
+#    (5, _('Chat')),
 )
 
 

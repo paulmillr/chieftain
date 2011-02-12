@@ -28,8 +28,8 @@ msgid "Default"
 msgstr "Обычный"
 
 #: board/models.py:35
-msgid "No images"
-msgstr "Без изображений"
+msgid "No files"
+msgstr "Без файлов"
 
 #: board/models.py:36
 msgid "Feed"
