@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-12 10:20+0200\n"
+"POT-Creation-Date: 2011-02-12 11:11+0200\n"
 "PO-Revision-Date: 2011-01-23 19:23+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -323,13 +323,17 @@ msgstr "Разрешенный IP"
 msgid "Allowed IPs"
 msgstr "Разрешенные IP"
 
-#: board/validators.py:24
+#: board/validators.py:35
 msgid "Invalid file type"
 msgstr "Загружаемый тип файла не поддерживается"
 
-#: board/validators.py:26
+#: board/validators.py:37
 msgid "Too big file"
 msgstr "Загружаемый файл имеет слишком большой размер"
+
+#: board/validators.py:69
+msgid "Authentication required to create threads in this section"
+msgstr "Для создания тем в этом разделе требуется аутентификация"
 
 #: board/api/resources.py:86
 msgid "Error on deleting post #"

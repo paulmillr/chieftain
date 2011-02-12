@@ -558,22 +558,31 @@ function initAJAX() {
         $.post(page, data)
             .error(function(data) {
                 //document.write(data.responseText); // for debugging
-                var rt = $.parseJSON(data.responseText)['field-errors'],
+                var rt = $.parseJSON(data.responseText),
+                    errors,
+                    errorText,
                     t = [], l;
-                for (var i in rt) {
-                    // Get label text of current field
-                    l = $('label[for="'+i+'"]').text();
-                    t.push(l + ': ' + rt[i].join(', '));
+                if (rt['field-errors']) {
+                    errors = rt['field-errors'];
+                    for (var i in errors) {
+                        // Get label text of current field
+                        l = $('label[for="'+i+'"]').text();
+                        t.push(l + ': ' + errors[i].join(', '));
+                    }
+                    errorText = t.join('<br/>')
+                } else {
+                    errorText = rt['detail'];
                 }
-                $.message('error', t.join('<br/>'));
+
+                $.message('error', errorText);
             })
             .success(function(data) {
-                if (!$.settings('hideNotifications')) {
-                    $.message('notice', 'Ваше сообщение отправлено.');
-                }
                 if (currentPage.type == 'section') { // redirect
                     window.location.href += data.pid;
                     return true;
+                }
+                if (!$.settings('hideNotifications')) {
+                    $.message('notice', 'Ваше сообщение отправлено.');
                 }
                 $(data.html).hide().appendTo('.thread').fadeIn(500);
                 try {

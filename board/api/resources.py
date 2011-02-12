@@ -58,9 +58,9 @@ class PostRootResource(RootModelResource):
 
     def post(self, request, auth, content, *args, **kwargs):
         try:
-            instance = validators.post(request)
-        except validators.InvalidFileError as e:
-            return Response(status.BAD_REQUEST, e)
+            instance = validators.post(request, auth)
+        except validators.ValidationError as e:
+            return Response(status.BAD_REQUEST, {'detail': e})
         return Response(status.CREATED, instance)
 
 

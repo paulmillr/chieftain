@@ -7,13 +7,24 @@ Created by Paul Bagwell on 2011-02-07.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 
+from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 from board import tools
 from board.models import Post, Thread, PostFormNoCaptcha, PostForm
 
 
-class InvalidFileError(Exception):
+class ValidationError(Exception):
+    """Base class for all validation errors"""
+    pass
+        
+
+class InvalidFileError(ValidationError):
     """Raised when user uploads file with bad type."""
+    pass
+
+
+class NotAuthenticatedError(ValidationError):
+    """Raised when user posts in section, that requires auth."""
     pass
 
 
@@ -27,7 +38,7 @@ def attachment(file, section):
     return allowed[file.content_type]  # extension
 
 
-def post(request, no_captcha=True):
+def post(request, auth, no_captcha=True):
     """Makes various changes on new post creation.
 
        If there is no POST['thread'] specified, it will create
@@ -50,6 +61,13 @@ def post(request, no_captcha=True):
         thread = Thread(section_id=request.POST['section'], bump=post.date)
     else:
         thread = Thread.objects.get(id=request.POST['thread'])
+    section_is_feed = (thread.section.type == 3)
+
+    if section_is_feed and new_thread:  # if current section is feed
+        if not request.user.is_authenticated():
+            raise NotAuthenticatedError(_(
+                'Authentication required to create threads in this section'
+            ))
     if with_files:
         file = request.FILES['file']
         ext = attachment(f, t.section)
@@ -59,12 +77,13 @@ def post(request, no_captcha=True):
         post.poster = s[0]
     if not post.poster:
         post.poster = thread.section.default_name
-    if post.email.lower() != 'sage':
-        thread.bump = post.date
-        if post.email == 'mvtn'.encode('rot13'):
-            s = u'\u5350'
-            post.poster = post.email = post.topic = s * 10
-            post.message = (s + u' ') * 50
+    if not section_is_feed and new_thread:
+        if post.email.lower() != 'sage':
+            thread.bump = post.date
+    if post.email == 'mvtn'.encode('rot13'):
+        s = u'\u5350'
+        post.poster = post.email = post.topic = s * 10
+        post.message = (s + u' ') * 50
     if new_thread:
         thread.save(rebuild_cache=False)
         post.thread = thread

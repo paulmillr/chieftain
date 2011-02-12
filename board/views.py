@@ -60,7 +60,7 @@ def faq(request):
 
 def post_router(request, op_post=None):
     """Routes post creation requests."""
-    p = validators.post(request, False)
+    p = validators.post(request, no_captcha=False)
     if not p:  # display error page
         return rtr('error.html', request, {'errors': PostForm(p).errors})
     # get op post and created post pids
