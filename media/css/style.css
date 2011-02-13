@@ -311,7 +311,7 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
 .post .topic {font-weight: bold;}
-.post .message {display: inline-block; margin-top: 20px;}
+.post .message {display: inline-block; float: left; margin-top: 20px;}
 .post .message, .post .message * {vertical-align:top;}
 .post .message.poster ins {background: none; text-decoration: underline; font-weight: normal; color: inherit;}
 .post .underlined {border-bottom: 1px dashed;}
