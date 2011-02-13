@@ -20,7 +20,7 @@ __all__ = [
     'ThreadRootResource', 'ThreadResource',
     'SectionRootResource', 'SectionResource',
     'FileTypeRootResource', 'FileTypeResource',
-    'FileCategoryRootResource', 'FileCategoryResource',
+    'FileGroupRootResource', 'FileGroupResource',
     'SectionGroupRootResource', 'SectionGroupResource',
 ]
 
@@ -155,25 +155,25 @@ class FileTypeRootResource(RootModelResource):
     """A list resource for FileType."""
     allowed_methods = anon_allowed_methods = ('GET',)
     model = FileType
-    fields = ('id', 'category_id', 'mime', 'extension')
+    fields = ('id', 'category_id', 'type', 'extension')
 
 
 class FileTypeResource(ModelResource):
     """A read resource for FileType."""
     allowed_methods = anon_allowed_methods = ('GET',)
     model = FileType
-    fields = ('id', 'category_id', 'mime', 'extension')
+    fields = ('id', 'category_id', 'type', 'extension')
 
 
-class FileCategoryRootResource(RootModelResource):
-    """A list resource for FileCategory."""
+class FileGroupRootResource(RootModelResource):
+    """A list resource for FileGroup."""
     allowed_methods = anon_allowed_methods = ('GET',)
-    model = FileCategory
+    model = FileGroup
     fields = ('id', 'name')
 
 
-class FileCategoryResource(ModelResource):
-    """A read resource for FileCategory."""
+class FileGroupResource(ModelResource):
+    """A read resource for FileGroup."""
     allowed_methods = anon_allowed_methods = ('GET',)
-    model = FileCategory
+    model = FileGroup
     fields = ('id', 'name')

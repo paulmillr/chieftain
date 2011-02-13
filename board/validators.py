@@ -39,7 +39,7 @@ def attachment(file, section):
     return allowed[file.content_type]  # extension
 
 
-def post(request, section_slug, no_captcha=True):
+def post(request, no_captcha=True):
     """Makes various changes on new post creation.
 
        If there is no POST['thread'] specified, it will create
@@ -59,8 +59,7 @@ def post(request, section_slug, no_captcha=True):
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = tools.key(post.password)
     if new_thread:
-        thread = Thread(section=Section.objects.get(slug=section_slug), 
-            bump=post.date)
+        thread = Thread(section_id=request.POST['section'], bump=post.date)
     else:
         thread = Thread.objects.get(id=request.POST['thread'])
     section_is_feed = (thread.section.type == 3)

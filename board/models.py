@@ -24,7 +24,7 @@ __all__ = [
     'cache', 'render_to_string',
     'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
     'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
-    'File', 'FileCategory', 'FileType', 'Section', 'SectionGroup', 'User',
+    'File', 'FileGroup', 'FileType', 'Section', 'SectionGroup', 'User',
     'PostForm', 'PostFormNoCaptcha', 'ThreadForm', 'DeniedIP', 'AllowedIP',
 ]
 
@@ -35,9 +35,19 @@ SECTION_TYPES = (
     (2, _('No files')),
     (3, _('Feed')),  # Users, that don't have accounts can't create threads
 # TODO
-#    (4, _('Premodded')),  # Each thread needs to be approved
-#    (5, _('Chat')),
+#    (4, _('International')),
+#    (5, _('Premodded')),  # Each thread needs to be approved
+#    (6, _('Chat')),
 )
+
+def get_file_path(base):
+    def f(instance, filename):
+        ip = instance.post
+        return '{base}/{slug}/{thread}/{pid}.{ext}'.format(
+            base=base, slug=ip.section(), thread=ip.thread,
+            pid=ip.pid, ext=instance.type.extension
+        )
+    return f
 
 
 def cached(seconds=900):
@@ -248,7 +258,7 @@ class File(models.Model):
     post = models.ForeignKey('Post', verbose_name=_('File post'))
     name = models.CharField(max_length=64,
         verbose_name=_('File original name'))
-    mime = models.ForeignKey('FileType', verbose_name=_('File MIME'))
+    type = models.ForeignKey('FileType', verbose_name=_('File type'))
     size = models.PositiveIntegerField(verbose_name=_('File size'))
     is_deleted = models.BooleanField(default=False,
         verbose_name=_('File is deleted'))
@@ -259,21 +269,24 @@ class File(models.Model):
     #meta = models.TextField()
     hash = models.CharField(max_length=32, blank=True,
         verbose_name=_('File hash'))
-    file = models.FileField(upload_to='test/{}',
+    file = models.FileField(upload_to=get_file_path('section'),
         verbose_name=_('File location'))
+    thumb = models.ImageField(upload_to=get_file_path('thumbs'),
+        verbose_name=_('File thumbnail'))
 
     def __unicode__(self):
-        return self.post
+        return '{0}/{1}'.format(self.post.section(), self.post.pid)
 
     class Meta:
         verbose_name = _('File')
         verbose_name_plural = _('Files')
 
 
-class FileCategory(models.Model):
+class FileGroup(models.Model):
     """Category of files"""
     name = models.CharField(max_length=32,
         verbose_name=_('File category name'))
+    default_image = models.ImageField(upload_to='default/')
 
     def __unicode__(self):
         return self.name
@@ -289,8 +302,8 @@ class FileType(models.Model):
         verbose_name=_('File type extension'))
     mime = models.CharField(max_length=250, blank=False,
         verbose_name=_('File type MIME'))
-    category = models.ForeignKey('FileCategory',
-        verbose_name=_('File type category'))
+    group = models.ForeignKey('FileGroup',
+        verbose_name=_('File type group'))
 
     def __unicode__(self):
         return self.extension
@@ -306,7 +319,7 @@ class Section(models.Model):
         verbose_name=_('Section slug'))
     name = models.CharField(max_length=64,
         verbose_name=_('Section name'))
-    description = models.TextField(blank=False,
+    description = models.TextField(blank=True,
         verbose_name=_('Section description'))
     type = models.PositiveSmallIntegerField(default=1, choices=SECTION_TYPES,
         verbose_name=_('Section type'))
@@ -316,13 +329,13 @@ class Section(models.Model):
         verbose_name=_('Section filesize limit'))
     anonymity = models.BooleanField(default=False,
         verbose_name=_('Section force anonymity'))
-    default_name = models.CharField(max_length=64, default='Anonymous',
+    default_name = models.CharField(max_length=64, default=_('Anonymous'),
         verbose_name=_('Section default poster name'))
-    filetypes = models.ManyToManyField(FileCategory,
+    filetypes = models.ManyToManyField(FileGroup, blank=True,
         verbose_name=_('Section allowed filetypes'))
     bumplimit = models.PositiveSmallIntegerField(default=500,
         verbose_name=_('Section bumplimit'))
-    threadlimit = models.PositiveSmallIntegerField(default=10,
+    threadlimit = models.PositiveSmallIntegerField(default=200,
         verbose_name=_('Section thread limit'))
     objects = SectionManager()
 

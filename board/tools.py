@@ -8,7 +8,9 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import os
 import re
-import Image
+import tempfile
+from PIL import Image
+from django.core.files import File as DjangoFile
 from hashlib import md5, sha256
 from string import maketrans
 from crypt import crypt
@@ -21,38 +23,49 @@ __all__ = ['handle_uploaded_file', 'tripcode', 'key']
 
 def handle_uploaded_file(file, extension, post):
     """Moves uploaded file to files directory and makes thumb."""
-    directory = os.path.join(settings.MEDIA_ROOT, 'sections', post.section(),
-        str(post.thread_id))
-    file_path = '{0}.{1}'.format(post.pid, extension)
-    path = os.path.join(directory, file_path)
+    def make_path(dir):
+        args = settings.MEDIA_ROOT, dir, post.section(), str(post.thread_id)
+        return os.path.join(*args)
+    directory = make_path('section')
     if not os.path.isdir(directory):
         os.makedirs(directory)
+    file_path = '{0}.{1}'.format(post.pid, extension)
+    m = md5()
+    for chunk in file.chunks():
+        m.update(chunk)
+    del chunk
     file_data = {
         'post': post,
         'name': file.name,
-        'mime': FileType.objects.get(extension=extension),
+        'type': FileType.objects.get(extension=extension),
         'size': file.size,
         'image_height': 0,
         'image_width': 0,
+        'file': DjangoFile(file),
+        'hash': m.hexdigest(),
     }
-    m = md5()
-    with open(path, 'wb+') as destination:
-        for chunk in file.chunks():
-            destination.write(chunk)
-            m.update(chunk)
-    file_data['hash'] = m.hexdigest()
-    #try:  # make thumb
-    #    img = Image.open(file)
-    #    THUMB_SIZE = 200, 200
-    #    img.thumbnail(THUMB_SIZE)
-    #    img.save(outfile)
-    #    thumb_path = outfile
-    #except IOError:
-    #    thumb_path = filegroup.image
-    file_data['file'] = destination
-    print file_data
-    f = File(**file_data).save()
-    #return f
+    f = File(**file_data)
+    f.save()
+    try:  # make thumb
+        MAX = 200
+        img = Image.open(f.file.file)
+        height, width = img.size
+        f.image_height = height
+        f.image_width = width
+        if height > MAX or width > MAX:
+            thumb_dir = make_path('thumbs')
+            if not os.path.isdir(thumb_dir):
+                os.makedirs(thumb_dir)
+            tmp = tempfile.NamedTemporaryFile(suffix='.{0}'.format(
+                extension))
+            img.thumbnail((MAX, MAX), Image.ANTIALIAS)
+            img.save(tmp)
+            f.thumb = DjangoFile(tmp)
+    except IOError:
+        pass
+    f.save()
+    tmp.close()
+    return f
 
 
 def tripcode(text):

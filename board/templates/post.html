@@ -11,16 +11,24 @@
         </header>
         <div class="content">
             {% if post.file_count > 0 %}
+            <div class="files">
             {% for f in post.file_set.all %}
-            <div class="file">
-                <div class="file-info"> <!-- TODO: EDIT ME -->
-                    <a target="_blank" href="{{f.file}}">{{post.pid}}.{{f.extension}}</a>
-                    (<em>{{f.size}}, {% if f.image_height %}{{f.image_height}}x{{f.image_width}}{% endif %}</em>)
-                    <a href="#image-edit" class="edit">G</a>
+                <div class="file-info">
+                    <a target="_blank" href="{{f.file.url}}">{{post.pid}}.{{f.type.extension}}</a>
+                    (<em>{{f.size|filesizeformat}}{% if f.image_height %}, {{f.image_height}}x{{f.image_width}}{% endif %}</em>)
+                    <!--<a href="#image-edit" class="edit">G</a>-->
                 </div>
-                <a href="{{f.file}}" onclick="resize"><img src="{{f.thumb}}" alt="{{f.hash}}"></a>
-            </div>
+                <a href="{{f.file.url}}" onclick="resize">
+                    {% if f.thumb %}
+                        <img src="{{f.thumb.url}}" class="file" id="file{{f.id}}" data-hash="{{f.hash}}" alt="">
+                    {% else %}
+                    {% if f.type.group.default_image %}
+                        <img src="{{f.type.group.default_image.url}}" class="file-icon" id="file{{f.id}}" alt="">
+                    {% endif %}
+                    {% endif %}
+                </a>
             {% endfor %}
+            </div>
             {% endif %}
             <div class="message">
                 {% autoescape off %}

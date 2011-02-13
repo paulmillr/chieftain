@@ -317,7 +317,7 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post .underlined {border-bottom: 1px dashed;}
 .post blockquote {color: #789922; clear: both;}
 .post blockquote > p {display: inline;}
-.post .file {margin-right: 10px; float:left; max-width: 200px; max-height: 200px;}
+.post .files {margin-right: 10px; float:left; max-width: 220px; max-height: 220px;}
 .post span:empty {margin: 0;}
 .deleted {background: #e44;}
 .file-info a:link, .file-info a:hover {text-decoration: underline;}
