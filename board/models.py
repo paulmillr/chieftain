@@ -104,9 +104,8 @@ class SectionGroupManager(models.Manager):
            Gets list of board sections.
            We're not using QuerySet because they cannot be cached.
         """
-        groups = SectionGroup.objects.all().order_by('order')
         data = []  # http://goo.gl/CpPq6
-        for group in groups:
+        for group in SectionGroup.objects.all().order_by('order'):
             d = {
                 'id': group.id,
                 'name': group.name,
@@ -134,6 +133,7 @@ class Thread(models.Model):
     def posts_html(self):
         return self.post_set.filter(is_deleted=False).values('html')
 
+    @cached(5)
     def count(self):
         lp = 5
         ps = self.post_set.filter(is_deleted=False)
@@ -143,11 +143,14 @@ class Thread(models.Model):
         else:
             start = stop - lp
             return {
-                'total': stop, 'start': start, 'stop': stop,
+                'total': stop, 
+                'start': start, 
+                'stop': stop,
                 'skipped': start - 1,
                 'skipped_files': ps.filter(file_count__gt=0).count()
             }
 
+    @cached(3600)
     @property
     def op_post(self):
         return self.post_set.all()[0]
@@ -160,7 +163,7 @@ class Thread(models.Model):
             return all
         else:  # select first one and last 5 posts
             start, stop = c['start'], c['stop']
-            return [s.all()[0]] + list(all[start:stop])
+            return [all[0]] + list(all[start:stop])
 
     def remove(self):
         """Deletes thread."""
@@ -271,6 +274,11 @@ class File(models.Model):
         verbose_name=_('File location'))
     thumb = models.ImageField(upload_to=get_file_path('thumbs'),
         verbose_name=_('File thumbnail'))
+    
+    def remove(self):
+        self.is_deleted = True
+        self.save()
+        self.post.save()
 
     def __unicode__(self):
         return '{0}/{1}'.format(self.post.section(), self.post.pid)
@@ -329,7 +337,7 @@ class Section(models.Model):
         verbose_name=_('Section force anonymity'))
     default_name = models.CharField(max_length=64, default=_('Anonymous'),
         verbose_name=_('Section default poster name'))
-    filetypes = models.ManyToManyField(FileTypeGroup, blank=True,
+    filetypes = models.ManyToManyField('FileTypeGroup', blank=True,
         verbose_name=_('Section allowed filetypes'))
     bumplimit = models.PositiveSmallIntegerField(default=500,
         verbose_name=_('Section bumplimit'))
