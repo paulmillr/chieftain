@@ -26,6 +26,6 @@ urlpatterns = patterns('board.api.resources',
     (r'^section/(?P<slug>\w+)', 'SectionResource'),
     (r'^filetype/$', 'FileTypeRootResource'),
     (r'^filetype/(?P<id>\d+)$', 'FileTypeResource'),
-    (r'^filegroup/$', 'FileGroupRootResource'),
-    (r'^filegroup/(?P<id>\d+)$', 'FileGroupResource'),
+    (r'^filetypegroup/$', 'FileTypeGroupRootResource'),
+    (r'^filetypegroup/(?P<id>\d+)$', 'FileTypeGroupResource'),
 )

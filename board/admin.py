@@ -27,7 +27,7 @@ class PostAdmin(admin.ModelAdmin):
 admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Post, PostAdmin)
 admin.site.register(File)
-admin.site.register(FileGroup)
+admin.site.register(FileTypeGroup)
 admin.site.register(FileType)
 admin.site.register(Section)
 admin.site.register(SectionGroup)

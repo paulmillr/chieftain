@@ -47,24 +47,23 @@ def handle_uploaded_file(file, extension, post):
     f = File(**file_data)
     f.save()
     try:  # make thumb
-        MAX = 200
         img = Image.open(f.file.file)
-        height, width = img.size
-        f.image_height = height
-        f.image_width = width
-        if height > MAX or width > MAX:
-            thumb_dir = make_path('thumbs')
-            if not os.path.isdir(thumb_dir):
-                os.makedirs(thumb_dir)
-            tmp = tempfile.NamedTemporaryFile(suffix='.{0}'.format(
-                extension))
+        f.image_height, f.image_width = img.size
+        MAX = 200
+        if max(img.size) < MAX:
+            f.save()
+            return f
+        thumb_dir = make_path('thumbs')
+        if not os.path.isdir(thumb_dir):
+            os.makedirs(thumb_dir)
+        with tempfile.NamedTemporaryFile(
+            suffix='.{0}'.format(extension)) as tmp:
             img.thumbnail((MAX, MAX), Image.ANTIALIAS)
             img.save(tmp)
             f.thumb = DjangoFile(tmp)
+            f.save()
     except IOError:
         pass
-    f.save()
-    tmp.close()
     return f
 
 

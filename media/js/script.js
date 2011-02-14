@@ -331,7 +331,7 @@ function init() {
         if (!$.settings('oldInsert') && currentPage.type != 'section') {
             var n = $('#post' + $(this).text());
             $('.new-post').insertAfter(n);
-            textArea.insert('>>' + e.srcElement.innerHTML + ' ');
+            textArea.insert('>>' + e.target.innerHTML + ' ');
             return false
         } else {
             return true;
@@ -547,65 +547,75 @@ function initHotkeys() {
 }
 
 function initAJAX() {
-    if ($.settings('noAJAX')) {
-        return false;
+    //if ($.settings('noAJAX')) {
+    //    return false;
+    //}
+    function errorCallback(event) {
+        //document.write(data.responseText); // for debugging
+        var rt = $.parseJSON(event.responseText),
+            errors,
+            errorText,
+            t = [], l;
+        if (rt['field-errors']) {
+            errors = rt['field-errors'];
+            for (var i in errors) {
+                // Get label text of current field
+                l = $('label[for="'+i+'"]').text();
+                t.push(l + ': ' + errors[i].join(', '));
+            }
+            errorText = t.join('<br/>')
+        } else {
+            errorText = rt['detail'];
+        }
+
+        $.message('error', errorText);
     }
+    
+    function successCallback(data) {
+        if (currentPage.type === 'section') { // redirect
+            window.location.href += data.pid;
+            return true;
+        }
+        $(data.html).hide().appendTo('.thread').fadeIn(500);
+        try {
+            window.location.hash = '#post' + data.pid;
+        } catch(e) {}
+        $('.captcha-img').trigger('click');
+        var newpost = $('.new-post');
+        if (newpost.parent().attr('id') !== 'main') {
+            newpost.insertBefore('.threads');
+        }
+        newpost.find(':input').each(function() {
+            switch (this.type) {
+                case 'email':
+                case 'file':
+                case 'select-multiple':
+                case 'select-one':
+                case 'text':
+                case 'textarea':
+                    $(this).val('');
+                    break;
+                case 'checkbox':
+                case 'radio':
+                    this.checked = false;
+            }
+        });
+    }
+    
     $('.new-post').submit(function(event) {
-        event.preventDefault();
-        var data = $(this).serialize(),
-            page = '/api/post/';
-
-        $.post(page, data)
-            .error(function(data) {
-                //document.write(data.responseText); // for debugging
-                var rt = $.parseJSON(data.responseText),
-                    errors,
-                    errorText,
-                    t = [], l;
-                if (rt['field-errors']) {
-                    errors = rt['field-errors'];
-                    for (var i in errors) {
-                        // Get label text of current field
-                        l = $('label[for="'+i+'"]').text();
-                        t.push(l + ': ' + errors[i].join(', '));
-                    }
-                    errorText = t.join('<br/>')
-                } else {
-                    errorText = rt['detail'];
-                }
-
-                $.message('error', errorText);
-            })
-            .success(function(data) {
-                if (currentPage.type == 'section') { // redirect
-                    window.location.href += data.pid;
-                    return true;
-                }
-                if (!$.settings('hideNotifications')) {
-                    $.message('notice', 'Ваше сообщение отправлено.');
-                }
-                $(data.html).hide().appendTo('.thread').fadeIn(500);
-                try {
-                    window.location.hash = 'post' + data.pid;
-                } catch(e) {}
-                $('.captcha-img').trigger('click');
-                $('.new-post').insertBefore('.threads');
-                $('.new-post').find(':input').each(function() {
-                    switch (this.type) {
-                        case 'email':
-                        case 'file':
-                        case 'select-multiple':
-                        case 'select-one':
-                        case 'text':
-                        case 'textarea':
-                            $(this).val('');
-                            break;
-                        case 'checkbox':
-                        case 'radio':
-                            this.checked = false;
-                    }
-                });
-            });
+        var form = $(this),
+            uri = '/api/post/?_accept=application/json',
+            jxhr;
+        // if we got no files
+        if (!$('#file').val()) {
+            jxhr = $.post(uri, form.serialize());
+        } else if (!!window.FileReader) {  // send without ajax
+            jxhr = $.mpu(uri, form);
+        } else {  // multipart uploader
+            return true;
+        }
+        jxhr.error(errorCallback).success(successCallback);
+        return false;
     });
 }
 

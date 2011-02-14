@@ -6,6 +6,17 @@ window.log = function(){
     if(this.console) console.log( Array.prototype.slice.call(arguments) );
 };
 
+// catch all document.write() calls
+(function(doc){
+    var write = doc.write;
+    doc.write = function(q) {
+        if (/docwriteregexwhitelist/.test(q)) {
+            write.apply(doc, arguments);
+        }
+    };
+})(document);
+
+
 /*
  * Crypto-JS v2.0.0
  * SHA256
@@ -68,9 +79,8 @@ $.extend({
     },
     
     settingsFactory : function(prefix) {
-        self = this;
         return function(name, value, options) {
-            return self.cookie(prefix + name, value, options);
+            return jQuery.cookie(prefix + name, value, options);
         }
     },
     
@@ -219,105 +229,211 @@ $.extend({
      * limitations under the License.
      */
     // Based on code of jquery.toastmessage, modified by Paul Bagwell
-    message : function(type) {
-        self = jQuery.message;
-        if (self.prototype[type]) {
-            return self.prototype[type].apply(this, Array.prototype.slice.call(arguments, 1));
-        } else if (typeof type === 'object' || !type) {
-            return self.prototype.init.apply(this, arguments);
+    message : function(type, message, options) {
+        var defaultSettings = {
+            inEffect: {opacity: 'show'}, // in effect
+            inEffectDuration: 600, // in effect duration in ms
+            stayTime: 3000, // time in miliseconds before the item has to disappear
+            text: '',    // content of the item
+            sticky: false, // should the notification item be sticky or not?
+            type: 'notice', // notice, warning, error, success
+            position: 'top-right', // top-right, center, middle-bottom etc
+            closeText: '', // text which will be shown as close button, 
+                           // set to '' when you want to introduce an image via css
+            close: null // callback function when the message is closed
+        };
+        
+        function init(options) {
+            if (options) {
+                $.extend(defaultSettings, options);
+            }
         }
-        return self.prototype.notice.apply(this, Array.prototype.slice.call(arguments, 0));
-    },
-});
+        
+        function remove(obj, options) {
+            obj.animate({opacity: '0'}, 600, function() {
+                obj.parent().animate({height: '0px'}, 300, function() {
+                    obj.parent().remove();
+                });
+            });
+            // callback
+            if (options && options.close !== null) {
+                options.close();
+            }
+        }
+        
+        function show(options) {
+            var localSettings = $.extend(defaultSettings, options),
+                notificationWrapAll = (!$('.notification-container').length) ? 
+                    $('<div/>').addClass('notification-container')
+                    .addClass('notification-position-' + localSettings.position)
+                    .appendTo('body') 
+                    : $('.notification-container'), 
+                notificationItemOuter = $('<div/>').addClass('notification-item-wrapper'), 
+                notificationItemInner = $('<div/>').hide()
+                    .addClass('notification-item notification-type-' + localSettings.type)
+                    .appendTo(notificationWrapAll)
+                    .html('<p>' + localSettings.text + '</p>')
+                    .animate(localSettings.inEffect, localSettings.inEffectDuration)
+                    .wrap(notificationItemOuter), 
+                notificationItemClose = $('<div/>')
+                    .addClass('notification-item-close')
+                    .prependTo(notificationItemInner)
+                    .html(localSettings.closeText)
+                    .click(function() {
+                        remove(notificationItemInner, localSettings);
+                    }),
+                notificationItemImage = $('<div/>').addClass('notification-item-image')
+                    .addClass('notification-item-image-' + localSettings.type)
+                    .prependTo(notificationItemInner);
 
-$.extend(jQuery.message.prototype, {
-    defaultSettings : {
-        inEffect: {opacity: 'show'}, // in effect
-        inEffectDuration: 600, // in effect duration in ms
-        stayTime: 3000, // time in miliseconds before the item has to disappear
-        text: '',    // content of the item
-        sticky: false, // should the toast item sticky or not?
-        type: 'notice', // notice, warning, error, success
-        position: 'top-right', // top-right, center, middle-bottom etc
-        closeText: '', // text which will be shown as close button, 
-                       // set to '' when you want to introduce an image via css
-        close: null // callback function when the message is closed
+            if (navigator.userAgent.match(/MSIE 6/i)) {
+                notificationWrapAll.css({top: document.documentElement.scrollTop});
+            }
+
+            if (!localSettings.sticky) {
+                setTimeout(function() {
+                    remove(notificationItemInner, localSettings);
+                },
+                localSettings.stayTime);
+            }
+            return notificationItemInner;
+        }
+        
+        if (!message) {
+            message = type;
+            type = 'notice';
+        }
+        
+        return show({
+            'text': message, 
+            'type': type || 'notice',
+        })
     },
     
-    init : function(options) {
-        if (options) {
-            $.extend(self.prototype.defaultSettings, options);
+    /**
+     * jQuery multipart uploader class.
+     * 
+     * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
+     * Licensed under the MIT license:
+     * http://www.opensource.org/licenses/mit-license.php
+     */
+    mpu : function(uri, form) {
+        function MultipartUploader(uri, form) {
+            if (typeof form === 'string') {
+                form = $(form);
+            }
+            
+            this.uri = uri;
+            this.form = form;
+            this.send();
         }
-    },
-
-    show : function(options) {
-        var localSettings = {},
-            toastWrapAll, toastItemOuter, toastItemInner, 
-            toastItemClose, toastItemImage;
-        $.extend(localSettings, self.prototype.defaultSettings, options);
-        toastWrapAll = (!$('.toast-container').length) ? 
-            $('<div/>').addClass('toast-container')
-            .addClass('toast-position-' + localSettings.position)
-            .appendTo('body') 
-            : $('.toast-container');
         
-        toastItemOuter = $('<div/>').addClass('toast-item-wrapper');
-
-        toastItemInner = $('<div/>').hide()
-            .addClass('toast-item toast-type-' + localSettings.type)
-            .appendTo(toastWrapAll)
-            .html('<p>' + localSettings.text + '</p>')
-            .animate(localSettings.inEffect, localSettings.inEffectDuration)
-            .wrap(toastItemOuter);
-
-        toastItemClose = $('<div/>').addClass('toast-item-close')
-            .prependTo(toastItemInner)
-            .html(localSettings.closeText)
-            .click(function() { $.message('remove',toastItemInner, localSettings) });
-
-        toastItemImage = $('<div/>').addClass('toast-item-image')
-            .addClass('toast-item-image-' + localSettings.type)
-            .prependTo(toastItemInner);
-
-        if (navigator.userAgent.match(/MSIE 6/i)) {
-            toastWrapAll.css({top: document.documentElement.scrollTop});
-        }
-
-        if (!localSettings.sticky) {
-            setTimeout(function() {
-                $.message('remove', toastItemInner, localSettings);
+        $.extend(MultipartUploader.prototype, {
+            boundary : 'gc0p4Jq0M2Yt08jU534c0p',
+            errorCallback : function(data) {},
+            successCallback : function(data) {},
+            error : function(callback) {
+                this.errorCallback = callback;
+                return this;
             },
-            localSettings.stayTime);
-        }
-        return toastItemInner;
-    },
 
-    notice : function (message) {
-        return $.message('show', {text: message, type: 'notice'});
-    },
+            success : function(callback) {
+                this.successCallback = callback;
+                return this;
+            },
 
-    success : function (message) {
-        return $.message('show', {text: message, type: 'success'});
-    },
+            makeMultipartItem : function(name, value) {
+                var res = '';
+                res += '--' + this.boundary + '\r\n';
+                res += 'Content-Disposition: form-data; ';
+                res += 'name="'+name+'"\r\n\r\n';
+                res += value + '\r\n';
+                return res;
+            },
 
-    error : function (message) {
-        return $.message('show', {text: message, type: 'error'});
-    },
+            serializedToMultipart : function(list) {
+                // convert jQuery.serializeArray(arr) to multipart data
+                var res = '';
+                for (var i=0; i < list.length; i++) {
+                    res += this.makeMultipartItem(list[i]['name'], list[i]['value']);
+                }
+                return res;
+            },
 
-    warning : function (message) {
-        return $.message('show', {text: message, type: 'warning'});
-    },
+            fileToMultipart : function(fileInput, callback) {
+                var files = fileInput.attr('files'),
+                    fr = new FileReader(),
+                    file = files[0],
+                    self = this;
 
-    remove: function(obj, options) {
-        obj.animate({opacity: '0'}, 600, function() {
-            obj.parent().animate({height: '0px'}, 300, function() {
-                obj.parent().remove();
-            });
+                if (!file) {
+                    return callback('');
+                }
+                
+                function wrapFile(fileData) {
+                    var res = '';
+                    res += '--' + self.boundary + '\r\n'
+                    res += 'Content-Disposition: form-data; name="' + fileInput.attr('id') + '"; ';
+                    res += 'filename="' + file.name + '"\r\n';
+                    res += 'Content-Type: ' + file.type + '\r\n\r\n';
+                    res += fileData + '\r\n';
+                    res += '--' + self.boundary + '--\r\n';
+                    return res
+                }
+                
+                fr.onload = function(event) {
+                    if (event.loaded !== event.total) {
+                        return false;
+                    }
+                    callback(wrapFile(event.currentTarget.result));
+                };
+                
+                fr.readAsBinaryString(file);
+            },
+
+            send : function() {
+                var fr = new FileReader(),
+                    xhr = new XMLHttpRequest(),
+                    body = '', // request body
+                    self = this,
+                    fileInput = this.form.find('input[type="file"]:first');
+
+                xhr.open('POST', this.uri, true);
+                xhr.setRequestHeader('Content-Type', 'multipart/form-data; boundary=' + this.boundary);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 400) {
+                            self.successCallback($.parseJSON(xhr.responseText));
+                        } else {
+                            self.errorCallback(xhr);
+                        }
+                    }
+                };
+                body += this.serializedToMultipart(this.form.serializeArray());
+                this.fileToMultipart(fileInput, function(fileData) {
+                    body += fileData;
+                    
+                    if (xhr.sendAsBinary) { // native support by Firefox
+                        xhr.sendAsBinary(body);
+                    } else if (Uint8Array) { // use FileWriter API in Chrome
+                        var blob = new BlobBuilder(),
+                            arrb = new ArrayBuffer(body.length),
+                            ui8a = new Uint8Array(arrb, 0);
+                        for (var i=0; i < body.length; i++) {
+                            ui8a[i] = (body.charCodeAt(i) & 0xff);
+                        }
+                        blob.append(arrb);
+                        xhr.send(blob.getBlob());
+                    } else { // send raw data
+                        xhr.send(body);
+                    }
+                    
+                });
+                return this;
+            },
         });
-        // callback
-        if (options && options.close !== null) {
-            options.close();
-        }
+        
+        return new MultipartUploader(uri, form);
     }
 });
 

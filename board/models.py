@@ -24,7 +24,7 @@ __all__ = [
     'cache', 'render_to_string',
     'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
     'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
-    'File', 'FileGroup', 'FileType', 'Section', 'SectionGroup', 'User',
+    'File', 'FileTypeGroup', 'FileType', 'Section', 'SectionGroup', 'User',
     'PostForm', 'PostFormNoCaptcha', 'ThreadForm', 'DeniedIP', 'AllowedIP',
 ]
 
@@ -41,13 +41,13 @@ SECTION_TYPES = (
 )
 
 def get_file_path(base):
-    def f(instance, filename):
+    def closure(instance, filename):
         ip = instance.post
         return '{base}/{slug}/{thread}/{pid}.{ext}'.format(
             base=base, slug=ip.section(), thread=ip.thread,
             pid=ip.pid, ext=instance.type.extension
         )
-    return f
+    return closure
 
 
 def cached(seconds=900):
@@ -55,17 +55,17 @@ def cached(seconds=900):
         Cache the result of a function call for the specified number of
         seconds, using Django's caching mechanism.
     """
-    def doCache(f):
-        def x(*args, **kwargs):
-                key = sha1(f.__module__ + f.__name__ +
-                    str(args) + str(kwargs)).hexdigest()
-                result = cache.get(key)
-                if result is None:
-                    result = f(*args, **kwargs)
-                    cache.set(key, result, seconds)
-                return result
-        return x
-    return doCache
+    def do_cache(f):
+        def closure(*args, **kwargs):
+            key = sha1(f.__module__ + f.__name__ +
+                str(args) + str(kwargs)).hexdigest()
+            result = cache.get(key)
+            if result is None:
+                result = f(*args, **kwargs)
+                cache.set(key, result, seconds)
+            return result
+        return closure
+    return do_cache
 
 
 class InsufficientRightsError(Exception):
@@ -131,7 +131,6 @@ class Thread(models.Model):
         verbose_name=_('Thread is closed'))
     html = models.TextField(blank=True, verbose_name=_('Thread html'))
 
-    @property
     def posts_html(self):
         return self.post_set.filter(is_deleted=False).values('html')
 
@@ -153,7 +152,6 @@ class Thread(models.Model):
     def op_post(self):
         return self.post_set.all()[0]
 
-    @property
     def last_posts(self):
         c = self.count()
         s = self.post_set.filter(is_deleted=False)
@@ -282,27 +280,13 @@ class File(models.Model):
         verbose_name_plural = _('Files')
 
 
-class FileGroup(models.Model):
-    """Category of files"""
-    name = models.CharField(max_length=32,
-        verbose_name=_('File category name'))
-    default_image = models.ImageField(upload_to='default/')
-
-    def __unicode__(self):
-        return self.name
-
-    class Meta:
-        verbose_name = _('File category')
-        verbose_name_plural = _('File categories')
-
-
 class FileType(models.Model):
     """File type"""
     extension = models.CharField(max_length=10, unique=True,
         verbose_name=_('File type extension'))
     mime = models.CharField(max_length=250, blank=False,
         verbose_name=_('File type MIME'))
-    group = models.ForeignKey('FileGroup',
+    group = models.ForeignKey('FileTypeGroup',
         verbose_name=_('File type group'))
 
     def __unicode__(self):
@@ -311,6 +295,20 @@ class FileType(models.Model):
     class Meta:
         verbose_name = _('File type')
         verbose_name_plural = _('File types')
+
+
+class FileTypeGroup(models.Model):
+    """Category of files"""
+    name = models.CharField(max_length=32,
+        verbose_name=_('File type group name'))
+    default_image = models.ImageField(upload_to='default/')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = _('File type group')
+        verbose_name_plural = _('File type group')
 
 
 class Section(models.Model):
@@ -331,7 +329,7 @@ class Section(models.Model):
         verbose_name=_('Section force anonymity'))
     default_name = models.CharField(max_length=64, default=_('Anonymous'),
         verbose_name=_('Section default poster name'))
-    filetypes = models.ManyToManyField(FileGroup, blank=True,
+    filetypes = models.ManyToManyField(FileTypeGroup, blank=True,
         verbose_name=_('Section allowed filetypes'))
     bumplimit = models.PositiveSmallIntegerField(default=500,
         verbose_name=_('Section bumplimit'))
@@ -395,7 +393,7 @@ class Section(models.Model):
 
 
 class SectionGroup(models.Model):
-    """Group of board sections. Example: [b / d / s] [a / aa] """
+    """Group of board sections. Example: [b / d / s] [a / aa]."""
     name = models.CharField(max_length=64, blank=False,
         verbose_name=_('Section group name'))
     order = models.SmallIntegerField(verbose_name=_('Section group order'))
@@ -411,7 +409,7 @@ class SectionGroup(models.Model):
 
 
 class User(models.Model):
-    """User (moderator etc.)"""
+    """User (moderator etc.)."""
     username = models.CharField(max_length=32, unique=True,
         verbose_name=_('User name'))
     password = models.CharField(max_length=64,

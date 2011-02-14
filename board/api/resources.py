@@ -20,7 +20,7 @@ __all__ = [
     'ThreadRootResource', 'ThreadResource',
     'SectionRootResource', 'SectionResource',
     'FileTypeRootResource', 'FileTypeResource',
-    'FileGroupRootResource', 'FileGroupResource',
+    'FileTypeGroupRootResource', 'FileTypeGroupResource',
     'SectionGroupRootResource', 'SectionGroupResource',
 ]
 
@@ -165,15 +165,15 @@ class FileTypeResource(ModelResource):
     fields = ('id', 'category_id', 'type', 'extension')
 
 
-class FileGroupRootResource(RootModelResource):
-    """A list resource for FileGroup."""
+class FileTypeGroupRootResource(RootModelResource):
+    """A list resource for FileTypeGroup."""
     allowed_methods = anon_allowed_methods = ('GET',)
-    model = FileGroup
+    model = FileTypeGroup
     fields = ('id', 'name')
 
 
-class FileGroupResource(ModelResource):
-    """A read resource for FileGroup."""
+class FileTypeGroupResource(ModelResource):
+    """A read resource for FileTypeGroup."""
     allowed_methods = anon_allowed_methods = ('GET',)
-    model = FileGroup
+    model = FileTypeGroup
     fields = ('id', 'name')
