@@ -609,9 +609,9 @@ function initAJAX() {
         // if we got no files
         if (!$('#file').val()) {
             jxhr = $.post(uri, form.serialize());
-        } else if (!!window.FileReader) {  // send without ajax
+        } else if (!!window.FileReader) {  // html5 multipart uploader
             jxhr = $.mpu(uri, form);
-        } else {  // multipart uploader
+        } else {  // send without ajax
             return true;
         }
         jxhr.error(errorCallback).success(successCallback);
