@@ -59,7 +59,12 @@ def post(request, no_captcha=True):
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = tools.key(post.password)
     if new_thread:
-        thread = Thread(section_id=request.POST['section'], bump=post.date)
+        kw = {'bump': post.date}
+        if request.POST['section'].is_digit:
+            kw['section_id'] = request.POST['section']
+        else:
+            kw['section'] = Section.objects.get(slug=request.POST['section'])
+        thread = Thread(**kw)
     else:
         thread = Thread.objects.get(id=request.POST['thread'])
     section_is_feed = (thread.section.type == 3)

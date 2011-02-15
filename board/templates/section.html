@@ -36,5 +36,9 @@
     {% endif %}
     <div class="deleteMode">
         <input type="button" value="{% trans "Delete posts" %}" data-back="{% trans "Cancel" %}" class="toggle">
+        <p style="display: none">
+            <label for="onlyFiles">{% trans "Only files" %}</label>
+            <input type="checkbox" name="onlyFiles" id="onlyFiles">
+        </p>
     </div>
 {% endblock %}

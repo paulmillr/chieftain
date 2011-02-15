@@ -126,7 +126,10 @@ class PostResource(ModelResource):
 
     def delete(self, request, auth, *args, **kwargs):
         """Deletes post."""
-        post = self.model.objects.get(id=kwargs['id'])
+        try:
+            post = self.model.objects.get(id=kwargs['id'])
+        except self.model.DoesNotExist:
+            raise ResponseException(status.NOT_FOUND)
         key = request.GET['password']
         if len(key) < 64:  # make hash if we got plain text password
             key = tools.key(key)
@@ -188,10 +191,31 @@ class FileRootResource(RootModelResource):
 
 class FileResource(ModelResource):
     """A list resource for File."""
-    allowed_methods = anon_allowed_methods = ('GET',)
+    allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
     model = File
     fields = ('id', 'post', 'name', 'type', 'size', 'is_deleted',
         'image_width', 'image_height', 'hash', 'file', 'thumb')
+
+    def delete(self, request, auth, *args, **kwargs):
+        """Deletes attachment."""
+        try:
+            file = self.model.objects.get(**kwargs)
+        except self.model.DoesNotExist:
+            raise ResponseException(status.NOT_FOUND)
+
+        key = request.GET['password']
+        if len(key) < 64:  # make hash if we got plain text password
+            key = tools.key(key)
+
+        if file.post.password != key:
+            raise ResponseException(status.FORBIDDEN, content={
+                'detail': u'{0}{1}. {2}'.format(
+                    _('Error on deleting file #'), post.pid,
+                    _('Password mismatch')
+                )
+            })
+        file.remove()
+        return Response(status.NO_CONTENT)
 
 class FileTypeRootResource(RootModelResource):
     """A list resource for FileType."""

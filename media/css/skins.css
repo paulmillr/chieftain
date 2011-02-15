@@ -28,7 +28,13 @@
 #photon .post .number,
 #photon .post time{float:right;}
 #photon .deleted {background: inherit;}
-#photon .deleted .post-wrapper {background: #e44;}
+#photon .deleted .post-wrapper,
+#photon .content .deleted {background: #e44;}
+#photon .deleted img {
+    filter: alpha(opacity=50);
+    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    opacity: 0.5;
+}
 
 /* Neutron Rewrited v0.30 for klipped */
 #neutron body{background:none #212121;color:#698CC0;font-family:"Trebuchet MS",Trebuchet,tahoma,serif;counter-reset:threadpostcount !important;}

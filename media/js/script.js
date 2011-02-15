@@ -249,6 +249,9 @@ function resetSettings() {
 }
 
 function slideRemove(elem) {
+    if (typeof elem !== 'object') {
+        elem = $(elem);
+    }
     elem.slideUp(600, function() {
         $(this).remove();
     });
@@ -281,6 +284,7 @@ function init() {
         if (t.attr('class') == 'toggled') {
             t.removeClass('toggled');
             t.addClass('toggle');
+            $('.deleted').removeClass('deleted');
         } else {
             t.removeClass('toggle');
             t.addClass('toggled');
@@ -292,34 +296,47 @@ function init() {
         if ($('.deleteMode input').attr('class') !== 'toggled') {
             return true;
         }
-        var post = $(this).addClass('deleted'),
-            id = post.data('id'),
-            password = Crypto.SHA256($('#password').val());
-        
+        var t = $(this),
+            onlyFiles = !!$('#onlyFiles').attr('checked'),
+            target = !onlyFiles ? t : t.find('.files'),
+            url = !onlyFiles ? 
+                '/api/post/' + target.data('id') : 
+                '/api/file/' + target.find('.file').attr('id').replace(/file/, ''),
+            password = Crypto.SHA256($('#password').val()),
+            cb;
+        target.addClass('deleted');
+        if (!onlyFiles) {
+            cb = function(data) {
+                if (target.prev().length !== 0) {
+                    // post is not first in thread
+                    slideRemove(target);
+                    return true;
+                }
+
+                // remove whole thread
+                if (currentPage.type === 'thread') {
+                    window.location.href = './';
+                    return true;
+                }
+                var thread = target.parent();
+                thread.children().addClass('deleted');
+                slideRemove(thread);
+            }
+        } else {
+            cb = function(data) {
+                slideRemove(t.find('.files, .file-info'));
+                return true;
+            }
+        }
         $.ajax({
-            'url': '/api/post/' + id + '?password=' + password,
+            'url': url + '?password=' + password,
             'type': 'DELETE',
         })
         .error(function(data) {
             $.message('error', $.parseJSON(data.responseText)['detail']);
-            post.removeClass('deleted');
+            target.removeClass('deleted');
         })
-        .success(function(data) {
-            if (post.prev().length !== 0) {
-                // post is not first in thread
-                slideRemove(post);
-                return true;
-            }
-            
-            // remove whole thread
-            if (currentPage.type === 'thread') {
-                window.location.href = './';
-                return true;
-            }
-            var thread = post.parent();
-            thread.children().addClass('deleted');
-            slideRemove(thread);
-        });
+        .success(cb);
     });
     
     $('#main > .thread').delegate('.edit', 'click', function(event) {

@@ -150,7 +150,6 @@ class Thread(models.Model):
                 'skipped_files': ps.filter(file_count__gt=0).count()
             }
 
-    @cached(3600)
     @property
     def op_post(self):
         return self.post_set.all()[0]
@@ -279,6 +278,7 @@ class File(models.Model):
         self.is_deleted = True
         self.save()
         self.post.save()
+        self.post.thread.save()
 
     def __unicode__(self):
         return '{0}/{1}'.format(self.post.section(), self.post.pid)

@@ -12,6 +12,7 @@
         <div class="content">
             {% if post.file_count > 0 %}
             {% for f in post.file_set.all %}
+            {% if not f.is_deleted %}
             <div class="file-info">
                 <a target="_blank" href="{{f.file.url}}">{{post.pid}}.{{f.type.extension}}</a>
                 (<em>{{f.size|filesizeformat}}{% if f.image_height %}, {{f.image_height}}x{{f.image_width}}{% endif %}</em>)
@@ -28,8 +29,8 @@
                     {% endif %}
                 </a>
             </div>
+            {% endif %}
             {% endfor %}
-            
             {% endif %}
             <div class="message">
                 {% autoescape off %}
