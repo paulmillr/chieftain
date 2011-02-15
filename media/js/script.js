@@ -488,13 +488,33 @@ function initSettings() {
 
 function initStyle() {
     var key = 'ustyle',
-        cookie = $.settings(key);
+        style = $.settings(key);
     
-    if (!cookie) {
+    if (!style) {
         return false;
     }
     
     $('html').attr('id', cookie);
+    
+    if (style === 'klipton') {
+        function removeSel() {
+            $('.postlist').remove();
+            $('.selected').removeClass('selected');
+            return false;
+        }
+        $('.thread').click(function(event) {
+            if ($(this).hasClass('selected')) {
+                removeSel();
+                return false;
+            }
+            removeSel();
+            $(this).addClass('selected');
+            var s = $('<section/>').addClass('postlist').appendTo('#main'),
+                p = $(this).find('.post').clone();
+            p.appendTo(s)
+            return false;
+        });
+    }
     
     return true;
 }

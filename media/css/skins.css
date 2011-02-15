@@ -15,27 +15,47 @@
 #photon .new-post .empty{font-style:italic;}
 #photon .new-post .captcha-img{width:300px;}
 #photon .new-post .bbcode{padding-bottom:5px;font-size:1em;}
-#photon .new-style dl {clear: none;}
-#photon .new-style dt {display: none;}
-
+#photon .new-style dl{clear:none;}
+#photon .new-style dt{display:none;}
 /* Threads and posts */
 #photon .thread{border-top-color:#ccc;}
 #photon .post{background:none;padding:0;margin-bottom:5px;}
-#photon .post-wrapper, 
-#photon .faq > li{display:inline-block;background:#DDD;padding:5px;border-radius:5px;-moz-border-radius: 5px;border:1px solid #ccc;}
-#photon .post:first-child .post-wrapper {background: inherit; border: 0; width: 100%;}
-#photon .post .number a, 
-#photon .post .number a:visited {color: inherit;}
+#photon .post-wrapper,
+#photon .faq > li{display:inline-block;background:#DDD;padding:5px;border-radius:5px;-moz-border-radius:5px;border:1px solid #ccc;}
+#photon .post:first-child .post-wrapper{background:inherit;border:0;width:100%;}
+#photon .post .number a,
+#photon .post .number a:visited{color:inherit;}
 #photon .post .number,
 #photon .post time{float:right;}
-#photon .deleted {background: inherit;}
+#photon .deleted{background:inherit;}
 #photon .deleted .post-wrapper,
-#photon .content .deleted {background: #e44;}
-#photon .deleted img {
-    filter: alpha(opacity=50);
-    -ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
-    opacity: 0.5;
-}
+#photon .content .deleted{background:#e44;}
+#photon .deleted img{filter:alpha(opacity=50);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";opacity:0.5;}
+
+/* klipton alpha */
+#klipton body{background:#D8DCE0 url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAABMCAIAAAAjsUpsAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAAEVJREFUeNqMTlsKACAMku5/Z9sL1lpUH6JMJ4LkAGBQTdVxIwUQXVizNK+zd1Tecjfv1RHbnE/bcmPrKL8/XYufG6cAAwBFymotT/a6tQAAAABJRU5ErkJggg==') repeat-x;}
+#klipton .sidebar,footer,.paginator,.deleteMode{display:none;}
+#klipton #container-wrap > *{margin-left:10px;}
+#klipton #container-wrap > header{display:none;}
+#klipton #main{padding-top:20px;}
+#klipton .postlist,
+#klipton .threads{width:405px;border:1px solid #eee;border-radius:5px;-moz-border-radius:5px;background:#C9E2FE;padding:20px 1px;-webkit-box-shadow:5px 5px 5px #555;-moz-box-shadow:5px 5px 5px #555;box-shadow:5px 5px 5px #555;float:left;}
+#klipton .thread.selected{background:#3a3;color:white;}
+#klipton .postlist{margin-left:20px;}
+#klipton .postlist .post,
+#klipton .thread{font-size:12px;background:#fff;border:solid #eee;border-top:1px;border-bottom:1px;border-left:0;border-right:0;margin:1px 0;}
+#klipton .thread:first-child{}
+#klipton .thread .skipped{display:none;}
+#klipton .thread .post{display:none;background:none;margin-top:0;margin-bottom:0;}
+#klipton .thread .post:first-child{display:block;}
+#klipton .post img{max-width:50px;}
+#klipton .post header{float:right;width:70px;}
+#klipton .post .info-wrapper{float:right;}
+#klipton .post .content{margin:0;padding-left:60px;width:250px;}
+#klipton .post .files{width:60px;margin-left:-60px;margin-right:0;}
+#klipton .post .message{display:block;}
+#klipton .post .file-info{display:none;}
+#klipton .new-post{display:none;}
 
 /* Neutron Rewrited v0.30 for klipped */
 #neutron body{background:none #212121;color:#698CC0;font-family:"Trebuchet MS",Trebuchet,tahoma,serif;counter-reset:threadpostcount !important;}
@@ -147,4 +167,4 @@
 #neutron .poster a[href="SAGE"]:hover{color:#CC1212 !important;}
 #neutron .poster a[href="sage"]:before,
 #neutron .poster a[href="Sage"]:before
-#neutron ,.poster a[href="SAGE"]:before{content:url(sage.png);padding-right:2px;}
+#neutron,.poster a[href="SAGE"]:before{content:url(sage.png);padding-right:2px;}
