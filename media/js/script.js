@@ -260,7 +260,15 @@ function slideRemove(elem) {
 function init() {
     var textArea = new Newpost('#message'),
         set = $.settings('hideSectGroup');
-    
+
+    function searchPost(board, pid, callback) {
+        var p = $('#post' + pid);
+        if (p.length) {
+            return p;
+        }
+        $.get('/api/post/' + board + '/' + pid, callback);
+    }
+
     $('.bbcode a').click(function(e) {
         e.preventDefault();
         var t = $(this),
@@ -274,7 +282,26 @@ function init() {
         textArea.wrap(start, end, code);
     });
     
-    $('.deleteMode > input').click(function(x) {
+    $('.message').delegate('.postlink', 'hover', function(event) {
+        if (event.type === 'mouseleave') {
+            $('.hover').remove();
+            return false;
+        }
+        var m = $(this).attr('href').match(/(?:\/(\w+)\/)?(\d+)/),
+            globalLink = !!m[1],
+            board = globalLink ? m[1] : currentPage.section,
+            pid = m[2],
+            from = searchPost(board, pid, function(data) {
+                var div = $(data.html).clone().addClass('hover').css({
+                    'position': 'relative',
+                    'top': event.pageY - this.offsetTop - 90 + 'px',
+                    'left': event.pageX - this.offsetLeft + 'px',
+                }).appendTo('.thread');
+            });
+            
+    });
+    
+    $('.deleteMode > input').click(function(event) {
         var tmp = this.value,
             t = $(this),
             fn;
