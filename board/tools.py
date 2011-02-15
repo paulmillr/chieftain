@@ -37,7 +37,7 @@ def handle_uploaded_file(file, extension, post):
     file_data = {
         'post': post,
         'name': file.name,
-        'type': FileType.objects.get(extension=extension),
+        'type': FileType.objects.filter(extension=extension)[0],
         'size': file.size,
         'image_height': 0,
         'image_width': 0,

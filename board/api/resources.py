@@ -31,7 +31,8 @@ class Resource(Resource):
     emitters = [
         emitters.JSONEmitter,
         emitters.XMLEmitter,
-        #emitters.DocumentingHTMLEmitter,
+        emitters.DocumentingHTMLEmitter,
+        emitters.JSONTextEmitter,
         #emitters.DocumentingPlainTextEmitter,
     ]
 
@@ -49,7 +50,7 @@ class RootModelResource(RootModelResource, Resource):
 
 class ThreadRootResource(RootModelResource):
     """A create/list resource for Thread."""
-    allowed_methods = ('GET',)
+    allowed_methods = anon_allowed_methods = ('GET',)
     model = Thread
     fields = (
         'id', 'section_id', 'bump', 'is_pinned',
@@ -102,7 +103,7 @@ class PostRootResource(RootModelResource):
         try:
             instance = validators.post(request, auth)
         except validators.ValidationError as e:
-            raise ResponseException(status.BAD_REQUEST, {'detail': e})
+            return Response(status.BAD_REQUEST, {'detail': e})
         return Response(status.CREATED, instance)
 
 
@@ -135,7 +136,7 @@ class PostResource(ModelResource):
             key = tools.key(key)
 
         if post.password != key:
-            raise ResponseException(status.FORBIDDEN, content={
+            return Response(status.FORBIDDEN, content={
                 'detail': u'{0}{1}. {2}'.format(
                     _('Error on deleting post #'), post.pid,
                     _('Password mismatch')

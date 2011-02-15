@@ -23,6 +23,7 @@
 #photon .post{background:none;padding:0;margin-bottom:5px;}
 #photon .post-wrapper, 
 #photon .faq > li{display:inline-block;background:#DDD;padding:5px;border-radius:5px;-moz-border-radius: 5px;border:1px solid #ccc;}
+#photon .post:first-child .post-wrapper {background: inherit; border: 0; width: 100%;}
 #photon .post .number a, 
 #photon .post .number a:visited {color: inherit;}
 #photon .post .number,

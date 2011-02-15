@@ -251,7 +251,7 @@ em {font-style: italic;}
 #container > b.border-d { -webkit-transform: scale(1.5) rotate(45deg); -webkit-transform-origin: 80% 0%; -moz-transform: scale(1.5) rotate(45deg); -moz-transform-origin: 80% 0%; left: auto; right: 2em; top: 0; }
 
 /* Top */
-#container header {border-bottom: 1px solid #aaa; margin-bottom: 5px; padding-bottom: 5px;}
+#container-wrap > header {border-bottom: 1px solid #aaa; margin-bottom: 5px; padding-bottom: 5px;}
 .logo {display: table; margin: 0 auto;}
 .section-banner {width: 300px; height: 100px; margin: 0 auto;}
 .search {float:right; width: 215px;}
@@ -300,7 +300,9 @@ fieldset dt {width: 150px; font-weight: bold;}
 .settings dt {width: auto;}
 
 /* Threads and posts */
+.thread {margin-bottom: 10px;}
 .thread, .faq {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
+.skipped {color: #666;}
 .post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}
 .post:after {clear: both;}
 .post input[type="checkbox"] {margin: 3px 5px 0 4px;}
@@ -308,10 +310,14 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post .number {font-weight: bold;}
 .post .number a, .post .number a:visited {color: inherit;}
 .post .number a:hover {color: #06f;}
+.post .poster a {text-decoration: underline;}
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
 .post .topic {font-weight: bold;}
-.post .message {display: inline-block; float: left; margin-top: 20px;}
+.post .content {margin-top: 10px;}
+.post .file-info {margin: -10px 0 5px 0;}
+.post .files {margin-top: -5px;}
+.post .message {display: inline;}
 .post .message, .post .message * {vertical-align:top;}
 .post .message.poster ins {background: none; text-decoration: underline; font-weight: normal; color: inherit;}
 .post .underlined {border-bottom: 1px dashed;}

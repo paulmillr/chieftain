@@ -60,7 +60,7 @@ def post(request, no_captcha=True):
     post.password = tools.key(post.password)
     if new_thread:
         kw = {'bump': post.date}
-        if request.POST['section'].is_digit:
+        if request.POST['section'].isdigit():
             kw['section_id'] = request.POST['section']
         else:
             kw['section'] = Section.objects.get(slug=request.POST['section'])

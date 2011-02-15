@@ -304,6 +304,7 @@ function init() {
                 '/api/file/' + target.find('.file').attr('id').replace(/file/, ''),
             password = Crypto.SHA256($('#password').val()),
             cb;
+        function block(event) {event.preventDefault();}
         target.addClass('deleted');
         if (!onlyFiles) {
             cb = function(data) {
@@ -564,12 +565,9 @@ function initHotkeys() {
 }
 
 function initAJAX() {
-    //if ($.settings('noAJAX')) {
-    //    return false;
-    //}
-    function errorCallback(event) {
+    function errorCallback(data) {
         //document.write(data.responseText); // for debugging
-        var rt = $.parseJSON(event.responseText),
+        var rt = data,
             errors,
             errorText,
             t = [], l;
@@ -587,7 +585,7 @@ function initAJAX() {
 
         $.message('error', errorText);
     }
-    
+
     function successCallback(data) {
         if (currentPage.type === 'section') { // redirect
             window.location.href += data.pid;
@@ -618,21 +616,15 @@ function initAJAX() {
             }
         });
     }
-    
-    $('.new-post').submit(function(event) {
-        var form = $(this),
-            uri = '/api/post/?_accept=application/json',
-            jxhr;
-        // if we got no files
-        if (!$('#file').val()) {
-            jxhr = $.post(uri, form.serialize());
-        } else if (!!window.FileReader) {  // html5 multipart uploader
-            jxhr = $.mpu(uri, form);
-        } else {  // send without ajax
-            return true;
-        }
-        jxhr.error(errorCallback).success(successCallback);
-        return false;
+    $('.new-post').ajaxForm({ 
+        'target': 'body',
+        'success': function(data) {
+            return !data['field-errors'] && !data['detail'] ? 
+                successCallback(data) :
+                errorCallback(data);
+        },
+        'url': '/api/post/?_accept=text/plain',
+        'dataType': 'json',
     });
 }
 

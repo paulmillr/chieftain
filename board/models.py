@@ -12,7 +12,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.core.exceptions import ImproperlyConfigured
 from django.db import models
-from django.forms import ModelForm, CharField, IntegerField
+from django.forms import ModelForm, CharField, IntegerField, FileField
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
@@ -290,7 +290,7 @@ class File(models.Model):
 
 class FileType(models.Model):
     """File type"""
-    extension = models.CharField(max_length=10, unique=True,
+    extension = models.CharField(max_length=10,
         verbose_name=_('File type extension'))
     mime = models.CharField(max_length=250, blank=False,
         verbose_name=_('File type MIME'))
@@ -468,7 +468,7 @@ class PostFormNoCaptcha(ModelForm):
 
        Used for disabling double requests to api server.
     """
-    section = IntegerField(required=False)
+    section = CharField(required=False)
 
     class Meta:
         model = Post
@@ -476,6 +476,7 @@ class PostFormNoCaptcha(ModelForm):
 
 class PostForm(PostFormNoCaptcha):
     """Simple post form."""
+    file = FileField(required=False)
     captcha = fields.ReCaptchaField(required=False)
     recaptcha_challenge_field = CharField(required=False)
     recaptcha_response_field = CharField(required=False)
