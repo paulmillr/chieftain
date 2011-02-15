@@ -320,7 +320,6 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post .message {display: inline;}
 .post .message, .post .message * {vertical-align:top;}
 .post .message.poster ins {background: none; text-decoration: underline; font-weight: normal; color: inherit;}
-.post .underlined {border-bottom: 1px dashed;}
 .post blockquote {color: #789922; clear: both;}
 .post blockquote > p {display: inline;}
 .post .files {margin-right: 10px; float:left; max-width: 220px; max-height: 220px;}
@@ -328,6 +327,10 @@ fieldset dt {width: 150px; font-weight: bold;}
 .deleted {background: #e44;}
 .file-info a:link, .file-info a:hover {text-decoration: underline;}
 .file-info {color: #666; font-size: 0.9em;}
+
+.underlined {border-bottom: 1px dashed;}
+.spoiler {background: #bbb; color: #bbb;}
+.spoiler:hover {color: #333;}
 
 .info-wrapper {float: left;}
 .info-wrapper > * {float: left; margin: 0 5px 0 0;}
