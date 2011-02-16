@@ -41,6 +41,7 @@ SECTION_TYPES = (
 #    (6, _('Chat')),
 )
 
+
 def get_file_path(base):
     def closure(instance, filename):
         ip = instance.post
@@ -144,8 +145,8 @@ class Thread(models.Model):
         else:
             start = stop - lp
             return {
-                'total': stop, 
-                'start': start, 
+                'total': stop,
+                'start': start,
                 'stop': stop,
                 'skipped': start - 1,
                 'skipped_files': ps.filter(file_count__gt=0).count()
@@ -274,7 +275,7 @@ class File(models.Model):
         verbose_name=_('File location'))
     thumb = models.ImageField(upload_to=get_file_path('thumbs'),
         verbose_name=_('File thumbnail'))
-    
+
     def remove(self):
         self.is_deleted = True
         self.save()
@@ -435,11 +436,6 @@ class UserProfile(models.Model):
         verbose_name = _('User profile')
         verbose_name_plural = _('User profiles')
 
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        profile, created = UserProfile.objects.get_or_create(user=instance)
-
-models.signals.post_save.connect(create_user_profile, sender=User)
 
 class IP(models.Model):
     """Abstract base class for all ban classes."""
@@ -492,3 +488,10 @@ class PostForm(PostFormNoCaptcha):
 class ThreadForm(ModelForm):
     class Meta:
         model = Thread
+
+
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        profile, created = UserProfile.objects.get_or_create(user=instance)
+
+models.signals.post_save.connect(create_user_profile, sender=User)

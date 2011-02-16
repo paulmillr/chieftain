@@ -9,7 +9,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 import re
 import sys
 import os
-import hotshot, hotshot.stats
+import hotshot
 import tempfile
 import StringIO
 from operator import add
@@ -19,18 +19,16 @@ from django.db import connection
 from django.template import Template, Context
 from django.conf import settings
 
-#
-# Log all SQL statements direct to the console (when running in DEBUG)
-# Intended for use with the django development server.
-#
-__all__ = ['SQLLogToConsoleMiddleware', 'StatsMiddleware', 'ProfilingMiddleware']
+__all__ = [
+    'SQLLogToConsoleMiddleware', 'StatsMiddleware', 'ProfilingMiddleware'
+]
 
-words_re = re.compile( r'\s+' )
+words_re = re.compile(r'\s+')
 
 group_prefix_re = [
-    re.compile( "^.*/django/[^/]+" ),
-    re.compile( "^(.*)/[^/]+$" ), # extract module path
-    re.compile( ".*" ),           # catch strange entries
+    re.compile(r'^.*/django/[^/]+'),
+    re.compile(r'^(.*)/[^/]+$'),  # extract module path
+    re.compile(r'.*'),  # catch strange entries
 ]
 
 
@@ -111,34 +109,41 @@ class ProfileMiddleware(object):
 
     Add the "prof" key to query string by appending ?prof (or &prof=)
     and you'll see the profiling results in your browser.
-    It's set up to only be available in django's debug mode, is available for superuser otherwise,
-    but you really shouldn't add this middleware to any production configuration.
+    It's set up to only be available in django's debug mode, is available
+    for superuser otherwise, but you really shouldn't add this middleware
+    to any production configuration.
 
     WARNING: It uses hotshot profiler which is not thread safe.
     """
     def process_request(self, request):
-        if (settings.DEBUG or request.user.is_superuser) and request.GET.has_key('prof'):
+        if ((settings.DEBUG or request.user.is_superuser) and
+            'prof' in request.GET):
             self.tmpfile = tempfile.mktemp()
             self.prof = hotshot.Profile(self.tmpfile)
 
     def process_view(self, request, callback, callback_args, callback_kwargs):
-        if (settings.DEBUG or request.user.is_superuser) and request.GET.has_key('prof'):
-            return self.prof.runcall(callback, request, *callback_args, **callback_kwargs)
+        if ((settings.DEBUG or request.user.is_superuser) and
+            'prof' in request.GET):
+            return self.prof.runcall(callback, request, *callback_args,
+                **callback_kwargs)
 
     def get_group(self, file):
         for g in group_prefix_re:
-            name = g.findall( file )
+            name = g.findall(file)
             if name:
                 return name[0]
 
     def get_summary(self, results_dict, sum):
-        list = [ (item[1], item[0]) for item in results_dict.items() ]
-        list.sort( reverse = True )
+        list = [(item[1], item[0]) for item in results_dict.items()]
+        list.sort(reverse=True)
         list = list[:40]
 
-        res = "      tottime\n"
+        res = '      tottime\n'
         for item in list:
-            res += "%4.1f%% %7.3f %s\n" % ( 100*item[0]/sum if sum else 0, item[0], item[1] )
+            res += "%4.1f%% %7.3f %s\n" % (
+                100 * item[0] / sum if sum else 0,
+                item[0], item[1]
+            )
 
         return res
 
@@ -151,7 +156,7 @@ class ProfileMiddleware(object):
         sum = 0
 
         for s in stats_str:
-            fields = words_re.split(s);
+            fields = words_re.split(s)
             if len(fields) == 7:
                 time = float(fields[2])
                 sum += time
@@ -163,16 +168,18 @@ class ProfileMiddleware(object):
 
                 group = self.get_group(file)
                 if not group in mygroups:
-                    mygroups[ group ] = 0
-                mygroups[ group ] += time
+                    mygroups[group] = 0
+                mygroups[group] += time
 
-        return "<pre>" + \
-               " ---- By file ----\n\n" + self.get_summary(mystats,sum) + "\n" + \
-               " ---- By group ---\n\n" + self.get_summary(mygroups,sum) + \
-               "</pre>"
+        return ('<pre>'
+               ' ---- By file ----\n\n' + self.get_summary(mystats, sum)
+               '\n'
+               ' ---- By group ---\n\n' + self.get_summary(mygroups, sum)
+               '</pre>')
 
     def process_response(self, request, response):
-        if (settings.DEBUG or request.user.is_superuser) and request.GET.has_key('prof'):
+        if ((settings.DEBUG or request.user.is_superuser) and
+            'prof' in request.GET):
             self.prof.close()
 
             out = StringIO.StringIO()

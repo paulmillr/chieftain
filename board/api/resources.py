@@ -56,7 +56,7 @@ class ThreadRootResource(RootModelResource):
         'id', 'section_id', 'bump', 'is_pinned',
         'is_closed', 'html',
     )
-    
+
     def get(self, request, auth, *args, **kwargs):
         return self.model.objects.filter(is_deleted=False)[:20]
 
@@ -70,7 +70,7 @@ class ThreadResource(ModelResource):
         'id', 'section_id', 'bump', 'is_pinned',
         'is_closed', 'html',
     )
-    
+
     def get(self, request, auth, *args, **kwargs):
         try:
             kwargs['is_deleted'] = False
@@ -95,7 +95,7 @@ class PostRootResource(RootModelResource):
         'date', 'message', 'email', 'html',
         ('thread', ('id', ('section', ('id', 'slug')))),
     )
-    
+
     def get(self, request, auth, *args, **kwargs):
         return self.model.objects.filter(is_deleted=False)[:20]
 
@@ -116,7 +116,7 @@ class PostResource(ModelResource):
         'date', 'message', 'email', 'html',
         ('thread', ('id', ('section', ('id', 'slug')))),
     )
-    
+
     @staticmethod
     def is_deleted_by_mod(request, post):
         user = request.user
@@ -127,14 +127,13 @@ class PostResource(ModelResource):
             if mod and post.section() in mod.get().modded():
                 return True
         return False
-    
+
     def get(self, request, auth, *args, **kwargs):
         try:
             kwargs['is_deleted'] = False
             return self.model.objects.get(**kwargs)
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
-
 
     def delete(self, request, auth, *args, **kwargs):
         """Deletes post."""
@@ -200,7 +199,7 @@ class FileRootResource(RootModelResource):
     model = File
     fields = ('id', 'post', 'name', 'type', 'size', 'is_deleted',
         'image_width', 'image_height', 'hash', 'file', 'thumb')
-    
+
 
 class FileResource(ModelResource):
     """A list resource for File."""
@@ -229,6 +228,7 @@ class FileResource(ModelResource):
             })
         file.remove()
         return Response(status.NO_CONTENT)
+
 
 class FileTypeRootResource(RootModelResource):
     """A list resource for FileType."""

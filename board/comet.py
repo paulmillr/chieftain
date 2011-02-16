@@ -15,12 +15,13 @@ from django.conf import settings
 
 __all__ = ['gev']
 
+
 class GeventDB(object):
     """Wrapper around geventmysql."""
     def __init__(self, settings):
         d = settings.DATABASES.items().pop()[1]
         host, user, paswd = d['HOST'] or '127.0.0.1', d['USER'], d['PASSWORD']
-        conn = geventmysql.connect(host=host, user=user, password=paswd, 
+        conn = geventmysql.connect(host=host, user=user, password=paswd,
             charset='utf8')
         cur = conn.cursor()
         cur.execute('USE {0}'.format(d['NAME']))
@@ -47,10 +48,9 @@ class ThreadRoom(object):
         self.db = GeventDB(settings)
         self.cache = []
 
-
     def message_new(self, msg):
         """Adds new message to the cache and sends event.
-        
+
            msg - html cache of the post
         """
         self.cache.append(msg)
@@ -59,7 +59,7 @@ class ThreadRoom(object):
         self.new_message_event.set()
         self.new_message_event.clear()
         return json_response(msg)
-    
+
     def message_updates(self, request, thread):
         r = request.session.get('cursor') or {}
         cursor = r.get(thread)
@@ -80,7 +80,6 @@ class ThreadRoom(object):
                 request.session['cursor'][thread] = self.cache[-1]['id']
             else:
                 request.session['cursor'].pop(thread, None)
-
 
 
 t = ThreadRoom()

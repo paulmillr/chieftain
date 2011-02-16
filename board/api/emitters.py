@@ -25,6 +25,7 @@ else:
                 return ''
             return yaml.safe_dump(output)
 
+
 class JSONTextEmitter(JSONEmitter):
     """Emitter which serializes to JSON, but has media_type of plain text."""
     media_type = 'text/plain'
