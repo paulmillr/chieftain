@@ -259,7 +259,11 @@ function slideRemove(elem) {
 
 function init() {
     var textArea = new Newpost('#message'),
-        set = $.settings('hideSectGroup');
+        set = $.settings('hideSectGroup'),
+        pass = $.settings('password');
+    if (pass) {
+        $('#password').val(pass);
+    }
 
     function searchPost(board, pid, callback) {
         var p = $('#post' + pid);
@@ -268,6 +272,10 @@ function init() {
         }
         $.get('/api/post/' + board + '/' + pid, callback);
     }
+    
+    $('#password').bind('change', function(event) {
+        $.settings('password', $(this).val());
+    })
 
     $('.bbcode a').click(function(e) {
         e.preventDefault();

@@ -172,9 +172,9 @@ class ProfileMiddleware(object):
                 mygroups[group] += time
 
         return ('<pre>'
-               ' ---- By file ----\n\n' + self.get_summary(mystats, sum)
+               ' ---- By file ----\n\n' + self.get_summary(mystats, sum) +
                '\n'
-               ' ---- By group ---\n\n' + self.get_summary(mygroups, sum)
+               ' ---- By group ---\n\n' + self.get_summary(mygroups, sum) +
                '</pre>')
 
     def process_response(self, request, response):
