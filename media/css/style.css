@@ -241,7 +241,7 @@ em {font-style: italic;}
 .right {float: right;}
 .dashed { border: 1px dashed; }
 .stats {border: 1px dashed; padding: 0 5px;}
-/*#container + iframe {display: none;} /* Recaptcha bug */
+#container + iframe {display: none;} /* Recaptcha bug */
 
 
 /* yeah */
@@ -297,7 +297,8 @@ fieldset dt {width: 150px; font-weight: bold;}
 .new-post .captcha-img {vertical-align: bottom; margin:0; padding:0;}
 .new-style .username-d, .new-style .topic-d {float: left;}
 .new-style .email-d, .new-style .password-d {float: right;}
-.settings dt {width: auto;}
+.settings dt {width: auto; margin-bottom: 8px;}
+.settings input {vertical-align: top;}
 
 /* Threads and posts */
 .thread {margin-bottom: 10px;}
@@ -375,8 +376,10 @@ footer .copyright a {text-decoration: underline;}
 .notification-position-middle-bottom{position:absolute;left:50%;margin-left:-140px;margin-top:-40px;top:75%;}
 
 /* Code highlight */
-.codehilite pre {
-    padding: .5em;
+pre {
+    font-family: Monaco, Consolas, 'Droid Sans Mono', Courier, monospace;
+    font-size: 0.8em;
+    padding: 0.5em;
     margin: 1em 0;
     background-color: #fafafa;
     border: solid 1px #ccc;

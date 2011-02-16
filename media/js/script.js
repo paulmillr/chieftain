@@ -405,17 +405,17 @@ function init() {
 function initSettings() {
     // those things depend on cookie settings
     var s = parseQs(), 
-        settings = $('.settings dd').find('select, input'),
+        settings = $('.settings').find('select, input'),
         changes = { // description of all functions on settings pages
             'ustyle' : function(x) {
                 $('html').attr('id', x);
             },
             
             'hideSidebar' : function(x) {
-                var margin = (x) ? '10px' : '200px';
+                var margin = x ? '10px' : '200px';
 
                 $('#sidebar').toggle(0, null, function(x) {
-                    $('#container-wrap > *').css({'marginLeft' : margin});
+                    $('header, #main, footer').css({'margin-left' : margin});
                 });
             },
 
@@ -479,19 +479,10 @@ function initSettings() {
     settings.change(function(event) {
         var value = this.value;
         if (this.checked !== undefined) {
-            value = (this.checked.toString() === 'false') ? '' : this.checked;
+            value = this.checked ? true : '';
         }
         console.log('Setting "' + this.id + '" changed to ', value);
         $.settings(this.id, value);
-    });
-    
-    $('.hideSidebar').click(function(e) {
-        e.preventDefault();
-        var k = 'hideSidebar',
-            c = $.settings(k),
-            v = c == '' ? 'on' : '',
-            f = changes[k];
-        f($.settings('hideSidebar', v));
     });
     
     $('#sidebar h4').click(function(e) {
@@ -515,7 +506,7 @@ function initSettings() {
     for (var id in changes) {
         var func = changes[id],
             c = $.settings(id);
-        regChangeEvent(id, func);
+        //regChangeEvent(id, func);
         if (c) {
             func(id);
         }

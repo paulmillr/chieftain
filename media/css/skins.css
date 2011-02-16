@@ -27,6 +27,7 @@
 #photon .post .number a:visited{color:inherit;}
 #photon .post .number,
 #photon .post time{float:right;}
+#photon .post .message {font-size: 1.05em;}
 #photon .deleted{background:inherit;}
 #photon .deleted .post-wrapper,
 #photon .content .deleted{background:#e44;}

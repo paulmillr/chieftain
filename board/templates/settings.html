@@ -6,64 +6,72 @@
 <form>
     <fieldset class="settings">
         <dl>
+            <dt><input type="submit" value="{% trans "Save preferences" %}"></dt>
+        </dl>
+        <dl>
             <dt>
                 <label for="ustyle">{% trans "Board style" %}</label>
-            </dt>
-            <dd>
                 <select name="ustyle" id="ustyle" size="1">
                     <option value="photon">Photon</option>
                     <option value="neutron">Neutron</option>
                     <!--<option value="klipton">Klipton (alpha)</option>-->
                 </select>
-            </dd>
+            </dt>
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="oldInsert" id="oldInsert">
                 <label for="oldInsert">{% trans "Old posting way" %}</label>
             </dt>
-            <dd><input type="checkbox" name="oldInsert" id="oldInsert"></dd>
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="newForm" id="newForm">
                 <label for="newForm">{% trans "New style form" %}</label>
             </dt>
-            <dd><input type="checkbox" name="newForm" id="newForm"></dd>
+            
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="hideNotifications" id="hideNotifications">
                 <label for="hideNotifications">{% trans "Disable notifications" %}</label>
             </dt>
-            <dd><input type="checkbox" name="hideNotifications" id="hideNotifications"></dd>
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="noAJAX" id="noAJAX">
                 <label for="noAJAX">{% trans "Disable ajax" %}</label>
             </dt>
-            <dd><input type="checkbox" name="noAJAX" id="noAJAX"></dd>
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="hideBBCodes" id="hideBBCodes">
                 <label for="hideBBCodes">{% trans "Hide markup panel" %}</label>
             </dt>
-            <dd><input type="checkbox" name="hideBBCodes" id="hideBBCodes"></dd>
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="hideSidebar" id="hideSidebar">
                 <label for="hideSidebar">{% trans "Hide sidebar" %}</label>
             </dt>
-            <dd><input type="checkbox" name="hideSidebar" id="hideSidebar"></dd>
         </dl>
         <dl>
-            <dt><label for="hideNav">{% trans "Hide navigation" %}</label></dt>
-            <dd><input type="checkbox" name="hideNav" id="hideNav"></dd>
+            <dt>
+                <input type="checkbox" name="hideNav" id="hideNav">
+                <label for="hideNav">{% trans "Hide navigation" %}</label>
+            </dt>
         </dl>
         <dl>
-            <dt><label for="hideSectBanner">{% trans "Hide sections banner" %}</label></dt>
-            <dd><input type="checkbox" name="hideSectBanner" id="hideSectBanner"></dd>
+            <dt>
+                <input type="checkbox" name="hideSectBanner" id="hideSectBanner">
+                <label for="hideSectBanner">{% trans "Hide sections banner" %}</label>
+            </dt>
         </dl>
         <dl>
-            <dt><label for="dontLogVisits">{% trans "Don't log visited threads" %} (<a href="?clear" class="clearVisitedThreads">{% trans "clear" %}</a>)</label></dt>
-            <dd><input type="checkbox" name="dontLogVisits" id="dontLogVisits"></dd>
+            <dt>
+                <input type="checkbox" name="dontLogVisits" id="dontLogVisits">
+                <label for="dontLogVisits">{% trans "Don't log visited threads" %} (<a href="?clear" class="clearVisitedThreads">{% trans "clear" %}</a>)</label>
+            </dt>
         </dl>
     </fieldset>
 </form>

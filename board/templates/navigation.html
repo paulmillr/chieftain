@@ -12,7 +12,7 @@
     {% if not group.is_hidden %}
     <ul data-id="{{group.id}}" class="group">
         {% for section in group.sections %}
-        <li><a href="/{{section.slug}}/" title="{{section.description}}">{{section.slug}}</a></li>{% endfor %}
+        <li><a href="/{{section.slug}}/" title="{{section.name}}">{{section.slug}}</a></li>{% endfor %}
     </ul>
     {% endif %}
     {% endfor %}

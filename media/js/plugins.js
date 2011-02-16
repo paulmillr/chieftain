@@ -78,9 +78,29 @@ $.extend({
         }
     },
     
+    localStorage : function(name, value) {
+        var val;
+        function postParse(data) {
+            if (data == 'undefined' || typeof data == 'undefined') {
+                data = null;
+            }
+            return data;
+        }
+        if (!value) {
+            var val = window.localStorage[name];
+            val = postParse(val);
+            return JSON.parse(val);
+        } else {
+            window.localStorage[name] = JSON.stringify(postParse(value));
+            return JSON.stringify(postParse(value));
+        }
+    },
+    
     settingsFactory : function(prefix) {
         return function(name, value, options) {
-            return jQuery.cookie(prefix + name, value, options);
+            name = prefix + name;
+            //return jQuery.localStorage(name, value);
+            return jQuery.cookie(name, value, options);
         }
     },
     
