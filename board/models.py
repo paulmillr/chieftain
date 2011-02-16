@@ -245,6 +245,11 @@ class Post(models.Model):
             self.rebuild_cache()
         super(self.__class__, self).save()
 
+    def delete(self):
+        super(self.__class__, self).delete()
+        if self.is_op_post:
+            self.thread.delete()
+
     def __unicode__(self):
         return '{0}/{1}'.format(self.thread.section.slug, self.pid)
 
