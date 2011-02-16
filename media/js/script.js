@@ -456,8 +456,9 @@ function initSettings() {
     }
     
     settings.each(function(x) {
-        var s = $.settings(this.id), t;
-        if (!!(t = parseQs(this.id))) {
+        var s = $.settings(this.id), 
+            t = parseQs(this.id);
+        if (!!t) {
             $.settings(this.id, t);
             s = t;
         }
@@ -469,7 +470,7 @@ function initSettings() {
             if (this.checked == null) {
                 this.value = s;
             } else {
-                this.checked = s
+                this.checked = s;
             }
         }
     });
@@ -477,8 +478,8 @@ function initSettings() {
     
     settings.change(function(event) {
         var value = this.value;
-        if (this.checked === null) {
-            value = (this.checked === 'false') ? '' : this.checked;
+        if (this.checked !== undefined) {
+            value = (this.checked.toString() === 'false') ? '' : this.checked;
         }
         console.log('Setting "' + this.id + '" changed to ', value);
         $.settings(this.id, value);
@@ -529,7 +530,7 @@ function initStyle() {
         return false;
     }
     
-    $('html').attr('id', cookie);
+    $('html').attr('id', style);
     
     if (style === 'klipton') {
         function removeSel() {
