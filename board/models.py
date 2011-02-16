@@ -214,7 +214,7 @@ class Post(models.Model):
         verbose_name=_('Post email'))
     topic = models.CharField(max_length=48, blank=True,
         verbose_name=_('Post topic'))
-    password = models.CharField(max_length=64, blank=True,
+    password = models.CharField(max_length=64, blank=False,
         verbose_name=_('Post password'))
     message = models.TextField(verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
