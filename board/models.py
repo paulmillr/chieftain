@@ -11,6 +11,7 @@ from datetime import datetime
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.core.exceptions import ImproperlyConfigured
+from django.contrib.auth.models import User
 from django.db import models
 from django.forms import ModelForm, CharField, IntegerField, FileField
 from django.template.loader import render_to_string
@@ -21,11 +22,11 @@ from board import fields
 
 
 __all__ = [
-    'cache', 'render_to_string',
-    'DAY', 'cached', 'InsufficientRightsError', 'InvalidKeyError',
-    'PostManager', 'SectionManager', 'SectionGroupManager', 'Thread', 'Post',
-    'File', 'FileTypeGroup', 'FileType', 'Section', 'SectionGroup', 'User',
-    'PostForm', 'PostFormNoCaptcha', 'ThreadForm', 'DeniedIP', 'AllowedIP',
+    'cache', 'render_to_string', 'DAY', 'cached', 'InsufficientRightsError',
+    'InvalidKeyError', 'PostManager', 'SectionManager', 'SectionGroupManager',
+    'Thread', 'Post', 'File', 'FileTypeGroup', 'FileType', 'Section',
+    'SectionGroup', 'UserProfile', 'PostForm', 'PostFormNoCaptcha',
+    'ThreadForm', 'DeniedIP', 'AllowedIP',
 ]
 
 DAY = 86400  # seconds in day
@@ -416,23 +417,29 @@ class SectionGroup(models.Model):
         verbose_name_plural = _('Section groups')
 
 
-class User(models.Model):
+class UserProfile(models.Model):
     """User (moderator etc.)."""
-    username = models.CharField(max_length=32, unique=True,
-        verbose_name=_('User name'))
-    password = models.CharField(max_length=64,
-        verbose_name=_('User password'))
+    user = models.ForeignKey(User)
     # sections, modded by user
     sections = models.ManyToManyField('Section', blank=False,
         verbose_name=_('User owned sections'))
 
+    def modded(self):
+        """List of modded section slugs."""
+        return [i[0] for i in self.sections.values_list('slug')]
+
     def __unicode__(self):
-        return self.username
+        return '{0}'.format(self.user)
 
     class Meta:
-        verbose_name = _('User')
-        verbose_name_plural = _('Users')
+        verbose_name = _('User profile')
+        verbose_name_plural = _('User profiles')
 
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        profile, created = UserProfile.objects.get_or_create(user=instance)
+
+models.signals.post_save.connect(create_user_profile, sender=User)
 
 class IP(models.Model):
     """Abstract base class for all ban classes."""

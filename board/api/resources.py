@@ -117,6 +117,17 @@ class PostResource(ModelResource):
         ('thread', ('id', ('section', ('id', 'slug')))),
     )
     
+    @staticmethod
+    def is_deleted_by_mod(request, post):
+        user = request.user
+        if user.is_authenticated():
+            if user.is_superuser:
+                return True
+            mod = user.userprofile_set.all()
+            if mod and post.section() in mod.get().modded():
+                return True
+        return False
+    
     def get(self, request, auth, *args, **kwargs):
         try:
             kwargs['is_deleted'] = False
@@ -135,15 +146,16 @@ class PostResource(ModelResource):
         if len(key) < 64:  # make hash if we got plain text password
             key = tools.key(key)
 
-        if post.password != key:
+        if self.is_deleted_by_mod(request, post) or post.password == key:
+            post.remove()
+            return Response(status.NO_CONTENT)
+        else:
             return Response(status.FORBIDDEN, content={
                 'detail': u'{0}{1}. {2}'.format(
                     _('Error on deleting post #'), post.pid,
                     _('Password mismatch')
                 )
             })
-        post.remove()
-        return Response(status.NO_CONTENT)
 
 
 class SectionRootResource(RootModelResource):

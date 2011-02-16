@@ -31,7 +31,7 @@ admin.site.register(FileTypeGroup)
 admin.site.register(FileType)
 admin.site.register(Section)
 admin.site.register(SectionGroup)
-admin.site.register(User)
+admin.site.register(UserProfile)
 
 
 if 'board.middleware.DenyMiddleware' in settings.MIDDLEWARE_CLASSES:
