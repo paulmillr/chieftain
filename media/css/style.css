@@ -377,8 +377,8 @@ footer .copyright a {text-decoration: underline;}
 
 /* Code highlight */
 pre {
-    font-family: Monaco, Consolas, 'Droid Sans Mono', Courier, monospace;
-    font-size: 0.8em;
+    font-family: 'Menlo', 'Monaco', 'Consolas', 'Droid Sans Mono', Courier, monospace;
+    font-size: 0.75em;
     padding: 0.5em;
     margin: 1em 0;
     background-color: #fafafa;
