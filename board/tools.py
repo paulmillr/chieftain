@@ -11,7 +11,8 @@ import re
 import tempfile
 from PIL import Image
 from django.core.files import File as DjangoFile
-from hashlib import md5, sha256
+from django.utils.translation import ugettext_lazy as _
+from hashlib import sha256
 from string import maketrans
 from crypt import crypt
 from klipped import settings
@@ -21,19 +22,15 @@ from board.models import File, FileType
 __all__ = ['handle_uploaded_file', 'tripcode', 'key']
 
 
-def handle_uploaded_file(file, extension, post):
+def handle_uploaded_file(file, file_hash, extension, post):
     """Moves uploaded file to files directory and makes thumb."""
     def make_path(dir):
-        args = settings.MEDIA_ROOT, dir, post.section(), str(post.thread_id)
+        args = settings.MEDIA_ROOT, dir, post.section()
         return os.path.join(*args)
     directory = make_path('section')
     if not os.path.isdir(directory):
         os.makedirs(directory)
     file_path = '{0}.{1}'.format(post.pid, extension)
-    m = md5()
-    for chunk in file.chunks():
-        m.update(chunk)
-    del chunk
     file_data = {
         'post': post,
         'name': file.name,
@@ -42,7 +39,7 @@ def handle_uploaded_file(file, extension, post):
         'image_height': 0,
         'image_width': 0,
         'file': DjangoFile(file),
-        'hash': m.hexdigest(),
+        'hash': file_hash,
     }
     f = File(**file_data)
     f.save()

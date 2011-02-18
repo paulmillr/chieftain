@@ -78,29 +78,10 @@ $.extend({
         }
     },
     
-    localStorage : function(name, value) {
-        var val;
-        function postParse(data) {
-            if (data == 'undefined' || typeof data == 'undefined') {
-                data = null;
-            }
-            return data;
-        }
-        if (!value) {
-            var val = window.localStorage[name];
-            val = postParse(val);
-            return JSON.parse(val);
-        } else {
-            window.localStorage[name] = JSON.stringify(postParse(value));
-            return JSON.stringify(postParse(value));
-        }
-    },
-    
     settingsFactory : function(prefix) {
         return function(name, value, options) {
             name = prefix + name;
-            //return jQuery.localStorage(name, value);
-            return jQuery.cookie(name, value, options);
+            return $.cookie(name, value, options);
         }
     },
     
@@ -109,10 +90,10 @@ $.extend({
         return this.settingsFactory('k_')(name, value, options);
     },
     
-    storage : function(name, value, flush) {
+    storage : function(name, value, mode) {
         var res;
         name = 'k_' + name;
-        if (flush) {
+        if (mode === 'flush') {
             window.localStorage[name] = ''
             return true;
         }
@@ -505,7 +486,7 @@ function keyHandler( handleObj ) {
 		}
 		
 		// Keypress represents characters, not special keys
-		var special = event.type !== "keypress" && jQuery.hotkeys.specialKeys[ event.which ],
+		var special = event.type !== "keypress" && $.hotkeys.specialKeys[ event.which ],
 			character = String.fromCharCode( event.which ).toLowerCase(),
 			key, modif = "", possible = {};
 
@@ -532,11 +513,11 @@ function keyHandler( handleObj ) {
 
 		} else {
 			possible[ modif + character ] = true;
-			possible[ modif + jQuery.hotkeys.shiftNums[ character ] ] = true;
+			possible[ modif + $.hotkeys.shiftNums[ character ] ] = true;
 
 			// "$" can be triggered as "Shift+4" or "Shift+$" or just "$"
 			if ( modif === "shift+" ) {
-				possible[ jQuery.hotkeys.shiftNums[ character ] ] = true;
+				possible[ $.hotkeys.shiftNums[ character ] ] = true;
 			}
 		}
 
@@ -548,11 +529,29 @@ function keyHandler( handleObj ) {
 	};
 }
 
-jQuery.each([ "keydown", "keyup", "keypress" ], function() {
-	jQuery.event.special[ this ] = { add: keyHandler };
+$.each([ "keydown", "keyup", "keypress" ], function() {
+	$.event.special[ this ] = { add: keyHandler };
 });
 
+$.fn.hasScrollBar = function() {
+    return this.get(0).scrollHeight > this.height();
+}
+
 })(jQuery);
+
+/*
+jQuery Placeholder 1.1.1
+
+Copyright (c) 2010 Michael J. Ryan (http://tracker1.info/)
+
+Dual licensed under the MIT and GPL licenses:
+	http://www.opensource.org/licenses/mit-license.php
+	http://www.gnu.org/licenses/gpl.html
+*/
+(function(a){function f(){var b=a(this);a(b.data(e)).css("display","none")}function i(){var b=this;setTimeout(function(){var c=a(b);a(c.data(e)).css("top",c.position().top+"px").css("left",c.position().left+"px").css("display",c.val()?"none":"block")},200)}var e="PLACEHOLDER-LABEL",j=false,k={labelClass:"placeholder"},g=document.createElement("input");if("placeholder"in g){a.fn.placeholder=a.fn.unplaceholder=function(){};delete g}else{delete g;a.fn.placeholder=function(b){if(!j){a(".PLACEHOLDER-INPUT").live("click",
+f).live("focusin",f).live("focusout",i);j=bound=true}var c=a.extend(k,b);this.each(function(){var l=Math.random().toString(32).replace(/\./,""),d=a(this),h=a('<label style="position:absolute;display:none;top:0;left:0;"></label>');if(!(!d.attr("placeholder")||d.data("PLACEHOLDER-INPUT")==="PLACEHOLDER-INPUT")){d.attr("id")||(d.attr("id")="input_"+l);h.attr("id",d.attr("id")+"_placeholder").data("PLACEHOLDER-INPUT","#"+d.attr("id")).attr("for",d.attr("id")).addClass(c.labelClass).addClass(c.labelClass+
+"-for-"+this.tagName.toLowerCase()).addClass(e).text(d.attr("placeholder"));d.data(e,"#"+h.attr("id")).data("PLACEHOLDER-INPUT","PLACEHOLDER-INPUT").addClass("PLACEHOLDER-INPUT").after(h);f.call(this);i.call(this)}})};a.fn.unplaceholder=function(){this.each(function(){var b=a(this),c=a(b.data(e));if(b.data("PLACEHOLDER-INPUT")==="PLACEHOLDER-INPUT"){c.remove();b.removeData("PLACEHOLDER-INPUT").removeData(e).removeClass("PLACEHOLDER-INPUT")}})}}})(jQuery);
+
 
 
 /*!

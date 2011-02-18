@@ -6,6 +6,7 @@ models.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+import os
 import re
 from datetime import datetime
 from django.core.cache import cache
@@ -45,7 +46,7 @@ SECTION_TYPES = (
 def get_file_path(base):
     def closure(instance, filename):
         ip = instance.post
-        return '{base}/{slug}/{thread}/{pid}.{ext}'.format(
+        return '{base}/{slug}/{pid}.{ext}'.format(
             base=base, slug=ip.section(), thread=ip.thread,
             pid=ip.pid, ext=instance.type.extension
         )
@@ -181,6 +182,11 @@ class Thread(models.Model):
         if rebuild_cache:
             self.rebuild_cache()
         super(self.__class__, self).save()
+        # remove first thread in section
+        ts = self.section.thread_set
+        if ts.filter(is_pinned=False).count() > self.section.threadlimit:
+            t = ts.order_by('bump')[0]
+            t.delete()
 
     def __unicode__(self):
         return unicode(self.id)
@@ -216,13 +222,16 @@ class Post(models.Model):
         verbose_name=_('Post topic'))
     password = models.CharField(max_length=64, blank=False,
         verbose_name=_('Post password'))
-    message = models.TextField(verbose_name=_('Post message'))
+    message = models.TextField(blank=True, verbose_name=_('Post message'))
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
 
     @cached(DAY)
     def section(self):
         return self.thread.section.slug
+
+    def files(self):  # workaround for REST api
+        return self.file_set.all()
 
     def remove(self):
         """Deletes post."""
@@ -231,7 +240,7 @@ class Post(models.Model):
         else:
             self.is_deleted = True
             self.save(rebuild_cache=False)
-            self.thread.save()
+            self.thread.save(rebuild_cache=True)
 
     def rebuild_cache(self):
         """Regenerates html cache of post."""
@@ -249,6 +258,7 @@ class Post(models.Model):
         super(self.__class__, self).delete()
         if self.is_op_post:
             self.thread.delete()
+        self.file_set.delete()
 
     def __unicode__(self):
         return '{0}/{1}'.format(self.thread.section.slug, self.pid)
@@ -352,9 +362,14 @@ class Section(models.Model):
         verbose_name=_('Section thread limit'))
     objects = SectionManager()
 
+    ONPAGE = 20
+
     def page_threads(self, page=1):
-        onpage = 20
-        threads = Paginator(self.thread_set.filter(is_deleted=False), onpage)
+        threads = Paginator(
+            self.thread_set.filter(is_deleted=False).order_by('-is_pinned',
+                '-bump'),
+            self.ONPAGE
+        )
         return threads.page(page)
 
     #@cached(3 * DAY)

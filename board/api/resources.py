@@ -81,7 +81,7 @@ class ThreadResource(ModelResource):
         for f in self.fields:
             res[f] = inst.__getattribute__(f)
         pf = [f for f in list(PostResource.fields) if isinstance(f, str)]
-        res['post_set'] = inst.post_set.filter(is_deleted=False).values(*pf)
+        res['posts'] = inst.post_set.filter(is_deleted=False).values(*pf)
         return res
 
 
@@ -115,6 +115,7 @@ class PostResource(ModelResource):
         'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
         'date', 'message', 'email', 'html',
         ('thread', ('id', ('section', ('id', 'slug')))),
+        'files',
     )
 
     @staticmethod

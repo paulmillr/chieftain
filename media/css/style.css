@@ -241,6 +241,7 @@ em {font-style: italic;}
 .right {float: right;}
 .dashed { border: 1px dashed; }
 .stats {border: 1px dashed; padding: 0 5px;}
+.overflow-hidden {overflow: hidden !important;}
 #container + iframe {display: none;} /* Recaptcha bug */
 
 
@@ -269,8 +270,9 @@ nav li {float: left;}
 .group a, .group span {font-size: 1em; padding: 0 0 0 1em; white-space: nowrap; line-height: 2em; text-decoration: none; font-weight: bold; }
 
 #container-wrap {float: left; width: 100%;}
-#container-wrap > * {margin-left: 200px; margin-right: 10px;}
-#sidebar {width: 200px; float: left; font-size: 1.1em; margin-left: -100%;}
+#container-wrap > * {margin-left: 210px; margin-right: 10px;}
+#sidebar {width: 210px; float: left; font-size: 1.1em; margin-left: -100%;}
+#sidebar aside {position: fixed; overflow: hidden; width: 170px; padding-right: 20px;}
 #sidebar .hidebutton {float: right;}
 #sidebar h2 {margin-bottom: 10px;}
 #sidebar h4 {font-size: 1em; margin-bottom: 1px;}
@@ -293,10 +295,15 @@ fieldset dt {width: 150px; font-weight: bold;}
 .new-style .message-d > dd {width: 390px; padding: 5px 0;}
 .new-style .bbcode {margin-top: 0;}
 .new-style textarea {width: 100%;}
+.new-style input {min-width: 162px;}
 .new-style input[type="submit"] {margin-left: 5px;}
 .new-post .captcha-img {vertical-align: bottom; margin:0; padding:0;}
 .new-style .username-d, .new-style .topic-d {float: left;}
 .new-style .email-d, .new-style .password-d {float: right;}
+label.placeholder {
+		padding: 4px 4px 4px 4px;
+		color: #999999;
+	}
 .settings dt {width: auto; margin-bottom: 8px;}
 .settings input {vertical-align: top;}
 
@@ -306,7 +313,8 @@ fieldset dt {width: 150px; font-weight: bold;}
 .skipped {color: #666;}
 .post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}
 .post:after {clear: both;}
-.post input[type="checkbox"] {margin: 3px 5px 0 4px;}
+.post header {padding-bottom: 20px;}
+.post .answer {float: right;}
 .post .number:before {content: "№";}
 .post .number {font-weight: bold;}
 .post .number a, .post .number a:visited {color: inherit;}
@@ -315,26 +323,36 @@ fieldset dt {width: 150px; font-weight: bold;}
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
 .post .topic {font-weight: bold;}
-.post .content {margin-top: 10px;}
-.post .file-info {margin: -10px 0 5px 0;}
-.post .files {margin-top: -5px;}
-.post .message {display: inline;}
+.post .content {max-height: 400px; overflow: auto;}
+.post .file-info {margin: -20px 0 5px 0; position: absolute;}
+.post .files {} 
+.post img.nsfw {opacity: 0.2; filter:alpha(opacity=20);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";}
+.post .message {display: inline-block;}
 .post .message, .post .message * {vertical-align:top;}
 .post .message.poster ins {background: none; text-decoration: underline; font-weight: normal; color: inherit;}
 .post blockquote {color: #789922; clear: both;}
 .post blockquote > p {display: inline;}
 .post .files {margin-right: 10px; float:left; max-width: 220px; max-height: 220px;}
+.post.resized .content {max-height: none;}
+.post.resized .files {max-width: none; max-height: none;}
 .post span:empty {margin: 0;}
 .deleted {background: #e44;}
+.info-wrapper {float: left;}
+.info-wrapper > * {float: left; margin: 0 5px 0 0;}
 .file-info a:link, .file-info a:hover {text-decoration: underline;}
 .file-info {color: #666; font-size: 0.9em;}
+
+.is_closed, .is_pinned, .bookmark, .hide {width: 16px; height: 16px; float: right;}
+.is_closed {background: url('../images/closed.png');}
+.is_pinned {background: url('../images/pinned.png');}
+.bookmark {background: url('../images/bookmark.png');}
+.add {opacity: 0.3;filter:alpha(opacity=30);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";}
+.hide {background: url('../images/hide.png');}
 
 .underlined {border-bottom: 1px dashed;}
 .spoiler {background: #bbb; color: #bbb;}
 .spoiler:hover {color: #333;}
 
-.info-wrapper {float: left;}
-.info-wrapper > * {float: left; margin: 0 5px 0 0;}
 .buttons {float: right; margin-left: 5px;}
 .buttons .fav:before {content: "F";}
 .buttons .hide:before {content: "X";}
@@ -440,7 +458,6 @@ pre {
     html { -webkit-text-size-adjust:none; -ms-text-size-adjust:none; } */
     .section-banner {display: none;}
     .fieldset dl {display: none;}
-    .new-style fieldset {width: 330px;}
 }
 
 /*

@@ -7,10 +7,18 @@ Created by Paul Bagwell on 2011-02-07.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 
+import re
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
+from hashlib import md5
 from board import tools
-from board.models import Post, Thread, PostFormNoCaptcha, PostForm
+from board.models import Post, Thread, PostFormNoCaptcha, PostForm, File
+
+
+__all__ = [
+    'ValidationError', 'InvalidFileError', 'NotAuthenticatedError',
+    'attachment', 'parse_message', 'post',
+]
 
 
 class ValidationError(Exception):
@@ -36,7 +44,14 @@ def attachment(file, section):
     lim = section.filesize_limit
     if lim != 0 and file.size > lim:
         raise InvalidFileError(_('Too big file'))
-    return allowed[file.content_type]  # extension
+    m = md5()
+    for chunk in file.chunks():
+        m.update(chunk)
+    del chunk
+    file_hash = m.hexdigest()
+    if File.objects.filter(hash=file_hash).count() > 0:
+        raise InvalidFileError(_('This file already exists'))
+    return (allowed[file.content_type], file_hash)  # extension, file hash
 
 
 def post(request, no_captcha=True):
@@ -67,11 +82,17 @@ def post(request, no_captcha=True):
         thread = Thread(**kw)
     else:
         thread = Thread.objects.get(id=request.POST['thread'])
+        if thread.is_closed:
+            raise ValidationError(_('This thread is closed, '
+                'you cannot post to it.'))
     section_is_feed = (thread.section.type == 3)
 
+    if not post.message and new_thread and not post.file_count:
+        raise ValidationError(_('You need to enter post message'
+            ' or upload file to create new thread.'))
     if with_files:  # validate attachments
         file = request.FILES['file']
-        ext = attachment(file, thread.section)
+        ext, file_hash = attachment(file, thread.section)
     if section_is_feed and new_thread and not request.user.is_authenticated():
         raise NotAuthenticatedError(_('Authentication required to create '
             'threads in this section'))
@@ -83,6 +104,9 @@ def post(request, no_captcha=True):
         s = post.poster.split('#')
         post.tripcode = tools.tripcode(s.pop())
         post.poster = s[0]
+    elif ('## OP ##' in post.poster and not new_thread and
+        post.password == thread.op_post().password):
+        post.tripcode = '## OP ##'
     if post.email == 'mvtn'.encode('rot13'):
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10
@@ -93,7 +117,7 @@ def post(request, no_captcha=True):
     post.pid = thread.section.pid_incr()
     if with_files:
         post.save(rebuild_cache=False)
-        tools.handle_uploaded_file(file, ext, post)
+        tools.handle_uploaded_file(file, file_hash, ext, post)
     post.save()
     thread.save()
     return post

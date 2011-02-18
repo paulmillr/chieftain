@@ -85,6 +85,92 @@ function getSelText() {
     document.aform.selectedtext.value =  window.getSelection();
 }
 
+// prototype for all containers at the board
+function BoardContainer(storageName, isDict) {
+    this.storageName = storageName;
+    this.isDict = isDict || false;
+}
+$.extend(BoardContainer.prototype, {
+    storageName : '',
+    isDict : false,
+    
+    // gets all keys
+    list : function() {
+        var s = $.storage(this.storageName);
+        if (typeof s !== 'undefined') {
+            return s;
+        } else {
+            return this.isDict ? {} : []
+        }
+    },
+
+    // checks if key is in container
+    // returns item if container is dictionary and 
+    // bool(inList) if container is list
+    get : function(key) {
+        return this.isDict ? 
+            this.list()[key] : 
+            this.list().indexOf(key);
+    },
+    
+    set : function(key, value) {
+        var l = this.list();
+        if (this.isDict) {
+            l[key] = value;
+        } else {
+            l.push(key);
+        }
+        $.storage(this.storageName, l);
+        return l;
+    },
+    
+    push : function(key) {
+        if (!this.isDict) {
+            this.set(key);
+        }
+    },
+    
+    incr : function(key, item) {
+        if (this.isDict) {
+            var v = this.get(key);
+            if (typeof key === 'object' && item in key) {
+                ++k[item];
+                this.set(key, v);
+                return k[item];
+            }
+        } else {
+            var l = this.list();
+            ++l[key];
+            $.storage(this.storageName, l);
+            return l[key];
+        }
+
+    },
+    
+    remove : function(item) {
+        var index = this.get(item), 
+        l = this.list(), newList;
+        if (!this.isDict && index !== -1) {
+            newList = l.slice(0, index).concat(l.slice(index, l.length - 1));
+            $.storage(this.storageName, newList);
+            return newList;
+        }
+    },
+    
+    pop : function(key) {
+        var s = this.list();
+        s[key] = '';
+        $.storage(this.storageName, s);
+        return s;
+    },
+    
+    // clears container
+    flush : function() {
+        $.storage(this.storageName, '', 'flush');
+        return true;
+    },
+});
+
 /**
  * Simple color container class.
  * 
@@ -184,6 +270,16 @@ function previewPost(selector) {
     });
 }
 
+function checkForSidebarScroll() {
+    var bodyHeight = $(window).height(),
+        side = $('#sidebar aside'),
+        sideHeight = side.height();
+
+    if (sideHeight > bodyHeight) {
+        side.height(parseInt(bodyHeight)).css('overflow-y', 'scroll');
+    }
+}
+
 function labelsToPlaceholders(list) {
     for (var i=0; i < list.length; i++) {
         var x = list[i],
@@ -191,6 +287,7 @@ function labelsToPlaceholders(list) {
             dt = $('.' + x + '-d').find('dt').hide(),
             dd = $('#' + x);
         dd.attr('placeholder', t);
+        dd.placeholder(t);
     }
     if ($('.bbcode').css('display') === 'none') {
         $('.captcha-d').css({marginTop : 1})
@@ -270,7 +367,9 @@ function init() {
         if (p.length) {
             return p;
         }
-        $.get('/api/post/' + board + '/' + pid, callback);
+        $.get('/api/post/' + board + '/' + pid, function(data) {
+            callback(data.html);
+        });
     }
     
     $('#password').bind('change', function(event) {
@@ -290,23 +389,35 @@ function init() {
         textArea.wrap(start, end, code);
     });
     
-    $('.message').delegate('.postlink', 'hover', function(event) {
-        if (event.type === 'mouseleave') {
-            $('.hover').remove();
-            return false;
-        }
+    $('.thread').delegate('.postlink', 'clicka', function(event) {
+        event.preventDefault();
+        window.location.hash = '#' + $(this).attr('href');
+    });
+    
+    $('.threads').delegate('.postlink', 'hover', function(event) {
+        event.preventDefault();
         var m = $(this).attr('href').match(/(?:\/(\w+)\/)?(\d+)/),
             globalLink = !!m[1],
             board = globalLink ? m[1] : currentPage.section,
             pid = m[2],
-            from = searchPost(board, pid, function(data) {
-                var div = $(data.html).clone().addClass('hover').css({
-                    'position': 'relative',
-                    'top': event.pageY - this.offsetTop - 90 + 'px',
-                    'left': event.pageX - this.offsetLeft + 'px',
-                }).appendTo('.thread');
-            });
-            
+            post = $(this).closest('.post'),
+            off = [this.offsetTop, this.offsetLeft],
+            callback = function(html) {
+                var outer = $('<div/>').addClass('post hover').css({
+                    'position': 'absolute',
+                    'top': event.pageX + 15 +'px',
+                    'left': off[1] + 'px',
+                }).hover(function(event) {
+                    if (event.type === 'mouseleave') {
+                        $(this).remove();
+                    }
+                    
+                }),
+                    div = $(html).clone();
+                div.find('.bookmark, .is_closed, .is_pinned').remove();
+                outer.append(div).insertAfter(post);
+            };
+            globalLink ? searchPost(board, pid, callback) : callback($('#post' + pid).html());
     });
     
     $('.deleteMode > input').click(function(event) {
@@ -411,6 +522,17 @@ function initSettings() {
                 $('html').attr('id', x);
             },
             
+            'toggleNsfw' : function(x) {
+                if (x) {
+                    $('.post img').addClass('nsfw')
+                    .hover(function(event) {
+                        $(this).toggleClass('nsfw');
+                    });
+                } else {
+                    $('.post img').removeClass('nsfw');
+                }
+            },
+            
             'hideSidebar' : function(x) {
                 var margin = x ? '10px' : '200px';
 
@@ -500,8 +622,17 @@ function initSettings() {
         }
         
         $.settings(key, set);
-        ul.slideToggle(500);
+        ul.slideToggle(500, checkForSidebarScroll);
     });
+    
+    $('.toggleNsfw').click(function(event) {
+        event.preventDefault();
+        var k = 'toggleNsfw',
+            c = $.settings(k),
+            v = c ? '' : 1;
+        $.settings(k, v);
+        changes.toggleNsfw(v);
+    })
     
     for (var id in changes) {
         var func = changes[id],
@@ -516,6 +647,56 @@ function initSettings() {
 function initStyle() {
     var key = 'ustyle',
         style = $.settings(key);
+    
+    checkForSidebarScroll();
+    
+    document.onscroll = function() {
+        $('.sidebar').css('left', '-' + document.body.scrollLeft + 'px')
+    };
+    
+    var posts = $('.section .post:first-child').each(function(x) {
+        var href = $(this).find('.number a').attr('href'),
+            span = $('<span/>').addClass('answer')
+            .html('[<a href="'+href+'">Ответ</a>]');
+        if ($(this).find('.is_closed').length == 0) {
+            span.insertBefore($(this).find('.number'));
+        }
+    });
+    
+    $('.threads').delegate('.post:not(.resized) .files a', 'click', function(event) {
+        event.preventDefault();
+        var children = $(this).children();
+        children.data('thumb', children.attr('src'));
+        children.attr('src', $(this).attr('href'));
+        $(this).closest('.post').addClass('resized');
+    });
+    
+    $('.threads').delegate('.post.resized .files a', 'click', function(event) {
+        event.preventDefault();
+        var children = $(this).children();
+        $(this).closest('.post').removeClass('resized');
+        children.attr('src', children.data('thumb'));
+    });
+
+
+    $('.section .post .content').each(function() {
+        var t = $(this), parent, span, a;
+        if (t.hasScrollBar()) {
+            t.addClass('overflow-hidden');
+            span = $('<span/>').addClass('skipped')
+                .text("Комментарий слишком длинный.")
+                .appendTo(t.parent());
+            a = $('<a/>').attr('href', '#showFullComment')
+            .addClass('skipped')
+            .text('Полный текст')
+            .click(function(event) {
+                event.preventDefault();
+                t.removeClass('overflow-hidden');
+                $(this).parent().remove();
+            })
+            .appendTo(span);
+        }
+    })
     
     if (!style) {
         return false;
@@ -547,59 +728,156 @@ function initStyle() {
 }
 
 function initStorage() {
-    var status = ('localStorage' in window && window['localStorage'] !== null),
-        key = 'visitedThreads', 
-        visitedList = $('.' + key),
-        thread, storage, elem, tpl, ul, div;
-    
-    $('#dontLogVisits').click(function(event) {
-        visitedList.slideToggle();
-    });
-    
-    if (!status || $.settings('dontLogVisits')) {
+    var status = ('localStorage' in window && window['localStorage'] !== null);
+    if (!status) {
         return false;
     }
     
-    storage = $.storage(key) ? $.storage(key) : {};
+    if (!$.settings('dontLogVisits')) {
+        initVisitedThreads();
+    }
+    
+    if (!$.settings('disableBookmarks')) {
+        initBookmarks();
+    }
+    initHidden();
     
     // Thread visits counter
-    if (currentPage.type == 'thread') {
-        thread = currentPage.thread;
-        if (!(thread in storage)) {
-            storage[thread] = { 
-                'op_post': currentPage.op_post, 
-                'section': currentPage.section,
-                'visits': 1,
-                'title': $('article:first-child .title').text(),
-                'description': $.trim($('article:first-child .text').text())
-                                .substring(0, 100) + '...',
-            };
-        } else {
-            storage[thread]['visits']++;
-        }
-        $.storage('visitedThreads', storage);
-    } else if (currentPage.type == 'settings') {
-        ul = visitedList.find('ul');
-        visitedList.show();
-        for (var i in storage) {
-            var a = $('<a/>');
-            item = storage[i];
-            elem = $('<li/>');
-            // elem.data('visits', item.visits);
-            tpl = '/'+item.section+'/'+item.op_post;
-            a.attr('href', tpl);
-            a.text(tpl + ': ' + item.description);
-            ul.append(elem.append(a));
-        }
-        $('.sortVisitedThreads').click(function(event) {
-            
+    function initVisitedThreads() {
+        var container = new BoardContainer('visitedThreads', true),
+            visitedList = $('.' + container.storageName);
+
+        $('#dontLogVisits').click(function(event) {
+            visitedList.slideToggle();
         });
-        $('.clearVisitedThreads').click(function(event) {
-            event.preventDefault();
-            $.storage(key, 0, true); // flush storage
-            ul.children('li').slideUp('normal', function() {
-                $(this).remove();
+
+        if (currentPage.type == 'thread') {
+            thread = currentPage.thread;
+            if (!(thread in container.list())) {
+                container.set(thread, {
+                    'op_post': currentPage.op_post, 
+                    'section': currentPage.section,
+                    'visits': 1,
+                    'title': $('article:first-child .title').text(),
+                    'description': (function() {
+                        var text = $('article:first-child .text').text();
+                        if (text.length > 100) {
+                            text = text.substring(0, 100) + '...';
+                        } 
+                        return $.trim(text);
+                    })(),
+                })
+            } else {
+                container.incr(thread, 'visits');
+            }
+        } else if (currentPage.type == 'settings') {
+            var list = container.list();
+            ul = visitedList.find('ul');
+            visitedList.show();
+            for (var i in list) {
+                var a = $('<a/>'),
+                    item = list[i],
+                    elem = $('<li/>'),
+                // elem.data('visits', item.visits);
+                    tpl = '/'+item.section+'/'+item.op_post;
+                a.attr('href', tpl);
+                a.text(tpl + ': ' + item.description);
+                ul.append(elem.append(a));
+            }
+            $('.sortVisitedThreads').click(function(event) {
+
             });
+            $('.clearVisitedThreads').click(function(event) {
+                event.preventDefault();
+                container.flush();
+                ul.children('li').slideUp('normal', function() {
+                    $(this).remove();
+                });
+            });
+        }
+    }
+    function getThreadId(bookmarkNode) {
+        return $(bookmarkNode).closest('.thread').attr('id').replace('thread', '');
+    }
+    
+    function initBookmarks() {
+        var container = new BoardContainer('bookmarks', false),
+            className = 'bookmark';
+        
+        $('.thread').each(function(x) {
+            var s = $('<span/>').addClass(className).addClass('add');
+            if (container.get($(this).attr('id').replace('thread', '')) !== -1) {
+                s.removeClass('add').addClass('remove');
+            }
+            s.appendTo(
+                $(this).find('.post:first-child header')
+            );
+            $(this).find('.post:first-child')
+        });
+        $('.threads').delegate('.'+ className +'.add', 'click', function(event) {
+            event.preventDefault();
+            var t = getThreadId(this);
+            container.push(t);
+            $(this).removeClass('add').addClass('remove');
+        });
+        $('.threads').delegate('.'+ className +'.remove', 'click', function(event) {
+            event.preventDefault();
+            var t = getThreadId(this);
+            container.remove(t);
+            $(this).removeClass('remove').addClass('add');
+        });
+    }
+
+    function initHidden() {
+        var container = new BoardContainer('hidden', false),
+            className = 'hide';
+        
+        $('.thread').each(function(x) {
+            var s = $('<span/>').addClass(className).addClass('add');
+            if (container.get($(this).attr('id').replace('thread', '')) !== -1) {
+                s.removeClass('add').addClass('remove');
+            }
+            s.appendTo(
+                $(this).find('.post:first-child header')
+            );
+            $(this).find('.post:first-child')
+            if (s.hasClass('remove')) {
+                $(this).find('.post:not(:first-child)').hide();
+                var first = $(this).find('.post:first-child')
+                first.find('.content').hide();
+                var s = $('<span/>').addClass('skipped')
+                    .text(
+                        'Тред #'+ first.attr('id').replace('post', '') +
+                        '('+ first.find('.message').text().split(0, 100) +') скрыт.'
+                    ).appendTo(first.find('.post-wrapper'));
+            }
+        });
+        $('.threads').delegate('.'+ className +'.add', 'click', function(event) {
+            event.preventDefault();
+            var t = getThreadId(this),
+                thread = $('#thread' + t),
+                first = thread.find('.post:first-child');
+            container.push(t);
+            
+            thread.find('.post:not(:first-child)').hide();
+            first.find('.content').hide();
+            $('<span/>').addClass('skipped')
+                .text(
+                    'Тред #'+ first.attr('id').replace('post', '') +
+                    '('+ first.find('.message').text().split(0, 100) +') скрыт.'
+                ).appendTo(first.find('.post-wrapper'));
+            $(this).removeClass('add').addClass('remove');
+        });
+        $('.threads').delegate('.'+ className +'.remove', 'click', function(event) {
+            event.preventDefault();
+            var t = getThreadId(this),
+                thread = $('#thread' + t),
+                first = thread.find('.post:first-child');
+            container.remove(t);
+            first.find('.skipped').remove();
+            thread.find('.post:not(:first-child)').show();
+            first.find('.content').show();
+            $(this).removeClass('remove').addClass('add');
         });
     }
 }
@@ -635,7 +913,7 @@ function initAJAX() {
 
     function successCallback(data) {
         if (currentPage.type === 'section') { // redirect
-            window.location.href += data.pid;
+            window.location.href = './' + data.pid;
             return true;
         }
         $(data.html).hide().appendTo('.thread').fadeIn(500);

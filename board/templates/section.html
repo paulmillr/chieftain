@@ -11,7 +11,7 @@
     {% include "form.html" %}
     <h3><a href="http://2-ch.ru/pr/res/9227.html">О багах писать сюда</a></h3>
     {{section.description}}
-    <div class="threads">
+    <div class="threads{% if threads %} section{% endif %}">
         {% autoescape off %}
         {% if threads %}
             {% for thread in threads.object_list %}
