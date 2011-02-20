@@ -3,6 +3,8 @@
 """
 middleware.py
 
+Some source code taken from https://github.com/justquick/django-ban/.
+
 Created by Paul Bagwell on 2011-01-30.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
