@@ -66,6 +66,7 @@ def post(request, no_captcha=True):
         return False
     new_thread = not request.POST.get('thread')
     with_files = bool(request.FILES.get('file'))
+    logged_in = bool(request.user.is_authenticated())
 
     post = form.save(commit=False)
     post.date = datetime.now()
@@ -82,31 +83,41 @@ def post(request, no_captcha=True):
         thread = Thread(**kw)
     else:
         thread = Thread.objects.get(id=request.POST['thread'])
-        if thread.is_closed:
+        if thread.is_closed and not logged_in:
             raise ValidationError(_('This thread is closed, '
                 'you cannot post to it.'))
     section_is_feed = (thread.section.type == 3)
 
-    if not post.message and new_thread and not post.file_count:
+    if not post.message and not post.file_count:
         raise ValidationError(_('You need to enter post message'
             ' or upload file to create new thread.'))
     if with_files:  # validate attachments
         file = request.FILES['file']
         ext, file_hash = attachment(file, thread.section)
-    if section_is_feed and new_thread and not request.user.is_authenticated():
+    if section_is_feed and new_thread and not logged_in:
         raise NotAuthenticatedError(_('Authentication required to create '
             'threads in this section'))
     elif post.email.lower() != 'sage':
         thread.bump = post.date
-    if not post.poster:
-        post.poster = thread.section.default_name
+    if '!' in post.poster:
+        if ('!OP' in post.poster and not new_thread and
+            post.password == thread.op_post.password):
+            post.poster = ''
+            post.tripcode = '!OP'
+        elif '!name' in post.poster and logged_in:
+            post.poster = ''
+            if request.user.is_superuser:
+                username = '!{0}'.format(request.user.username)
+            else:
+                username = '!Mod'
+            post.tripcode = username
     elif '#' in post.poster:  # make tripcode
         s = post.poster.split('#')
         post.tripcode = tools.tripcode(s.pop())
         post.poster = s[0]
-    elif ('## OP ##' in post.poster and not new_thread and
-        post.password == thread.op_post().password):
-        post.tripcode = '## OP ##'
+
+    if not post.poster:
+        post.poster = thread.section.default_name
     if post.email == 'mvtn'.encode('rot13'):
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10

@@ -189,7 +189,7 @@ button {  width: auto; overflow: visible; }
 
 /* Hide for both screenreaders and browsers
    css-discuss.incutio.com/wiki/Screenreader_Visibility */
-.hidden { display: none; visibility: hidden; }
+.hidden { display: none; }
 
 /* Hide only visually, but have it available for screenreaders: by Jon Neal
   www.webaim.org/techniques/css/invisiblecontent/  &  j.mp/visuallyhidden */
@@ -271,10 +271,11 @@ nav li {float: left;}
 
 #container-wrap {float: left; width: 100%;}
 #container-wrap > * {margin-left: 210px; margin-right: 10px;}
+#container-wrap.no-sidebar > * {margin-left: 10px;}
 #sidebar {width: 210px; float: left; font-size: 1.1em; margin-left: -100%;}
 #sidebar aside {position: fixed; overflow: hidden; width: 170px; padding-right: 20px;}
-#sidebar .hidebutton {float: right;}
 #sidebar h2 {margin-bottom: 10px;}
+#sidebar .hide {margin: -20px -15px 0 0;}
 #sidebar h4 {font-size: 1em; margin-bottom: 1px;}
 #sidebar li {list-style: none;}
 #sidebar aside {margin: 0 1em;}
@@ -301,9 +302,9 @@ fieldset dt {width: 150px; font-weight: bold;}
 .new-style .username-d, .new-style .topic-d {float: left;}
 .new-style .email-d, .new-style .password-d {float: right;}
 label.placeholder {
-		padding: 4px 4px 4px 4px;
-		color: #999999;
-	}
+    padding: 4px 4px 4px 4px;
+    color: #999999;
+}
 .settings dt {width: auto; margin-bottom: 8px;}
 .settings input {vertical-align: top;}
 
@@ -322,6 +323,7 @@ label.placeholder {
 .post .poster a {text-decoration: underline;}
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
+.post .tripcode.staff {color: #f14a29;}
 .post .topic {font-weight: bold;}
 .post .content {max-height: 400px; overflow: auto;}
 .post .file-info {margin: -20px 0 5px 0; position: absolute;}

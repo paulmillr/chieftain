@@ -1,53 +1,51 @@
-DEBUG = True
+# encoding: utf-8
+import os
+
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-ADMINS = (
-    ('paul', 'pbagwl@gmail.com'),
+MANAGERS = ADMINS = (
+    ('paul', 'paul@example.com'),
 )
-
-MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2',
             #'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'klipped',  # Or path to database file if using sqlite3.
-        'USER': 'klipped',  # Not used with sqlite3.
-        'PASSWORD': 'klipped',  # Not used with sqlite3.
+        'NAME': '',  # Or path to database file if using sqlite3.
+        'USER': '',  # Not used with sqlite3.
+        'PASSWORD': '',  # Not used with sqlite3.
         'HOST': '',  # Empty string for localhost. Not used with sqlite3.
         'PORT': '',  # Empty string for default. Not used with sqlite3.
     }
 }
 
-CACHE_BACKEND = 'memcached://127.0.0.1:11211/'
+CACHE_BACKEND = 'memcached://127.0.0.1:11211/?max_entries=10000'
 
+DISABLE_CAPTCHA = True
+RECAPTCHA_PUBLIC_KEY = '6LdeQcESAAAAABABMVv5jWI0B6Ut2baEWvH8A0qC'
+RECAPTCHA_PRIVATE_KEY = '6LdeQcESAAAAADFDC3ImXUzyYaD60t2etCpHih1M'
+#APPEND_SLASH = False
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 TIME_ZONE = 'Europe/Kiev'
-
-# http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = 'ru'
 
 SITE_ID = 1
 USE_I18N = True
 USE_L10N = True
 
-# Absolute filesystem path to the directory that will hold user-uploaded files.
-# Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/klipped/media/'
+SITE_TITLE = u'Два.ч 2.0 β'
+SITE_URL = 'http://b.2-ch.ru/'
+BASE_DIR = os.path.dirname(__file__)
+MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
+MEDIA_URL = '{0}files/'.format(SITE_URL)
+STATIC_ROOT = os.path.join(BASE_DIR, 'media')
+MEDIA_URL = '{0}media/'.format(SITE_URL)
 
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash if there is a path component (optional in other cases).
-# Examples: "http://media.lawrence.com", "http://example.com/media/"
-MEDIA_URL = 'http://2-ch.ru/media/'
-STATIC_ROOT = MEDIA_URL
-
-# URL prefix for admin media -- CSS, JavaScript and images. Make sure to use a
-# trailing slash.
-# Examples: "http://foo.com/media/", "/media/".
-ADMIN_MEDIA_PREFIX = '/media/admin-media/'
+ADMIN_MEDIA_PREFIX = '/admin-media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '5akd0aok29i0432jijisaj929001asd'
+SECRET_KEY = '231adxaseqweasdasda5akd0asdaszASDAEWp'
 
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -60,23 +58,26 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'opt.StatsMiddleware',
-    #'opt.SQLLogToConsoleMiddleware',
+    'board.middleware.DenyMiddleware',
+
+    # for debugging
+    #'opt.middlewares.StatsMiddleware',
+    #'opt.middlewares.SQLLogToConsoleMiddleware',
+    #'opt.middlewares.ProfileMiddleware',
 )
+
+AUTH_PROFILE_MODULE = 'klipped.board.User'
 
 ROOT_URLCONF = 'klipped.urls'
 
 TEMPLATE_DIRS = (
-    '/home/klipped/board/templates',
-    # Put strings here, like
-    # "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(BASE_DIR, 'board', 'templates'),
 )
 
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.core.context_processors.media',
     'django.contrib.auth.context_processors.auth',
+    'board.context_processors.settings',
 )
 
 INSTALLED_APPS = (
@@ -86,6 +87,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
-    'django.contrib.markup',
-    'board',
+    'djangorestframework',
+    'klipped.board',
+    #'klipped.mobile',
 )

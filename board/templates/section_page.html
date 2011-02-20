@@ -1,0 +1,30 @@
+{% extends "section_base.html" %}
+{% load i18n %}
+{% block title %}{{section.name}}{% endblock %}
+
+{% block section %}
+    {% include "form.html" %}
+    <section class="threads section">
+        {% autoescape off %}
+        {% for thread in threads.object_list %}
+            {{thread.html}}
+        {% endfor %}
+        {% endautoescape %}
+    </section>
+    <div class="paginator">
+        <ul class="group">
+        {% for p in threads.paginator.page_range %}
+            {% if p != threads.number %}
+                <li><a href="page{{p}}">{{p}}</a></li>
+            {% else %}
+                <li><span>{{p}}</span></li>
+            {% endif %}
+        {% endfor %}
+        </ul>
+        <ul class="group">
+            <li><span>{% trans "Everything" %}</span></li>
+            <li><a href="threads">{% trans "Threads" %}</a></li>
+            <li><a href="posts">{% trans "Posts" %}</a></li>
+        </ul>
+    </div>
+{% endblock %}

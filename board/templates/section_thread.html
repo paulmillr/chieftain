@@ -1,13 +1,17 @@
-{% extends "section.html" %}
+{% extends "section_base.html" %}
 {% load i18n %}
 {% block title %}{% trans "Thread title" %} {{thread.op_post.pid}}{% endblock %}
 
-{% block thread %}
-
-<section class="thread" id="thread{{thread.id}}">
-    {% for post in thread.posts_html %}
-        {{post.html}}
-    {% endfor %}
-</section>
-
+{% block section %}
+    <a href=".">{% trans "Go back" %}</a>
+    {% include "form.html" %}
+    <section class="threads">
+        <section class="thread" id="thread{{thread.id}}">
+            {% autoescape off %}
+            {% for post in thread.posts_html %}
+                {{post.html}}
+            {% endfor %}
+            {% endautoescape %}
+        </section>
+    </section>
 {% endblock %}

@@ -9,12 +9,15 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 import os
 import re
 from datetime import datetime
+from django.conf import settings
+from django.contrib.auth.models import User
+from django.contrib.syndication.views import Feed, FeedDoesNotExist
 from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.core.exceptions import ImproperlyConfigured
-from django.contrib.auth.models import User
-from django.db import models
+from django.db import models, connection, transaction
 from django.forms import ModelForm, CharField, IntegerField, FileField
+from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
@@ -82,15 +85,13 @@ class InvalidKeyError(Exception):
 
 
 class PostManager(models.Manager):
+    def op_posts_by_section(self, slug):
+        return self.filter(is_op_post=True, thread__section__slug=slug)
+
     @cached(3 * DAY)
     def by_section(self, slug, pid):
         """Gets post by its pid and section slug."""
-        try:
-            post = self.get(thread__section__slug=slug, pid=pid)
-        except Post.DoesNotExist as e:
-            raise e
-        else:
-            return post
+        return self.get(thread__section__slug=slug, pid=pid)
 
 
 class SectionManager(models.Manager):
@@ -132,11 +133,14 @@ class Thread(models.Model):
     is_closed = models.BooleanField(default=False,
         verbose_name=_('Thread is closed'))
     html = models.TextField(blank=True, verbose_name=_('Thread html'))
+    
+    def posts(self):
+        return self.post_set.filter(is_deleted=False)
 
     def posts_html(self):
-        return self.post_set.filter(is_deleted=False).values('html')
+        return self.posts().values('html')
 
-    @cached(5)
+    @cached(1)
     def count(self):
         lp = 5
         ps = self.post_set.filter(is_deleted=False)
@@ -155,7 +159,7 @@ class Thread(models.Model):
 
     @property
     def op_post(self):
-        return self.post_set.all()[0]
+        return self.post_set.filter(is_op_post=True)[0]
 
     def last_posts(self):
         c = self.count()
@@ -173,23 +177,27 @@ class Thread(models.Model):
         self.is_deleted = True
         self.save(rebuild_cache=False)
 
-    def rebuild_cache(self):
+    def rebuild_cache(self, with_op_post=False):
         """Regenerates cache of OP-post and last 5."""
+        if with_op_post:
+            self.op_post.save(rebuild_cache=False)
         self.html = render_to_string('thread.html', {'thread': self})
+        if with_op_post:
+            self.op_post.save(rebuild_cache=True)
 
     def save(self, rebuild_cache=True):
         """Saves thread and rebuilds cache."""
         if rebuild_cache:
+            super(self.__class__, self).save()
             self.rebuild_cache()
         super(self.__class__, self).save()
         # remove first thread in section
-        ts = self.section.thread_set
-        if ts.filter(is_pinned=False).count() > self.section.threadlimit:
-            t = ts.order_by('bump')[0]
-            t.delete()
+        ts = self.section.thread_set.filter(is_pinned=False)
+        if ts.count() > self.section.threadlimit:
+            ts.order_by('bump')[0].delete()
 
     def __unicode__(self):
-        return unicode(self.id)
+        return unicode(self.op_post)
 
     class Meta:
         verbose_name = _('Thread')
@@ -364,10 +372,41 @@ class Section(models.Model):
 
     ONPAGE = 20
 
+    def threads(self):
+        return self.thread_set.filter(is_deleted=False)
+
+    def op_posts(self):
+        fields = ('html', 'id', 'bump', 'is_pinned', 'is_closed',
+            'is_deleted')
+        sql = '''SELECT board_post.html, board_thread.id, 
+        board_thread.bump, board_thread.is_pinned,
+        board_thread.is_closed, board_thread.is_deleted
+        FROM board_post 
+        INNER JOIN board_thread ON board_post.thread_id = board_thread.id
+        WHERE board_post.is_op_post = 1
+        AND board_thread.is_deleted = 0
+        AND board_thread.section_id = {id}
+        ORDER BY board_thread.is_pinned DESC, board_thread.bump DESC
+        '''.format(id=self.id)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        return [dict(zip(fields, item)) for item in cursor.fetchall()]
+
+    def posts(self):
+        fields = ('html',)
+        sql = '''SELECT board_post.html
+        FROM board_post
+        INNER JOIN board_thread ON board_thread.id = board_post.thread_id
+        WHERE board_post.is_deleted = 0
+        AND board_thread.section_id = {id}
+        ORDER BY board_post.date DESC
+        '''.format(id=self.id)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        return [dict(zip(fields, item)) for item in cursor.fetchall()]
+
     def page_threads(self, page=1):
-        threads = Paginator(
-            self.thread_set.filter(is_deleted=False).order_by('-is_pinned',
-                '-bump'),
+        threads = Paginator(self.threads().order_by('-is_pinned'),
             self.ONPAGE
         )
         return threads.page(page)
@@ -474,6 +513,7 @@ class IP(models.Model):
 
 class DeniedIP(IP):
     """Used for bans."""
+    reason = models.CharField(_('Ban reason'), max_length=128, db_index=True)
     class Meta:
         verbose_name = _('Denied IP')
         verbose_name_plural = _('Denied IPs')
@@ -508,6 +548,76 @@ class PostForm(PostFormNoCaptcha):
 class ThreadForm(ModelForm):
     class Meta:
         model = Thread
+
+
+class SectionFeed(Feed):
+    def get_object(self, request, section_slug):
+        self.slug = section_slug
+        return get_object_or_404(Section, slug=section_slug)
+
+    def title(self, obj):
+        return u'{title} - {last} {section}'.format(
+            title=settings.SITE_TITLE, last=_('Last threads of section'),
+            section=self.slug
+        )
+
+    def link(self, obj):
+        return '/{0}/'.format(self.slug)
+
+    def description(self, obj):
+        return u'{last} {section}'.format(last=_('Last threads of section'),
+            section=self.slug)
+
+    def items(self):
+        return Post.objects.op_posts_by_section(self.slug).reverse(
+            ).values('pid', 'date', 'message')[:20]
+
+    def item_title(self, item):
+        return u'{0} {1}'.format(_('Thread'), item['pid'])
+    
+    def item_description(self, item):
+        return item['message']
+    
+    def item_link(self, item):
+        return '/{0}/{1}'.format(self.slug, item['pid'])
+
+
+class ThreadFeed(Feed):
+    def get_object(self, request, section_slug, op_post):
+        try:
+            post = Post.objects.by_section(section_slug, op_post)
+        except Post.DoesNotExist:
+            raise Http404
+        t = post.thread
+        self.section = section
+        self.op_post = op_post
+        self.posts = t.posts().reverse().values('pid', 'date', 'message')
+        return t
+
+    def title(self, obj):
+        return u'{title} - {last} {section}/{op_post}'.format(
+            title=settings.SITE_TITLE, last=_('Last posts of thread'),
+            section=self.section, op_post=self.op_post
+        )
+
+    def link(self, obj):
+        return '/{0}/{1}'.format(self.section, self.op_post)
+
+    def description(self, obj):
+        return u'{last} {op_post}'.format(last=_('Last posts of thread'),
+            op_post=self.op_post)
+
+    def items(self):
+        return self.posts
+
+    def item_title(self, item):
+        return u'{0} {1}'.format(_('Post'), item['pid'])
+    
+    def item_description(self, item):
+        return item['message']
+    
+    def item_link(self, item):
+        return '/{0}/{1}#{2}'.format(self.section, self.op_post, item['pid'])
 
 
 def create_user_profile(sender, instance, created, **kwargs):

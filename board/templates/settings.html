@@ -20,16 +20,15 @@
         </dl>
         <dl>
             <dt>
-                <input type="checkbox" name="oldInsert" id="oldInsert">
-                <label for="oldInsert">{% trans "Old posting way" %}</label>
+                <input type="checkbox" name="newForm" id="newForm">
+                <label for="newForm">{% trans "New style form" %}</label>
             </dt>
         </dl>
         <dl>
             <dt>
-                <input type="checkbox" name="newForm" id="newForm">
-                <label for="newForm">{% trans "New style form" %}</label>
+                <input type="checkbox" name="oldInsert" id="oldInsert">
+                <label for="oldInsert">{% trans "Old posting way" %}</label>
             </dt>
-            
         </dl>
         <dl>
             <dt>
@@ -37,12 +36,13 @@
                 <label for="hideNotifications">{% trans "Disable notifications" %}</label>
             </dt>
         </dl>
+        <!--
         <dl>
             <dt>
                 <input type="checkbox" name="noAJAX" id="noAJAX">
                 <label for="noAJAX">{% trans "Disable ajax" %}</label>
             </dt>
-        </dl>
+        </dl>-->
         <dl>
             <dt>
                 <input type="checkbox" name="hideBBCodes" id="hideBBCodes">
@@ -88,7 +88,7 @@
     </fieldset>
 </form>
 
-<div class="visitedThreads" style="display: none;">
+<div class="visitedThreads hidden">
     <h4>{% trans "Visited threads" %}</h4>
     <h5>{% trans "Sorted by the" %}
         <select name="visitedThreadsSort" id="visitedThreadsSort" size="1">

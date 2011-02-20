@@ -534,7 +534,7 @@ $.each([ "keydown", "keyup", "keypress" ], function() {
 });
 
 $.fn.hasScrollBar = function() {
-    return this.get(0).scrollHeight > this.height();
+    return this.get(0).scrollHeight - 1 > this.height();
 }
 
 })(jQuery);

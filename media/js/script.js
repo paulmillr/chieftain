@@ -263,11 +263,22 @@ ColorContainer.prototype = {
     },
 }
 
-function previewPost(selector) {
-    $(selector).hover(function(e) {
-        var d = $('<div/>');
-        e.preventDefault();
-    });
+function randomString(length) {
+    var s= '';
+    function randomchar() {
+        var n = Math.floor(Math.random() * 62);
+        if (n < 10) {
+            return n; //1-10
+        } else if (n < 36) {
+            return String.fromCharCode(n+55); //A-Z
+        } else {
+            return String.fromCharCode(n+61); //a-z
+        }
+    }
+    while(s.length < length) {
+        s += randomchar();
+    }
+    return s;
 }
 
 function checkForSidebarScroll() {
@@ -534,11 +545,8 @@ function initSettings() {
             },
             
             'hideSidebar' : function(x) {
-                var margin = x ? '10px' : '200px';
-
-                $('#sidebar').toggle(0, null, function(x) {
-                    $('header, #main, footer').css({'margin-left' : margin});
-                });
+                $('#container-wrap').toggleClass('no-sidebar');
+                $('#sidebar').toggle(0, null);
             },
 
             'hideNav' : function(x) {
@@ -607,6 +615,13 @@ function initSettings() {
         $.settings(this.id, value);
     });
     
+    $('#sidebar .hide').click(function(event) {
+        var k = 'hideSidebar',
+            h = $.settings(k) ? false : true;
+        $.settings(k, h);
+        changes[k](h);
+    });
+    
     $('#sidebar h4').click(function(e) {
         var num = this.id.split('group').pop(),
             key = 'hideSectGroup',
@@ -649,17 +664,19 @@ function initStyle() {
         style = $.settings(key);
     
     checkForSidebarScroll();
-    
+
+    $('.tripcode:contains("!")').addClass('staff');
+
     document.onscroll = function() {
         $('.sidebar').css('left', '-' + document.body.scrollLeft + 'px')
     };
     
-    var posts = $('.section .post:first-child').each(function(x) {
-        var href = $(this).find('.number a').attr('href'),
-            span = $('<span/>').addClass('answer')
-            .html('[<a href="'+href+'">Ответ</a>]');
-        if ($(this).find('.is_closed').length == 0) {
-            span.insertBefore($(this).find('.number'));
+    $('.section .post:first-child').each(function(x) {
+        var post = $(this),
+            href = post.find('.number a').attr('href'),
+            span = $('<span/>').addClass('answer').html('[<a href="'+href+'">Ответ</a>]');
+        if (post.find('.is_closed').length == 0) {
+            span.insertBefore(post.find('.number'));
         }
     });
     
@@ -916,7 +933,10 @@ function initAJAX() {
             window.location.href = './' + data.pid;
             return true;
         }
-        $(data.html).hide().appendTo('.thread').fadeIn(500);
+        $(data.html).hide()
+            .appendTo('.thread')
+            .fadeIn(500)
+            .find('.tripcode:contains("!")').addClass('staff');
         try {
             window.location.hash = '#post' + data.pid;
         } catch(e) {}
@@ -940,6 +960,9 @@ function initAJAX() {
                     this.checked = false;
             }
         });
+    }
+    if (!$('#password').val()) {
+        $('#password').val(randomString(8));
     }
     $('.new-post').ajaxForm({ 
         'target': 'body',

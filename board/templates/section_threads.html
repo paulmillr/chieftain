@@ -1,0 +1,23 @@
+{% extends "section_base.html" %}
+{% load i18n %}
+{% block title %}{{section.name}}{% endblock %}
+
+{% block section %}
+    {% include "form.html" %}
+    <section class="threads section">
+        {% autoescape off %}
+        {% for thread in threads %}
+        <section class="thread" id="thread{{thread.id}}">
+            {{thread.html}}
+        </section>
+        {% endfor %}
+        {% endautoescape %}
+    </section>
+    <div class="paginator">
+        <ul class="group">
+            <li><a href=".">{% trans "Everything" %}</a></li>
+            <li><span>{% trans "Threads" %}</span></li>
+            <li><a href="posts">{% trans "Posts" %}</a></li>
+        </ul>
+    </div>
+{% endblock %}

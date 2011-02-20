@@ -45,13 +45,13 @@
             <dd><input type="file" name="file" id="file"></dd>
         </dl>
         <dl class="captcha-d">
-            <dt {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}>
+            <dt {% if settings.DISABLE_CAPTCHA %}class="hidden"{% endif %}>
                 <label for="recaptcha_response_field">{% trans "Captcha" %}</label>
             </dt>
             <dd>
-                <div id="recaptcha_widget" style="display: none">
-                    <div id="recaptcha_image" onclick="Recaptcha.reload();" class="captcha-img" {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}></div>
-                    <p><input type="text" name="recaptcha_response_field" id="recaptcha_response_field" size="16" maxlength="32" class="captcha" {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}></p>
+                <div id="recaptcha_widget" class="hidden">
+                    <div id="recaptcha_image" onclick="Recaptcha.reload();" class="captcha-img{% if settings.DISABLE_CAPTCHA %} hidden{% endif %}"></div>
+                    <p><input type="text" name="recaptcha_response_field" id="recaptcha_response_field" size="16" maxlength="32" class="captcha" {% if settings.DISABLE_CAPTCHA %}class="hidden"{% endif %}></p>
                 </div>
                 {{form.captcha}}
             </dd>
@@ -63,3 +63,8 @@
         </dl>
     </fieldset>
 </form>
+<div class="info">
+    <h3><a href="http://2-ch.ru/pr/res/9227.html">О багах писать сюда</a></h3>
+    <h5>Боковая панель (ранее фрейм) скрывается либо в <a href="/settings">настройках</a>, либо по клику на кнопочке под названием сайта</h5>
+    <p class="sectionDescription">{{section.description}}</p>
+</div>

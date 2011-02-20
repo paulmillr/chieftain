@@ -2,9 +2,9 @@
     <div class="post-wrapper">
         <header class="clearfix">
             <div class="info-wrapper">
-                {% if post.is_op_post and thread %}
-                {% if thread.is_pinned %}<span class="is_pinned"></span>{% endif %}
-                {% if thread.is_closed %}<span class="is_closed"></span>{% endif %}
+                {% if post.thread and post.is_op_post %}
+                {% if post.thread.is_pinned %}<span class="is_pinned"></span>{% endif %}
+                {% if post.thread.is_closed %}<span class="is_closed"></span>{% endif %}
                 {% endif %}
                 <span class="number"><a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">{{post.pid}}</a></span>
                 <time datetime="{{post.date|date:'c'}}" pubdate>{{post.date|date:'d.m.Y H:i:s'}}</time>

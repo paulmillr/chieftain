@@ -11,17 +11,20 @@ import re
 from string import maketrans
 from crypt import crypt
 from datetime import datetime
-from django.core.paginator import InvalidPage, EmptyPage
+from django.conf import settings as site_settings
+from django.contrib.syndication.views import Feed
+from django.core.paginator import Paginator, InvalidPage, EmptyPage
 from django.http import Http404, HttpResponseRedirect,\
     HttpResponsePermanentRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
 from board import validators
 from board.models import *
 
 __all__ = [
-    'rtr', 'check_form', 'index', 'settings', 'faq', 'section', 'thread',
+    'rtr', 'index', 'settings', 'faq', 'section', 'threads', 'posts',
+    'thread',
 ]
 
 
@@ -71,7 +74,7 @@ def post_router(request, op_post=None):
     return HttpResponseRedirect('{0}#post{1}'.format(*args))
 
 
-def section(request, section, page=1):
+def section(request, section_slug, page):
     """
     Gets 20 threads from current section with
     OP post and last 5 posts in each thread.
@@ -79,21 +82,36 @@ def section(request, section, page=1):
     if request.method == 'POST':
         return post_router(request)
     try:
-        s = Section.objects.get(slug__exact=section)
+        s = Section.objects.get(slug=section_slug)
         t = s.page_threads(page)
     except (Section.DoesNotExist, InvalidPage, EmptyPage):
         raise Http404
-    form = PostForm()
-    return rtr('section.html', request, {'threads': t, 'section': s,
-        'form': form})
+    return rtr('section_page.html', request, {'threads': t, 'section': s,
+        'form': PostForm()})
 
+def threads(request, section_slug):
+    """Gets list of OP-posts in section."""
+    section = get_object_or_404(Section, slug=section_slug)
+    return rtr('section_threads.html', request, {'threads': section.op_posts(), 
+        'section': section, 'form': PostForm()})
 
-def thread(request, section, op_post):
+def posts(request, section_slug, page):
+    """Gets list of posts in section."""
+    section = get_object_or_404(Section, slug=section_slug)
+    posts_page = Paginator(section.posts(), section.ONPAGE)
+    try:
+        p = posts_page.page(page)
+    except (InvalidPage, EmptyPage):
+        raise Http404
+    return rtr('section_posts.html', request, {'posts': p,
+        'section': section, 'form': PostForm()})
+
+def thread(request, section_slug, op_post):
     """Gets thread and its posts."""
     if request.method == 'POST':
         return post_router(request, op_post)
     try:
-        post = Post.objects.by_section(section, op_post)
+        post = Post.objects.by_section(section_slug, op_post)
     except Post.DoesNotExist:
         raise Http404
     thread = post.thread

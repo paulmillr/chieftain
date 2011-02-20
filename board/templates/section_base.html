@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}{{section.name}}{% endblock %}
+
+{% load cache %}
+{% load i18n %}
+
+{% block content %}
+    {% block section %}{% endblock %}
+    <div class="deleteMode">
+        <input type="button" value="{% trans "Delete posts" %}" data-back="{% trans "Cancel" %}" class="toggle">
+        <div class="hidden">
+            <p><input type="checkbox" name="onlyFiles" id="onlyFiles">
+            <label for="onlyFiles">{% trans "Only files" %}</label></p>
+            
+            <div class="modPanel">
+                <p><input type="checkbox" name="deleteAll" id="deleteAll">
+                <label for="deleteAll">{% trans "Delete all messages from that IP" %}</label></p>
+
+                <p><input type="checkbox" name="ban" id="ban">
+                <label for="ban">{% trans "Ban IP" %}</label></p>
+
+                {% if thread %}
+                <p><input type="button" name="pinThread" value="{% trans 'Pin thread' %}" id="pinThread">
+                <input type="button" name="closeThread" value="{% trans 'Close thread' %}" id="closeThread"></p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

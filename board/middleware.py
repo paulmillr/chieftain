@@ -25,7 +25,7 @@ def ip_in(ip, model):
     try:
         for i in model.objects.all():
             if ip in i.network():
-                return True
+                return i.reason if i.reason else ''
     except ValueError:
         pass
     return False
@@ -46,7 +46,7 @@ def get_ip(request):
         return request.META['REMOTE_ADDR']
 
 
-def forbid(request):
+def forbid(request, reason=''):
     """
     Forbids a user to access the site
     Cleans up their session (if it exists)
@@ -56,7 +56,7 @@ def forbid(request):
     for k in request.session.keys():
         del request.session[k]
     return HttpResponseForbidden(render_to_string('banned.html',
-                context_instance=RequestContext(request)))
+        {'reason': reason}, context_instance=RequestContext(request)))
 
 
 class DenyMiddleware(object):
@@ -67,8 +67,10 @@ class DenyMiddleware(object):
         ip = get_ip(request)
         if not request.method in METHODS or ip in WHITELIST:
             return False
-        if ip_in(ip, DeniedIP):
-            return forbid(request)
+        reason = ip_in(ip, DeniedIP)
+        # not simply 'if reason:' because it could return empty string
+        if reason is not False:
+            return forbid(request, reason)
 
 
 class AllowMiddleware(object):
