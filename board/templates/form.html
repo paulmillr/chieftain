@@ -44,19 +44,22 @@
             <dt><label for="file">{% trans "File" %}</label></dt>
             <dd><input type="file" name="file" id="file"></dd>
         </dl>
+        {% if not settings.DISABLE_CAPTCHA %}
         <dl class="captcha-d">
             <dt {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}>
                 <label for="recaptcha_response_field">{% trans "Captcha" %}</label>
             </dt>
             <dd>
+                
                 <div id="recaptcha_widget" style="display: none">
                     <div id="recaptcha_image" onclick="Recaptcha.reload();" class="captcha-img" {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}></div>
                     <p><input type="text" name="recaptcha_response_field" id="recaptcha_response_field" size="16" maxlength="32" class="captcha" {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}></p>
                 </div>
+                
                 {{form.captcha}}
             </dd>
         </dl>
-        
+        {% endif %}
         <dl class="password-d">
             <dt><label for="password">{{form.password.label}}</label></dt>
             <dd><input type="password" name="password" id="password" size="16" maxlength="32"></dd>

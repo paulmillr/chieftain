@@ -3,38 +3,34 @@
 */
 
 var currentPage = (function() { // page detector
-    var pageType,
-        loc = window.location.href.split('/').slice('3'),
+    var loc = window.location.href.split('/').slice('3'),
         re = /(\d+)(?:.+)?/,
-        l, section, thread, op_post;
+        data = {cache: {}};
     if (loc[1] == null) { // main, settings or faq
         l = loc[0];
         pages = ['settings', 'faq'];
         for (var i=0; i < pages.length; i++) {
             var c = pages[i]
             if (l.substr(0, c.length) === c) {
-                pageType = c;
+                data.type = c;
             }
         }
-        pageType = pageType || 'main';
+        data.type = data.type || 'main';
     } else { // section or thread
-        section = loc[0];
+        data.section = loc[0];
         l = loc[1];
         if (l.match(/^\d+/)) {
-            pageType = 'thread';
-            thread = $('.thread').attr('id').match(re)[1];
-            op_post = l.match(re)[1];
+            data.type = 'thread';
+            data.cache.thread = $('.thread');
+            data.thread = getThreadId(data.cache.thread);
+            data.first = l.match(re)[1];
+            data.cache.first = $('#post' + data.first);
         } else {
-            pageType = 'section';
+            data.type = 'section';
         }
     }
     
-    return {
-        'type' : pageType,
-        'section' : section,
-        'thread' : thread,
-        'op_post' : op_post,
-    }
+    return data;
 })();
 
 function Newpost(element) { // listens textarea and adds some methods to it
@@ -83,6 +79,19 @@ function Newpost(element) { // listens textarea and adds some methods to it
 
 function getSelText() {
     document.aform.selectedtext.value =  window.getSelection();
+}
+
+function getThreadId(thread) {
+    return thread.attr('id').replace('thread', '');
+}
+
+function getPostId(post) {
+    return post.attr('data-id');
+    //return post.data('id');  // it's slower than .attr by ~10 times
+}
+
+function getPostPid(post) {
+    return post.attr('id').replace('post', '');
 }
 
 // Key-value database, based on localStorage
@@ -509,7 +518,9 @@ function initSettings() {
         settings = $('.settings').find('select, input'),
         changes = { // description of all functions on settings pages
             ustyle: function(x) {
-                $('html').attr('id', x);
+                if (x !== 'ustyle') {
+                    $('html').attr('id',  x);
+                }
             },
             
             toggleNsfw: function(x) {
@@ -734,7 +745,6 @@ function initStorage() {
         initVisitedThreads();
     }
     
-    
     // Thread visits counter
     function initVisitedThreads() {
         var container = new BoardContainer('visitedThreads', true),
@@ -748,7 +758,7 @@ function initStorage() {
             thread = currentPage.thread;
             if (!(thread in container.list())) {
                 container.set(thread, {
-                    'op_post': currentPage.op_post, 
+                    'first': currentPage.first, 
                     'section': currentPage.section,
                     'visits': 1,
                     'first_visit': (new Date()).getTime(),
@@ -773,7 +783,7 @@ function initStorage() {
                         item = list[i],
                         elem = $('<li/>'),
                     // elem.data('visits', item.visits);
-                        tpl = '/'+item.section+'/'+item.op_post;
+                        tpl = '/'+item.section+'/'+item.first;
                     a.attr('href', tpl);
                     a.text(tpl + ': ' + item.description);
                     ul.append(elem.append(a));
@@ -794,25 +804,15 @@ function initStorage() {
         }
     }
     
-    function getThreadId(thread) {
-        return thread.attr('id').replace('thread', '');
-    }
-    
-    function getPostId(post) {
-        return post.data('id');
-    }
-    
-    function getPostPid(post) {
-        return post.attr('id').replace('post', '');
-    }
-    
-    function PostContainer(span) {
-        span = $(span);
+    function PostContainer(span, post) {
+        if (!(span instanceof jQuery)) {
+            span = $(span);
+        }
         
         this.span = span;
-        this.post = span.closest('.post');
-        this.thread = this.post.closest('.thread');
-        this.first = this.thread.find('.post:first-child');
+        this.post = post ? (!(post instanceof jQuery) ? post : $(post)) : span.closest('.post');
+        this.thread = (currentPage.type === 'thread') ? currentPage.cache.thread : this.span.closest('.thread');
+        this.first = (currentPage.type === 'thread') ? currentPage.cache.first : this.thread.find('.post:first-child');
         this.id = getPostId(this.post);
         this.text_data = {
             'section': currentPage.section,
@@ -824,48 +824,55 @@ function initStorage() {
     // format:
     // {container, className, initFn, pushFn, popFn}
     function buttonInitializer(data) {
-        var item;
-        $.each(data, function(i) {
-            item = this;
+        var item,
+            dataCopy = {};
+        for (var i=0; i < data.length; ++i) {
+            item = data[i];
             
             if (!!$.settings('disable' + item.container)) {
                 return true;
             }
-
-            if (!item.onInit) item.onInit = function() {};
-            if (!item.onAdd) item.onAdd = function() {};
-            if (!item.onRemove) item.onRemove = function() {};
+            
+            dataCopy[item.className] = item;
 
             var container = new BoardContainer(item.container),
+                list = container.list(),
                 className = item.className;
 
             $('.post').each(function(x) {
                 var span = $('<span/>').addClass(className).addClass('add'),
-                    post = $(this),
-                    post_id = getPostId(post);
+                    post = $(this);
 
-                if (container.get(post_id)) {
+                if (getPostId(post) in list) {
                     span.removeClass('add').addClass('remove');
                 }
                 span.appendTo(post.find('header'));
-                item.onInit(new PostContainer(span));
+                if (!!item.onInit) {
+                    item.onInit(new PostContainer(span, post));
+                }
             });
 
             $('.threads').delegate('.' + className, 'click', function(event) {
                 event.preventDefault();
                 var post = new PostContainer(this),
-                    span = post.span;
+                    span = post.span,
+                    className = this.className.split(' ')[0],
+                    dt = dataCopy[className];
                 if (span.hasClass('add')) {  // add
                     span.removeClass('add').addClass('remove');
                     container.set(post.id, post.text_data);
-                    item.onAdd(post);
+                    if (dt.onAdd) {
+                        dt.onAdd(post);
+                    }
                 } else {  // remove
                     span.removeClass('remove').addClass('add');
                     container.remove(post.id);
-                    item.onRemove(post);
+                    if (dt.onRemove) {
+                       dt.onRemove(post);
+                    }
                 }
             });
-        });
+        }
     }
     
     buttonInitializer([
@@ -994,6 +1001,7 @@ function initAJAX() {
         'dataType': 'json',
     });
 }
+
 
 $(init);
 $(initSettings);

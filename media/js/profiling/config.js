@@ -37,7 +37,7 @@ var PROFILE = {
           var s = document.createElement('link');
           s.setAttribute('rel','stylesheet');      
           s.setAttribute('type','text/css');
-          s.setAttribute('href','js/profiling/yahoo-profiling.css');
+          s.setAttribute('href','/media/js/profiling/yahoo-profiling.css');
           document.body.appendChild(s);
           
 	        YAHOO.util.Dom.addClass(document.body, 'yui-skin-sam');
@@ -47,7 +47,7 @@ var PROFILE = {
       			visible: true, //expand the viewer mmediately after instantiation
       			showChart: true,
       		  //	base:"../../build/",
-      		  swfUrl: "js/profiling/charts.swf"
+      		  swfUrl: "/media/js/profiling/charts.swf"
       		});
   	
   }

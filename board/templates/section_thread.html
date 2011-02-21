@@ -9,7 +9,7 @@
         <section class="thread" id="thread{{thread.id}}">
             {% autoescape off %}
             {% for post in thread.posts_html %}
-                {{post.html}}
+            {{post.html}}
             {% endfor %}
             {% endautoescape %}
         </section>

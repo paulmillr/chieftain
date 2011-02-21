@@ -1,4 +1,5 @@
-{% load md2 %}<article class="post clearfix" id="post{{post.pid}}" data-id="{{post.id}}">
+{% load md2 %}
+<article class="post clearfix" id="post{{post.pid}}" data-id="{{post.id}}">
     <div class="post-wrapper">
         <header class="clearfix">
             <div class="info-wrapper">
@@ -41,9 +42,7 @@
             {% endfor %}
             {% endif %}
             <div class="message">
-                {% autoescape off %}
-                {{ post.message|markdown2:"safe,videos,code-friendly,code-color" }}
-                {% endautoescape %}
+                {% autoescape off %}{{ post.message|markdown2:"safe,videos,code-friendly,code-color" }}{% endautoescape %}
             </div>
         </div>
     </div>
