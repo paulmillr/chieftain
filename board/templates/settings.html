@@ -69,6 +69,12 @@
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="disableHidden" id="disableHidden">
+                <label for="disableHidden">{% trans "Disable posts hide" %}</label>
+            </dt>
+        </dl>
+        <dl>
+            <dt>
                 <input type="checkbox" name="disableBookmarks" id="disableBookmarks">
                 <label for="disableBookmarks">{% trans "Disable image " %}</label>
             </dt>
@@ -91,9 +97,9 @@
 <div class="visitedThreads hidden">
     <h4>{% trans "Visited threads" %}</h4>
     <h5>{% trans "Sorted by the" %}
-        <select name="visitedThreadsSort" id="visitedThreadsSort" size="1">
-            <option value="time">{% trans "time of first visit" %}</option>
-            <option value="visits">{% trans "visits count" %}</option></select>
+        <select name="sortVisitedThreads" id="sortVisitedThreads" class="sortVisitedThreads" size="1">
+            <option value="first_visit">{% trans "time of first visit" %}</option>
+            <option value="-visits">{% trans "visits count" %}</option></select>
     </h5>
     <ul></ul>
 </div>

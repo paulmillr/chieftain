@@ -19,6 +19,7 @@ from django.http import Http404, HttpResponseRedirect,\
 from django.shortcuts import get_object_or_404, render_to_response
 from django.template import RequestContext
 from django.views.decorators.cache import cache_page
+from django.utils.translation import ugettext_lazy as _
 from board import validators
 from board.models import *
 
@@ -50,15 +51,29 @@ def settings(request):
     return rtr('settings.html', request)
 
 
-def search(request):
-    """Searches on the board."""
-    pass
-
-
 #@cache_page(DAY / 2)
 def faq(request):
     """Gets FAQ page."""
     return rtr('faq.html', request)
+
+
+def search(request, section_slug, page):
+    section = get_object_or_404(Section, slug=section_slug)
+    is_op_post = request.GET.get('is_op_post') or False
+    posts = Post.objects.filter(is_deleted=False,
+        is_op_post=is_op_post,
+        thread__section=section,
+        message__contains=request.GET['q']).order_by('-date')
+    if not posts.count():
+        return rtr('error.html', request, {'details': _('Nothing found')})
+    posts_page = Paginator(posts, section.ONPAGE)
+    try:
+        p = posts_page.page(page)
+    except (InvalidPage, EmptyPage):
+        raise Http404
+
+    return rtr('section_posts.html', request, {'posts': p,
+            'section': section})
 
 
 def post_router(request, op_post=None):

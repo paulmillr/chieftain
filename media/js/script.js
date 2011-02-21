@@ -85,89 +85,68 @@ function getSelText() {
     document.aform.selectedtext.value =  window.getSelection();
 }
 
-// prototype for all containers at the board
-function BoardContainer(storageName, isDict) {
+// Key-value database, based on localStorage
+function BoardContainer(storageName) {
     this.storageName = storageName;
-    this.isDict = isDict || false;
 }
 $.extend(BoardContainer.prototype, {
     storageName : '',
-    isDict : false,
-    
+
     // gets all keys
-    list : function() {
+    list: function() {
         var s = $.storage(this.storageName);
-        if (typeof s !== 'undefined') {
-            return s;
-        } else {
-            return this.isDict ? {} : []
-        }
+        return (typeof s !== 'undefined' && typeof s !== 'string') ? s : {};
     },
 
     // checks if key is in container
     // returns item if container is dictionary and 
     // bool(inList) if container is list
-    get : function(key) {
-        return this.isDict ? 
-            this.list()[key] : 
-            this.list().indexOf(key);
+    get: function(key) {
+        return this.list()[key]
     },
     
-    set : function(key, value) {
+    set: function(key, value) {
         var l = this.list();
-        if (this.isDict) {
-            l[key] = value;
-        } else {
-            l.push(key);
-        }
-        $.storage(this.storageName, l);
-        return l;
+        l[key] = value;
+        return $.storage(this.storageName, l);
     },
     
-    push : function(key) {
-        if (!this.isDict) {
-            this.set(key);
+    incr: function(key, item) {
+        var dict = this.get(key);
+        if (typeof dict === 'object' && item in dict) {
+            ++dict[item];
+            this.set(key, dict);
+            return dict[item];
         }
     },
-    
-    incr : function(key, item) {
-        if (this.isDict) {
-            var v = this.get(key);
-            if (typeof key === 'object' && item in key) {
-                ++k[item];
-                this.set(key, v);
-                return k[item];
-            }
-        } else {
-            var l = this.list();
-            ++l[key];
-            $.storage(this.storageName, l);
-            return l[key];
-        }
 
-    },
-    
-    remove : function(item) {
-        var index = this.get(item), 
-        l = this.list(), newList;
-        if (!this.isDict && index !== -1) {
-            newList = l.slice(0, index).concat(l.slice(index, l.length - 1));
-            $.storage(this.storageName, newList);
-            return newList;
-        }
-    },
-    
-    pop : function(key) {
+    remove: function(key) {
         var s = this.list();
-        s[key] = '';
-        $.storage(this.storageName, s);
-        return s;
+        delete s[key];
+        return $.storage(this.storageName, s);
     },
     
     // clears container
-    flush : function() {
+    flush: function() {
         $.storage(this.storageName, '', 'flush');
-        return true;
+    },
+    
+    sort: function(key) {
+        var items = [],
+            l = this.list();
+        for (var i in l) {
+            l[i]['id'] = i;
+            items.push(l[i]);
+        }
+        items.sort(function(a, b) {
+            if (key[0] == '-') {
+                key = key.slice(1);
+                return a[key] < b[key];
+            } else {
+                return a[key] > b[key];
+            }
+        });
+        return items;
     },
 });
 
@@ -300,9 +279,9 @@ function labelsToPlaceholders(list) {
         dd.attr('placeholder', t);
         dd.placeholder(t);
     }
-    if ($('.bbcode').css('display') === 'none') {
-        $('.captcha-d').css({marginTop : 1})
-    }
+    //if ($('.bbcode').css('display') === 'none') {
+    //    $('.captcha-d').css({'margin-top' : '1px'})
+    //}
 }
 
 function manipulator(arr) { // manipulates elements. Used for custom user styles.
@@ -529,35 +508,32 @@ function initSettings() {
     var s = parseQs(), 
         settings = $('.settings').find('select, input'),
         changes = { // description of all functions on settings pages
-            'ustyle' : function(x) {
+            ustyle: function(x) {
                 $('html').attr('id', x);
             },
             
-            'toggleNsfw' : function(x) {
+            toggleNsfw: function(x) {
                 if (x) {
-                    $('.post img').addClass('nsfw')
-                    .hover(function(event) {
-                        $(this).toggleClass('nsfw');
-                    });
+                    $('.post img').addClass('nsfw');
                 } else {
                     $('.post img').removeClass('nsfw');
                 }
             },
             
-            'hideSidebar' : function(x) {
+            hideSidebar: function(x) {
                 $('#container-wrap').toggleClass('no-sidebar');
                 $('#sidebar').toggle(0, null);
             },
 
-            'hideNav' : function(x) {
+            hideNav: function(x) {
                 $('nav').toggle();
             },
 
-            'hideSectBanner' : function(x) {
+            hideSectBanner: function(x) {
                 $('.section-banner').toggle();
             },
             
-            'newForm' : function(x) {
+            newForm: function(x) {
                 if (!x) {
                     return false;
                 }
@@ -576,7 +552,7 @@ function initSettings() {
                 manipulator(styleInfo);
             },
             
-            'hideBBCodes' : function(x) {
+            hideBBCodes: function(x) {
                 $('.bbcode').hide();
             },
         };
@@ -638,6 +614,10 @@ function initSettings() {
         
         $.settings(key, set);
         ul.slideToggle(500, checkForSidebarScroll);
+    });
+    
+    $('.threads').delegate('.nsfw', 'hover', function(event) {
+        $(this).toggleClass('nsfw');
     });
     
     $('.toggleNsfw').click(function(event) {
@@ -754,10 +734,6 @@ function initStorage() {
         initVisitedThreads();
     }
     
-    if (!$.settings('disableBookmarks')) {
-        initBookmarks();
-    }
-    initHidden();
     
     // Thread visits counter
     function initVisitedThreads() {
@@ -775,9 +751,10 @@ function initStorage() {
                     'op_post': currentPage.op_post, 
                     'section': currentPage.section,
                     'visits': 1,
-                    'title': $('article:first-child .title').text(),
+                    'first_visit': (new Date()).getTime(),
+                    'title': $('.post:first-child .title').text(),
                     'description': (function() {
-                        var text = $('article:first-child .text').text();
+                        var text = $('.post:first-child .message').text();
                         if (text.length > 100) {
                             text = text.substring(0, 100) + '...';
                         } 
@@ -788,21 +765,24 @@ function initStorage() {
                 container.incr(thread, 'visits');
             }
         } else if (currentPage.type == 'settings') {
-            var list = container.list();
             ul = visitedList.find('ul');
             visitedList.show();
-            for (var i in list) {
-                var a = $('<a/>'),
-                    item = list[i],
-                    elem = $('<li/>'),
-                // elem.data('visits', item.visits);
-                    tpl = '/'+item.section+'/'+item.op_post;
-                a.attr('href', tpl);
-                a.text(tpl + ': ' + item.description);
-                ul.append(elem.append(a));
+            function makeList(list) {
+                for (var i=0; i < list.length; ++i) {
+                    var a = $('<a/>'),
+                        item = list[i],
+                        elem = $('<li/>'),
+                    // elem.data('visits', item.visits);
+                        tpl = '/'+item.section+'/'+item.op_post;
+                    a.attr('href', tpl);
+                    a.text(tpl + ': ' + item.description);
+                    ul.append(elem.append(a));
+                }
             }
-            $('.sortVisitedThreads').click(function(event) {
-
+            makeList(container.sort('visits'));
+            $('.sortVisitedThreads').change(function(event) {
+                ul.find('li').remove();
+                makeList(container.sort(this.value));
             });
             $('.clearVisitedThreads').click(function(event) {
                 event.preventDefault();
@@ -813,90 +793,126 @@ function initStorage() {
             });
         }
     }
-    function getThreadId(bookmarkNode) {
-        return $(bookmarkNode).closest('.thread').attr('id').replace('thread', '');
+    
+    function getThreadId(thread) {
+        return thread.attr('id').replace('thread', '');
     }
     
-    function initBookmarks() {
-        var container = new BoardContainer('bookmarks', false),
-            className = 'bookmark';
-        
-        $('.thread').each(function(x) {
-            var s = $('<span/>').addClass(className).addClass('add');
-            if (container.get($(this).attr('id').replace('thread', '')) !== -1) {
-                s.removeClass('add').addClass('remove');
-            }
-            s.appendTo(
-                $(this).find('.post:first-child header')
-            );
-            $(this).find('.post:first-child')
-        });
-        $('.threads').delegate('.'+ className +'.add', 'click', function(event) {
-            event.preventDefault();
-            var t = getThreadId(this);
-            container.push(t);
-            $(this).removeClass('add').addClass('remove');
-        });
-        $('.threads').delegate('.'+ className +'.remove', 'click', function(event) {
-            event.preventDefault();
-            var t = getThreadId(this);
-            container.remove(t);
-            $(this).removeClass('remove').addClass('add');
-        });
+    function getPostId(post) {
+        return post.data('id');
     }
-
-    function initHidden() {
-        var container = new BoardContainer('hidden', false),
-            className = 'hide';
+    
+    function getPostPid(post) {
+        return post.attr('id').replace('post', '');
+    }
+    
+    function PostContainer(span) {
+        span = $(span);
         
-        $('.thread').each(function(x) {
-            var s = $('<span/>').addClass(className).addClass('add');
-            if (container.get($(this).attr('id').replace('thread', '')) !== -1) {
-                s.removeClass('add').addClass('remove');
-            }
-            s.appendTo(
-                $(this).find('.post:first-child header')
-            );
-            $(this).find('.post:first-child')
-            if (s.hasClass('remove')) {
-                $(this).find('.post:not(:first-child)').hide();
-                var first = $(this).find('.post:first-child')
-                first.find('.content').hide();
-                var s = $('<span/>').addClass('skipped')
-                    .text(
-                        'Тред #'+ first.attr('id').replace('post', '') +
-                        '('+ first.find('.message').text().split(0, 100) +') скрыт.'
-                    ).appendTo(first.find('.post-wrapper'));
-            }
-        });
-        $('.threads').delegate('.'+ className +'.add', 'click', function(event) {
-            event.preventDefault();
-            var t = getThreadId(this),
-                thread = $('#thread' + t),
-                first = thread.find('.post:first-child');
-            container.push(t);
+        this.span = span;
+        this.post = span.closest('.post');
+        this.thread = this.post.closest('.thread');
+        this.first = this.thread.find('.post:first-child');
+        this.id = getPostId(this.post);
+        this.text_data = {
+            'section': currentPage.section,
+            'first': getPostPid(this.first),
+            'pid': getPostPid(this.post),
+        };
+    }
+    
+    // format:
+    // {container, className, initFn, pushFn, popFn}
+    function buttonInitializer(data) {
+        var item;
+        $.each(data, function(i) {
+            item = this;
             
-            thread.find('.post:not(:first-child)').hide();
-            first.find('.content').hide();
-            $('<span/>').addClass('skipped')
-                .text(
-                    'Тред #'+ first.attr('id').replace('post', '') +
-                    '('+ first.find('.message').text().split(0, 100) +') скрыт.'
-                ).appendTo(first.find('.post-wrapper'));
-            $(this).removeClass('add').addClass('remove');
-        });
-        $('.threads').delegate('.'+ className +'.remove', 'click', function(event) {
-            event.preventDefault();
-            var t = getThreadId(this),
-                thread = $('#thread' + t),
-                first = thread.find('.post:first-child');
-            container.remove(t);
-            first.find('.skipped').remove();
-            thread.find('.post:not(:first-child)').show();
-            first.find('.content').show();
-            $(this).removeClass('remove').addClass('add');
+            if (!!$.settings('disable' + item.container)) {
+                return true;
+            }
+
+            if (!item.onInit) item.onInit = function() {};
+            if (!item.onAdd) item.onAdd = function() {};
+            if (!item.onRemove) item.onRemove = function() {};
+
+            var container = new BoardContainer(item.container),
+                className = item.className;
+
+            $('.post').each(function(x) {
+                var span = $('<span/>').addClass(className).addClass('add'),
+                    post = $(this),
+                    post_id = getPostId(post);
+
+                if (container.get(post_id)) {
+                    span.removeClass('add').addClass('remove');
+                }
+                span.appendTo(post.find('header'));
+                item.onInit(new PostContainer(span));
+            });
+
+            $('.threads').delegate('.' + className, 'click', function(event) {
+                event.preventDefault();
+                var post = new PostContainer(this),
+                    span = post.span;
+                if (span.hasClass('add')) {  // add
+                    span.removeClass('add').addClass('remove');
+                    container.set(post.id, post.text_data);
+                    item.onAdd(post);
+                } else {  // remove
+                    span.removeClass('remove').addClass('add');
+                    container.remove(post.id);
+                    item.onRemove(post);
+                }
+            });
         });
     }
+    
+    buttonInitializer([
+        {
+            container: 'Bookmarks', 
+            className: 'bookmark'
+        },
+        {
+            container: 'Hidden', 
+            className: 'hide',
+            onInit : function(data) {
+                if (data.span.hasClass('remove')) {
+                    this.onAdd(data);
+                }
+            },
+
+            onAdd : function(data) {
+                var first = false, post;
+                if (data.id === getPostId(data.first)) {
+                    data.thread.find('.post:not(:first-child)').hide();
+                    post = data.first;
+                    first = true;
+                } else {
+                    post = data.post;
+                }
+                post.find('.content').hide();
+                var t = first ? 'Тред' : 'Пост',
+                    s = $('<span/>').addClass('skipped')
+                    .text(t +
+                        ' #'+ getPostPid(post) +
+                        '('+ post.find('.message').text().split(0, 100) +') скрыт.'
+                    ).appendTo(post.find('.post-wrapper'));
+            },
+
+            onRemove: function(data) {
+                var p;
+                if (data.id === getPostId(data.first)) {
+                    data.thread.find('.post:not(:first-child)').show();
+                    p = data.first;
+                } else {
+                    p = data.post;
+                }
+                p.find('.skipped').remove();
+                p.find('.content').show();
+            }
+        },
+    ]);
 }
 
 function initHotkeys() {
@@ -907,6 +923,12 @@ function initHotkeys() {
 }
 
 function initAJAX() {
+    if (!$('#password').val()) {
+        $('#password').val(randomString(8));
+    }
+    if ($.settings('noAJAX')) {
+        return true;
+    }
     function errorCallback(data) {
         //document.write(data.responseText); // for debugging
         var rt = data,
@@ -960,9 +982,6 @@ function initAJAX() {
                     this.checked = false;
             }
         });
-    }
-    if (!$('#password').val()) {
-        $('#password').val(randomString(8));
     }
     $('.new-post').ajaxForm({ 
         'target': 'body',

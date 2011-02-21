@@ -254,8 +254,10 @@ em {font-style: italic;}
 /* Top */
 #container-wrap > header {border-bottom: 1px solid #aaa; margin-bottom: 5px; padding-bottom: 5px;}
 .logo {display: table; margin: 0 auto;}
-.section-banner {width: 300px; height: 100px; margin: 0 auto;}
-.search {float:right; width: 215px;}
+.section-banner {width: 300px; height: 100px; margin: 0 auto; display: none;}
+.search {position: absolute; right: 10px;}
+.search input[type="search"], .search input[type="submit"] {vertical-align: top;}
+.search input[type="checkbox"] {vertical-align: middle;}
 
 /* Navigation panel */
 nav ul {display: inline;}

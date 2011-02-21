@@ -26,11 +26,11 @@ from board import fields
 
 
 __all__ = [
-    'cache', 'render_to_string', 'DAY', 'cached', 'InsufficientRightsError',
-    'InvalidKeyError', 'PostManager', 'SectionManager', 'SectionGroupManager',
+    'DAY', 'cached', 
+    'PostManager', 'SectionManager', 'SectionGroupManager',
     'Thread', 'Post', 'File', 'FileTypeGroup', 'FileType', 'Section',
     'SectionGroup', 'UserProfile', 'PostForm', 'PostFormNoCaptcha',
-    'ThreadForm', 'DeniedIP', 'AllowedIP',
+    'ThreadForm', 'SectionFeed', 'ThreadFeed', 'DeniedIP', 'AllowedIP',
 ]
 
 DAY = 86400  # seconds in day
@@ -72,16 +72,6 @@ def cached(seconds=900):
             return result
         return closure
     return do_cache
-
-
-class InsufficientRightsError(Exception):
-    """Raises if user has insufficient rights for current operation."""
-    pass
-
-
-class InvalidKeyError(Exception):
-    """Raises if user has entered invalid modkey or deletion password."""
-    pass
 
 
 class PostManager(models.Manager):
@@ -406,7 +396,7 @@ class Section(models.Model):
         return [dict(zip(fields, item)) for item in cursor.fetchall()]
 
     def page_threads(self, page=1):
-        threads = Paginator(self.threads().order_by('-is_pinned'),
+        threads = Paginator(self.threads().order_by('-is_pinned', '-bump'),
             self.ONPAGE
         )
         return threads.page(page)

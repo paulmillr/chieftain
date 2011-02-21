@@ -63,7 +63,7 @@ def post(request, no_captcha=True):
     f = PostFormNoCaptcha if no_captcha else PostForm
     form = f(request.POST, request.FILES)
     if not form.is_valid():
-        return False
+        raise ValidationError(form.errors)
     new_thread = not request.POST.get('thread')
     with_files = bool(request.FILES.get('file'))
     logged_in = bool(request.user.is_authenticated())
@@ -88,9 +88,12 @@ def post(request, no_captcha=True):
                 'you cannot post to it.'))
     section_is_feed = (thread.section.type == 3)
 
-    if not post.message and not post.file_count:
-        raise ValidationError(_('You need to enter post message'
-            ' or upload file to create new thread.'))
+    if (not post.message and not post.file_count):
+        raise ValidationError(_('Enter post message or attach '
+            'a file to your post'))
+    elif (new_thread and not post.file_count):
+        raise ValidationError(_('You need to '
+            'upload file to create new thread.'))
     if with_files:  # validate attachments
         file = request.FILES['file']
         ext, file_hash = attachment(file, thread.section)

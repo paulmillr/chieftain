@@ -22,6 +22,7 @@
         <div id="container-wrap">
             <header class="clearfix">
                 {% include "navigation.html" %}
+                {% block search %}{% endblock %}
                 <div class="logo"><h1><a href=".">
                     {{settings.SITE_TITLE}}&nbsp;&mdash;
                     {% block title %}{% endblock %}</a></h1></div>

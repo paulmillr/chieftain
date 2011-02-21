@@ -106,6 +106,7 @@ $.extend({
             return res;
         } else {
             window.localStorage[name] = JSON.stringify(value);
+            return value;
         }
     },
     

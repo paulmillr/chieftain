@@ -3,7 +3,9 @@
 {% block title %}{{section.name}}{% endblock %}
 
 {% block section %}
+    {% if form %}
     {% include "form.html" %}
+    {% endif %}
     <section class="threads section">
         {% autoescape off %}
         {% for post in posts.object_list %}
