@@ -11,7 +11,7 @@ from board.models import *
 from django.contrib import admin
 
 
-class IPAdmin(admin.ModelAdmin):
+class DeniedIPAdmin(admin.ModelAdmin):
     search_fields = ('ip',)
 
 
@@ -32,10 +32,5 @@ admin.site.register(FileType)
 admin.site.register(Section)
 admin.site.register(SectionGroup)
 admin.site.register(UserProfile)
-
-
-if 'board.middleware.DenyMiddleware' in settings.MIDDLEWARE_CLASSES:
-    admin.site.register(DeniedIP, IPAdmin)
-
-if 'board.middleware.AllowMiddleware' in settings.MIDDLEWARE_CLASSES:
-    admin.site.register(AllowedIP, IPAdmin)
+admin.site.register(Wordfilter)
+admin.site.register(DeniedIP, DeniedIPAdmin)

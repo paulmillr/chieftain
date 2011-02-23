@@ -6,6 +6,7 @@ views.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+import os
 import sys
 import re
 from string import maketrans
@@ -13,31 +14,21 @@ from crypt import crypt
 from datetime import datetime
 from django.conf import settings as site_settings
 from django.contrib.syndication.views import Feed
-from django.core.paginator import Paginator, InvalidPage, EmptyPage
+from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseRedirect,\
     HttpResponsePermanentRedirect
-from django.shortcuts import get_object_or_404, render_to_response
-from django.template import RequestContext
+from django.shortcuts import get_object_or_404
 from django.views.decorators.cache import cache_page
 from django.utils.translation import ugettext_lazy as _
-from board import validators
+from board import validators, template
 from board.models import *
+from board.shortcuts import *
+from modpanel.views import is_mod
 
 __all__ = [
-    'rtr', 'index', 'settings', 'faq', 'section', 'threads', 'posts',
+    'index', 'settings', 'faq', 'section', 'threads', 'posts',
     'thread',
 ]
-
-
-def rtr(template, request, dictionary={}):
-    """Wrapper around render_to_response.
-
-       Adds sidebar to all requests.
-    """
-    dictionary.update({'navigation': SectionGroup.objects.sections()})
-    return render_to_response(template, dictionary,
-        context_instance=RequestContext(request))
-
 
 #@cache_page(DAY)
 def index(request):
@@ -66,12 +57,7 @@ def search(request, section_slug, page):
         message__contains=request.GET['q']).order_by('-date')
     if not posts.count():
         return rtr('error.html', request, {'details': _('Nothing found')})
-    posts_page = Paginator(posts, section.ONPAGE)
-    try:
-        p = posts_page.page(page)
-    except (InvalidPage, EmptyPage):
-        raise Http404
-
+    p = get_page_or_404(Paginator(posts, section.ONPAGE), page)
     return rtr('section_posts.html', request, {'posts': p,
             'section': section})
 
@@ -96,45 +82,67 @@ def section(request, section_slug, page):
     """
     if request.method == 'POST':
         return post_router(request)
-    try:
-        s = Section.objects.get(slug=section_slug)
-        t = s.page_threads(page)
-    except (Section.DoesNotExist, InvalidPage, EmptyPage):
-        raise Http404
-    return rtr('section_page.html', request, {'threads': t, 'section': s,
-        'form': PostForm()})
+    s = get_object_or_404(Section, slug=section_slug)
+    t = get_page_or_404(Paginator(s.threads(), s.ONPAGE), page)
+    return template.handle_file_cache(
+        'section_page.html',
+        '{0}/page/{1}.html'.format(section_slug, page),
+        request,
+        update_context({'threads': t, 'section': s, 'form': PostForm()}),
+    )
 
 def threads(request, section_slug):
     """Gets list of OP-posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
-    return rtr('section_threads.html', request, {'threads': section.op_posts(), 
-        'section': section, 'form': PostForm()})
+    return template.handle_file_cache(
+        'section_threads.html',
+        '{0}/threads.html'.format(section_slug),
+        request,
+        update_context({
+            'threads': section.op_posts(),
+            'section': section,
+            'form': PostForm(),
+            'mod': is_mod(request, section_slug)
+        })
+    )
 
 def posts(request, section_slug, page):
     """Gets list of posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
-    posts_page = Paginator(section.posts(), section.ONPAGE)
-    try:
-        p = posts_page.page(page)
-    except (InvalidPage, EmptyPage):
-        raise Http404
-    return rtr('section_posts.html', request, {'posts': p,
-        'section': section, 'form': PostForm()})
+    p = get_page_or_404(Paginator(section.posts(), section.ONPAGE), page)
+    return template.handle_file_cache(
+        'section_posts.html',
+        '{0}/posts/{1}.html'.format(section_slug, page),
+        request, 
+        update_context({
+            'posts': p, 'section': section, 'form': PostForm(),
+            'mod': is_mod(request, section_slug)
+        })
+    )
+
+def images(request, section_slug, page):
+    """Gets list of images in section."""
+    section = get_object_or_404(Section, slug=section_slug)
+    images_page = Paginator(section.images(), 100)
+    
 
 def thread(request, section_slug, op_post):
     """Gets thread and its posts."""
     if request.method == 'POST':
         return post_router(request, op_post)
-    try:
-        post = Post.objects.by_section(section_slug, op_post)
-    except Post.DoesNotExist:
-        raise Http404
+    post = get_object_or_404(Post, thread__section__slug=section_slug,
+        pid=op_post)
     thread = post.thread
     if thread.is_deleted:
         raise Http404
     if not post.is_op_post:
         return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
-    form = PostForm()
-    return rtr('section_thread.html', request,
-        {'thread': thread, 'form': form})
+    mod = is_mod(request, section_slug)
+    return template.handle_file_cache(
+        'section_thread.html',
+        '{0}/thread/{1}.html'.format(section_slug, op_post),
+        request, 
+        update_context({'thread': thread, 'form': PostForm(),
+        'mod': is_mod(request, section_slug)})
+    )

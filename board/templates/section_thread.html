@@ -1,4 +1,5 @@
 {% extends "section_base.html" %}
+{% load haship %}
 {% load i18n %}
 {% block title %}{% trans "Thread title" %} {{thread.op_post.pid}}{% endblock %}
 
@@ -10,8 +11,14 @@
             {% autoescape off %}
             {% for post in thread.posts_html %}
             {{post.html}}
+            {% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}
             {% endfor %}
             {% endautoescape %}
         </section>
     </section>
+    <ul class="group">
+        <li><a href=".">{% trans "Everything" %}</a></li>
+        <li><a href="threads">{% trans "Threads" %}</a></li>
+        <li><a href="posts">{% trans "Posts" %}</a></li>
+    </ul>
 {% endblock %}

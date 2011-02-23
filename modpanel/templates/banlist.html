@@ -1,0 +1,12 @@
+{% extends "modindex.html" %}
+{% load cache %}
+{% load i18n %}
+
+{% block title %}{% trans "Mod control panel" %}{% endblock %}
+
+{% block modcontent %}
+{% trans "Ban list"}
+{% for i in banlist %}
+{{i}}
+{% endfor %}
+{% endblock %}

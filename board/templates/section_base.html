@@ -1,9 +1,8 @@
 {% extends "base.html" %}
-{% block title %}{{section.name}}{% endblock %}
-
 {% load cache %}
 {% load i18n %}
 
+{% block title %}{{section.name}}{% endblock %}
 {% block search %}
 <form action="search" method="get" accept-charset="utf-8" class="search">
     <input type="search" name="q" placeholder="{% trans 'Search' %}" id="q">
@@ -15,24 +14,24 @@
 
 {% block content %}
     {% block section %}{% endblock %}
-    <div class="deleteMode">
-        <input type="button" value="{% trans "Delete posts" %}" data-back="{% trans "Cancel" %}" class="toggle">
+    <form class="deleteMode">
+        <input type="button" value="{% trans 'Delete posts' %}" data-back="{% trans 'Cancel' %}" class="toggle">
         <div class="hidden">
-            <p><input type="checkbox" name="onlyFiles" id="onlyFiles">
-            <label for="onlyFiles">{% trans "Only files" %}</label></p>
+            <p><input type="checkbox" name="only_files" id="only_files">
+            <label for="only_files">{% trans "Only files" %}</label></p>
             
             <div class="modPanel">
-                <p><input type="checkbox" name="deleteAll" id="deleteAll">
-                <label for="deleteAll">{% trans "Delete all messages from that IP" %}</label></p>
+                <p><input type="checkbox" name="delete_all" id="delete_all">
+                <label for="delete_all">{% trans "Delete all messages from that IP" %}</label></p>
 
-                <p><input type="checkbox" name="ban" id="ban">
-                <label for="ban">{% trans "Ban IP" %}</label></p>
+                <p><input type="checkbox" name="ban_ip" id="ban_ip">
+                <label for="ban_ip">{% trans "Ban IP" %}</label></p>
 
                 {% if thread %}
-                <p><input type="button" name="pinThread" value="{% trans 'Pin thread' %}" id="pinThread">
-                <input type="button" name="closeThread" value="{% trans 'Close thread' %}" id="closeThread"></p>
+                <p><input type="button" name="pin_thread" value="{% trans 'Pin thread' %}" id="pin_thread">
+                <input type="button" name="close_thread" value="{% trans 'Close thread' %}" id="close_thread"></p>
                 {% endif %}
             </div>
         </div>
-    </div>
+    </form>
 {% endblock %}

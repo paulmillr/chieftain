@@ -323,6 +323,7 @@ label.placeholder {
 .post .number a, .post .number a:visited {color: inherit;}
 .post .number a:hover {color: #06f;}
 .post .poster a {text-decoration: underline;}
+.post .ip {float: right; color: #f00; font-weight: bold;}
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
 .post .tripcode.staff {color: #f14a29;}

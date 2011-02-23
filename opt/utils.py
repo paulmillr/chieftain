@@ -12,12 +12,14 @@ import shutil
 from board.models import *
 from django.template.loader import render_to_string
 from django.conf import settings
+from django.core.cache import cache
 
-__all__ = ['rebuild', 'generate']
+__all__ = ['rebuild', 'wipe', 'generate']
 
 
 def rebuild():
     """Rebuilds cache."""
+    shutil.rmtree('cache', ignore_errors=True)
     threads = Thread.objects.all()
     posts = Post.objects.all()
     for c, tr in enumerate(threads):
@@ -33,7 +35,6 @@ def rebuild():
 
 def wipe():
     """Wipes board."""
-    from django.core.cache import cache
     threads = Thread.objects.all().delete()
     posts = Post.objects.all().delete()
     files = File.objects.all().delete()
@@ -41,6 +42,7 @@ def wipe():
     make_path = lambda x: os.path.join(settings.MEDIA_ROOT, x)
     for d in [make_path(x) for x in ['section', 'thumbs']]:
         shutil.rmtree(d, ignore_errors=True)
+    shutil.rmtree('cache', ignore_errors=True)
     return True
 
 

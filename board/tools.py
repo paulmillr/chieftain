@@ -12,7 +12,7 @@ import tempfile
 from PIL import Image
 from django.core.files import File as DjangoFile
 from django.utils.translation import ugettext_lazy as _
-from hashlib import sha256
+from hashlib import sha1
 from string import maketrans
 from crypt import crypt
 from klipped import settings
@@ -25,7 +25,7 @@ __all__ = ['handle_uploaded_file', 'tripcode', 'key']
 def handle_uploaded_file(file, file_hash, extension, post):
     """Moves uploaded file to files directory and makes thumb."""
     def make_path(dir):
-        args = settings.MEDIA_ROOT, dir, post.section()
+        args = settings.MEDIA_ROOT, dir, post.section_slug()
         return os.path.join(*args)
     directory = make_path('section')
     if not os.path.isdir(directory):
@@ -77,4 +77,4 @@ def tripcode(text):
 
 def key(text):
     """Generates key for passwords etc."""
-    return sha256(text).hexdigest()
+    return sha1(text).hexdigest()

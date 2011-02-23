@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+{% load i18n %}<!DOCTYPE html>
 <title>{% trans "Banned" %}</title>
 
 <style>
@@ -18,6 +18,6 @@ span[frown] { transform: rotate(90deg); display:inline-block; color: #bbb; }
 
 <details>
   <summary><h1>{% trans "You've been banned from this board" %}</h1></summary>
-  <details>{{reason}}</details>
+  <details>{% trans "Reason" %}: {{reason}}</details>
   <p><span frown><a href="//klipped.pbagwl.com/">klipped</a></span></p>
 </details>

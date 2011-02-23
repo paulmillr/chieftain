@@ -1,4 +1,5 @@
 {% extends "section_base.html" %}
+{% load haship %}
 {% load i18n %}
 {% block title %}{{section.name}}{% endblock %}
 
@@ -11,6 +12,7 @@
         {% for post in posts.object_list %}
         <section class="thread">
             {{post.html}}
+            {% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}
         </section>
         {% endfor %}
         {% endautoescape %}

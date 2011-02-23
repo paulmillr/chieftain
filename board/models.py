@@ -22,7 +22,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
 from ipcalc import Network
-from board import fields
+from board import fields, template
 
 
 __all__ = [
@@ -31,6 +31,7 @@ __all__ = [
     'Thread', 'Post', 'File', 'FileTypeGroup', 'FileType', 'Section',
     'SectionGroup', 'UserProfile', 'PostForm', 'PostFormNoCaptcha',
     'ThreadForm', 'SectionFeed', 'ThreadFeed', 'DeniedIP', 'AllowedIP',
+    'Wordfilter',
 ]
 
 DAY = 86400  # seconds in day
@@ -50,7 +51,7 @@ def get_file_path(base):
     def closure(instance, filename):
         ip = instance.post
         return '{base}/{slug}/{pid}.{ext}'.format(
-            base=base, slug=ip.section(), thread=ip.thread,
+            base=base, slug=ip.section_slug(), thread=ip.thread,
             pid=ip.pid, ext=instance.type.extension
         )
     return closure
@@ -78,7 +79,7 @@ class PostManager(models.Manager):
     def op_posts_by_section(self, slug):
         return self.filter(is_op_post=True, thread__section__slug=slug)
 
-    @cached(3 * DAY)
+    #@cached(3 * DAY)
     def by_section(self, slug, pid):
         """Gets post by its pid and section slug."""
         return self.get(thread__section__slug=slug, pid=pid)
@@ -111,6 +112,16 @@ class SectionGroupManager(models.Manager):
         return data
 
 
+class WordfilterManager(models.Manager):
+    """Manager for Wordfilter"""
+
+    def words(self):
+        return [i[0] for i in self.values_list('word')]
+
+    def scan(self, message):
+        return any(word in message for word in self.words())
+
+
 class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
@@ -128,7 +139,7 @@ class Thread(models.Model):
         return self.post_set.filter(is_deleted=False)
 
     def posts_html(self):
-        return self.posts().values('html')
+        return self.posts().values('html', 'ip')
 
     @cached(1)
     def count(self):
@@ -150,6 +161,27 @@ class Thread(models.Model):
     @property
     def op_post(self):
         return self.post_set.filter(is_op_post=True)[0]
+
+    def un_lp(self, offset, limit):
+        fields = ('thread_id', 'html')
+        sql = '''
+            (SELECT board_post.thread_id, board_post.html 
+            FROM board_post 
+            WHERE board_post.thread_id = {thread_id} 
+            AND board_post.is_op_post = 1
+            AND board_post.is_deleted = 0)
+            UNION ALL
+            (SELECT board_post.thread_id, board_post.html 
+            FROM board_post 
+            WHERE board_post.thread_id = {thread_id} 
+            AND board_post.is_deleted = 0
+            ORDER BY board_post.id ASC
+            LIMIT {offset}, {limit})
+        '''.format(thread_id=self.id, offset=offset, limit=limit)
+        cursor = connection.cursor()
+        cursor.execute(sql)
+        
+        return (dict(zip(fields, i)) for i in cursor.fetchall())
 
     def last_posts(self):
         c = self.count()
@@ -174,6 +206,9 @@ class Thread(models.Model):
         self.html = render_to_string('thread.html', {'thread': self})
         if with_op_post:
             self.op_post.save(rebuild_cache=True)
+
+    def rebuild_template_cache(self):
+        template.rebuild_cache(self.section.slug, self.op_post.pid)
 
     def save(self, rebuild_cache=True):
         """Saves thread and rebuilds cache."""
@@ -224,8 +259,10 @@ class Post(models.Model):
     html = models.TextField(blank=True, verbose_name=_('Post html'))
     objects = PostManager()
 
-    @cached(DAY)
     def section(self):
+        return self.thread.section
+
+    def section_slug(self):
         return self.thread.section.slug
 
     def files(self):  # workaround for REST api
@@ -296,7 +333,7 @@ class File(models.Model):
         self.post.thread.save()
 
     def __unicode__(self):
-        return '{0}/{1}'.format(self.post.section(), self.post.pid)
+        return '{0}/{1}'.format(self.post.section_slug(), self.post.pid)
 
     class Meta:
         verbose_name = _('File')
@@ -363,52 +400,25 @@ class Section(models.Model):
     ONPAGE = 20
 
     def threads(self):
-        return self.thread_set.filter(is_deleted=False)
+        return self.thread_set.filter(is_deleted=False).order_by(
+            '-is_pinned', '-bump')
 
     def op_posts(self):
-        fields = ('html', 'id', 'bump', 'is_pinned', 'is_closed',
-            'is_deleted')
-        sql = '''SELECT board_post.html, board_thread.id, 
-        board_thread.bump, board_thread.is_pinned,
-        board_thread.is_closed, board_thread.is_deleted
-        FROM board_post 
-        INNER JOIN board_thread ON board_post.thread_id = board_thread.id
-        WHERE board_post.is_op_post = 1
-        AND board_thread.is_deleted = 0
-        AND board_thread.section_id = {id}
-        ORDER BY board_thread.is_pinned DESC, board_thread.bump DESC
-        '''.format(id=self.id)
-        cursor = connection.cursor()
-        cursor.execute(sql)
-        return [dict(zip(fields, item)) for item in cursor.fetchall()]
+        return Post.objects.filter(is_deleted=False,
+            is_op_post=True,
+            thread__section=self.id).order_by('-date', '-pid')
 
     def posts(self):
-        fields = ('html',)
-        sql = '''SELECT board_post.html
-        FROM board_post
-        INNER JOIN board_thread ON board_thread.id = board_post.thread_id
-        WHERE board_post.is_deleted = 0
-        AND board_thread.section_id = {id}
-        ORDER BY board_post.date DESC
-        '''.format(id=self.id)
-        cursor = connection.cursor()
-        cursor.execute(sql)
-        return [dict(zip(fields, item)) for item in cursor.fetchall()]
+        return Post.objects.filter(is_deleted=False,
+            thread__section=self.id).order_by('-date', '-pid')
 
-    def page_threads(self, page=1):
-        threads = Paginator(self.threads().order_by('-is_pinned', '-bump'),
-            self.ONPAGE
-        )
-        return threads.page(page)
+    def posts_html(self):
+        return self.posts().values('html')
 
     #@cached(3 * DAY)
     def allowed_filetypes(self):
         """List of allowed MIME types of section."""
-        allowed = []
-        for cat in self.filetypes.all():
-            for filetype in cat.filetype_set.values_list('mime', 'extension'):
-                allowed.append(filetype)
-        return dict(allowed)
+        return FileType.objects.filter(group__in=self.filetypes)
 
     @property
     def key(self):
@@ -478,12 +488,31 @@ class UserProfile(models.Model):
         """List of modded section slugs."""
         return [i[0] for i in self.sections.values_list('slug')]
 
+    def moderates(self, section_slug):
+        if self.user.is_superuser or section_slug in self.modded():
+            return True
+        return False
+
     def __unicode__(self):
         return '{0}'.format(self.user)
 
     class Meta:
         verbose_name = _('User profile')
         verbose_name_plural = _('User profiles')
+
+
+class Wordfilter(models.Model):
+    """Black list word, phrase."""
+    word = models.CharField(max_length=100, unique=True,
+        verbose_name=_('Word'))
+    objects = WordfilterManager()
+
+    def __unicode__(self):
+        return self.word
+
+    class Meta:
+        verbose_name = _('Wordfilter')
+        verbose_name_plural = _('Wordfilters')
 
 
 class IP(models.Model):
@@ -504,6 +533,10 @@ class IP(models.Model):
 class DeniedIP(IP):
     """Used for bans."""
     reason = models.CharField(_('Ban reason'), max_length=128, db_index=True)
+    by = models.ForeignKey(User)
+    date = models.DateTimeField(default=datetime.now)
+    def __unicode__(self):
+        return '{0} @ {1}'.format(self.ip, self.date)
     class Meta:
         verbose_name = _('Denied IP')
         verbose_name_plural = _('Denied IPs')
@@ -560,7 +593,7 @@ class SectionFeed(Feed):
 
     def items(self):
         return Post.objects.op_posts_by_section(self.slug).reverse(
-            ).values('pid', 'date', 'message')[:20]
+            ).values('pid', 'date', 'message')[:40]
 
     def item_title(self, item):
         return u'{0} {1}'.format(_('Thread'), item['pid'])

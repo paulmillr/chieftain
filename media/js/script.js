@@ -26,7 +26,13 @@ var currentPage = (function() { // page detector
             data.first = l.match(re)[1];
             data.cache.first = $('#post' + data.first);
         } else {
-            data.type = 'section';
+            if (l.match('posts')) {
+                data.type = 'posts';
+            } else if (l.match('threads')) {
+                data.type = 'threads'
+            } else {
+                data.type = 'section';
+            }
         }
     }
     
@@ -104,7 +110,7 @@ $.extend(BoardContainer.prototype, {
     // gets all keys
     list: function() {
         var s = $.storage(this.storageName);
-        return (typeof s !== 'undefined' && typeof s !== 'string') ? s : {};
+        return (typeof s !== 'undefined' && typeof s !== 'string' && s !== null) ? s : {};
     },
 
     // checks if key is in container
@@ -258,9 +264,9 @@ function randomString(length) {
         if (n < 10) {
             return n; //1-10
         } else if (n < 36) {
-            return String.fromCharCode(n+55); //A-Z
+            return String.fromCharCode(n + 55); //A-Z
         } else {
-            return String.fromCharCode(n+61); //a-z
+            return String.fromCharCode(n + 61); //a-z
         }
     }
     while(s.length < length) {
@@ -360,6 +366,9 @@ function init() {
     if (pass) {
         $('#password').val(pass);
     }
+    $('#main').delegate('#password', 'change', function(event) {
+        $.settings('password', this.value);
+    });
 
     function searchPost(board, pid, callback) {
         var p = $('#post' + pid);
@@ -370,10 +379,6 @@ function init() {
             callback(data.html);
         });
     }
-    
-    $('#password').bind('change', function(event) {
-        $.settings('password', $(this).val());
-    })
 
     $('.bbcode a').click(function(e) {
         e.preventDefault();
@@ -404,13 +409,14 @@ function init() {
             callback = function(html) {
                 var outer = $('<div/>').addClass('post hover').css({
                     'position': 'absolute',
-                    'top': event.pageX + 15 +'px',
+                    'top': off[0] + 15 +'px',
                     'left': off[1] + 'px',
-                }).hover(function(event) {
+                })
+                .addClass('post-preview preview' + pid)
+                .hover(function(event) {
                     if (event.type === 'mouseleave') {
                         $(this).remove();
                     }
-                    
                 }),
                     div = $(html).clone();
                 div.find('.bookmark, .is_closed, .is_pinned').remove();
@@ -426,6 +432,9 @@ function init() {
         this.value = t.data('back');
         t.data('back', tmp);
         t.next().toggle();
+        if (!$('.ip').length) {
+            $('.modPanel').remove();
+        }
         if (t.attr('class') == 'toggled') {
             t.removeClass('toggled');
             t.addClass('toggle');
@@ -436,53 +445,72 @@ function init() {
         }
     });
     
+    $('#ban_ip').click(function(event) {
+        var t = $(this),
+            i = $('<input type="text" id="ban_reason" name="ban_reason" placeholder="Причина" />');
+        if (t.attr('checked')) {
+            i.insertAfter('label[for="ban_ip"]');
+        } else {
+            $('#ban_reason').remove();
+        }
+    });
+    
     // Posts deletion
     $('#main').delegate('.post', 'click', function(event) {
         if ($('.deleteMode input').attr('class') !== 'toggled') {
             return true;
         }
         var t = $(this),
-            onlyFiles = !!$('#onlyFiles').attr('checked'),
-            target = !onlyFiles ? t : t.find('.files'),
-            url = !onlyFiles ? 
+            only_files = !!$('#only_files').attr('checked'),
+            ban_ip = !!$('#ban_ip').attr('checked'),
+            delete_all = !!$('#delete_all').attr('checked'),
+            target = !only_files ? t : t.find('.files'),
+            url = !only_files ? 
                 '/api/post/' + target.data('id') : 
                 '/api/file/' + target.find('.file').attr('id').replace(/file/, ''),
-            password = Crypto.SHA256($('#password').val()),
+            password = Crypto.SHA1($('#password').val()),
             cb;
-        function block(event) {event.preventDefault();}
+        url += '?password=' + password;
+        url += '&' + $('.deleteMode').serialize();
         target.addClass('deleted');
-        if (!onlyFiles) {
-            cb = function(data) {
-                if (target.prev().length !== 0) {
-                    // post is not first in thread
-                    slideRemove(target);
-                    return true;
-                }
-
-                // remove whole thread
-                if (currentPage.type === 'thread') {
-                    window.location.href = './';
-                    return true;
-                }
-                var thread = target.parent();
-                thread.children().addClass('deleted');
-                slideRemove(thread);
-            }
-        } else {
-            cb = function(data) {
-                slideRemove(t.find('.files, .file-info'));
-                return true;
-            }
-        }
         $.ajax({
-            'url': url + '?password=' + password,
+            'url': url,
             'type': 'DELETE',
         })
         .error(function(data) {
             $.message('error', $.parseJSON(data.responseText)['detail']);
             target.removeClass('deleted');
         })
-        .success(cb);
+        .success(function(data) {
+            if (only_files) {
+                slideRemove(t.find('.files, .file-info'));
+                return true;
+            }
+            if (delete_all) {
+                var t = target.find('.ip').text(),
+                    d = $('.ip').filter(function() {
+                        return $(this).text() === t;
+                }).each(function() {
+                    var post = $(this).closest('.post');
+                    post.addClass('deleted');
+                    slideRemove(post);
+                });
+            }
+            if (target.prev().length !== 0) {
+                // post is not first in thread
+                slideRemove(target);
+                return true;
+            }
+
+            // remove whole thread
+            if (currentPage.type === 'thread') {
+                window.location.href = './';
+                return true;
+            }
+            var thread = target.parent();
+            thread.children().addClass('deleted');
+            slideRemove(thread);
+        });
     });
     
     $('#main > .thread').delegate('.edit', 'click', function(event) {
@@ -704,7 +732,12 @@ function initStyle() {
             })
             .appendTo(span);
         }
-    })
+    });
+    
+    $('.ip').each(function(x) {
+        var t = $(this);
+        t.insertBefore(t.prev().find('.number'));
+    });
     
     if (!style) {
         return false;
@@ -808,6 +841,7 @@ function initStorage() {
         if (!(span instanceof jQuery)) {
             span = $(span);
         }
+        var isposts = (currentPage.type === 'posts');
         
         this.span = span;
         this.post = post ? (!(post instanceof jQuery) ? post : $(post)) : span.closest('.post');
@@ -816,7 +850,7 @@ function initStorage() {
         this.id = getPostId(this.post);
         this.text_data = {
             'section': currentPage.section,
-            'first': getPostPid(this.first),
+            'first': !isposts ? getPostPid(this.first) : '',
             'pid': getPostPid(this.post),
         };
     }

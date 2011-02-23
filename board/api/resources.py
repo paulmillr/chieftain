@@ -6,9 +6,10 @@ resources.py
 Created by Paul Bagwell on 2011-02-03.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from board import tools, validators
+from board import tools, validators, template
 from board.api import emitters
 from board.models import *
+from modpanel.views import is_mod
 from django.utils.translation import ugettext as _
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
@@ -74,13 +75,16 @@ class ThreadResource(ModelResource):
     def get(self, request, auth, *args, **kwargs):
         try:
             kwargs['is_deleted'] = False
-            inst = self.model.objects.get(**kwargs)
-        except self.model.DoesNotExist:
+            kwargs['pid'] = kwargs.pop('id')
+            kwargs['thread__section__slug'] = kwargs.pop('section__slug')
+            op_post = Post.objects.get(**kwargs)
+            inst = op_post.thread
+        except (Post.DoesNotExist, self.model.DoesNotExist):
             raise ResponseException(status.NOT_FOUND)
         res = {}
         for f in self.fields:
             res[f] = inst.__getattribute__(f)
-        pf = [f for f in list(PostResource.fields) if isinstance(f, str)]
+        pf = [f for f in list(PostResource.fields) if isinstance(f, str) and f != 'files']
         res['posts'] = inst.post_set.filter(is_deleted=False).values(*pf)
         return res
 
@@ -118,17 +122,6 @@ class PostResource(ModelResource):
         'files',
     )
 
-    @staticmethod
-    def is_deleted_by_mod(request, post):
-        user = request.user
-        if user.is_authenticated():
-            if user.is_superuser:
-                return True
-            mod = user.userprofile_set.all()
-            if mod and post.section() in mod.get().modded():
-                return True
-        return False
-
     def get(self, request, auth, *args, **kwargs):
         try:
             kwargs['is_deleted'] = False
@@ -143,11 +136,36 @@ class PostResource(ModelResource):
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
         key = request.GET['password']
-        if len(key) < 64:  # make hash if we got plain text password
+        if len(key) < 40:  # make hash if we got plain text password
             key = tools.key(key)
 
-        if self.is_deleted_by_mod(request, post) or post.password == key:
+        if post.password == key:
             post.remove()
+            return Response(status.NO_CONTENT)
+        elif is_mod(request, post.section_slug()):
+            if request.GET.get('ban_ip'):
+                r = request.GET.get('ban_reason')
+                if not r:
+                    return Response(status.BAD_REQUEST, {
+                    'detail': _('You need to enter ban reason')})
+                d = DeniedIP(ip=post.ip, reason=r, by=request.user)
+                d.save()
+            if request.GET.get('delete_all'):
+                slug = post.section_slug()
+                posts = post.section().posts(
+                    ).filter(ip=post.ip, is_deleted=False)
+                # remove threads
+                print posts
+                op = posts.filter(is_op_post=True).values('pid', 'thread')
+                template.rebuild_cache(slug, [i['pid'] for i in op])
+                t = Thread.objects.filter(id__in=[i['thread'] for i in op])
+                t.update(is_deleted=True)
+                #posts.update(is_deleted=True)
+                for p in posts:
+                    p.remove()
+            else:
+                post.remove()
+            post.thread.rebuild_template_cache()
             return Response(status.NO_CONTENT)
         else:
             return Response(status.FORBIDDEN, content={
@@ -217,9 +235,8 @@ class FileResource(ModelResource):
             raise ResponseException(status.NOT_FOUND)
 
         key = request.GET['password']
-        if len(key) < 64:  # make hash if we got plain text password
+        if len(key) < 40:  # make hash if we got plain text password
             key = tools.key(key)
-
         if file.post.password != key:
             raise ResponseException(status.FORBIDDEN, content={
                 'detail': u'{0}{1}. {2}'.format(

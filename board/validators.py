@@ -11,13 +11,13 @@ import re
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 from hashlib import md5
-from board import tools
-from board.models import Post, Thread, PostFormNoCaptcha, PostForm, File
+from board import tools, template
+from board.models import *
 
 
 __all__ = [
     'ValidationError', 'InvalidFileError', 'NotAuthenticatedError',
-    'attachment', 'parse_message', 'post',
+    'attachment', 'post',
 ]
 
 
@@ -87,13 +87,15 @@ def post(request, no_captcha=True):
             raise ValidationError(_('This thread is closed, '
                 'you cannot post to it.'))
     section_is_feed = (thread.section.type == 3)
-
-    if (not post.message and not post.file_count):
+    section_no_files = not thread.section.filetypes.count()
+    if not post.message and not post.file_count:
         raise ValidationError(_('Enter post message or attach '
             'a file to your post'))
-    elif (new_thread and not post.file_count):
+    elif new_thread and not post.file_count and not section_no_files:
         raise ValidationError(_('You need to '
             'upload file to create new thread.'))
+    elif Wordfilter.objects.scan(post.message):
+        raise ValidationError(_('Your post contains blacklisted word.'))
     if with_files:  # validate attachments
         file = request.FILES['file']
         ext, file_hash = attachment(file, thread.section)
@@ -134,4 +136,5 @@ def post(request, no_captcha=True):
         tools.handle_uploaded_file(file, file_hash, ext, post)
     post.save()
     thread.save()
+    template.rebuild_cache(thread.section.slug, thread.op_post.pid)
     return post
