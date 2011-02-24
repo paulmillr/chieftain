@@ -37,7 +37,12 @@ var currentPage = (function() { // page detector
     }
     
     return data;
-})();
+})(),
+
+    api = {
+    url: '/api',
+    defaultType: 'text/plain'    
+};
 
 function PostArea(element) { // listens textarea and adds some methods to it
     this.textarea = $(element)[0];
@@ -92,8 +97,7 @@ function getThreadId(thread) {
 }
 
 function getPostId(post) {
-    return post.attr('data-id');
-    //return post.data('id');  // it's slower than .attr by ~10 times
+    return post.attr('data-id'); // it's faster than .data by ~10 times
 }
 
 function getPostPid(post) {
@@ -397,7 +401,7 @@ function init() {
         if (p.length) {
             return p;
         }
-        $.get('/api/post/' + board + '/' + pid, function(data) {
+        $.get(window.api.url + '/post/' + board + '/' + pid, function(data) {
             callback(data.html);
         });
     }
@@ -488,8 +492,8 @@ function init() {
             delete_all = !!$('#delete_all').attr('checked'),
             target = !only_files ? t : t.find('.files'),
             url = !only_files ? 
-                '/api/post/' + target.data('id') : 
-                '/api/file/' + target.find('.file').attr('id').replace(/file/, ''),
+                window.api.url + '/post/' + target.data('id') : 
+                window.api.url + '/file/' + target.find('.file').attr('id').replace(/file/, ''),
             password = Crypto.SHA1($('#password').val()),
             cb;
         url += '?password=' + password;
@@ -688,7 +692,7 @@ function initSettings() {
             v = c ? '' : 1;
         $.settings(k, v);
         changes.toggleNsfw(v);
-    })
+    });
     
     for (var id in changes) {
         var func = changes[id],
@@ -824,7 +828,7 @@ function initHidden() {
                             text = text.substring(0, 100) + '...';
                         } 
                         return $.trim(text);
-                    })(),
+                    })()
                 })
             } else {
                 container.incr(thread, 'visits');
@@ -966,7 +970,7 @@ function initButtons(selector) {
                 p.find('.skipped').remove();
                 p.find('.content').show();
             }
-        },
+        }
     ]);
     if (!window.buttonsInitialized) {
         window.buttonsInitialized = true;
@@ -1009,10 +1013,10 @@ function initAJAX() {
     }
 
     function successCallback(data) {
-        if (currentPage.type === 'section') { // redirect
+        /*if (currentPage.type === 'section') { // redirect
             window.location.href = './' + data.pid;
             return true;
-        }
+        }*/
         var h = $(data.html).hide()
             .appendTo('.thread')
             .fadeIn(500);
@@ -1044,14 +1048,14 @@ function initAJAX() {
         });
     }
     $('.new-post').ajaxForm({ 
-        'target': 'body',
-        'success': function(data) {
+        target: 'body',
+        success: function(data) {
             return !data['field-errors'] && !data['detail'] ? 
                 successCallback(data) :
                 errorCallback(data);
         },
-        'url': '/api/post/?_accept=text/plain',
-        'dataType': 'json',
+        url: window.api.url + '/post/?_accept=text/plain',
+        dataType: 'json',
     });
 }
 
@@ -1062,7 +1066,7 @@ function initAutoload() {
     function checkForNewPosts() {
         $.ajax({
             type: 'GET',
-            url: '/api/stream/' + currentPage.thread, 
+            url: window.api.url + '/stream/' + currentPage.thread, 
             dataType: 'json',
             data: {
                 '_accept': 'text/plain',

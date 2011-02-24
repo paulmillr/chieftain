@@ -6,6 +6,7 @@ resources.py
 Created by Paul Bagwell on 2011-02-03.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+from datetime import datetime
 from django.utils.translation import ugettext as _
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
@@ -131,6 +132,8 @@ class PostRootResource(RootModelResource):
             instance = validators.post(request, auth)
         except validators.ValidationError as e:
             return Response(status.BAD_REQUEST, {'detail': e})
+        # django sends date with microseconds. We don't want it.
+        instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
         return Response(status.CREATED, instance)
 
 
