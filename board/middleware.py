@@ -11,9 +11,9 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponseForbidden
-from board.models import DeniedIP, AllowedIP
+from board.models import DeniedIP
 
-__all__ = ['DenyMiddleware', 'AllowMiddleware']
+__all__ = ['DenyMiddleware', 'DisableCSRFMiddleware']
 
 
 METHODS = ('GET', 'POST', 'UPDATE', 'DELETE')
@@ -21,9 +21,7 @@ WHITELIST = ()
 
 
 def ip_in(ip, model):
-    """
-    Returns True if the given ip address is in one of the ban models
-    """
+    """Returns True if the given ip address is in one of the ban models."""
     try:
         for i in model.objects.all():
             if ip in i.network():
@@ -62,9 +60,7 @@ def forbid(request, reason=''):
 
 
 class DenyMiddleware(object):
-    """
-    Forbids any request if they are in the DeniedIP list
-    """
+    """Forbids any request if they are in the DeniedIP list."""
     def process_request(self, request):
         ip = get_ip(request)
         if not request.method in METHODS or ip in WHITELIST:
@@ -73,17 +69,6 @@ class DenyMiddleware(object):
         # not simply 'if reason:' because it could return empty string
         if reason is not False:
             return forbid(request, reason)
-
-
-class AllowMiddleware(object):
-    """
-    Forbids any request if they are not in the AllowedIP list
-    """
-    def process_request(self, request):
-        if not request.method in METHODS:
-            return False
-        if not ip_in(get_ip(request), AllowedIP):
-            return forbid(request)
 
 
 class DisableCSRFMiddleware(object):

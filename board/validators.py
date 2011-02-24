@@ -22,7 +22,7 @@ __all__ = [
 
 
 class ValidationError(Exception):
-    """Base class for all validation errors"""
+    """Base class for all validation errors."""
     pass
 
 
@@ -86,8 +86,10 @@ def post(request, no_captcha=True):
         if thread.is_closed and not logged_in:
             raise ValidationError(_('This thread is closed, '
                 'you cannot post to it.'))
+
     section_is_feed = (thread.section.type == 3)
     section_no_files = not thread.section.filetypes.count()
+
     if not post.message and not post.file_count:
         raise ValidationError(_('Enter post message or attach '
             'a file to your post'))
@@ -96,6 +98,7 @@ def post(request, no_captcha=True):
             'upload file to create new thread.'))
     elif Wordfilter.objects.scan(post.message):
         raise ValidationError(_('Your post contains blacklisted word.'))
+
     if with_files:  # validate attachments
         file = request.FILES['file']
         ext, file_hash = attachment(file, thread.section)
@@ -124,7 +127,7 @@ def post(request, no_captcha=True):
         post.tripcode = tools.tripcode(s.pop())
         post.poster = s[0]
 
-    if not post.poster:
+    if not post.poster or thread.section.anonymity:
         post.poster = thread.section.default_name
     if post.email == 'mvtn'.encode('rot13'):
         s = u'\u5350'

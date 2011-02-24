@@ -6,16 +6,13 @@ models.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-import os
-import re
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed, FeedDoesNotExist
 from django.core.cache import cache
 from django.core.paginator import Paginator
-from django.core.exceptions import ImproperlyConfigured
-from django.db import models, connection, transaction
+from django.db import models, connection
 from django.forms import ModelForm, CharField, IntegerField, FileField
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -30,8 +27,7 @@ __all__ = [
     'PostManager', 'SectionManager', 'SectionGroupManager',
     'Thread', 'Post', 'File', 'FileTypeGroup', 'FileType', 'Section',
     'SectionGroup', 'UserProfile', 'PostForm', 'PostFormNoCaptcha',
-    'ThreadForm', 'SectionFeed', 'ThreadFeed', 'DeniedIP', 'AllowedIP',
-    'Wordfilter',
+    'SectionFeed', 'ThreadFeed', 'DeniedIP', 'Wordfilter',
 ]
 
 DAY = 86400  # seconds in day
@@ -48,6 +44,7 @@ SECTION_TYPES = (
 
 
 def get_file_path(base):
+    """Builds path to stored static files. Used in File class."""
     def closure(instance, filename):
         ip = instance.post
         return '{base}/{slug}/{pid}.{ext}'.format(
@@ -58,10 +55,7 @@ def get_file_path(base):
 
 
 def cached(seconds=900):
-    """
-        Cache the result of a function call for the specified number of
-        seconds, using Django's caching mechanism.
-    """
+    """Cache the result of a function call."""
     def do_cache(f):
         def closure(*args, **kwargs):
             key = sha1(f.__module__ + f.__name__ +
@@ -76,13 +70,7 @@ def cached(seconds=900):
 
 
 class PostManager(models.Manager):
-    def op_posts_by_section(self, slug):
-        return self.filter(is_op_post=True, thread__section__slug=slug)
-
-    #@cached(3 * DAY)
-    def by_section(self, slug, pid):
-        """Gets post by its pid and section slug."""
-        return self.get(thread__section__slug=slug, pid=pid)
+    pass
 
 
 class SectionManager(models.Manager):
@@ -100,6 +88,10 @@ class SectionGroupManager(models.Manager):
            We're not using QuerySet because they cannot be cached.
         """
         data = []  # http://goo.gl/CpPq6
+        #for group in SectionGroup.objects.all().order_by('order').values():
+        #    group['sections'] = list(group.section_set.values())
+        #    data.append(group)
+        #return data
         for group in SectionGroup.objects.all().order_by('order'):
             d = {
                 'id': group.id,
@@ -265,11 +257,12 @@ class Post(models.Model):
     def section_slug(self):
         return self.thread.section.slug
 
-    def files(self):  # workaround for REST api
+    def files(self):
+        """Workaround for REST api."""
         return self.file_set.all()
 
     def remove(self):
-        """Deletes post."""
+        """Visually deletes post."""
         if self.is_op_post:
             self.thread.remove()
         else:
@@ -282,7 +275,6 @@ class Post(models.Model):
         self.html = render_to_string('post.html', {'post': self})
 
     def save(self, rebuild_cache=True):
-        """Overload of default save method."""
         if rebuild_cache:
             if not self.id:
                 super(self.__class__, self).save()
@@ -318,7 +310,6 @@ class File(models.Model):
         verbose_name=_('File image width'))
     image_height = models.PositiveSmallIntegerField(blank=True,
         verbose_name=_('File image height'))
-    #meta = models.TextField()
     hash = models.CharField(max_length=32, blank=True,
         verbose_name=_('File hash'))
     file = models.FileField(upload_to=get_file_path('section'),
@@ -372,7 +363,7 @@ class FileTypeGroup(models.Model):
 
 
 class Section(models.Model):
-    """Board section"""
+    """Board section."""
     slug = models.SlugField(max_length=5, unique=True,
         verbose_name=_('Section slug'))
     name = models.CharField(max_length=64,
@@ -415,14 +406,13 @@ class Section(models.Model):
     def posts_html(self):
         return self.posts().values('html')
 
-    #@cached(3 * DAY)
     def allowed_filetypes(self):
         """List of allowed MIME types of section."""
         return FileType.objects.filter(group__in=self.filetypes)
 
     @property
     def key(self):
-        """Memcached key name."""
+        """Section last post PID cache key name."""
         return 'section_last_{slug}'.format(slug=self.slug)
 
     @property
@@ -480,7 +470,6 @@ class SectionGroup(models.Model):
 class UserProfile(models.Model):
     """User (moderator etc.)."""
     user = models.ForeignKey(User)
-    # sections, modded by user
     sections = models.ManyToManyField('Section', blank=False,
         verbose_name=_('User owned sections'))
 
@@ -489,9 +478,8 @@ class UserProfile(models.Model):
         return [i[0] for i in self.sections.values_list('slug')]
 
     def moderates(self, section_slug):
-        if self.user.is_superuser or section_slug in self.modded():
-            return True
-        return False
+        """Boolean value of user moderation rights of section_slug."""
+        return self.user.is_superuser or section_slug in self.modded()
 
     def __unicode__(self):
         return '{0}'.format(self.user)
@@ -515,26 +503,16 @@ class Wordfilter(models.Model):
         verbose_name_plural = _('Wordfilters')
 
 
-class IP(models.Model):
-    """Abstract base class for all ban classes."""
+class DeniedIP(models.Model):
+    """Used for bans."""
     ip = models.CharField(_('IP network'), max_length=18, db_index=True,
             help_text=_('Either IP address or IP network specification'))
-
-    def __unicode__(self):
-        return self.ip
-
-    def network(self):
-        return Network(self.ip)
-
-    class Meta:
-        abstract = True
-
-
-class DeniedIP(IP):
-    """Used for bans."""
     reason = models.CharField(_('Ban reason'), max_length=128, db_index=True)
     by = models.ForeignKey(User)
     date = models.DateTimeField(default=datetime.now)
+
+    def network(self):
+        return Network(self.ip)
 
     def __unicode__(self):
         return '{0} @ {1}'.format(self.ip, self.date)
@@ -542,13 +520,6 @@ class DeniedIP(IP):
     class Meta:
         verbose_name = _('Denied IP')
         verbose_name_plural = _('Denied IPs')
-
-
-class AllowedIP(IP):
-    """Used for bans."""
-    class Meta:
-        verbose_name = _('Allowed IP')
-        verbose_name_plural = _('Allowed IPs')
 
 
 class PostFormNoCaptcha(ModelForm):
@@ -570,12 +541,8 @@ class PostForm(PostFormNoCaptcha):
     recaptcha_response_field = CharField(required=False)
 
 
-class ThreadForm(ModelForm):
-    class Meta:
-        model = Thread
-
-
 class SectionFeed(Feed):
+    """Section threads RSS feed. Contains last 40 items of section."""
     def get_object(self, request, section_slug):
         self.slug = section_slug
         return get_object_or_404(Section, slug=section_slug)
@@ -608,6 +575,7 @@ class SectionFeed(Feed):
 
 
 class ThreadFeed(Feed):
+    """Thread posts RSS feed. Contains all posts in thread."""
     def get_object(self, request, section_slug, op_post):
         try:
             post = Post.objects.by_section(section_slug, op_post)
@@ -646,6 +614,7 @@ class ThreadFeed(Feed):
 
 
 def create_user_profile(sender, instance, created, **kwargs):
+    """Connects UserProfile class with builtit User."""
     if created:
         profile, created = UserProfile.objects.get_or_create(user=instance)
 

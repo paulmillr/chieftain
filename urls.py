@@ -6,8 +6,8 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),
-    (r'^api/', include('board.api.urls')),
+    (r'^api/', include('api.urls')),
     (r'^modpanel/', include('modpanel.urls')),
-    #(r'^m/', include('mobile.urls')),
+    #(r'^mobile/', include('mobile.urls')),
     (r'^', include('board.urls')),
 )

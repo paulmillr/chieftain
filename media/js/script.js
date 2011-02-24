@@ -39,7 +39,7 @@ var currentPage = (function() { // page detector
     return data;
 })();
 
-function Newpost(element) { // listens textarea and adds some methods to it
+function PostArea(element) { // listens textarea and adds some methods to it
     this.textarea = $(element)[0];
     this.insert = function(text) {
         var textarea = this.textarea;
@@ -382,7 +382,7 @@ function slideRemove(elem) {
 }
 
 function init() {
-    var textArea = new Newpost('#message'),
+    var textArea = new PostArea('#message'),
         set = $.settings('hideSectGroup'),
         pass = $.settings('password');
     if (pass) {

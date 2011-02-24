@@ -15,6 +15,7 @@ __all__ = ['get_page_or_404', 'update_context', 'rtr']
 
 
 def get_page_or_404(paginator, page):
+    """Gets page from Paginator instance or raises Http404 error."""
     try:
         return paginator.page(page)
     except (InvalidPage, EmptyPage):
@@ -22,8 +23,8 @@ def get_page_or_404(paginator, page):
 
 
 def update_context(context):
-    """Updates context with sidebar."""
-    from board.models import SectionGroup
+    """Updates context dictionary with sidebar."""
+    from board.models import SectionGroup  # block recursive import
     context.update({'navigation': SectionGroup.objects.sections()})
     return context
 

@@ -8,7 +8,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.conf.urls.defaults import patterns
 
-urlpatterns = patterns('board.api.resources',
+urlpatterns = patterns('api.resources',
     (r'^post/$', 'PostRootResource'),
     (r'^post/(?P<id>\d+)$', 'PostResource'),
     (r'^post/(?P<thread__section__slug>\w+)/$', 'PostResource'),

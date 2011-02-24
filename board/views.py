@@ -6,14 +6,6 @@ views.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-import os
-import sys
-import re
-from string import maketrans
-from crypt import crypt
-from datetime import datetime
-from django.conf import settings as site_settings
-from django.contrib.syndication.views import Feed
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseRedirect,\
     HttpResponsePermanentRedirect
@@ -26,26 +18,20 @@ from board.shortcuts import *
 from modpanel.views import is_mod
 
 __all__ = [
-    'index', 'settings', 'faq', 'section', 'threads', 'posts',
-    'thread',
+    'index', 'settings', 'faq', 'search',
+    'section', 'threads', 'posts', 'thread',
 ]
 
 
-#@cache_page(DAY)
 def index(request):
-    """Main imageboard page"""
     return rtr('index.html', request)
 
 
-#@cache_page(DAY)
 def settings(request):
-    """User settings page."""
     return rtr('settings.html', request)
 
 
-#@cache_page(DAY / 2)
 def faq(request):
-    """Gets FAQ page."""
     return rtr('faq.html', request)
 
 
@@ -94,7 +80,7 @@ def section(request, section_slug, page):
 
 
 def threads(request, section_slug):
-    """Gets list of OP-posts in section."""
+    """List of OP-posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
     return template.handle_file_cache(
         'section_threads.html',
@@ -110,7 +96,7 @@ def threads(request, section_slug):
 
 
 def posts(request, section_slug, page):
-    """Gets list of posts in section."""
+    """List of posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
     p = get_page_or_404(Paginator(section.posts(), section.ONPAGE), page)
     return template.handle_file_cache(
@@ -125,13 +111,13 @@ def posts(request, section_slug, page):
 
 
 def images(request, section_slug, page):
-    """Gets list of images in section."""
+    """List of images in section."""
     section = get_object_or_404(Section, slug=section_slug)
     images_page = Paginator(section.images(), 100)
 
 
 def thread(request, section_slug, op_post):
-    """Gets thread and its posts."""
+    """Thread and its posts."""
     if request.method == 'POST':
         return post_router(request, op_post)
     post = get_object_or_404(Post, thread__section__slug=section_slug,

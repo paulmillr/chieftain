@@ -10,7 +10,6 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 import os
 import codecs
 import shutil
-from django.core.servers.basehttp import FileWrapper
 from django.http import HttpResponse
 from django.template import RequestContext
 from django.template.loader import render_to_string

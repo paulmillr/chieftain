@@ -19,6 +19,7 @@ def strip(ip):
 
 
 def haship(value, arg=''):
+    """Hashes first two blocks if IP address."""
     ip = value.split('.')
     i = [strip(str(ip[:2]))]
     i.extend(ip[2:])

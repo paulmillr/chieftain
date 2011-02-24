@@ -11,7 +11,7 @@ from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, status, ResponseException
 from board import tools, validators, template
-from board.api import emitters
+from api import emitters
 from board.models import *
 from modpanel.views import is_mod
 
