@@ -8,9 +8,10 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from datetime import datetime
 from django.utils.translation import ugettext as _
+from djangorestframework import status
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
-from djangorestframework.response import Response, status, ResponseException
+from djangorestframework.response import Response, ResponseException
 from board import tools, validators, template
 from api import emitters
 from board.models import *

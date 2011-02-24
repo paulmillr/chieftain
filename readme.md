@@ -33,7 +33,6 @@ klipped is a new generation imageboard. It is fastest open source chan. It has p
 * [py-markdown2](https://github.com/pbagwl/markdown2)
 * [ipcalc](http://pypi.python.org/pypi/ipcalc)
 * [django-rest-framework](http://django-rest-framework.org/)
-* [django-sphinx](https://github.com/dcramer/django-sphinx.git)
 * [recaptcha-client](http://pypi.python.org/pypi/recaptcha-client)
 * [PIL](http://www.pythonware.com/products/pil/)
 * Any supported by django SQL database binding (MySQLdb, postgresql, sqlite3,
