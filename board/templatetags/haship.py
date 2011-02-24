@@ -13,11 +13,14 @@ from hashlib import md5
 
 register = template.Library()
 
-md = lambda x: md5(x).hexdigest()[:5]
+
+def strip(ip):
+    return md5(ip).hexdigest()[:5]
+
 
 def haship(value, arg=''):
     ip = value.split('.')
-    i = [md(str(ip[:2]))]
+    i = [strip(str(ip[:2]))]
     i.extend(ip[2:])
     return mark_safe('.'.join(i))
 

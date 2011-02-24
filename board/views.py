@@ -30,6 +30,7 @@ __all__ = [
     'thread',
 ]
 
+
 #@cache_page(DAY)
 def index(request):
     """Main imageboard page"""
@@ -91,6 +92,7 @@ def section(request, section_slug, page):
         update_context({'threads': t, 'section': s, 'form': PostForm()}),
     )
 
+
 def threads(request, section_slug):
     """Gets list of OP-posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
@@ -106,6 +108,7 @@ def threads(request, section_slug):
         })
     )
 
+
 def posts(request, section_slug, page):
     """Gets list of posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
@@ -113,18 +116,19 @@ def posts(request, section_slug, page):
     return template.handle_file_cache(
         'section_posts.html',
         '{0}/posts/{1}.html'.format(section_slug, page),
-        request, 
+        request,
         update_context({
             'posts': p, 'section': section, 'form': PostForm(),
             'mod': is_mod(request, section_slug)
         })
     )
 
+
 def images(request, section_slug, page):
     """Gets list of images in section."""
     section = get_object_or_404(Section, slug=section_slug)
     images_page = Paginator(section.images(), 100)
-    
+
 
 def thread(request, section_slug, op_post):
     """Gets thread and its posts."""
@@ -142,7 +146,7 @@ def thread(request, section_slug, op_post):
     return template.handle_file_cache(
         'section_thread.html',
         '{0}/thread/{1}.html'.format(section_slug, op_post),
-        request, 
+        request,
         update_context({'thread': thread, 'form': PostForm(),
         'mod': is_mod(request, section_slug)})
     )

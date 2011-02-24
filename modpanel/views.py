@@ -11,6 +11,7 @@ from django.contrib.auth.decorators import login_required
 from board.models import Wordfilter, DeniedIP
 from board.shortcuts import rtr
 
+
 def is_mod(request, section_slug):
     u = request.user
     if u.is_authenticated():
@@ -18,14 +19,17 @@ def is_mod(request, section_slug):
             return True
     return False
 
+
 def index(request):
     return rtr('modindex.html', request)
+
 
 @login_required
 def wordfilter(request):
     return rtr('wordfilter.html', request, {
         'wordlist': Wordfilter.objects.all()})
-    
+
+
 @login_required
 def banlist(request):
     return rtr('banlist.html', request, {

@@ -26,7 +26,7 @@ from board import fields, template
 
 
 __all__ = [
-    'DAY', 'cached', 
+    'DAY', 'cached',
     'PostManager', 'SectionManager', 'SectionGroupManager',
     'Thread', 'Post', 'File', 'FileTypeGroup', 'FileType', 'Section',
     'SectionGroup', 'UserProfile', 'PostForm', 'PostFormNoCaptcha',
@@ -134,7 +134,7 @@ class Thread(models.Model):
     is_closed = models.BooleanField(default=False,
         verbose_name=_('Thread is closed'))
     html = models.TextField(blank=True, verbose_name=_('Thread html'))
-    
+
     def posts(self):
         return self.post_set.filter(is_deleted=False)
 
@@ -165,22 +165,22 @@ class Thread(models.Model):
     def un_lp(self, offset, limit):
         fields = ('thread_id', 'html')
         sql = '''
-            (SELECT board_post.thread_id, board_post.html 
-            FROM board_post 
-            WHERE board_post.thread_id = {thread_id} 
+            (SELECT board_post.thread_id, board_post.html
+            FROM board_post
+            WHERE board_post.thread_id = {thread_id}
             AND board_post.is_op_post = 1
             AND board_post.is_deleted = 0)
             UNION ALL
-            (SELECT board_post.thread_id, board_post.html 
-            FROM board_post 
-            WHERE board_post.thread_id = {thread_id} 
+            (SELECT board_post.thread_id, board_post.html
+            FROM board_post
+            WHERE board_post.thread_id = {thread_id}
             AND board_post.is_deleted = 0
             ORDER BY board_post.id ASC
             LIMIT {offset}, {limit})
         '''.format(thread_id=self.id, offset=offset, limit=limit)
         cursor = connection.cursor()
         cursor.execute(sql)
-        
+
         return (dict(zip(fields, i)) for i in cursor.fetchall())
 
     def last_posts(self):
@@ -535,8 +535,10 @@ class DeniedIP(IP):
     reason = models.CharField(_('Ban reason'), max_length=128, db_index=True)
     by = models.ForeignKey(User)
     date = models.DateTimeField(default=datetime.now)
+
     def __unicode__(self):
         return '{0} @ {1}'.format(self.ip, self.date)
+
     class Meta:
         verbose_name = _('Denied IP')
         verbose_name_plural = _('Denied IPs')
@@ -597,10 +599,10 @@ class SectionFeed(Feed):
 
     def item_title(self, item):
         return u'{0} {1}'.format(_('Thread'), item['pid'])
-    
+
     def item_description(self, item):
         return item['message']
-    
+
     def item_link(self, item):
         return '/{0}/{1}'.format(self.slug, item['pid'])
 
@@ -635,10 +637,10 @@ class ThreadFeed(Feed):
 
     def item_title(self, item):
         return u'{0} {1}'.format(_('Post'), item['pid'])
-    
+
     def item_description(self, item):
         return item['message']
-    
+
     def item_link(self, item):
         return '/{0}/{1}#{2}'.format(self.section, self.op_post, item['pid'])
 

@@ -25,7 +25,7 @@ def render_to_file(template, filename, request, context):
 
 
 def handle_file_cache(template, filename, request, context):
-    if False or context.get('mod'):
+    if context.get('mod'):
         return rtr(template, request, context, True)
     filename = os.path.join('cache', *filename.split('/'))
     if not os.path.exists(filename):
@@ -38,21 +38,16 @@ def handle_file_cache(template, filename, request, context):
             return HttpResponse(f.read())
     except IOError:
         return rtr(template, request, context, True)
-    #wrapper = FileWrapper(file(filename))
-    #response = HttpResponse(wrapper, content_type='text/html')
-    #response['Content-Length'] = os.path.getsize(filename)
-    #return response
-    #return 
 
 
 def rebuild_cache(section_slug, item):
     """Refresh cache of:
-    
+
        * thread/item.html
        * threads.html*
        * posts/*
        * page/*
-       
+
        Can take iterable as second argument.
     """
     pathes = ['page/', 'posts/', 'threads.html']

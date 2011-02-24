@@ -79,7 +79,7 @@ def key(text):
     """Generates key for passwords etc."""
     return sha1(text).hexdigest()
 
+
 def from_timestamp(timestamp):
     """Convert timestamp to datetime object."""
     return str(datetime.fromtimestamp(int(timestamp)))
-
