@@ -165,6 +165,24 @@ $.extend(BoardContainer.prototype, {
     },
 });
 
+function PostContainer(span, post) {
+    if (!(span instanceof jQuery)) {
+        span = $(span);
+    }
+    var isposts = (currentPage.type === 'posts');
+    
+    this.span = span;
+    this.post = post ? (!(post instanceof jQuery) ? post : $(post)) : span.closest('.post');
+    this.thread = (currentPage.type === 'thread') ? currentPage.cache.thread : this.span.closest('.thread');
+    this.first = (currentPage.type === 'thread') ? currentPage.cache.first : this.thread.find('.post:first-child');
+    this.id = getPostId(this.post);
+    this.text_data = {
+        'section': currentPage.section,
+        'first': !isposts ? getPostPid(this.first) : '',
+        'pid': getPostPid(this.post),
+    };
+}
+
 /**
  * Simple color container class.
  * 
@@ -273,6 +291,10 @@ function randomString(length) {
         s += randomchar();
     }
     return s;
+}
+
+function getCurrentTimestamp() {
+    return (new Date()).getTime().toString().slice(0, 10);
 }
 
 function checkForSidebarScroll() {
@@ -768,7 +790,7 @@ function initStyle() {
     return true;
 }
 
-function initStorage() {
+function initHidden() {
     var status = ('localStorage' in window && window['localStorage'] !== null);
     if (!status) {
         return false;
@@ -836,33 +858,20 @@ function initStorage() {
             });
         }
     }
-    
-    function PostContainer(span, post) {
-        if (!(span instanceof jQuery)) {
-            span = $(span);
-        }
-        var isposts = (currentPage.type === 'posts');
-        
-        this.span = span;
-        this.post = post ? (!(post instanceof jQuery) ? post : $(post)) : span.closest('.post');
-        this.thread = (currentPage.type === 'thread') ? currentPage.cache.thread : this.span.closest('.thread');
-        this.first = (currentPage.type === 'thread') ? currentPage.cache.first : this.thread.find('.post:first-child');
-        this.id = getPostId(this.post);
-        this.text_data = {
-            'section': currentPage.section,
-            'first': !isposts ? getPostPid(this.first) : '',
-            'pid': getPostPid(this.post),
-        };
+}
+
+function initButtons(selector) {
+    var status = ('localStorage' in window && window['localStorage'] !== null),
+        selector = typeof selector == 'function' ? $('.post') : selector;
+    if (!status) {
+        return false;
     }
-    
-    // format:
-    // {container, className, initFn, pushFn, popFn}
     function buttonInitializer(data) {
-        var item,
-            dataCopy = {};
-        for (var i=0; i < data.length; ++i) {
-            item = data[i];
-            
+        var dataCopy = {};
+        $.each(data, function() {
+            var item = this;
+            dataCopy[this.className] = this;
+
             if (!!$.settings('disable' + item.container)) {
                 return true;
             }
@@ -873,7 +882,7 @@ function initStorage() {
                 list = container.list(),
                 className = item.className;
 
-            $('.post').each(function(x) {
+            selector.each(function(x) {
                 var span = $('<span/>').addClass(className).addClass('add'),
                     post = $(this);
 
@@ -885,6 +894,10 @@ function initStorage() {
                     item.onInit(new PostContainer(span, post));
                 }
             });
+            
+            if (window.buttonsInitialized) {
+                return true;
+            }
 
             $('.threads').delegate('.' + className, 'click', function(event) {
                 event.preventDefault();
@@ -906,7 +919,7 @@ function initStorage() {
                     }
                 }
             });
-        }
+        });
     }
     
     buttonInitializer([
@@ -937,7 +950,8 @@ function initStorage() {
                     s = $('<span/>').addClass('skipped')
                     .text(t +
                         ' #'+ getPostPid(post) +
-                        '('+ post.find('.message').text().split(0, 100) +') скрыт.'
+                        //'('+ post.find('.message').text().split(0, 20) +')' +
+                        ' скрыт.'
                     ).appendTo(post.find('.post-wrapper'));
             },
 
@@ -954,6 +968,9 @@ function initStorage() {
             }
         },
     ]);
+    if (!window.buttonsInitialized) {
+        window.buttonsInitialized = true;
+    }
 }
 
 function initHotkeys() {
@@ -996,10 +1013,12 @@ function initAJAX() {
             window.location.href = './' + data.pid;
             return true;
         }
-        $(data.html).hide()
+        var h = $(data.html).hide()
             .appendTo('.thread')
-            .fadeIn(500)
-            .find('.tripcode:contains("!")').addClass('staff');
+            .fadeIn(500);
+        //h.each();
+        h.find('.tripcode:contains("!")').addClass('staff');
+        initButtons(h);
         try {
             window.location.hash = '#post' + data.pid;
         } catch(e) {}
@@ -1036,10 +1055,42 @@ function initAJAX() {
     });
 }
 
+function initAutoload() {
+    if (currentPage.type !== 'thread') {
+        return false;
+    }
+    function checkForNewPosts() {
+        $.ajax({
+            type: 'GET',
+            url: '/api/stream/' + currentPage.thread, 
+            dataType: 'json',
+            data: {
+                '_accept': 'text/plain',
+                'timestamp': getCurrentTimestamp() - 10
+            }
+        })
+        .success(function(data) {
+            if (data.posts.length > 0) {
+                $.each(data.posts, function(x) {
+                    if ($('#post' + this.pid).length > 0) {
+                        return true;
+                    }
+                    var h = $(this.html).appendTo('.thread');
+                    initButtons(h);
+                });
+            }
+        });
+    }
+    
+    window.setInterval(checkForNewPosts, 15000)
+}
+
 
 $(init);
 $(initSettings);
 $(initStyle);
-$(initStorage);
+$(initHidden);
+$(initButtons);
 $(initHotkeys);
 $(initAJAX);
+$(initAutoload);

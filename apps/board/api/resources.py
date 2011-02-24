@@ -16,7 +16,8 @@ from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, status, ResponseException
 
 __all__ = [
-    'Resource', 'ModelResource', 'RootModelResource', 'post_validator',
+    'Resource', 'ModelResource', 'RootModelResource',
+    'PostStreamResource',
     'PostRootResource', 'PostResource',
     'ThreadRootResource', 'ThreadResource',
     'SectionRootResource', 'SectionResource',
@@ -88,6 +89,26 @@ class ThreadResource(ModelResource):
         res['posts'] = inst.post_set.filter(is_deleted=False).values(*pf)
         return res
 
+
+class PostStreamResource(RootModelResource):
+    """docstring for PostStreamResource"""
+    allowed_methods = anon_allowed_methods = ('GET', 'POST')
+    model = Post
+    def get(self, request, auth, *args, **kwargs):
+        try:
+            ts = tools.from_timestamp(request.GET['timestamp'])
+            new_posts = Post.objects.filter(
+                date__gt=ts,
+                thread=kwargs['thread'],
+                is_deleted=False,
+            )
+            posts = []
+            if new_posts.count():
+                posts = new_posts.values('html', 'pid')
+        except KeyError:
+            return Response(status.BAD_REQUEST, {'detail': 'TS'})
+        return Response(status.OK, {'posts': posts})
+        
 
 class PostRootResource(RootModelResource):
     """A create/list resource for Post."""

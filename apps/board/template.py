@@ -33,11 +33,16 @@ def handle_file_cache(template, filename, request, context):
         if not os.path.isdir(d):
             os.makedirs(d)
         render_to_file(template, filename, request, context)
+    try:
+        with open(filename) as f:
+            return HttpResponse(f.read())
+    except IOError:
+        return rtr(template, request, context, True)
     #wrapper = FileWrapper(file(filename))
     #response = HttpResponse(wrapper, content_type='text/html')
     #response['Content-Length'] = os.path.getsize(filename)
     #return response
-    return HttpResponse(open(filename).read())
+    #return 
 
 
 def rebuild_cache(section_slug, item):

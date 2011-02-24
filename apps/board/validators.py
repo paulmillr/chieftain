@@ -102,8 +102,11 @@ def post(request, no_captcha=True):
     if section_is_feed and new_thread and not logged_in:
         raise NotAuthenticatedError(_('Authentication required to create '
             'threads in this section'))
-    elif post.email.lower() != 'sage':
-        thread.bump = post.date
+    if post.email.lower() != 'sage':
+        if new_thread:
+            thread.bump = post.date
+        elif thread.posts().count() < thread.section.bumplimit:
+            thread.bump = post.date
     if '!' in post.poster:
         if ('!OP' in post.poster and not new_thread and
             post.password == thread.op_post.password):
