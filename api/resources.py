@@ -62,7 +62,8 @@ class ThreadRootResource(RootModelResource):
     )
 
     def get(self, request, auth, *args, **kwargs):
-        return self.model.objects.filter(is_deleted=False)[:20]
+        #if kwargs.get('')
+        return self.model.objects.filter(**kwargs)[:20]
 
 
 class ThreadResource(ModelResource):
@@ -76,25 +77,27 @@ class ThreadResource(ModelResource):
     )
 
     def get(self, request, auth, *args, **kwargs):
+        slug = kwargs.get('section__slug')
         try:
-            kwargs['is_deleted'] = False
-            kwargs['pid'] = kwargs.pop('id')
-            kwargs['thread__section__slug'] = kwargs.pop('section__slug')
-            op_post = Post.objects.get(**kwargs)
-            inst = op_post.thread
+            if not slug:
+                instance = Thread.objects.get(**kwargs)
+            else:
+                op_post = Post.objects.get(pid=kwargs['id'],
+                    thread__section__slug=kwargs['section__slug'])
+                instance = op_post.thread
         except (Post.DoesNotExist, self.model.DoesNotExist):
             raise ResponseException(status.NOT_FOUND)
         res = {}
         for f in self.fields:
-            res[f] = inst.__getattribute__(f)
+            res[f] = instance.__getattribute__(f)
         pf = [f for f in list(PostResource.fields)
             if isinstance(f, str) and f != 'files']
-        res['posts'] = inst.post_set.filter(is_deleted=False).values(*pf)
+        res['posts'] = instance.posts().values(*pf)
         return res
 
 
 class PostStreamResource(RootModelResource):
-    """docstring for PostStreamResource"""
+    """A stream resource for Post."""
     allowed_methods = anon_allowed_methods = ('GET', 'POST')
     model = Post
 
@@ -103,8 +106,7 @@ class PostStreamResource(RootModelResource):
             ts = tools.from_timestamp(request.GET['timestamp'])
             new_posts = Post.objects.filter(
                 date__gt=ts,
-                thread=kwargs['thread'],
-                is_deleted=False,
+                thread=kwargs['thread']
             )
             posts = []
             if new_posts.count():
@@ -126,7 +128,7 @@ class PostRootResource(RootModelResource):
     )
 
     def get(self, request, auth, *args, **kwargs):
-        return self.model.objects.filter(is_deleted=False)[:20]
+        return self.model.objects.all()[:20]
 
     def post(self, request, auth, content, *args, **kwargs):
         try:
@@ -151,7 +153,6 @@ class PostResource(ModelResource):
 
     def get(self, request, auth, *args, **kwargs):
         try:
-            kwargs['is_deleted'] = False
             return self.model.objects.get(**kwargs)
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
@@ -179,15 +180,13 @@ class PostResource(ModelResource):
                 d.save()
             if request.GET.get('delete_all'):
                 slug = post.section_slug()
-                posts = post.section().posts(
-                    ).filter(ip=post.ip, is_deleted=False)
+                posts = post.section().posts().filter(ip=post.ip)
                 # remove threads
                 print posts
                 op = posts.filter(is_op_post=True).values('pid', 'thread')
                 template.rebuild_cache(slug, [i['pid'] for i in op])
                 t = Thread.objects.filter(id__in=[i['thread'] for i in op])
                 t.update(is_deleted=True)
-                #posts.update(is_deleted=True)
                 for p in posts:
                     p.remove()
             else:
@@ -243,7 +242,7 @@ class FileRootResource(RootModelResource):
     """A list resource for File."""
     allowed_methods = anon_allowed_methods = ('GET',)
     model = File
-    fields = ('id', 'post', 'name', 'type', 'size', 'is_deleted',
+    fields = ('id', 'post', 'name', 'type', 'size',
         'image_width', 'image_height', 'hash', 'file', 'thumb')
 
 
@@ -251,7 +250,7 @@ class FileResource(ModelResource):
     """A list resource for File."""
     allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
     model = File
-    fields = ('id', 'post', 'name', 'type', 'size', 'is_deleted',
+    fields = ('id', 'post', 'name', 'type', 'size',
         'image_width', 'image_height', 'hash', 'file', 'thumb')
 
     def delete(self, request, auth, *args, **kwargs):

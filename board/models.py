@@ -69,8 +69,40 @@ def cached(seconds=900):
     return do_cache
 
 
+class ThreadManager(models.Manager):
+    def get_query_set(self):
+        return super(ThreadManager, self).get_query_set().filter(
+            is_deleted=False)
+
+
+class DeletedThreadManager(models.Manager):
+    def get_query_set(self):
+        return super(DeletedThreadManager, self).get_query_set().filter(
+            is_deleted=True)
+        
+
 class PostManager(models.Manager):
-    pass
+    def get_query_set(self):
+        return super(PostManager, self).get_query_set().filter(
+            is_deleted=False)
+
+
+class DeletedPostManager(models.Manager):
+    def get_query_set(self):
+        return super(DeletedPostManager, self).get_query_set().filter(
+            is_deleted=True)
+
+
+class FileManager(models.Manager):
+    def get_query_set(self):
+        return super(FileManager, self).get_query_set().filter(
+            is_deleted=False)
+
+
+class DeletedFileManager(models.Manager):
+    def get_query_set(self):
+        return super(DeletedFileManager, self).get_query_set().filter(
+            is_deleted=True)
 
 
 class SectionManager(models.Manager):
@@ -118,14 +150,16 @@ class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
     bump = models.DateTimeField(blank=True, db_index=True,
-        verbose_name=_('Thread bump date'))
+        verbose_name=_('Bump date'))
     is_deleted = models.BooleanField(default=False,
-        verbose_name=_('Thread is deleted'))
+        verbose_name=_('Is deleted'))
     is_pinned = models.BooleanField(default=False,
-        verbose_name=_('Thread is pinned'))
+        verbose_name=_('Is pinned'))
     is_closed = models.BooleanField(default=False,
-        verbose_name=_('Thread is closed'))
-    html = models.TextField(blank=True, verbose_name=_('Thread html'))
+        verbose_name=_('Is closed'))
+    html = models.TextField(blank=True, verbose_name=_('HTML cache'))
+    objects = ThreadManager()
+    deleted_objects = DeletedThreadManager()
 
     def posts(self):
         return self.post_set.filter(is_deleted=False)
@@ -136,7 +170,7 @@ class Thread(models.Model):
     @cached(1)
     def count(self):
         lp = 5
-        ps = self.post_set.filter(is_deleted=False)
+        ps = self.posts()
         stop = ps.count()
         if stop <= lp:  # if we got thread with less posts than lp
             return {'total': stop, 'skipped': 0, 'skipped_files': 0}
@@ -177,7 +211,7 @@ class Thread(models.Model):
 
     def last_posts(self):
         c = self.count()
-        s = self.post_set.filter(is_deleted=False)
+        s = self.posts()
         all = s.all()
         if not c['skipped']:
             return all
@@ -187,7 +221,7 @@ class Thread(models.Model):
 
     def remove(self):
         """Deletes thread."""
-        self.post_set.all().update(is_deleted=True)
+        self.posts().update(is_deleted=True)
         self.is_deleted = True
         self.save(rebuild_cache=False)
 
@@ -227,29 +261,30 @@ class Post(models.Model):
     """Represents post."""
     pid = models.PositiveIntegerField(blank=True, verbose_name=_('PID'))
     thread = models.ForeignKey('Thread', blank=True, null=True,
-        verbose_name=_('Post thread'))
+        verbose_name=_('Thread'))
     is_op_post = models.BooleanField(default=False,
-        verbose_name=_('Post is op post'))
+        verbose_name=_('First post in thread'))
     date = models.DateTimeField(default=datetime.now, blank=True,
-        verbose_name=_('Post bump date'))
+        verbose_name=_('Bump date'))
     is_deleted = models.BooleanField(default=False,
-        verbose_name=_('Post is deleted'))
+        verbose_name=_('Is deleted'))
     file_count = models.SmallIntegerField(default=0,
-        verbose_name=_('Post file count'), blank=True)
+        verbose_name=_('File count'), blank=True)
     ip = models.IPAddressField(verbose_name=_('Post ip'), blank=True)
     poster = models.CharField(max_length=32, blank=True,
-        verbose_name=_('Post poster'))
+        verbose_name=_('Poster'))
     tripcode = models.CharField(max_length=32, blank=True,
-        verbose_name=_('Post tripcode'))
+        verbose_name=_('Tripcode'))
     email = models.CharField(max_length=32, blank=True,
-        verbose_name=_('Post email'))
+        verbose_name=_('Email'))
     topic = models.CharField(max_length=48, blank=True,
-        verbose_name=_('Post topic'))
+        verbose_name=_('Topic'))
     password = models.CharField(max_length=64, blank=False,
-        verbose_name=_('Post password'))
-    message = models.TextField(blank=True, verbose_name=_('Post message'))
-    html = models.TextField(blank=True, verbose_name=_('Post html'))
+        verbose_name=_('Password'))
+    message = models.TextField(blank=True, verbose_name=_('Message'))
+    html = models.TextField(blank=True, verbose_name=_('HTML cache'))
     objects = PostManager()
+    deleted_objects = DeletedPostManager()
 
     def section(self):
         return self.thread.section
@@ -259,7 +294,7 @@ class Post(models.Model):
 
     def files(self):
         """Workaround for REST api."""
-        return self.file_set.all()
+        return self.file_set.filter(is_deleted=False)
 
     def remove(self):
         """Visually deletes post."""
@@ -299,25 +334,28 @@ class Post(models.Model):
 
 class File(models.Model):
     """Represents files at the board."""
-    post = models.ForeignKey('Post', verbose_name=_('File post'))
+    post = models.ForeignKey('Post', verbose_name=_('Post'))
     name = models.CharField(max_length=64,
-        verbose_name=_('File original name'))
-    type = models.ForeignKey('FileType', verbose_name=_('File type'))
-    size = models.PositiveIntegerField(verbose_name=_('File size'))
+        verbose_name=_('Original name'))
+    type = models.ForeignKey('FileType', verbose_name=_('Type'))
+    size = models.PositiveIntegerField(verbose_name=_('Size'))
     is_deleted = models.BooleanField(default=False,
-        verbose_name=_('File is deleted'))
+        verbose_name=_('Is deleted'))
     image_width = models.PositiveSmallIntegerField(blank=True,
-        verbose_name=_('File image width'))
+        verbose_name=_('Image width'))
     image_height = models.PositiveSmallIntegerField(blank=True,
-        verbose_name=_('File image height'))
+        verbose_name=_('Image height'))
     hash = models.CharField(max_length=32, blank=True,
-        verbose_name=_('File hash'))
+        verbose_name=_('Hash'))
     file = models.FileField(upload_to=get_file_path('section'),
-        verbose_name=_('File location'))
+        verbose_name=_('Location'))
     thumb = models.ImageField(upload_to=get_file_path('thumbs'),
-        verbose_name=_('File thumbnail'))
+        verbose_name=_('Thumbnail'))
+    objects = FileManager()
+    deleted_objects = DeletedFileManager()
 
     def remove(self):
+        """Visually deletes file."""
         self.is_deleted = True
         self.save()
         self.post.save()
@@ -334,11 +372,11 @@ class File(models.Model):
 class FileType(models.Model):
     """File type"""
     extension = models.CharField(max_length=10,
-        verbose_name=_('File type extension'))
+        verbose_name=_('Extension'))
     mime = models.CharField(max_length=250, blank=False,
-        verbose_name=_('File type MIME'))
+        verbose_name=_('MIME'))
     group = models.ForeignKey('FileTypeGroup',
-        verbose_name=_('File type group'))
+        verbose_name=_('Group'))
 
     def __unicode__(self):
         return self.extension
@@ -351,7 +389,7 @@ class FileType(models.Model):
 class FileTypeGroup(models.Model):
     """Category of files"""
     name = models.CharField(max_length=32,
-        verbose_name=_('File type group name'))
+        verbose_name=_('Name'))
     default_image = models.ImageField(upload_to='default/')
 
     def __unicode__(self):
@@ -365,43 +403,41 @@ class FileTypeGroup(models.Model):
 class Section(models.Model):
     """Board section."""
     slug = models.SlugField(max_length=5, unique=True,
-        verbose_name=_('Section slug'))
+        verbose_name=_('Slug'))
     name = models.CharField(max_length=64,
-        verbose_name=_('Section name'))
+        verbose_name=_('Name'))
     description = models.TextField(blank=True,
-        verbose_name=_('Section description'))
+        verbose_name=_('Description'))
     type = models.PositiveSmallIntegerField(default=1, choices=SECTION_TYPES,
-        verbose_name=_('Section type'))
+        verbose_name=_('Type'))
     group = models.ForeignKey('SectionGroup',
-        verbose_name=_('Section group'))
+        verbose_name=_('Group'))
     filesize_limit = models.PositiveIntegerField(default=MEGABYTE * 5,
-        verbose_name=_('Section filesize limit'))
+        verbose_name=_('Filesize limit'))
     anonymity = models.BooleanField(default=False,
-        verbose_name=_('Section force anonymity'))
+        verbose_name=_('Force anonymity'))
     default_name = models.CharField(max_length=64, default=_('Anonymous'),
-        verbose_name=_('Section default poster name'))
+        verbose_name=_('Default poster name'))
     filetypes = models.ManyToManyField('FileTypeGroup', blank=True,
-        verbose_name=_('Section allowed filetypes'))
+        verbose_name=_('File types'))
     bumplimit = models.PositiveSmallIntegerField(default=500,
-        verbose_name=_('Section bumplimit'))
+        verbose_name=_('Max posts in thread'))
     threadlimit = models.PositiveSmallIntegerField(default=200,
-        verbose_name=_('Section thread limit'))
+        verbose_name=_('Max threads'))
     objects = SectionManager()
 
     ONPAGE = 20
 
     def threads(self):
-        return self.thread_set.filter(is_deleted=False).order_by(
-            '-is_pinned', '-bump')
+        return self.thread_set.order_by('-is_pinned', '-bump')
 
     def op_posts(self):
-        return Post.objects.filter(is_deleted=False,
-            is_op_post=True,
+        return Post.objects.filter(is_op_post=True,
             thread__section=self.id).order_by('-date', '-pid')
 
     def posts(self):
-        return Post.objects.filter(is_deleted=False,
-            thread__section=self.id).order_by('-date', '-pid')
+        return Post.objects.filter(thread__section=self.id).order_by(
+            '-date', '-pid')
 
     def posts_html(self):
         return self.posts().values('html')
@@ -454,8 +490,8 @@ class Section(models.Model):
 class SectionGroup(models.Model):
     """Group of board sections. Example: [b / d / s] [a / aa]."""
     name = models.CharField(max_length=64, blank=False,
-        verbose_name=_('Section group name'))
-    order = models.SmallIntegerField(verbose_name=_('Section group order'))
+        verbose_name=_('Name'))
+    order = models.SmallIntegerField(verbose_name=_('Order'))
     is_hidden = models.BooleanField(default=False, verbose_name=_('Is hidden'))
     objects = SectionGroupManager()
 
