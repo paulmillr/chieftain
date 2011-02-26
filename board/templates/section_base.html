@@ -6,9 +6,9 @@
 {% block search %}
 <form action="search" method="get" accept-charset="utf-8" class="search">
     <input type="search" name="q" placeholder="{% trans 'Search' %}" id="q">
-    <label for="is_op_post">{% trans 'OP-post' %}</label>
+    <p><label for="is_op_post">{% trans 'OP-post' %}</label>
     <input type="checkbox" name="is_op_post" id="is_op_post">
-    <input type="submit" value="&rarr;">
+    <input type="submit" value="&rarr;"></p>
 </form>
 {% endblock %}
 

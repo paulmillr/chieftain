@@ -17,6 +17,7 @@ from board.shortcuts import rtr
 
 __all__ = ['render_to_file', 'handle_file_cache', 'rebuild_cache']
 
+CACHE_DIR = 'cache'
 
 def render_to_file(template, filename, request, context):
     with codecs.open(filename, 'w', 'utf-8') as f:
@@ -26,7 +27,7 @@ def render_to_file(template, filename, request, context):
 def handle_file_cache(template, filename, request, context):
     if context.get('mod'):
         return rtr(template, request, context, True)
-    filename = os.path.join('cache', *filename.split('/'))
+    filename = os.path.join(CACHE_DIR, *filename.split('/'))
     if not os.path.exists(filename):
         d = os.path.dirname(filename)
         if not os.path.isdir(d):
@@ -39,7 +40,7 @@ def handle_file_cache(template, filename, request, context):
         return rtr(template, request, context, True)
 
 
-def rebuild_cache(section_slug, item):
+def rebuild_cache(section_slug=None, item=None):
     """Refresh cache of:
 
        * thread/item.html
@@ -48,7 +49,13 @@ def rebuild_cache(section_slug, item):
        * page/*
 
        Can take iterable as second argument.
+       If no arguments passed, it would remove all cache.
     """
+    if not section_slug:
+        if os.path.exists(CACHE_DIR):
+            for d in os.listdir(CACHE_DIR):
+                shutil.rmtree(os.path.join(CACHE_DIR, d))
+        return True
     pathes = ['page/', 'posts/', 'threads.html']
     if hasattr(item, '__iter__'):
         for i in item:
@@ -57,7 +64,7 @@ def rebuild_cache(section_slug, item):
         pathes.append('thread/{0}.html'.format(item))
     for i in pathes:
         isdir = bool(i.endswith('/'))
-        t = os.path.join('cache', section_slug, *i.split('/'))
+        t = os.path.join(CACHE_DIR, section_slug, *i.split('/'))
         if os.path.exists(t):
             if not isdir:
                 os.remove(t)

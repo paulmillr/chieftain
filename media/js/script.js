@@ -7,6 +7,18 @@ var api = {
     url: '/api',
     defaultType: 'text/plain'    
 },
+    // pre-localize messages because of django bug
+    i18n = (function() {
+        var l = [
+        gettext('Reason'),
+        gettext('Reply'),
+        gettext('Message is too long.'),
+        gettext('Full text'),
+        gettext('Thread'),
+        gettext('Post'),
+        gettext('hidden')
+    ];
+    })(),
     // page detector
     currentPage = (function() {
     var loc = window.location.href.split('/').slice('3'),
@@ -456,7 +468,7 @@ function init() {
                 var text = map[i][j];
                     links.push('<a class="postlink"  href="#post'+text+'">&gt;&gt;'+text+'</a>');
             }
-            div.html('Ответы:' + links.join(','));
+            div.html(gettext('Replies') + ':' + links.join(','));
             $('#post' + i + ' .post-wrapper').append(div);
         }
     }
@@ -545,7 +557,8 @@ function init() {
     
     $('#ban_ip').click(function(event) {
         var t = $(this),
-            i = $('<input type="text" id="ban_reason" name="ban_reason" placeholder="Причина" />');
+            i = $('<input type="text" id="ban_reason" name="ban_reason"/>')
+                .attr('placeholder', gettext('Reason'));
         if (t.attr('checked')) {
             i.insertAfter('label[for="ban_ip"]');
         } else {
@@ -790,7 +803,8 @@ function initStyle() {
     $('.section .post:first-child').each(function(x) {
         var post = $(this),
             href = post.find('.number a').attr('href'),
-            span = $('<span/>').addClass('answer').html('[<a href="'+href+'">Ответ</a>]');
+            span = $('<span/>').addClass('answer')
+                .html('[<a href="'+href+'">'+ gettext('Reply') +'</a>]');
         if (post.find('.is_closed').length == 0) {
             span.insertBefore(post.find('.number'));
         }
@@ -818,11 +832,11 @@ function initStyle() {
         if (t.hasScrollBar()) {
             t.addClass('overflow-hidden');
             span = $('<span/>').addClass('skipped')
-                .text('Комментарий слишком длинный.')
+                .text(gettext('Message is too long.'))
                 .appendTo(t.parent());
             a = $('<a/>').attr('href', '#showFullComment')
             .addClass('skipped')
-            .text('Полный текст')
+            .text(gettext('Full text'))
             .click(function(event) {
                 event.preventDefault();
                 t.removeClass('overflow-hidden');
@@ -1023,12 +1037,12 @@ function initButtons(selector) {
                     post = data.post;
                 }
                 post.find('.content').hide();
-                var t = first ? 'Тред' : 'Пост',
+                var t = first ? gettext('Thread') : gettext('Post'),
                     s = $('<span/>').addClass('skipped')
                     .text(t +
                         ' #'+ getPostPid(post) +
                         //'('+ post.find('.message').text().split(0, 20) +')' +
-                        ' скрыт.'
+                        ' ' + gettext('hidden') + '.'
                     ).appendTo(post.find('.post-wrapper'));
             },
 

@@ -452,7 +452,7 @@ class Section(models.Model):
     @property
     def pid(self):
         """Gets section last post PID."""
-        return cache.get(self.key) or self.refresh_cache()
+        return cache.get(self.key) or self.rebuild_cache()
 
     @pid.setter
     def pid(self, value):
@@ -465,10 +465,10 @@ class Section(models.Model):
         try:
             return cache.incr(self.key)
         except ValueError:
-            self.refresh_cache()
+            self.rebuild_cache()
         return cache.incr(self.key)
 
-    def refresh_cache(self):
+    def rebuild_cache(self):
         """Refreshes cache of section last post PID."""
         try:
             pid = Post.objects.filter(thread__section=self.id).latest().pid
@@ -476,6 +476,11 @@ class Section(models.Model):
             pid = 0
         self.pid = pid
         return pid
+
+    def save(self):
+        super(self.__class__, self).save()
+        cache.delete('sections')
+        template.rebuild_cache()
 
     def __unicode__(self):
         return self.slug
@@ -492,6 +497,11 @@ class SectionGroup(models.Model):
     order = models.SmallIntegerField(verbose_name=_('Order'))
     is_hidden = models.BooleanField(default=False, verbose_name=_('Is hidden'))
     objects = SectionGroupManager()
+
+    def save(self):
+        super(self.__class__, self).save()
+        cache.delete('sections')
+        template.rebuild_cache()
 
     def __unicode__(self):
         return unicode(self.name) + ', ' + unicode(self.order)

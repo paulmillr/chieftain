@@ -1,0 +1,52 @@
+# Russian translation for klipped imageboard.
+# Copyright (C) 2011 Paul Bagwell
+# This file is distributed under the same license as the klipped package.
+# FIRST AUTHOR <pbagwl@gmail.com>, 2011.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: 1.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2011-02-26 18:50+0200\n"
+"PO-Revision-Date: 2011-02-26 17:38+0200\n"
+"Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
+"Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
+"Language: Russian\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
+"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+
+#: media/js/script.js:13
+msgid "Reason"
+msgstr "Причина"
+
+#: media/js/script.js:14
+msgid "Reply"
+msgstr "Ответ"
+
+#: media/js/script.js:15
+msgid "Message is too long."
+msgstr "Комментарий слишком слишком длинный."
+
+#: media/js/script.js:16
+msgid "Full text"
+msgstr "Полный текст"
+
+#: media/js/script.js:17
+msgid "Thread"
+msgstr "Тред"
+
+#: media/js/script.js:18
+msgid "Post"
+msgstr "Сообщение"
+
+#: media/js/script.js:19
+msgid "hidden"
+msgstr "скрыт"
+
+#: media/js/script.js:468
+msgid "Replies"
+msgstr "Ответы"
