@@ -15,7 +15,6 @@ import StringIO
 from operator import add
 from time import time
 from django.db import connection
-from django.db import connection
 from django.template import Template, Context
 from django.conf import settings
 
@@ -52,36 +51,27 @@ class SQLLogToConsoleMiddleware:
 class StatsMiddleware(object):
     def process_view(self, request, view_func, view_args, view_kwargs):
         # turn on debugging in db backend to capture time
-        from django.conf import settings
-        debug = settings.DEBUG
-        settings.DEBUG = True
-
-        # get number of db queries before we do anything
+        debug, settings.DEBUG = settings.DEBUG, True
         n = len(connection.queries)
 
         # time the view
         start = time()
         response = view_func(request, *view_args, **view_kwargs)
-        totTime = time() - start
+        total_time = time() - start
 
         # compute the db time for the queries just run
         queries = len(connection.queries) - n
         if queries:
-            dbTime = reduce(add, [float(q['time'])
-                                  for q in connection.queries[n:]])
+            db_time = sum(float(q['time']) for q in connection.queries[n:])
         else:
-            dbTime = 0.0
+            db_time = 0.0
 
-        # and backout python time
-        pyTime = totTime - dbTime
-
-        # restore debugging setting again
         settings.DEBUG = debug
 
         stats = {
-            'totTime': totTime,
-            'pyTime': pyTime,
-            'dbTime': dbTime,
+            'total_time': total_time,
+            'py_time': total_time - db_time,
+            'db_time': db_time,
             'queries': queries,
         }
 

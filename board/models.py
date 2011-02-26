@@ -14,6 +14,7 @@ from django.core.cache import cache
 from django.core.paginator import Paginator
 from django.db import models, connection
 from django.forms import ModelForm, CharField, IntegerField, FileField
+from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
@@ -34,11 +35,11 @@ DAY = 86400  # seconds in day
 MEGABYTE = 2 ** 20
 SECTION_TYPES = (
     (1, _('Default')),
-    (2, _('No files')),
-    (3, _('Feed')),  # Users, that don't have accounts can't create threads
+#    (2, _('Premodded')),
+    (3, _('News')),
 # TODO
-#    (4, _('International')),
-#    (5, _('Premodded')),  # Each thread needs to be approved
+    (4, _('International')),
+#    (5, _('Private')),
 #    (6, _('Chat')),
 )
 
@@ -54,16 +55,19 @@ def get_file_path(base):
     return closure
 
 
-def cached(seconds=900):
+def cached(seconds=900, key=None):
     """Cache the result of a function call."""
     def do_cache(f):
         def closure(*args, **kwargs):
-            key = sha1(f.__module__ + f.__name__ +
-                str(args) + str(kwargs)).hexdigest()
-            result = cache.get(key)
+            if key:
+                cache_key = key
+            else:
+                cache_key = sha1(f.__module__ + f.__name__ +
+                    str(args) + str(kwargs)).hexdigest()
+            result = cache.get(cache_key)
             if result is None:
                 result = f(*args, **kwargs)
-                cache.set(key, result, seconds)
+                cache.set(cache_key, result, seconds)
             return result
         return closure
     return do_cache
@@ -79,7 +83,7 @@ class DeletedThreadManager(models.Manager):
     def get_query_set(self):
         return super(DeletedThreadManager, self).get_query_set().filter(
             is_deleted=True)
-        
+
 
 class PostManager(models.Manager):
     def get_query_set(self):
@@ -108,36 +112,27 @@ class DeletedFileManager(models.Manager):
 class SectionManager(models.Manager):
     @cached(DAY)
     def sections(self):
-        return Section.objects.all().order_by('slug')
+        return self.order_by('slug')
 
 
 class SectionGroupManager(models.Manager):
     """Manager for SectionGroup."""
-    @cached(DAY)
+    @cached(DAY, 'sections')
     def sections(self):
         """
            Gets list of board sections.
            We're not using QuerySet because they cannot be cached.
         """
-        data = []  # http://goo.gl/CpPq6
-        #for group in SectionGroup.objects.all().order_by('order').values():
-        #    group['sections'] = list(group.section_set.values())
-        #    data.append(group)
-        #return data
-        for group in SectionGroup.objects.all().order_by('order'):
-            d = {
-                'id': group.id,
-                'name': group.name,
-                'order': group.order,
-                'is_hidden': group.is_hidden,
-                'sections': list(group.section_set.values())
-            }
-            data.append(d)
+        data = []
+        sections = list(Section.objects.all().values())
+        for g in self.order_by('order').values():
+            g['sections'] = [s for s in sections if s['group_id'] == g['id']]
+            data.append(g)
         return data
 
 
 class WordfilterManager(models.Manager):
-    """Manager for Wordfilter"""
+    """Manager for Wordfilter."""
 
     def words(self):
         return [i[0] for i in self.values_list('word')]
@@ -259,7 +254,8 @@ class Thread(models.Model):
 
 class Post(models.Model):
     """Represents post."""
-    pid = models.PositiveIntegerField(blank=True, verbose_name=_('PID'))
+    pid = models.PositiveIntegerField(blank=True, db_index=True,
+        verbose_name=_('PID'))
     thread = models.ForeignKey('Thread', blank=True, null=True,
         verbose_name=_('Thread'))
     is_op_post = models.BooleanField(default=False,
@@ -271,7 +267,9 @@ class Post(models.Model):
     file_count = models.SmallIntegerField(default=0,
         verbose_name=_('File count'), blank=True)
     ip = models.IPAddressField(verbose_name=_('Post ip'), blank=True)
-    poster = models.CharField(max_length=32, blank=True,
+    country = models.CharField(max_length=5, blank=True,
+        verbose_name=_('Country code'))  # used for /int/-like sections
+    poster = models.CharField(max_length=32, blank=True, null=True,
         verbose_name=_('Poster'))
     tripcode = models.CharField(max_length=32, blank=True,
         verbose_name=_('Tripcode'))
@@ -597,8 +595,8 @@ class SectionFeed(Feed):
             section=self.slug)
 
     def items(self):
-        return Post.objects.op_posts_by_section(self.slug).reverse(
-            ).values('pid', 'date', 'message')[:40]
+        return Post.objects.filter(thread__section__slug=self.slug,
+            is_op_post=True).reverse().values('pid', 'date', 'message')[:40]
 
     def item_title(self, item):
         return u'{0} {1}'.format(_('Thread'), item['pid'])
@@ -614,11 +612,12 @@ class ThreadFeed(Feed):
     """Thread posts RSS feed. Contains all posts in thread."""
     def get_object(self, request, section_slug, op_post):
         try:
-            post = Post.objects.by_section(section_slug, op_post)
+            post = Post.objects.get(thread__section__slug=section_slug,
+                pid=op_post, is_op_post=True)
         except Post.DoesNotExist:
             raise Http404
         t = post.thread
-        self.section = section
+        self.slug = section_slug
         self.op_post = op_post
         self.posts = t.posts().reverse().values('pid', 'date', 'message')
         return t
@@ -626,11 +625,11 @@ class ThreadFeed(Feed):
     def title(self, obj):
         return u'{title} - {last} {section}/{op_post}'.format(
             title=settings.SITE_TITLE, last=_('Last posts of thread'),
-            section=self.section, op_post=self.op_post
+            section=self.slug, op_post=self.op_post
         )
 
     def link(self, obj):
-        return '/{0}/{1}'.format(self.section, self.op_post)
+        return '/{0}/{1}'.format(self.slug, self.op_post)
 
     def description(self, obj):
         return u'{last} {op_post}'.format(last=_('Last posts of thread'),
@@ -646,7 +645,7 @@ class ThreadFeed(Feed):
         return item['message']
 
     def item_link(self, item):
-        return '/{0}/{1}#{2}'.format(self.section, self.op_post, item['pid'])
+        return '/{0}/{1}#{2}'.format(self.slug, self.op_post, item['pid'])
 
 
 def create_user_profile(sender, instance, created, **kwargs):

@@ -8,6 +8,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 
 import re
+from django.contrib.gis.utils import GeoIP
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 from hashlib import md5
@@ -133,6 +134,8 @@ def post(request, no_captcha=True):
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10
         post.message = (s + u' ') * 50
+    if thread.section.type == 4:  # international
+        post.country = GeoIP().country(post.ip)['country_code']
     if new_thread:
         thread.save(rebuild_cache=False)
         post.thread = thread

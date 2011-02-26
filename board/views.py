@@ -34,6 +34,7 @@ def settings(request):
 def faq(request):
     return rtr('faq.html', request)
 
+
 def api(request):
     return rtr('api.html', request)
 

@@ -2,7 +2,13 @@
 
 */
 
-var currentPage = (function() { // page detector
+
+var api = {
+    url: '/api',
+    defaultType: 'text/plain'    
+},
+    // page detector
+    currentPage = (function() {
     var loc = window.location.href.split('/').slice('3'),
         re = /(\d+)(?:.+)?/,
         data = {cache: {}};
@@ -37,21 +43,23 @@ var currentPage = (function() { // page detector
     }
     
     return data;
-})(),
+})();
 
-    api = {
-    url: '/api',
-    defaultType: 'text/plain'    
-};
+function PostArea(element) {
+    // listens textarea and adds some methods to it
 
-function PostArea(element) { // listens textarea and adds some methods to it
     this.textarea = $(element)[0];
     this.insert = function(text) {
+    // inserts text in textarea and focuses on it
         var textarea = this.textarea;
     	if (textarea) {
     		if (textarea.createTextRange && textarea.caretPos) { // IE
     			var caretPos = textarea.caretPos;
-    			caretPos.text = caretPos.text.charAt(caretPos.text.length-1) == " " ? text + " " : text;
+    			if (caretPos.text.charAt(caretPos.text.length-1) == ' ') {
+    			    caretPost.text = text + ' ';
+    			} else {
+    			    caretPos.text = text;
+    			}
     		} else if (textarea.setSelectionRange) { // Firefox
     			var start = textarea.selectionStart,
     			    end = textarea.selectionEnd;
@@ -65,6 +73,8 @@ function PostArea(element) { // listens textarea and adds some methods to it
     }
 
     this.wrap = function(tagStart, tagEnd, eachLine) {
+    // wraps selected text in tagStart text tagEnd
+    // and inserts to textarea
         var textarea = this.textarea,
             size = (tagStart + tagEnd).length;
         
@@ -88,10 +98,6 @@ function PostArea(element) { // listens textarea and adds some methods to it
     }
 }
 
-function getSelText() {
-    document.aform.selectedtext.value =  window.getSelection();
-}
-
 function getThreadId(thread) {
     return thread.attr('id').replace('thread', '');
 }
@@ -104,8 +110,8 @@ function getPostPid(post) {
     return post.attr('id').replace('post', '');
 }
 
-// Key-value database, based on localStorage
 function BoardContainer(storageName) {
+    // Key-value database, based on localStorage
     this.storageName = storageName;
 }
 $.extend(BoardContainer.prototype, {
@@ -213,23 +219,29 @@ ColorContainer.prototype = {
     set green(value) {this.data[1] = value},
     set blue(value) {this.data[2] = value},
     set alpha(value) {this.data[3] = value},
-    get rgb() {return this.torgb(this.data)},
-    get rgba() {return this.torgba(this.data)},
-    get hex() {return this.tohex(this.data.slice(0,3))},
-    get hsl() {return this.tohsl(this.data.slice(0,3))},
+
+    get rgb() {
+        return this.torgb(this.data)
+    },
+    get rgba() {
+        return this.torgba(this.data)
+    },
+    get hex() {
+        return this.tohex(this.data.slice(0,3))
+    },
+    get hsl() {
+        return this.tohsl(this.data.slice(0,3))
+    },
     
-    torgba : function(arr) {
-        arr = this.unpack(arguments);
+    torgba: function(arr) {
         return 'rgba(' + arr.join(',') + ')';
     },
     
-    torgb : function(arr) {
-        arr = this.unpack(arguments);
+    torgb: function(arr) {
         return 'rgb(' + arr.slice(0,3).join(',') + ')';
     },
     
-    tohex : function(arr) {
-        arr = this.unpack(arguments);
+    tohex: function(arr) {
         function hex(number) {
             if (number instanceof Array) {
                 var tmp = '';
@@ -252,7 +264,7 @@ ColorContainer.prototype = {
         return '#'+hex(arr);
     },
     
-    tohsl : function(arr) {
+    tohsl: function(arr) {
         var r = arr[0], g = arr[1], b = arr[2];
         r /= 255, g /= 255, b /= 255;
         var max = Math.max(r, g, b), min = Math.min(r, g, b);
@@ -273,26 +285,22 @@ ColorContainer.prototype = {
 
         return [Math.floor(h * 360), Math.floor(s * 100), Math.floor(l * 100)];
     },
-    
-    unpack : function(arr) {
-        return (arr[0] instanceof Array) ? arr[0] : arr;
-    },
 }
 
 function randomString(length) {
-    var s= '';
-    function randomchar() {
+    function randomChar() {
         var n = Math.floor(Math.random() * 62);
         if (n < 10) {
             return n; //1-10
         } else if (n < 36) {
-            return String.fromCharCode(n + 55); //A-Z
+            return String.fromCharCode(n + 55); // A-Z
         } else {
-            return String.fromCharCode(n + 61); //a-z
+            return String.fromCharCode(n + 61); // a-z
         }
     }
+    var s = '';
     while(s.length < length) {
-        s += randomchar();
+        s += randomChar();
     }
     return s;
 }
@@ -325,7 +333,8 @@ function labelsToPlaceholders(list) {
     //}
 }
 
-function manipulator(arr) { // manipulates elements. Used for custom user styles.
+function manipulator(arr) {
+    // manipulates elements. Used for user styles.
     var cases = {
         after : function(from, to) {
             $(from).remove().insertAfter(to)
@@ -342,12 +351,13 @@ function manipulator(arr) { // manipulates elements. Used for custom user styles
     }
 }
 
-// make page changes, that can't be afforded through CSS
-function styleDOM(style) {
 
+function styleDOM(style) {
+    // make page changes, that can't be afforded through CSS
 }
 
-function parseQs(key) { // query string parser
+function parseQs(key) {
+    // query string parser
     var d = location.href.split('?').pop().split('&'),
         parsed = {}, tmp;
         
@@ -363,17 +373,6 @@ function parseQs(key) { // query string parser
         return parsed[key];
     }
     return false;
-}
-
-function regChangeEvent(id, func) {
-    $('#'+id).change(function(e) {
-        //console.log(this.value, func)
-        func(this.value)
-    });
-}
-
-function resetSettings() {
-    // TODO
 }
 
 function slideRemove(elem) {
@@ -405,6 +404,16 @@ function init() {
             callback(data.html);
         });
     }
+    
+    function removeIfPreview(element) {
+        element = element instanceof jQuery ? element : $(element);
+        var p = element.prev();
+        if (p.hasClass('post-preview')) {
+            removeIfPreview(p);
+            p.remove();
+        }
+        element.remove();
+    }
 
     $('.bbcode a').click(function(e) {
         e.preventDefault();
@@ -424,32 +433,95 @@ function init() {
         window.location.hash = '#' + $(this).attr('href');
     });
     
-    $('.threads').delegate('.postlink', 'hover', function(event) {
-        event.preventDefault();
-        var m = $(this).attr('href').match(/(?:\/(\w+)\/)?(\d+)/),
-            globalLink = !!m[1],
-            board = globalLink ? m[1] : currentPage.section,
-            pid = m[2],
-            post = $(this).closest('.post'),
-            off = [this.offsetTop, this.offsetLeft],
-            callback = function(html) {
-                var outer = $('<div/>').addClass('post hover').css({
-                    'position': 'absolute',
-                    'top': off[0] + 15 +'px',
-                    'left': off[1] + 'px',
-                })
-                .addClass('post-preview preview' + pid)
-                .hover(function(event) {
-                    if (event.type === 'mouseleave') {
-                        $(this).remove();
+    function getPostLinkPid(postlink) {
+        return postlink.href.replace(/(.*\/)?(\d+)/, '$2');
+    }
+    
+    function buildAnswersMap() {
+        var map = {};
+        $('.postlink').each(function() {
+            var pid = parseInt(getPostPid($(this).closest('.post'))),
+                href = getPostLinkPid(this);
+            if (map[href]) {
+                map[href].push(pid);
+            } else {
+                map[href] = [pid];
+            }
+        });
+        
+        for (var i in map) {
+            var div = $('<div class="answer-map"/>'),
+                links = [];
+            for (var j=0; j < map[i].length; j++) {
+                var text = map[i][j];
+                    links.push('<a class="postlink"  href="#post'+text+'">&gt;&gt;'+text+'</a>');
+            }
+            div.html('Ответы:' + links.join(','));
+            $('#post' + i + ' .post-wrapper').append(div);
+        }
+    }
+    
+    function previewPosts() {
+        $('.postlink').each(function(x) {
+            var pid = getPostLinkPid(this);
+            if ($('#post' + pid).length === 0) {
+                return true;
+            }
+            this.href = '#post' + pid;
+        });
+        
+        $('.threads').delegate('.postlink', 'mouseover', function(event) {
+            event.preventDefault();
+            var t = $(this),
+                m = t.attr('href').match(/(?:\/(\w+)\/)?(\d+)/),
+                globalLink = !!m[1],
+                board = globalLink ? m[1] : currentPage.section,
+                pid = m[2],
+                post = t.closest('.post'),
+                timestamp = getCurrentTimestamp(),
+                id = 'preview-' + pid + '-' + timestamp,
+                top = event.clientY + (document.documentElement.scrollTop || document.body.scrollTop)
+                left = event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft + 1;
+                function callback(html) {
+                    var div = $(html).clone(),
+                        outer = $('<article/>').addClass('post post-preview')
+                    .attr('id', id)
+                    .css({'top': top + 11 +'px', 'left': left + 'px'})
+                    .hover(function(ev) {}, function(ev) {
+                        if ($(ev.target).hasClass('post-preview')) {
+                            return false;
+                        }
+                        removeIfPreview(this);
+                    });
+
+                    window.mouseOnPreview = true;
+
+                    // remove icons
+                    div.find('.bookmark, .hide, .is_closed, .is_pinned').remove();
+                    outer.append(div).insertAfter(post);
+                }
+                if (globalLink) {
+                    console.log(2)
+                    searchPost(board, pid, callback);
+                } else {
+                    callback($('#post' + pid).html());
+                }
+
+                t.bind('mouseout', function(ev) {
+                    if (!$(ev.target).is('.post-preview')) {
+                        return false;
                     }
-                }),
-                    div = $(html).clone();
-                div.find('.bookmark, .is_closed, .is_pinned').remove();
-                outer.append(div).insertAfter(post);
-            };
-            globalLink ? searchPost(board, pid, callback) : callback($('#post' + pid).html());
-    });
+                    $('#' + id).remove();
+                });
+        });
+    }
+    
+    if (!$.settings('disablePostsPreview')) {
+        previewPosts();
+    }
+    if (!$.settings('disableAnswersMap')) {
+        buildAnswersMap();
+    }
     
     $('.deleteMode > input').click(function(event) {
         var tmp = this.value,
@@ -494,8 +566,8 @@ function init() {
             url = !only_files ? 
                 window.api.url + '/post/' + target.data('id') : 
                 window.api.url + '/file/' + target.find('.file').attr('id').replace(/file/, ''),
-            password = Crypto.SHA1($('#password').val()),
-            cb;
+            password = Crypto.SHA1($('#password').val());
+
         url += '?password=' + password;
         url += '&' + $('.deleteMode').serialize();
         target.addClass('deleted');
@@ -697,7 +769,6 @@ function initSettings() {
     for (var id in changes) {
         var func = changes[id],
             c = $.settings(id);
-        //regChangeEvent(id, func);
         if (c) {
             func(id);
         }
@@ -725,6 +796,7 @@ function initStyle() {
         }
     });
     
+    // images resize
     $('.threads').delegate('.post:not(.resized) .files a', 'click', function(event) {
         event.preventDefault();
         var children = $(this).children();
@@ -740,13 +812,13 @@ function initStyle() {
         children.attr('src', children.data('thumb'));
     });
 
-
+    // strip long posts at section page
     $('.section .post .content').each(function() {
         var t = $(this), parent, span, a;
         if (t.hasScrollBar()) {
             t.addClass('overflow-hidden');
             span = $('<span/>').addClass('skipped')
-                .text("Комментарий слишком длинный.")
+                .text('Комментарий слишком длинный.')
                 .appendTo(t.parent());
             a = $('<a/>').attr('href', '#showFullComment')
             .addClass('skipped')
@@ -760,6 +832,7 @@ function initStyle() {
         }
     });
     
+    // modpanel
     $('.ip').each(function(x) {
         var t = $(this);
         t.insertBefore(t.prev().find('.number'));
@@ -1031,6 +1104,8 @@ function initAJAX() {
         if (newpost.parent().attr('id') !== 'main') {
             newpost.insertBefore('.threads');
         }
+        
+        // clear entered data
         newpost.find(':input').each(function() {
             switch (this.type) {
                 case 'email':
@@ -1097,4 +1172,4 @@ $(initHidden);
 $(initButtons);
 $(initHotkeys);
 $(initAJAX);
-$(initAutoload);
+//$(initAutoload);

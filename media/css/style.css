@@ -315,6 +315,7 @@ label.placeholder {
 .thread, .faq {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
 .skipped {color: #666;}
 .post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}
+.post-preview {position: absolute; z-index: 10;}
 .post:after {clear: both;}
 .post header {padding-bottom: 20px;}
 .post .answer {float: right;}
@@ -341,6 +342,8 @@ label.placeholder {
 .post.resized .content {max-height: none;}
 .post.resized .files {max-width: none; max-height: none;}
 .post span:empty {margin: 0;}
+.post .answer-map {margin-top: 5px; font-style: italic;}
+.post .answer-map .postlink {margin-left: 3px; font-size: 0.85em;}
 .deleted {background: #e44;}
 .info-wrapper {float: left;}
 .info-wrapper > * {float: left; margin: 0 5px 0 0;}

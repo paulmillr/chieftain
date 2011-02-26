@@ -1,4 +1,4 @@
-{% load md2 %}
+{% load md2 %}{% load settings %}
 <article class="post clearfix" id="post{{post.pid}}" data-id="{{post.id}}">
     <div class="post-wrapper">
         <header class="clearfix">
@@ -6,6 +6,8 @@
                 {% if post.thread and post.is_op_post %}
                 {% if post.thread.is_pinned %}<span class="is_pinned"></span>{% endif %}
                 {% if post.thread.is_closed %}<span class="is_closed"></span>{% endif %}
+                {% endif %}
+                {% if post.country %}<span class="country"><img src="{% setting 'STATIC_URL' %}/images/flags/{{post.country|lower}}.png" alt="{{post.country}}" title="{{post.country}}"></span>
                 {% endif %}
                 <span class="number"><a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">{{post.pid}}</a></span>
                 <time datetime="{{post.date|date:'c'}}" pubdate>{{post.date|date:"d.m.Y H:i:s"}}</time>

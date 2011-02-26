@@ -17,7 +17,7 @@ urlpatterns = patterns('board.views',
     # single threads
     (r'^thread/(?P<id>\d+)$', ThreadResource.as_view()),
     # by first post pid
-    (r'^thread/(?P<section__slug>\w+)/(?P<id>\d+)$', 
+    (r'^thread/(?P<section__slug>\w+)/(?P<id>\d+)$',
         ThreadResource.as_view()),
     # list of posts
     (r'^post/$', PostRootResource.as_view()),

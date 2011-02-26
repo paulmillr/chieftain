@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="{{settings.STATIC_URL}}css/skins.css?v=11" class="ustyle">
     
     <script src="{{settings.STATIC_URL}}js/preload.js?v=11"></script>
+    <script src="{% url django.views.i18n.javascript_catalog %}"></script>
+    
 </head>
 
 <body>
@@ -28,10 +30,10 @@
                     {{settings.SITE_TITLE}}&nbsp;&mdash;
                     {% block title %}{% endblock %}</a></h1></div>
                 <div class="menu"></div>
-                <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{settings.STATIC_URL}}images/aa.png" alt="/aa/"></a></div>
+                <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{settings.STATIC_URL}}images/aa.png" alt="/aa/" width="300" height="100"></a></div>
             </header>
             <div id="main" role="main">
-            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Total: %(totTime).3fs. Python: %(pyTime).3fs. Database: %(dbTime).3fs. Queries: %(queries)d.</div> -->
+            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Total: %(total_time).3fs. Python: %(py_time).3fs. Database: %(db_time).3fs. Queries: %(queries)d.</div> -->
             </div>
             <footer>
                 {% include "navigation.html" %}
@@ -40,7 +42,7 @@
         </div>
         <div id="sidebar">{% include "sidebar.html" %}</div>
     </div> <!-- end of #container -->
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
     <script>!window.jQuery && document.write(unescape('%3Cscript src="{{settings.STATIC_URL}}js/libs/jquery-1.5.0.min.js"%3E%3C/script%3E'))</script>
     <script src="{{settings.STATIC_URL}}js/plugins.js?v=14"></script>
     <script src="{{settings.STATIC_URL}}js/script.js?v=28"></script>
