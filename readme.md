@@ -4,30 +4,36 @@ klipped - new generation imageboard.
 
 ## What?
 
-klipped is a new generation imageboard. It is fastest open source chan. It has plenty of modern features and modular design. klipped is built with HTML5, Python programming language, Django web framework with use of jQuery javascript library and Memcached memory caching system.
+klipped is a new generation imageboard. It is fastest open source chan.
+It has plenty of modern features and modular design. klipped is built with
+HTML5, Python programming language, Django web framework, Tornado scalable
+non-blocking web server with use of jQuery javascript library and Memcached
+memory caching system.
 
 ## Features
 
 * Lightweight architecture
-* Advanched post validation tools: tripcodes and tripbuttons
-* Mobile and smartphone versions
+* Realtime publish and subscribe system (posts autoload)
+* REST API with XML, YAML and JSON serializers
+* Advanched post validation tools including tripcodes
 * Markdown support with code highlighting
-* Thread archiving
-* REST API with XML, YAML and JSON serializers.
-* Comet
-* Canvas drawer
 * Full-text search
 * AJAX
 * Answer maps & previews
 * Customizable styles
 * Advanced moderation and administration tools
 * Internationalization (5 languages are supported currently)
-* Valid HTML5
+* HTML5
 
+### Planned for first release
+
+* Mobile and smartphone versions
+* HTML5 oekaki
 
 ## Dependencies
 
 * [django](http://www.djangoproject.com/download/)
+* [Tornado](http://www.tornadoweb.org/)
 * [memcached](http://memcached.org/)
 * [py-memcached](http://pypi.python.org/pypi/python-memcached/)
 * [py-markdown2](https://github.com/pbagwl/markdown2)
@@ -40,7 +46,9 @@ Oracle)
 
 ## Licensing
 
-Klipped is licensed under MIT license. It means that you can copy, distribute, adapt and transmit the work for free, but the copyright notice and license shall be included in all copies or substantial portions of klipped.
+Klipped is licensed under MIT license. It means that you can copy, distribute,
+adapt and transmit the work for free, but the copyright notice and license shall 
+be included in all copies or substantial portions of klipped.
 
 Copyright (c) 2011 Paul Bagwell, http://klipped.pbagwl.com/.
 

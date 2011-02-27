@@ -4,9 +4,14 @@
 	Twitter: @2ch_ru
 	From: Moscow, Russia
 
+	Developer, HTML5+CSS guy: pbagwl
+	Site: pbagwl.com
+	Twitter: @pbagwl
+	From: Kharkiv, Ukraine
+
 /* SITE */
-	Last update: 2011/02
+	Last update: 2011/03
 	Language: Russian
 	Doctype: HTML5 with CSS3
-	Tools: Python, Django
+	Tools: Python, Django, Tornado
 	IDE: Textmate
