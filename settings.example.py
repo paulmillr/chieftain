@@ -1,31 +1,36 @@
 # encoding: utf-8
 import os
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 MANAGERS = ADMINS = (
-    ('paul', 'paul@example.com'),
+    ('test', 'test@example.com'),
 )
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2',
             #'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': '',  # Or path to database file if using sqlite3.
-        'USER': '',  # Not used with sqlite3.
-        'PASSWORD': '',  # Not used with sqlite3.
+        'NAME': 'test',  # Or path to database file if using sqlite3.
+        'USER': 'test',  # Not used with sqlite3.
+        'PASSWORD': 'test',  # Not used with sqlite3.
         'HOST': '',  # Empty string for localhost. Not used with sqlite3.
         'PORT': '',  # Empty string for default. Not used with sqlite3.
     }
 }
 
 CACHE_BACKEND = 'memcached://127.0.0.1:11211/?max_entries=10000'
+COMET = {
+    'host': '127.0.0.1',
+    'port': 8888,
+}
+GEOIP_PATH = '/home/klipped/contrib/'
 
 DISABLE_CAPTCHA = True
-RECAPTCHA_PUBLIC_KEY = '6LdeQcESAAAAABABMVv5jWI0B6Ut2baEWvH8A0qC'
-RECAPTCHA_PRIVATE_KEY = '6LdeQcESAAAAADFDC3ImXUzyYaD60t2etCpHih1M'
-#APPEND_SLASH = False
+RECAPTCHA_PUBLIC_KEY = 'r'
+RECAPTCHA_PRIVATE_KEY = 'r'
+# APPEND_SLASH = False
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 TIME_ZONE = 'Europe/Kiev'
 LANGUAGE_CODE = 'ru'
@@ -35,17 +40,19 @@ USE_I18N = True
 USE_L10N = True
 
 SITE_TITLE = u'Два.ч 2.0 β'
-SITE_URL = 'http://b.2-ch.ru/'
+SITE_URL = 'http://2ch.ru/'
+FILES_URL = 'http://static.2ch.ru/'
 BASE_DIR = os.path.dirname(__file__)
+CACHE_DIR = 'cache'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
-MEDIA_URL = '{0}files/'.format(SITE_URL)
+MEDIA_URL = '{0}files/'.format(FILES_URL)
 STATIC_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '{0}media/'.format(SITE_URL)
+STATIC_URL = '{0}media/'.format(FILES_URL)
 
 ADMIN_MEDIA_PREFIX = '/admin-media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = '231adxaseqweasdasda5akd0asdaszASDAEWp'
+SECRET_KEY = 'tqaejwiqwjasidjaisjiq43uiiejwajeiqjwie'
 
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
@@ -58,6 +65,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+    'board.middleware.DisableCSRFMiddleware',
     'board.middleware.DenyMiddleware',
 
     # for debugging
@@ -87,7 +95,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
-    'djangorestframework',
     'klipped.board',
+    'klipped.api',
+    'klipped.modpanel',
     #'klipped.mobile',
 )

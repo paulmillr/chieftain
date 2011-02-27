@@ -32,6 +32,7 @@ memory caching system.
 
 ## Dependencies
 
+* You need Python 2.6 or 2.7 to run klipped.
 * [django](http://www.djangoproject.com/download/)
 * [Tornado](http://www.tornadoweb.org/)
 * [memcached](http://memcached.org/)
