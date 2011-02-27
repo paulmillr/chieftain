@@ -21,7 +21,6 @@ from modpanel.views import is_mod
 
 __all__ = [
     'Resource', 'ModelResource', 'RootModelResource',
-    'PostStreamResource',
     'PostRootResource', 'PostResource',
     'ThreadRootResource', 'ThreadResource',
     'SectionRootResource', 'SectionResource',
@@ -148,10 +147,7 @@ class PostResource(ModelResource):
             post = self.model.objects.get(id=kwargs['id'])
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
-        key = request.GET['password']
-        if len(key) < 40:  # make hash if we got plain text password
-            key = tools.key(key)
-
+        key = tools.key(request.GET['password'])
         if post.password == key:
             post.remove()
             return Response(status.NO_CONTENT)
@@ -245,9 +241,7 @@ class FileResource(ModelResource):
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
 
-        key = request.GET['password']
-        if len(key) < 40:  # make hash if we got plain text password
-            key = tools.key(key)
+        key = tools.key(request.GET['password'])
         if file.post.password != key:
             raise ResponseException(status.FORBIDDEN, content={
                 'detail': u'{0}{1}. {2}'.format(

@@ -442,7 +442,9 @@ class Section(models.Model):
 
     def allowed_filetypes(self):
         """List of allowed MIME types of section."""
-        return FileType.objects.filter(group__in=self.filetypes)
+        f = FileType.objects.filter(group__in=self.filetypes.all()
+            ).values_list('mime', 'extension')
+        return dict(f)
 
     @property
     def key(self):

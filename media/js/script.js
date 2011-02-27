@@ -579,7 +579,7 @@ function init() {
             url = !only_files ? 
                 window.api.url + '/post/' + target.data('id') : 
                 window.api.url + '/file/' + target.find('.file').attr('id').replace(/file/, ''),
-            password = Crypto.SHA1($('#password').val());
+            password = $('#password').val();
 
         url += '?password=' + password;
         url += '&' + $('.deleteMode').serialize();
