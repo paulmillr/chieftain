@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-01-24 02:20+0200\n"
+"POT-Creation-Date: 2011-02-28 00:30+0200\n"
 "PO-Revision-Date: 2011-01-23 20:48+0200\n"
 "Last-Translator: Anonymous <nomad@ag.ru>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -18,270 +18,642 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n>1;\n"
 
-#: board/models.py:75
-msgid "Thread bump date"
-msgstr "Date de bump dernière"
+#: api/resources.py:159
+msgid "You need to enter ban reason"
+msgstr ""
 
-#: board/models.py:77
-msgid "Thread is pinned"
-msgstr "Fixée"
+#: api/resources.py:179
+msgid "Error on deleting post #"
+msgstr ""
 
-#: board/models.py:79
-msgid "Thread is closed"
-msgstr "Fermée"
+#: api/resources.py:180 api/resources.py:248
+msgid "Password mismatch"
+msgstr ""
 
-#: board/models.py:80
-msgid "Thread html"
-msgstr "cache-HTML"
+#: api/resources.py:247
+msgid "Error on deleting file #"
+msgstr ""
 
-#: board/models.py:126
-msgid "Post thread"
-msgstr "Topic"
+#: board/fields.py:24
+msgid "Invalid captcha"
+msgstr ""
 
-#: board/models.py:128
-msgid "Post is op post"
-msgstr "Post première"
+#: board/models.py:37
+msgid "Default"
+msgstr ""
 
-#: board/models.py:129
+#: board/models.py:39
+msgid "News"
+msgstr ""
+
+#: board/models.py:41
+msgid "International"
+msgstr ""
+
+#: board/models.py:148 board/models.py:264
 #, fuzzy
-msgid "Post bump date"
+msgid "Bump date"
 msgstr "Date de bump"
 
-#: board/models.py:131
-msgid "Post is deleted"
+#: board/models.py:150 board/models.py:266 board/models.py:341
+#, fuzzy
+msgid "Is deleted"
 msgstr "Supprimé"
 
-#: board/models.py:133
+#: board/models.py:152
 #, fuzzy
-msgid "Post file count"
-msgstr "Post première"
+msgid "Is pinned"
+msgstr "Fixée"
 
-#: board/models.py:134
+#: board/models.py:154
+#, fuzzy
+msgid "Is closed"
+msgstr "Fermée"
+
+#: board/models.py:155 board/models.py:283
+msgid "HTML cache"
+msgstr ""
+
+#: board/models.py:249 board/models.py:260 board/models.py:614
+#, fuzzy
+msgid "Thread"
+msgstr "cache-HTML"
+
+#: board/models.py:250 board/templates/section_page.html:26
+#: board/templates/section_posts.html:32
+#: board/templates/section_thread.html:21
+#: board/templates/section_threads.html:19
+#, fuzzy
+msgid "Threads"
+msgstr "cache-HTML"
+
+#: board/models.py:258
+msgid "PID"
+msgstr ""
+
+#: board/models.py:262
+#, fuzzy
+msgid "First post in thread"
+msgstr "Topic"
+
+#: board/models.py:268
+#, fuzzy
+msgid "File count"
+msgstr "Post"
+
+#: board/models.py:269
 msgid "Post ip"
 msgstr "IP-adresse"
 
-#: board/models.py:136
-msgid "Post poster"
+#: board/models.py:271
+msgid "Country code"
+msgstr ""
+
+#: board/models.py:273
+#, fuzzy
+msgid "Poster"
 msgstr "Auteur"
 
-#: board/models.py:138
-msgid "Post tripcode"
+#: board/models.py:275
+#, fuzzy
+msgid "Tripcode"
 msgstr "Tripcode"
 
-#: board/models.py:140
-msgid "Post email"
-msgstr "Email"
+#: board/models.py:277
+msgid "Email"
+msgstr ""
 
-#: board/models.py:142
-msgid "Post topic"
-msgstr "Topic"
+#: board/models.py:279
+msgid "Topic"
+msgstr ""
 
-#: board/models.py:144
-msgid "Post password"
+#: board/models.py:281
+#, fuzzy
+msgid "Password"
 msgstr "Mot de passe"
 
-#: board/models.py:145
-msgid "Post message"
+#: board/models.py:282
+#, fuzzy
+msgid "Message"
 msgstr "Texte"
 
-#: board/models.py:146
-msgid "Post html"
-msgstr "Cache-HTML"
+#: board/models.py:327 board/models.py:335 board/models.py:654
+#, fuzzy
+msgid "Post"
+msgstr "IP-adresse"
 
-#: board/models.py:158
-msgid "File post"
-msgstr "Post"
+#: board/models.py:328 board/templates/section_page.html:27
+#: board/templates/section_posts.html:33
+#: board/templates/section_thread.html:22
+#: board/templates/section_threads.html:20
+#, fuzzy
+msgid "Posts"
+msgstr "IP-adresse"
 
-#: board/models.py:160
-msgid "File original name"
+#: board/models.py:337
+#, fuzzy
+msgid "Original name"
 msgstr "Nom original"
 
-#: board/models.py:161
-msgid "File MIME"
-msgstr "MIME-type"
+#: board/models.py:338 board/models.py:410
+msgid "Type"
+msgstr ""
 
-#: board/models.py:162
-msgid "file_size"
-msgstr "Taille"
+#: board/models.py:339
+msgid "Size"
+msgstr ""
 
-#: board/models.py:164
-msgid "File is deleted"
-msgstr "Supprimé"
-
-#: board/models.py:166
-msgid "File image width"
+#: board/models.py:343
+#, fuzzy
+msgid "Image width"
 msgstr "Largeur d'image"
 
-#: board/models.py:168
-msgid "File image height"
+#: board/models.py:345
+#, fuzzy
+msgid "Image height"
 msgstr "Hauter d'image"
 
-#: board/models.py:171
-msgid "File hash"
-msgstr "Hachage"
+#: board/models.py:347
+msgid "Hash"
+msgstr ""
 
-#: board/models.py:174
-msgid "File location"
+#: board/models.py:349
+#, fuzzy
+msgid "Location"
 msgstr "Location"
 
-#: board/models.py:178
-msgid "File category name"
-msgstr "Nom"
-
-#: board/models.py:185
-msgid "File type extension"
-msgstr "Extention"
-
-#: board/models.py:187
-msgid "File type MIME"
-msgstr "MIME-type"
-
-#: board/models.py:189
-msgid "File type category"
-msgstr "Сatégorie"
-
-#: board/models.py:196
-msgid "Section slug"
-msgstr "Adresse"
-
-#: board/models.py:198
-msgid "Section name"
-msgstr "Nom"
-
-#: board/models.py:200
-msgid "Section description"
-msgstr "Description"
-
-#: board/models.py:202
-msgid "Section group"
-msgstr "Groupe"
-
-#: board/models.py:204
-msgid "Section filesize limit"
-msgstr "Limit de taille du fichier"
-
-#: board/models.py:206
-msgid "Section force anonymity"
-msgstr "Anonymat forcée"
-
-#: board/models.py:208
-msgid "Section default poster name"
-msgstr "Nom d'auter par défaut"
-
-#: board/models.py:210
-msgid "Section allowed filetypes"
-msgstr "Types des fichier autorisée"
-
-#: board/models.py:212
-msgid "Section bumplimit"
-msgstr "Bumplimite"
-
-#: board/models.py:214
-msgid "Section thread limit"
-msgstr "Limite des topics par la section"
-
-#: board/models.py:247
-msgid "Section group name"
-msgstr "Nom"
-
-#: board/models.py:248
-msgid "Section group order"
-msgstr "Ordre"
-
-#: board/models.py:258
-msgid "User name"
-msgstr "Pseudo"
-
-#: board/models.py:260
-msgid "User password"
-msgstr "Mot de passe de Mod"
-
-#: board/models.py:263
-msgid "User owned sections"
-msgstr "Sections moderée"
-
-#: templates/base.html:34
-msgid "Runs on"
+#: board/models.py:351
+msgid "Thumbnail"
 msgstr ""
 
-#: templates/index.html:6
-msgid "Welcome back"
-msgstr ""
-
-#: templates/index.html:7
-msgid "Welcome text"
-msgstr ""
-
-#: templates/navigation.html:4
-msgid "Main page"
-msgstr ""
-
-#: templates/navigation.html:5
-msgid "FAQ"
-msgstr ""
-
-#: templates/navigation.html:6
-msgid "Not Safe For Work"
-msgstr ""
-
-#: templates/navigation.html:6
-msgid "NSFW"
-msgstr ""
-
-#: templates/navigation.html:7 templates/settings.html:3
-msgid "Settings"
-msgstr ""
-
-#: templates/navigation.html:8
-msgid "Sidebar"
-msgstr ""
-
-#: templates/navigation.html:9
-msgid "Mobile version"
-msgstr ""
-
-#: templates/section.html:8
-msgid "Go back"
-msgstr ""
-
-#: templates/section.html:16
-msgid "Left this field empty"
-msgstr ""
-
-#: templates/section.html:53
+#: board/models.py:366 board/templates/form.html:43
 #, fuzzy
 msgid "File"
 msgstr "Post"
 
-#: templates/section.html:58
+#: board/models.py:367
+#, fuzzy
+msgid "Files"
+msgstr "Post"
+
+#: board/models.py:373
+msgid "Extension"
+msgstr ""
+
+#: board/models.py:375
+#, fuzzy
+msgid "MIME"
+msgstr "MIME-type"
+
+#: board/models.py:377 board/models.py:412
+msgid "Group"
+msgstr ""
+
+#: board/models.py:383
+#, fuzzy
+msgid "File type"
+msgstr "MIME-type"
+
+#: board/models.py:384 board/models.py:420
+#, fuzzy
+msgid "File types"
+msgstr "MIME-type"
+
+#: board/models.py:390 board/models.py:406 board/models.py:498
+msgid "Name"
+msgstr ""
+
+#: board/models.py:397 board/models.py:398
+#, fuzzy
+msgid "File type group"
+msgstr "Сatégorie"
+
+#: board/models.py:404
+msgid "Slug"
+msgstr ""
+
+#: board/models.py:408
+#, fuzzy
+msgid "Description"
+msgstr "Description"
+
+#: board/models.py:414
+#, fuzzy
+msgid "Filesize limit"
+msgstr "Limit de taille du fichier"
+
+#: board/models.py:416
+#, fuzzy
+msgid "Force anonymity"
+msgstr "Anonymat forcée"
+
+#: board/models.py:417
+msgid "Anonymous"
+msgstr ""
+
+#: board/models.py:418
+#, fuzzy
+msgid "Default poster name"
+msgstr "Nom d'auter par défaut"
+
+#: board/models.py:422
+#, fuzzy
+msgid "Max posts in thread"
+msgstr "Topic"
+
+#: board/models.py:424
+#, fuzzy
+msgid "Max threads"
+msgstr "Topic"
+
+#: board/models.py:491
+#, fuzzy
+msgid "Section"
+msgstr "Adresse"
+
+#: board/models.py:492
+#, fuzzy
+msgid "Sections"
+msgstr "Adresse"
+
+#: board/models.py:499
+msgid "Order"
+msgstr ""
+
+#: board/models.py:500
+msgid "Is hidden"
+msgstr ""
+
+#: board/models.py:512
+msgid "Section group"
+msgstr "Groupe"
+
+#: board/models.py:513
+#, fuzzy
+msgid "Section groups"
+msgstr "Groupe"
+
+#: board/models.py:520
+msgid "User owned sections"
+msgstr "Sections moderée"
+
+#: board/models.py:534
+msgid "User profile"
+msgstr ""
+
+#: board/models.py:535
+msgid "User profiles"
+msgstr ""
+
+#: board/models.py:541
+msgid "Word"
+msgstr ""
+
+#: board/models.py:548
+msgid "Wordfilter"
+msgstr ""
+
+#: board/models.py:549
+msgid "Wordfilters"
+msgstr ""
+
+#: board/models.py:554
+msgid "IP network"
+msgstr ""
+
+#: board/models.py:555
+msgid "Either IP address or IP network specification"
+msgstr ""
+
+#: board/models.py:556
+msgid "Ban reason"
+msgstr ""
+
+#: board/models.py:567
+msgid "Denied IP"
+msgstr ""
+
+#: board/models.py:568
+msgid "Denied IPs"
+msgstr ""
+
+#: board/models.py:598 board/models.py:606
+msgid "Last threads of section"
+msgstr ""
+
+#: board/models.py:639 board/models.py:647
+#, fuzzy
+msgid "Last posts of thread"
+msgstr "Topic"
+
+#: board/validators.py:44
+#, fuzzy
+msgid "Invalid file type"
+msgstr "Types des fichier autorisée"
+
+#: board/validators.py:47
+msgid "Too big file"
+msgstr ""
+
+#: board/validators.py:54
+msgid "This file already exists"
+msgstr ""
+
+#: board/validators.py:88
+msgid "This thread is closed, you cannot post to it."
+msgstr ""
+
+#: board/validators.py:95
+msgid "Enter post message or attach a file to your post"
+msgstr ""
+
+#: board/validators.py:98
+msgid "You need to upload file to create new thread."
+msgstr ""
+
+#: board/validators.py:101
+msgid "Your post contains blacklisted word."
+msgstr ""
+
+#: board/validators.py:107
+msgid "Authentication required to create threads in this section"
+msgstr ""
+
+#: board/views.py:49
+msgid "Nothing found"
+msgstr ""
+
+#: board/templates/404.html:2 board/templates/404.html.py:20
+msgid "Not found"
+msgstr ""
+
+#: board/templates/500.html:2 board/templates/500.html.py:20
+msgid "Internal server error"
+msgstr ""
+
+#: board/templates/api.html:5
+msgid "API"
+msgstr ""
+
+#: board/templates/api.html:8
+msgid "Documentation"
+msgstr ""
+
+#: board/templates/api.html:9
+msgid "Example URLs"
+msgstr ""
+
+#: board/templates/banned.html:2
+msgid "Banned"
+msgstr ""
+
+#: board/templates/banned.html:20
+msgid "You've been banned from this board"
+msgstr ""
+
+#: board/templates/banned.html:21
+msgid "Reason"
+msgstr ""
+
+#: board/templates/base.html:40
+msgid "Runs on"
+msgstr ""
+
+#: board/templates/form.html:7
+msgid "Left this field empty"
+msgstr ""
+
+#: board/templates/form.html:49
 msgid "Captcha"
 msgstr ""
 
-#: templates/settings.html:10
-msgid "Board style"
+#: board/templates/index.html:3 board/templates/navigation.html:4
+msgid "Main page"
 msgstr ""
 
-#: templates/settings.html:21
-msgid "Old posting way"
+#: board/templates/index.html:6
+msgid "Welcome back"
 msgstr ""
 
-#: templates/settings.html:27
-msgid "Hide sidebar"
+#: board/templates/index.html:7
+msgid "Welcome text"
 msgstr ""
 
-#: templates/settings.html:33
-msgid "Hide navigation"
+#: board/templates/navigation.html:5
+msgid "FAQ"
 msgstr ""
 
-#: templates/settings.html:39
-msgid "Hide sections banner"
+#: board/templates/navigation.html:6
+msgid "Not Safe For Work"
 msgstr ""
 
-#: templates/sidebar.html:3
-msgid "Dva.ch"
+#: board/templates/navigation.html:6
+msgid "NSFW"
 msgstr ""
 
-#: templates/thread.html:3
+#: board/templates/navigation.html:7 board/templates/settings.html:3
+msgid "Settings"
+msgstr ""
+
+#: board/templates/navigation.html:8
+msgid "Mobile version"
+msgstr ""
+
+#: board/templates/section_base.html:8
+msgid "Search"
+msgstr ""
+
+#: board/templates/section_base.html:9
+msgid "OP-post"
+msgstr ""
+
+#: board/templates/section_base.html:18
+#, fuzzy
+msgid "Delete posts"
+msgstr "Post"
+
+#: board/templates/section_base.html:18
+msgid "Cancel"
+msgstr ""
+
+#: board/templates/section_base.html:21
+msgid "Only files"
+msgstr ""
+
+#: board/templates/section_base.html:25
+msgid "Delete all messages from that IP"
+msgstr ""
+
+#: board/templates/section_base.html:28
+msgid "Ban IP"
+msgstr ""
+
+#: board/templates/section_base.html:31
+#, fuzzy
+msgid "Pin thread"
+msgstr "Topic"
+
+#: board/templates/section_base.html:32
+#, fuzzy
+msgid "Close thread"
+msgstr "Topic"
+
+#: board/templates/section_page.html:25 board/templates/section_posts.html:31
+#: board/templates/section_thread.html:20
+#: board/templates/section_threads.html:18
+msgid "Everything"
+msgstr ""
+
+#: board/templates/section_thread.html:4
 #, fuzzy
 msgid "Thread title"
 msgstr "cache-HTML"
+
+#: board/templates/section_thread.html:7
+msgid "Go back"
+msgstr ""
+
+#: board/templates/settings.html:9
+msgid "Save preferences"
+msgstr ""
+
+#: board/templates/settings.html:13
+msgid "Board style"
+msgstr ""
+
+#: board/templates/settings.html:24
+msgid "New style form"
+msgstr ""
+
+#: board/templates/settings.html:30
+msgid "Disable post autoload"
+msgstr ""
+
+#: board/templates/settings.html:36
+msgid "Old posting way"
+msgstr ""
+
+#: board/templates/settings.html:42
+#, fuzzy
+msgid "Disable notifications"
+msgstr "Location"
+
+#: board/templates/settings.html:49
+msgid "Disable ajax"
+msgstr ""
+
+#: board/templates/settings.html:55
+msgid "Hide markup panel"
+msgstr ""
+
+#: board/templates/settings.html:61 board/templates/sidebar.html:4
+msgid "Hide sidebar"
+msgstr ""
+
+#: board/templates/settings.html:67
+msgid "Hide navigation"
+msgstr ""
+
+#: board/templates/settings.html:73
+msgid "Disable posts hide"
+msgstr ""
+
+#: board/templates/settings.html:80
+msgid "Disable posts preview"
+msgstr ""
+
+#: board/templates/settings.html:86
+msgid "Disable answers map"
+msgstr ""
+
+#: board/templates/settings.html:92
+msgid "Disable bookmarks"
+msgstr ""
+
+#: board/templates/settings.html:98
+msgid "Hide sections banner"
+msgstr ""
+
+#: board/templates/settings.html:104
+msgid "Don't log visited threads"
+msgstr ""
+
+#: board/templates/settings.html:104
+msgid "clear"
+msgstr ""
+
+#: board/templates/settings.html:111
+#, fuzzy
+msgid "Visited threads"
+msgstr "Topic"
+
+#: board/templates/settings.html:112
+msgid "Sorted by the"
+msgstr ""
+
+#: board/templates/settings.html:114
+msgid "time of first visit"
+msgstr ""
+
+#: board/templates/settings.html:115
+msgid "visits count"
+msgstr ""
+
+#: modpanel/templates/banlist.html:5 modpanel/templates/modindex.html:5
+msgid "Mod control panel"
+msgstr ""
+
+#~ msgid "Thread bump date"
+#~ msgstr "Date de bump dernière"
+
+#~ msgid "Post is op post"
+#~ msgstr "Post première"
+
+#, fuzzy
+#~ msgid "Post file count"
+#~ msgstr "Post première"
+
+#~ msgid "Post email"
+#~ msgstr "Email"
+
+#~ msgid "Post topic"
+#~ msgstr "Topic"
+
+#~ msgid "Post html"
+#~ msgstr "Cache-HTML"
+
+#~ msgid "file_size"
+#~ msgstr "Taille"
+
+#~ msgid "File is deleted"
+#~ msgstr "Supprimé"
+
+#~ msgid "File hash"
+#~ msgstr "Hachage"
+
+#~ msgid "File category name"
+#~ msgstr "Nom"
+
+#~ msgid "File type extension"
+#~ msgstr "Extention"
+
+#~ msgid "Section name"
+#~ msgstr "Nom"
+
+#~ msgid "Section bumplimit"
+#~ msgstr "Bumplimite"
+
+#~ msgid "Section thread limit"
+#~ msgstr "Limite des topics par la section"
+
+#~ msgid "Section group name"
+#~ msgstr "Nom"
+
+#~ msgid "Section group order"
+#~ msgstr "Ordre"
+
+#~ msgid "User name"
+#~ msgstr "Pseudo"
+
+#~ msgid "User password"
+#~ msgstr "Mot de passe de Mod"

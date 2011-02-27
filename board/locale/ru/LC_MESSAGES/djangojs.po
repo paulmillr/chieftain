@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-26 18:50+0200\n"
+"POT-Creation-Date: 2011-02-28 00:28+0200\n"
 "PO-Revision-Date: 2011-02-26 17:38+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -41,12 +41,19 @@ msgstr "Тред"
 
 #: media/js/script.js:18
 msgid "Post"
-msgstr "Сообщение"
+msgstr "Пост"
 
 #: media/js/script.js:19
 msgid "hidden"
 msgstr "скрыт"
 
-#: media/js/script.js:468
-msgid "Replies"
-msgstr "Ответы"
+#: media/js/script.js:20
+msgid "bookmark"
+msgstr "Добавить в закладки"
+
+#: media/js/script.js:21
+msgid "hide"
+msgstr "Скрыть"
+
+#~ msgid "Replies"
+#~ msgstr "Ответы"

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-26 18:55+0200\n"
+"POT-Creation-Date: 2011-02-28 00:30+0200\n"
 "PO-Revision-Date: 2011-01-23 19:23+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -19,19 +19,19 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: api/resources.py:178
+#: api/resources.py:159
 msgid "You need to enter ban reason"
 msgstr "Необходимо ввести причину блокировки"
 
-#: api/resources.py:199
+#: api/resources.py:179
 msgid "Error on deleting post #"
 msgstr "Ошибка при удалении сообщения №"
 
-#: api/resources.py:200 api/resources.py:270
+#: api/resources.py:180 api/resources.py:248
 msgid "Password mismatch"
 msgstr "Неправильный пароль"
 
-#: api/resources.py:269
+#: api/resources.py:247
 msgid "Error on deleting file #"
 msgstr "Ошибка при удалении файла №"
 
@@ -71,7 +71,7 @@ msgstr "Закрыт"
 msgid "HTML cache"
 msgstr "Кэш"
 
-#: board/models.py:249 board/models.py:260 board/models.py:602
+#: board/models.py:249 board/models.py:260 board/models.py:614
 msgid "Thread"
 msgstr "Тред"
 
@@ -126,7 +126,7 @@ msgstr "Пароль"
 msgid "Message"
 msgstr "Текст"
 
-#: board/models.py:327 board/models.py:335 board/models.py:642
+#: board/models.py:327 board/models.py:335 board/models.py:654
 msgid "Post"
 msgstr "Сообщение"
 
@@ -197,7 +197,7 @@ msgstr "Тип файлов"
 msgid "File types"
 msgstr "Типы файлов"
 
-#: board/models.py:390 board/models.py:406 board/models.py:491
+#: board/models.py:390 board/models.py:406 board/models.py:498
 msgid "Name"
 msgstr "Название"
 
@@ -237,79 +237,79 @@ msgstr "Бамплимит"
 msgid "Max threads"
 msgstr "Максимальное количество тредов"
 
-#: board/models.py:484
+#: board/models.py:491
 msgid "Section"
 msgstr "Раздел"
 
-#: board/models.py:485
+#: board/models.py:492
 msgid "Sections"
 msgstr "Разделы"
 
-#: board/models.py:492
+#: board/models.py:499
 msgid "Order"
 msgstr "Порядок"
 
-#: board/models.py:493
+#: board/models.py:500
 msgid "Is hidden"
 msgstr "Скрыта"
 
-#: board/models.py:500
+#: board/models.py:512
 msgid "Section group"
 msgstr "Группа разделов"
 
-#: board/models.py:501
+#: board/models.py:513
 msgid "Section groups"
 msgstr "Группы разделов"
 
-#: board/models.py:508
+#: board/models.py:520
 msgid "User owned sections"
 msgstr "Модерируемые секции"
 
-#: board/models.py:522
+#: board/models.py:534
 msgid "User profile"
 msgstr "Модератор"
 
-#: board/models.py:523
+#: board/models.py:535
 msgid "User profiles"
 msgstr "Модераторы"
 
-#: board/models.py:529
+#: board/models.py:541
 msgid "Word"
 msgstr "Слово"
 
-#: board/models.py:536
+#: board/models.py:548
 msgid "Wordfilter"
 msgstr "Вордфильтр"
 
-#: board/models.py:537
+#: board/models.py:549
 msgid "Wordfilters"
 msgstr "Вордфильтры"
 
-#: board/models.py:542
+#: board/models.py:554
 msgid "IP network"
 msgstr "IP-адрес"
 
-#: board/models.py:543
+#: board/models.py:555
 msgid "Either IP address or IP network specification"
 msgstr "IP или подсеть"
 
-#: board/models.py:544
+#: board/models.py:556
 msgid "Ban reason"
 msgstr "Причина бана"
 
-#: board/models.py:555
+#: board/models.py:567
 msgid "Denied IP"
 msgstr "Заблокированный IP"
 
-#: board/models.py:556
+#: board/models.py:568
 msgid "Denied IPs"
 msgstr "Заблокированные IP"
 
-#: board/models.py:586 board/models.py:594
+#: board/models.py:598 board/models.py:606
 msgid "Last threads of section"
 msgstr "Последние сообщения раздела"
 
-#: board/models.py:627 board/models.py:635
+#: board/models.py:639 board/models.py:647
 msgid "Last posts of thread"
 msgstr "Последние сообщения треда"
 
@@ -497,32 +497,32 @@ msgid "New style form"
 msgstr "Новая форма ответа"
 
 #: board/templates/settings.html:30
+msgid "Disable post autoload"
+msgstr "Отключить автоподзагрузку"
+
+#: board/templates/settings.html:36
 msgid "Old posting way"
 msgstr "Не переносить форму ответа под сообщения"
 
-#: board/templates/settings.html:36
+#: board/templates/settings.html:42
 msgid "Disable notifications"
 msgstr "Отключить информационные уведомления"
 
-#: board/templates/settings.html:43
+#: board/templates/settings.html:49
 msgid "Disable ajax"
 msgstr "Отключить AJAX-отправку сообщений"
 
-#: board/templates/settings.html:49
+#: board/templates/settings.html:55
 msgid "Hide markup panel"
 msgstr "Скрыть панель разметки"
 
-#: board/templates/settings.html:55 board/templates/sidebar.html:4
+#: board/templates/settings.html:61 board/templates/sidebar.html:4
 msgid "Hide sidebar"
 msgstr "Скрыть боковую панель"
 
-#: board/templates/settings.html:61
+#: board/templates/settings.html:67
 msgid "Hide navigation"
 msgstr "Скрыть списки разделов"
-
-#: board/templates/settings.html:67 board/templates/settings.html.py:92
-msgid "Disable bookmarks"
-msgstr "Не использовать закладки"
 
 #: board/templates/settings.html:73
 msgid "Disable posts hide"
@@ -535,6 +535,10 @@ msgstr "Отключить предпосмотр ссылок"
 #: board/templates/settings.html:86
 msgid "Disable answers map"
 msgstr "Отключить карту ответов"
+
+#: board/templates/settings.html:92
+msgid "Disable bookmarks"
+msgstr "Не использовать закладки"
 
 #: board/templates/settings.html:98
 msgid "Hide sections banner"

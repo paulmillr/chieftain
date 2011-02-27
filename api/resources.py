@@ -163,7 +163,6 @@ class PostResource(ModelResource):
                 slug = post.section_slug()
                 posts = post.section().posts().filter(ip=post.ip)
                 # remove threads
-                print posts
                 op = posts.filter(is_op_post=True).values('pid', 'thread')
                 template.rebuild_cache(slug, [i['pid'] for i in op])
                 t = Thread.objects.filter(id__in=[i['thread'] for i in op])

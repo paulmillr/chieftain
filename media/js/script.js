@@ -16,7 +16,9 @@ var api = {
         gettext('Full text'),
         gettext('Thread'),
         gettext('Post'),
-        gettext('hidden')
+        gettext('hidden'),
+        gettext('bookmark'),
+        gettext('hide'),
     ];
     })(),
     // page detector
@@ -513,7 +515,6 @@ function init() {
                     outer.append(div).insertAfter(post);
                 }
                 if (globalLink) {
-                    console.log(2)
                     searchPost(board, pid, callback);
                 } else {
                     callback($('#post' + pid).html());
@@ -737,7 +738,7 @@ function initSettings() {
         if (this.checked !== undefined) {
             value = this.checked ? true : '';
         }
-        console.log('Setting "' + this.id + '" changed to ', value);
+        console.log('Setting %s changed to "%s".', this.id, value);
         $.settings(this.id, value);
     });
     
@@ -974,7 +975,8 @@ function initButtons(selector) {
                 className = item.className;
 
             selector.each(function(x) {
-                var span = $('<span/>').addClass(className).addClass('add'),
+                var span = $('<span/>').attr('title', gettext(className))
+                    .addClass(className).addClass('add'),
                     post = $(this);
 
                 if (getPostId(post) in list) {
@@ -1036,14 +1038,16 @@ function initButtons(selector) {
                 } else {
                     post = data.post;
                 }
-                post.find('.content').hide();
+                post.find('header, .content').hide();
                 var t = first ? gettext('Thread') : gettext('Post'),
                     s = $('<span/>').addClass('skipped')
                     .text(t +
                         ' #'+ getPostPid(post) +
                         //'('+ post.find('.message').text().split(0, 20) +')' +
                         ' ' + gettext('hidden') + '.'
-                    ).appendTo(post.find('.post-wrapper'));
+                    ).appendTo(post.find('.post-wrapper')),
+                    b = post.find('.bookmark, .hide').appendTo(s);
+                
             },
 
             onRemove: function(data) {
@@ -1055,7 +1059,7 @@ function initButtons(selector) {
                     p = data.post;
                 }
                 p.find('.skipped').remove();
-                p.find('.content').show();
+                p.find('header, .content').show();
             }
         }
     ]);
@@ -1104,6 +1108,14 @@ function initAJAX() {
             window.location.href = './' + data.pid;
             return true;
         }
+        if ($.settings('disablePubSub')) {
+            var post = $(data.html).hide()
+                .appendTo('.thread')
+                .fadeIn(500);
+            post.find('.tripcode:contains("!")').addClass('staff');
+            initButtons(post);
+        }
+
         var newpost = $('.new-post');
         if (newpost.parent().attr('id') !== 'main') {
             newpost.insertBefore('.threads');
@@ -1142,7 +1154,7 @@ function initAJAX() {
 }
 
 function initPubSub() {
-    if (currentPage.type !== 'thread') {
+    if (currentPage.type !== 'thread' || $.settings('disablePubSub')) {
         return false;
     }
     var comet = {
@@ -1161,6 +1173,10 @@ function initPubSub() {
             })
             .error(function() {
                 comet.sleepTime *= 2;
+                if (comet.sleepTime > 60000) {
+                    comet.sleepTime = 4000;
+                }
+                
                 console.log('Poll error; sleeping for', comet.sleepTime, 'ms');
                 window.setTimeout(comet.poll, comet.sleepTime);
             })
