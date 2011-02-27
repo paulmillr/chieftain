@@ -6,6 +6,8 @@ resources.py
 Created by Paul Bagwell on 2011-02-03.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+import urllib
+import urllib2
 from datetime import datetime
 from django.utils.translation import ugettext as _
 from djangorestframework import status
@@ -96,26 +98,6 @@ class ThreadResource(ModelResource):
         return res
 
 
-class PostStreamResource(RootModelResource):
-    """A stream resource for Post."""
-    allowed_methods = anon_allowed_methods = ('GET', 'POST')
-    model = Post
-
-    def get(self, request, auth, *args, **kwargs):
-        try:
-            ts = tools.from_timestamp(request.GET['timestamp'])
-            new_posts = Post.objects.filter(
-                date__gt=ts,
-                thread=kwargs['thread']
-            )
-            posts = []
-            if new_posts.count():
-                posts = new_posts.values('html', 'pid')
-        except KeyError:
-            return Response(status.BAD_REQUEST, {'detail': 'TS'})
-        return Response(status.OK, {'posts': posts})
-
-
 class PostRootResource(RootModelResource):
     """A create/list resource for Post."""
     allowed_methods = anon_allowed_methods = ('GET', 'POST')
@@ -137,6 +119,9 @@ class PostRootResource(RootModelResource):
             return Response(status.BAD_REQUEST, {'detail': e})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
+        url = 'http://127.0.0.1:8888/api/stream/{0}/publish'
+        urllib2.urlopen(url.format(instance.thread.id),
+            urllib.urlencode({'html': instance.html.encode('utf-8')}))
         return Response(status.CREATED, instance)
 
 

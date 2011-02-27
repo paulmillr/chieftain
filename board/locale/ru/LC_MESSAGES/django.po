@@ -104,7 +104,7 @@ msgstr "Код страны"
 
 #: board/models.py:273
 msgid "Poster"
-msgstr "Автор"
+msgstr "Имя"
 
 #: board/models.py:275
 msgid "Tripcode"

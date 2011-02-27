@@ -27,7 +27,7 @@ urlpatterns = patterns('board.views',
     (r'^post/(?P<thread__section__slug>\w+)/(?P<pid>\d+)$',
         PostResource.as_view()),
     # comet
-    (r'^stream/(?P<thread>\d+)$', PostStreamResource.as_view()),
+    #(r'^stream/(?P<thread>\d+)$', 'comet'),
     (r'^section/$', SectionRootResource.as_view()),
     (r'^section/(?P<id>\d+)$', SectionResource.as_view()),
     (r'^section/(?P<slug>\w+)', SectionResource.as_view()),

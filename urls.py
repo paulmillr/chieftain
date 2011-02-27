@@ -4,7 +4,7 @@ from piston.resource import Resource
 from board.handlers import PostHandler
 admin.autodiscover()
 
-packages = {'packages': ('klipped.board',),}
+packages = {'packages': ('klipped.board',), }
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),

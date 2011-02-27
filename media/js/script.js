@@ -122,6 +122,10 @@ function getPostPid(post) {
     return post.attr('id').replace('post', '');
 }
 
+function getPostLinkPid(postlink) {
+    return postlink.href.replace(/(.*\/)?(\d+)/, '$2');
+}
+
 function BoardContainer(storageName) {
     // Key-value database, based on localStorage
     this.storageName = storageName;
@@ -445,10 +449,6 @@ function init() {
         window.location.hash = '#' + $(this).attr('href');
     });
     
-    function getPostLinkPid(postlink) {
-        return postlink.href.replace(/(.*\/)?(\d+)/, '$2');
-    }
-    
     function buildAnswersMap() {
         var map = {};
         $('.postlink').each(function() {
@@ -460,7 +460,7 @@ function init() {
                 map[href] = [pid];
             }
         });
-        
+
         for (var i in map) {
             var div = $('<div class="answer-map"/>'),
                 links = [];
@@ -1100,25 +1100,18 @@ function initAJAX() {
     }
 
     function successCallback(data) {
-        /*if (currentPage.type === 'section') { // redirect
+        if (currentPage.type === 'section') { // redirect
             window.location.href = './' + data.pid;
             return true;
-        }*/
-        var h = $(data.html).hide()
-            .appendTo('.thread')
-            .fadeIn(500);
-        //h.each();
-        h.find('.tripcode:contains("!")').addClass('staff');
-        initButtons(h);
-        try {
-            window.location.hash = '#post' + data.pid;
-        } catch(e) {}
-        $('.captcha-img').trigger('click');
+        }
         var newpost = $('.new-post');
         if (newpost.parent().attr('id') !== 'main') {
             newpost.insertBefore('.threads');
         }
-        
+        try {
+            window.location.hash = '#post' + data.pid;
+        } catch(e) {}
+        $('.captcha-img').trigger('click');
         // clear entered data
         newpost.find(':input').each(function() {
             switch (this.type) {
@@ -1148,34 +1141,54 @@ function initAJAX() {
     });
 }
 
-function initAutoload() {
+function initPubSub() {
     if (currentPage.type !== 'thread') {
         return false;
     }
-    function checkForNewPosts() {
-        $.ajax({
-            type: 'GET',
-            url: window.api.url + '/stream/' + currentPage.thread, 
-            dataType: 'json',
-            data: {
-                '_accept': 'text/plain',
-                'timestamp': getCurrentTimestamp() - 10
+    var comet = {
+        sleepTime: 500,
+        cursor: null,
+
+        poll: function() {
+            var args = {};
+            if (comet.cursor) {
+                args.cursor = comet.cursor;
             }
-        })
-        .success(function(data) {
-            if (data.posts.length > 0) {
-                $.each(data.posts, function(x) {
-                    if ($('#post' + this.pid).length > 0) {
-                        return true;
-                    }
-                    var h = $(this.html).appendTo('.thread');
-                    initButtons(h);
-                });
-            }
-        });
+            
+            $.ajax('/api/stream/'+ currentPage.thread +'/subscribe', {
+                type: 'POST',
+                dataType: 'text',
+            })
+            .error(function() {
+                comet.sleepTime *= 2;
+                console.log('Poll error; sleeping for', comet.sleepTime, 'ms');
+                window.setTimeout(comet.poll, comet.sleepTime);
+            })
+            .success(function(response) {
+                try {
+                    response = $.parseJSON(response);
+                } catch(e) {}
+                if (!response.posts) {
+                    return false;
+                }
+                comet.cursor = response.cursor;
+                var posts = response.posts;
+                comet.cursor = posts[posts.length - 1].id;
+                //console.log(posts.length, 'new msgs', comet.cursor);
+
+                for (var i=0; i < posts.length; i++) {
+                    var post = $(posts[i]).hide()
+                        .appendTo('.thread')
+                        .fadeIn(500);
+                        post.find('.tripcode:contains("!")').addClass('staff');
+                        initButtons(post);
+                }
+                window.setTimeout(comet.poll, 0);
+            });
+        },
     }
-    
-    window.setInterval(checkForNewPosts, 15000)
+
+    comet.poll();
 }
 
 
@@ -1186,4 +1199,4 @@ $(initHidden);
 $(initButtons);
 $(initHotkeys);
 $(initAJAX);
-//$(initAutoload);
+$(initPubSub);

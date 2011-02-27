@@ -427,7 +427,7 @@ class Section(models.Model):
     ONPAGE = 20
 
     def threads(self):
-        return self.thread_set.order_by('-is_pinned', '-bump')
+        return self.thread_set.order_by('-is_pinned', '-bump', '-id')
 
     def op_posts(self):
         return Post.objects.filter(is_op_post=True,
