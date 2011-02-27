@@ -41,6 +41,9 @@ memory caching system.
 * [django-rest-framework](http://django-rest-framework.org/)
 * [recaptcha-client](http://pypi.python.org/pypi/recaptcha-client)
 * [PIL](http://www.pythonware.com/products/pil/)
+* [GeoIP C API](http://www.maxmind.com/app/c)
+* [GeoIP Python API](http://www.maxmind.com/app/python)
+* [GeoIP datasets](http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/)
 * Any supported by django SQL database binding (MySQLdb, postgresql, sqlite3,
 Oracle)
 
