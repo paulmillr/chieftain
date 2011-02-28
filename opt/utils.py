@@ -35,7 +35,7 @@ def rebuild():
             print 'Rendered post {0}'.format(c)
 
 
-def wipe(posts=10, thread_or_slug='', domain='http://2ch.pbagwl.com/'):
+def wipe(posts=10, thread_or_slug='', domain='http://b.2-ch.ru/'):
     """Requires Python 3.2."""
     # >>> wipe(50000, 'b')
     # 50000 posts in 0:34:54.923063
