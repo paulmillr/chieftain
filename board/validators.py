@@ -61,7 +61,8 @@ def post(request, no_captcha=True):
        If there is no POST['thread'] specified, it will create
        new thread.
     """
-    f = PostFormNoCaptcha if no_captcha else PostForm
+    #f = PostFormNoCaptcha if no_captcha else PostForm
+    f = PostFormNoCaptcha
     form = f(request.POST, request.FILES)
     if not form.is_valid():
         raise ValidationError(form.errors)

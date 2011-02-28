@@ -1,7 +1,10 @@
 /* Author: Paul Bagwell
 
 */
-
+if (typeof Recaptcha !== 'undefined') {
+    // workaround
+    Recaptcha.focus_response_field = function() {};
+}
 
 var api = {
     url: '/api',
