@@ -193,7 +193,7 @@ $.extend(BoardContainer.prototype, {
             }
         });
         return items;
-    },
+    }
 });
 
 function PostContainer(span, post) {
@@ -229,7 +229,7 @@ function ColorContainer(red, green, blue, alpha) {
     if (!alpha) alpha = 1;
     this.data = [red, green, blue, alpha];
 }
-
+/*
 ColorContainer.prototype = {
     data : [0, 0, 0, 1],
     get red() {return this.data[0]},
@@ -306,7 +306,7 @@ ColorContainer.prototype = {
 
         return [Math.floor(h * 360), Math.floor(s * 100), Math.floor(l * 100)];
     },
-}
+}*/
 
 function randomString(length) {
     function randomChar() {
@@ -1017,7 +1017,7 @@ function initButtons(selector) {
             });
         });
     }
-    
+
     buttonInitializer([
         {
             container: 'Bookmarks', 

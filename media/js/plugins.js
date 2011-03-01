@@ -306,7 +306,7 @@ $.extend({
         return show({
             'text': message, 
             'type': type || 'notice',
-        })
+        });
     },
     
     /**

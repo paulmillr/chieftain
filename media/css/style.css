@@ -260,15 +260,17 @@ em {font-style: italic;}
 .search input[type="checkbox"] {vertical-align: middle;}
 
 /* Navigation panel */
+nav {font-size: 0.95em;}
 nav ul {display: inline;}
 nav li {float: left;}
+.group {margin-right: 5px;}
 .group, nav li {margin-left: 0;}
 .group li {display: inline; margin-left: -0.6em;}
 .group li:first-child {margin-left: 0}
 .group li:first-child:before {content: " ["; padding-left: 2px;}
 .group li:first-child a, .group li:first-child span { padding: 0; }
 .group li:after {content: " /";}
-.group li:last-child:after {content: "]";}
+.group li:last-child:after {content: "]"; padding-right: 5px;}
 .group a, .group span {padding: 0 0 0 1em; white-space: nowrap; line-height: 1.5em; font-weight: bold;}
 .group a {text-decoration: underline;}
 
@@ -340,10 +342,11 @@ label.placeholder {
 .post .file-info {margin: -20px 0 5px 0; position: absolute;}
 .post .files {} 
 .post img.nsfw {opacity: 0.2; filter:alpha(opacity=20);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";}
-.post .message {display: inline-block;}
+
+.post .message {display: block;}
 .post .message, .post .message * {vertical-align:top;}
 .post .message.poster ins {background: none; text-decoration: underline; font-weight: normal; color: inherit;}
-.post blockquote {color: #789922; clear: both;}
+.post blockquote {color: #789922;}
 .post blockquote > p {display: inline;}
 .post .files {margin-right: 10px; float:left; max-width: 220px; max-height: 220px;}
 .post.resized .content {max-height: none;}
@@ -355,7 +358,7 @@ label.placeholder {
 .info-wrapper {float: left;}
 .info-wrapper > * {float: left; margin: 0 5px 0 0;}
 .file-info a:link, .file-info a:hover {text-decoration: underline;}
-.file-info {color: #666; font-size: 0.9em;}
+.file-info {color: #666; font-size: 0.85em;}
 
 .is_closed, .is_pinned, .bookmark, .hide {
     width: 16px; 
