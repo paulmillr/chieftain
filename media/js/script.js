@@ -1035,13 +1035,13 @@ function initButtons(selector) {
             onAdd : function(data) {
                 var first = false, post;
                 if (data.id === getPostId(data.first)) {
-                    data.thread.find('.post:not(:first-child)').hide();
+                    data.thread.addClass('hidden')
                     post = data.first;
                     first = true;
                 } else {
                     post = data.post;
                 }
-                post.find('header, .content').hide();
+                post.addClass('hidden')
                 var t = first ? gettext('Thread') : gettext('Post'),
                     s = $('<span/>').addClass('skipped')
                     .text(t +
@@ -1055,14 +1055,14 @@ function initButtons(selector) {
             onRemove: function(data) {
                 var p;
                 if (data.id === getPostId(data.first)) {
-                    data.thread.find('.post:not(:first-child)').show();
+                    data.thread.removeClass('hidden');
                     post = data.first;
                 } else {
                     post = data.post;
                 }
                 post.find('.bookmark, .hide').appendTo(post.find('header'));
                 post.find('.skipped').remove();
-                post.find('header, .content').show();
+                post.removeClass('hidden');
             }
         }
     ]);

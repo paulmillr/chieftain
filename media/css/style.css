@@ -75,8 +75,8 @@ input, select { vertical-align:middle; }
    * remove arial, helvetica from explicit font stack
    * we normalize monospace styles ourselves
    * table font-size is reset in the HTML5 reset above so there is no need to repeat
-*/
-body { font:13px/1.231 sans-serif; *font-size:small; } /* hack retained to preserve specificity */
+*/ /*13px/1.231*/
+body { *font-size:small; } /* hack retained to preserve specificity */
 
 select, input, textarea, button { font:99% sans-serif; }
 
@@ -225,7 +225,7 @@ button {  width: auto; overflow: visible; }
 body {
     color: #333; 
     background: #eee;
-    font: normal normal 300 14px/18px HelveticaNeue-Light, 'Helvetica Neue Light', 'Helvetica Neue', sans-serif;
+    font-size: 0.85em;
 }
 a:link, a:visited { text-decoration: none; }
 h1 {font-size: 2.5em; line-height: 1.5;}
@@ -251,8 +251,8 @@ em {font-style: italic;}
 #container > b.border-d { -webkit-transform: scale(1.5) rotate(45deg); -webkit-transform-origin: 80% 0%; -moz-transform: scale(1.5) rotate(45deg); -moz-transform-origin: 80% 0%; left: auto; right: 2em; top: 0; }
 
 /* Top */
-#container-wrap > header {border-bottom: 1px solid #aaa; margin-bottom: 5px; padding-bottom: 5px;}
-.logo {display: table; margin: 0 auto;}
+#container-wrap > header {border-bottom: 1px solid #aaa; margin-top: 7px; margin-bottom: 5px; padding-bottom: 5px;}
+.logo {display: table; margin: 10px auto 0 auto;}
 .section-banner {width: 300px; height: 100px; margin: 0 auto; display: none;}
 .search {position: absolute; right: 10px; text-align: right;}
 .search input[type="text"] {width: 5em;}
@@ -267,15 +267,16 @@ nav li {float: left;}
 .group li:first-child {margin-left: 0}
 .group li:first-child:before {content: " ["; padding-left: 2px;}
 .group li:first-child a, .group li:first-child span { padding: 0; }
-.group li:after {content: " •";}
+.group li:after {content: " /";}
 .group li:last-child:after {content: "]";}
-.group a, .group span {font-size: 1em; padding: 0 0 0 1em; white-space: nowrap; line-height: 2em; text-decoration: none; font-weight: bold; }
+.group a, .group span {padding: 0 0 0 1em; white-space: nowrap; line-height: 1.5em; font-weight: bold;}
+.group a {text-decoration: underline;}
 
 #container-wrap {float: left; width: 100%;}
-#container-wrap > * {margin-left: 210px; margin-right: 10px;}
+#container-wrap > * {margin-left: 280px; margin-right: 10px;}
 #container-wrap.no-sidebar > * {margin-left: 10px;}
-#sidebar {width: 210px; float: left; font-size: 1.1em; margin-left: -100%;}
-#sidebar aside {position: fixed; overflow: hidden; width: 170px; padding-right: 20px;}
+#sidebar {width: 280px; float: left; font-size: 1.1em; margin-left: -100%;}
+#sidebar aside {position: fixed; overflow: hidden; width: 240px; padding-right: 20px;}
 #sidebar h2 {margin-bottom: 10px;}
 #sidebar .hide {margin: -20px -15px 0 0;}
 #sidebar h4 {font-size: 1em; margin-bottom: 1px;}
@@ -292,6 +293,7 @@ section fieldset dl:last-child > dd {margin-bottom: 10px;}
 fieldset {width: 620px;}
 fieldset dl {font-size: 1.1em;}
 fieldset dt {width: 150px; font-weight: bold;}
+.new-post .message-d dt {margin-top: 80px;}
 .new-post textarea{width:34em;height:10em;}
 .new-style fieldset {width: 400px;}
 .new-style dt {display: none;}
@@ -307,14 +309,18 @@ label.placeholder {
     padding: 4px 4px 4px 4px;
     color: #999999;
 }
+
 .settings dt {width: auto; margin-bottom: 8px;}
 .settings input {vertical-align: top;}
 
 /* Threads and posts */
 .thread {margin-bottom: 10px;}
 .thread, .faq {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
+.thread.hidden, .post.hidden {display: block;}
+.thread.hidden .post:not(:first-child), .thread.hidden div.skipped {display: none;}
 .skipped {color: #666;}
 .post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}
+.post.hidden header, .post.hidden .content {display: none;}
 .post-preview {position: absolute; z-index: 10;}
 .post:after {clear: both;}
 .post header {padding-bottom: 20px;}
@@ -385,6 +391,7 @@ label.placeholder {
 .faq {list-style: none; margin-left: 0;}
 .faq li li {list-style: none;}
 
+footer {padding-bottom: 10px;}
 footer .copyright {text-align: center;}
 footer .copyright a {text-decoration: underline;}
 

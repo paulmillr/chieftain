@@ -4,7 +4,7 @@ klipped - new generation imageboard.
 
 ## What?
 
-klipped is a new generation imageboard. It is fastest open source chan.
+klipped is a new generation imageboard. It is fastest chan.
 It has plenty of modern features and modular design. klipped is built with
 HTML5, Python programming language, Django web framework, Tornado scalable
 non-blocking web server with use of jQuery javascript library and Memcached
