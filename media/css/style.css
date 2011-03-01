@@ -317,6 +317,7 @@ label.placeholder {
 .thread {margin-bottom: 10px;}
 .thread, .faq {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
 .thread.hidden, .post.hidden {display: block;}
+.thread.hidden.hard {display: none;}, .post.hidden.hard {display: none;}
 .thread.hidden .post:not(:first-child), .thread.hidden div.skipped {display: none;}
 .skipped {color: #666;}
 .post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}

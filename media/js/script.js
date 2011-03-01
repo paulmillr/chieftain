@@ -1033,15 +1033,16 @@ function initButtons(selector) {
             },
 
             onAdd : function(data) {
-                var first = false, post;
+                var first = false, post,
+                    hideClass = $.settings('hardHide') ? 'hard hidden' : 'hidden';
                 if (data.id === getPostId(data.first)) {
-                    data.thread.addClass('hidden')
+                    data.thread.addClass(hideClass);
                     post = data.first;
                     first = true;
                 } else {
                     post = data.post;
                 }
-                post.addClass('hidden')
+                post.addClass(hideClass);
                 var t = first ? gettext('Thread') : gettext('Post'),
                     s = $('<span/>').addClass('skipped')
                     .text(t +
