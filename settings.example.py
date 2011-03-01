@@ -21,7 +21,7 @@ DATABASES = {
 }
 
 CACHE_BACKEND = 'memcached://127.0.0.1:11211/?max_entries=10000'
-COMET = {
+PUBSUB = {
     'host': '127.0.0.1',
     'port': 8888,
 }

@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # encoding: utf-8
 """
-comet.py
+pubsub.py
 
 Created by Paul Bagwell on 2011-02-24.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.

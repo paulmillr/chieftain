@@ -24,9 +24,3 @@ urlpatterns = patterns('board.views',
     (r'^(?P<section_slug>\w+)/(?P<op_post>\d+)$', 'thread'),
     (r'^(?P<section_slug>\w+)/(?P<op_post>\d+)/rss', ThreadFeed()),
 )
-
-#urlpatterns += patterns('board.comet',
-#    (r'^comet/thread/(?P<thread_id>\d+)', 'thread'),
-    #(r'^comet/section/(?P<section)' 'section'),
-    #(r'^comet/user/(?P<session>\w+)', 'user'),
-#)
