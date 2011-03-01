@@ -1050,19 +1050,19 @@ function initButtons(selector) {
                         ' ' + gettext('hidden') + '.'
                     ).appendTo(post.find('.post-wrapper')),
                     b = post.find('.bookmark, .hide').appendTo(s);
-                
             },
 
             onRemove: function(data) {
                 var p;
                 if (data.id === getPostId(data.first)) {
                     data.thread.find('.post:not(:first-child)').show();
-                    p = data.first;
+                    post = data.first;
                 } else {
-                    p = data.post;
+                    post = data.post;
                 }
-                p.find('.skipped').remove();
-                p.find('header, .content').show();
+                post.find('.bookmark, .hide').appendTo(post.find('header'));
+                post.find('.skipped').remove();
+                post.find('header, .content').show();
             }
         }
     ]);
@@ -1160,14 +1160,14 @@ function initPubSub() {
     if (currentPage.type !== 'thread' || $.settings('disablePubSub')) {
         return false;
     }
-    var comet = {
+    var pubsub = {
         sleepTime: 500,
         cursor: null,
 
         poll: function() {
             var args = {};
-            if (comet.cursor) {
-                args.cursor = comet.cursor;
+            if (pubsub.cursor) {
+                args.cursor = pubsub.cursor;
             }
             
             $.ajax('/api/stream/'+ currentPage.thread +'/subscribe', {
@@ -1175,13 +1175,13 @@ function initPubSub() {
                 dataType: 'text',
             })
             .error(function() {
-                comet.sleepTime *= 2;
-                if (comet.sleepTime > 60000) {
-                    comet.sleepTime = 4000;
+                pubsub.sleepTime *= 2;
+                if (pubsub.sleepTime > 60000) {
+                    pubsub.sleepTime = 4000;
                 }
                 
-                console.log('Poll error; sleeping for', comet.sleepTime, 'ms');
-                window.setTimeout(comet.poll, comet.sleepTime);
+                console.log('Poll error; sleeping for', pubsub.sleepTime, 'ms');
+                window.setTimeout(pubsub.poll, pubsub.sleepTime);
             })
             .success(function(response) {
                 try {
@@ -1190,10 +1190,10 @@ function initPubSub() {
                 if (!response.posts) {
                     return false;
                 }
-                comet.cursor = response.cursor;
+                pubsub.cursor = response.cursor;
                 var posts = response.posts;
-                comet.cursor = posts[posts.length - 1].id;
-                //console.log(posts.length, 'new msgs', comet.cursor);
+                pubsub.cursor = posts[posts.length - 1].id;
+                //console.log(posts.length, 'new msgs', pubsub.cursor);
 
                 for (var i=0; i < posts.length; i++) {
                     var post = $(posts[i]).hide()
@@ -1202,12 +1202,12 @@ function initPubSub() {
                         post.find('.tripcode:contains("!")').addClass('staff');
                         initButtons(post);
                 }
-                window.setTimeout(comet.poll, 0);
+                window.setTimeout(pubsub.poll, 0);
             });
         },
     }
 
-    comet.poll();
+    pubsub.poll();
 }
 
 
