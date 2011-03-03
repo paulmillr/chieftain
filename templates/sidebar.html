@@ -1,7 +1,7 @@
 {% load i18n %}
 <aside class="sidebar">
     <h2><a href="/">{{settings.SITE_TITLE}}</a></h2>
-    <div class="hide" title="{% trans 'Hide sidebar' %}"></div>
+    <div class="hide" title="{% trans 'Hide sidebar' %}"><a href="#hide">{% trans 'Hide' %}</a></div>
     {% for group in navigation %}
     {% if not group.is_hidden %}
     <h4 id="sect-group{{group.id}}">{{group.name}}</h4>

@@ -285,7 +285,7 @@ nav li {float: left;}
 #sidebar {width: 280px; float: left; font-size: 1.1em; margin-left: -100%;}
 #sidebar aside {position: fixed; overflow: hidden; width: 240px; padding-right: 20px;}
 #sidebar h2 {margin-bottom: 10px;}
-#sidebar .hide {margin: -20px -15px 0 0;}
+#sidebar .hide {margin: -20px -15px 0 0; width: auto; background: none; font-size: 0.9em;}
 #sidebar h4 {font-size: 1em; margin-bottom: 1px;}
 #sidebar li {list-style: none;}
 #sidebar aside {margin: 0 1em;}

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-03 02:07+0200\n"
+"POT-Creation-Date: 2011-03-03 23:40+0200\n"
 "PO-Revision-Date: 2011-01-23 19:23+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -385,7 +385,7 @@ msgstr "Вы были забанены на этой доске"
 msgid "Reason"
 msgstr "Причина"
 
-#: templates/base.html:39 templates/pda/index.html:12
+#: templates/base.html:42 templates/pda/index.html:12
 msgid "Runs on"
 msgstr "Бегает на"
 
@@ -447,42 +447,43 @@ msgid "Mobile version"
 msgstr "Мобильная версия"
 
 #: templates/navigation.html:9 templates/sidebar.html:19
+#: templates/mobile/index.html:7
 msgid "PDA version"
 msgstr "КПК версия"
 
-#: templates/section_base.html:8
+#: templates/section_base.html:9
 msgid "Search"
 msgstr "Поиск"
 
-#: templates/section_base.html:9
+#: templates/section_base.html:10
 msgid "OP-post"
 msgstr "Первое сообщение"
 
-#: templates/section_base.html:18
+#: templates/section_base.html:19
 msgid "Delete posts"
 msgstr "Удалить сообщения"
 
-#: templates/section_base.html:18
+#: templates/section_base.html:19
 msgid "Cancel"
 msgstr "Отмена"
 
-#: templates/section_base.html:21
+#: templates/section_base.html:22
 msgid "Only files"
 msgstr "Только файлы"
 
-#: templates/section_base.html:25
+#: templates/section_base.html:26
 msgid "Delete all messages from that IP"
 msgstr "Удалить все сообщения с айпи"
 
-#: templates/section_base.html:28
+#: templates/section_base.html:29
 msgid "Ban IP"
 msgstr "Забанить айпи"
 
-#: templates/section_base.html:31
+#: templates/section_base.html:32
 msgid "Pin thread"
 msgstr "Прикрепить тред"
 
-#: templates/section_base.html:32
+#: templates/section_base.html:33
 msgid "Close thread"
 msgstr "Закрыть тред"
 
@@ -590,6 +591,10 @@ msgstr "времени первого визита"
 #: templates/settings.html:127
 msgid "visits count"
 msgstr "количеству посещений"
+
+#: templates/sidebar.html:4
+msgid "Hide"
+msgstr "Скрыть"
 
 #: templates/sidebar.html:14
 msgid "Links"

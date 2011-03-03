@@ -209,8 +209,8 @@ function PostContainer(span, post) {
     this.id = getPostId(this.post);
     this.text_data = {
         'section': currentPage.section,
-        'first': !isposts ? getPostPid(this.first) : '',
-        'pid': getPostPid(this.post),
+        'first': !isposts ? '':'',//getPostPid(this.first) : '',
+        'pid': ''//getPostPid(this.post),
     };
 }
 
@@ -456,8 +456,10 @@ function init() {
     
     function buildAnswersMap() {
         var map = {};
+        
         $('.postlink').each(function() {
-            var pid = parseInt(getPostPid($(this).closest('.post'))),
+            var post = $(this).closest('.post'),
+                pid = parseInt(getPostPid(post)),
                 href = getPostLinkPid(this);
             if (map[href]) {
                 map[href].push(pid);
@@ -754,6 +756,7 @@ function initSettings() {
     });
     
     $('#sidebar .hide').click(function(event) {
+        event.preventDefault();
         var k = 'hideSidebar',
             h = $.settings(k) ? false : true;
         $.settings(k, h);
