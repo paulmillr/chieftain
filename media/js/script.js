@@ -390,7 +390,7 @@ function parseQs(key) {
     if (!key) {
         return parsed;
     }
-    if (key in parsed) {
+    if (key in parsed && 'forced' in parsed) {
         return parsed[key];
     }
     return false;
@@ -421,7 +421,7 @@ function init() {
         if (p.length) {
             return p;
         }
-        $.get(window.api.url + '/post/' + board + '/' + pid, function(data) {
+        $.get(window.api.url + '/post/' + board + '/' + pid + '?html=1', function(data) {
             callback(data.html);
         });
     }
@@ -706,6 +706,13 @@ function initSettings() {
                 manipulator(styleInfo);
             },
             
+            bottomForm: function(x) {
+                x = $.settings(x);
+                if (x && currentPage.type === 'thread') {
+                    $('.new-post').insertAfter('.deleteMode');
+                }
+            },
+            
             hideBBCodes: function(x) {
                 $('.bbcode').hide();
             },
@@ -716,7 +723,7 @@ function initSettings() {
     }
     
     settings.each(function(x) {
-        var s = $.settings(this.id), 
+        var s = $.settings(this.id),
             t = parseQs(this.id);
         if (!!t) {
             $.settings(this.id, t);
@@ -743,6 +750,7 @@ function initSettings() {
         }
         console.log('Setting %s changed to "%s".', this.id, value);
         $.settings(this.id, value);
+        console.log('Current setting %s is "%s".', this.id, $.settings(this.id));
     });
     
     $('#sidebar .hide').click(function(event) {
@@ -1152,7 +1160,7 @@ function initAJAX() {
                 successCallback(data) :
                 errorCallback(data);
         },
-        url: window.api.url + '/post/?_accept=text/plain',
+        url: window.api.url + '/post/?html=1&_accept=text/plain',
         dataType: 'json',
     });
 }

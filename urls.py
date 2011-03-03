@@ -11,6 +11,7 @@ urlpatterns = patterns('',
     (r'^api/i18n/$', 'django.views.i18n.javascript_catalog', packages),
     (r'^api/', include('api.urls')),
     (r'^modpanel/', include('modpanel.urls')),
-    #(r'^mobile/', include('mobile.urls')),
+    (r'^pda/', include('pda.urls')),
+    (r'^mobile/', include('mobile.urls')),
     (r'^', include('board.urls')),
 )

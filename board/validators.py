@@ -127,6 +127,7 @@ def post(request, no_captcha=True):
     elif '#' in post.poster:  # make tripcode
         s = post.poster.split('#')
         post.tripcode = tools.tripcode(s.pop())
+        print s
         post.poster = s[0]
 
     if not post.poster or thread.section.anonymity:

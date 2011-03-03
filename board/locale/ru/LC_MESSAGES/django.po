@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 00:30+0200\n"
+"POT-Creation-Date: 2011-03-03 02:07+0200\n"
 "PO-Revision-Date: 2011-01-23 19:23+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -19,19 +19,19 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: api/resources.py:159
+#: api/resources.py:163
 msgid "You need to enter ban reason"
 msgstr "Необходимо ввести причину блокировки"
 
-#: api/resources.py:179
+#: api/resources.py:183
 msgid "Error on deleting post #"
 msgstr "Ошибка при удалении сообщения №"
 
-#: api/resources.py:180 api/resources.py:248
+#: api/resources.py:184 api/resources.py:252
 msgid "Password mismatch"
 msgstr "Неправильный пароль"
 
-#: api/resources.py:247
+#: api/resources.py:251
 msgid "Error on deleting file #"
 msgstr "Ошибка при удалении файла №"
 
@@ -72,13 +72,13 @@ msgid "HTML cache"
 msgstr "Кэш"
 
 #: board/models.py:249 board/models.py:260 board/models.py:614
+#: templates/mobile/thread.html:6 templates/pda/thread.html:6
 msgid "Thread"
 msgstr "Тред"
 
-#: board/models.py:250 board/templates/section_page.html:26
-#: board/templates/section_posts.html:32
-#: board/templates/section_thread.html:21
-#: board/templates/section_threads.html:19
+#: board/models.py:250 templates/section_page.html:26
+#: templates/section_posts.html:32 templates/section_thread.html:21
+#: templates/section_threads.html:19
 msgid "Threads"
 msgstr "Треды"
 
@@ -110,9 +110,9 @@ msgstr "Имя"
 msgid "Tripcode"
 msgstr "Трипкод"
 
-#: board/models.py:277
+#: board/models.py:277 templates/pda/index.html:185
 msgid "Email"
-msgstr "Почта"
+msgstr "Email"
 
 #: board/models.py:279
 msgid "Topic"
@@ -130,10 +130,9 @@ msgstr "Текст"
 msgid "Post"
 msgstr "Сообщение"
 
-#: board/models.py:328 board/templates/section_page.html:27
-#: board/templates/section_posts.html:33
-#: board/templates/section_thread.html:22
-#: board/templates/section_threads.html:20
+#: board/models.py:328 templates/section_page.html:27
+#: templates/section_posts.html:33 templates/section_thread.html:22
+#: templates/section_threads.html:20
 msgid "Posts"
 msgstr "Сообщения"
 
@@ -169,7 +168,7 @@ msgstr "Расположение"
 msgid "Thumbnail"
 msgstr "Иконка"
 
-#: board/models.py:366 board/templates/form.html:43
+#: board/models.py:366 templates/form.html:43
 msgid "File"
 msgstr "Файл"
 
@@ -241,7 +240,8 @@ msgstr "Максимальное количество тредов"
 msgid "Section"
 msgstr "Раздел"
 
-#: board/models.py:492
+#: board/models.py:492 templates/mobile/index.html:8
+#: templates/pda/index.html:20 templates/pda/index.html.py:172
 msgid "Sections"
 msgstr "Разделы"
 
@@ -325,23 +325,23 @@ msgstr "Загружаемый файл имеет слишком большой
 msgid "This file already exists"
 msgstr "Этот файл уже существует"
 
-#: board/validators.py:88
+#: board/validators.py:89
 msgid "This thread is closed, you cannot post to it."
 msgstr "Эта тред закрыт, вы не можете в него отвечать"
 
-#: board/validators.py:95
+#: board/validators.py:96
 msgid "Enter post message or attach a file to your post"
 msgstr "Введите сообщение или прикрепите файл"
 
-#: board/validators.py:98
+#: board/validators.py:99
 msgid "You need to upload file to create new thread."
 msgstr "Вы должны прикрепить файл для создания треда"
 
-#: board/validators.py:101
+#: board/validators.py:102
 msgid "Your post contains blacklisted word."
 msgstr "Ваше сообщение содержит запрещенное слово"
 
-#: board/validators.py:107
+#: board/validators.py:108
 msgid "Authentication required to create threads in this section"
 msgstr "Для создания тредов в этом разделе требуется аутентификация"
 
@@ -349,59 +349,67 @@ msgstr "Для создания тредов в этом разделе треб
 msgid "Nothing found"
 msgstr "Ничего не найдено"
 
-#: board/templates/404.html:2 board/templates/404.html.py:20
+#: modpanel/templates/banlist.html:5 modpanel/templates/modindex.html:5
+msgid "Mod control panel"
+msgstr "Модераторская"
+
+#: templates/404.html:2 templates/404.html.py:20
 msgid "Not found"
 msgstr "Не найдено"
 
-#: board/templates/500.html:2 board/templates/500.html.py:20
+#: templates/500.html:2 templates/500.html.py:20
 msgid "Internal server error"
 msgstr "Ошибка сервера"
 
-#: board/templates/api.html:5
+#: templates/api.html:5
 msgid "API"
 msgstr "Программный интерфейс"
 
-#: board/templates/api.html:8
+#: templates/api.html:8
 msgid "Documentation"
 msgstr "Документация"
 
-#: board/templates/api.html:9
+#: templates/api.html:9
 msgid "Example URLs"
 msgstr "Примеры ссылок"
 
-#: board/templates/banned.html:2
+#: templates/banned.html:2
 msgid "Banned"
 msgstr "Вы забанены!"
 
-#: board/templates/banned.html:20
+#: templates/banned.html:20
 msgid "You've been banned from this board"
 msgstr "Вы были забанены на этой доске"
 
-#: board/templates/banned.html:21
+#: templates/banned.html:21
 msgid "Reason"
 msgstr "Причина"
 
-#: board/templates/base.html:40
+#: templates/base.html:39 templates/pda/index.html:12
 msgid "Runs on"
 msgstr "Бегает на"
 
-#: board/templates/form.html:7
+#: templates/form.html:7
 msgid "Left this field empty"
 msgstr "(оставьте поле пустым)"
 
-#: board/templates/form.html:49
+#: templates/form.html:20
+msgid "Submit"
+msgstr "Отправить"
+
+#: templates/form.html:49
 msgid "Captcha"
 msgstr "Подтверждение"
 
-#: board/templates/index.html:3 board/templates/navigation.html:4
+#: templates/index.html:3 templates/navigation.html:4
 msgid "Main page"
 msgstr "Главная"
 
-#: board/templates/index.html:6
+#: templates/index.html:6 templates/mobile/index.html:5
 msgid "Welcome back"
 msgstr "Добро пожаловать. Снова."
 
-#: board/templates/index.html:7
+#: templates/index.html:7
 msgid "Welcome text"
 msgstr ""
 "Два.ч — это система форумов, где можно общаться быстро и свободно, где любая "
@@ -411,166 +419,219 @@ msgstr ""
 "ограниченную тематику. Словом, всё, что не запрещено правилами отдельно "
 "взятого форума и относится к его тематике, на этом форуме разрешено."
 
-#: board/templates/navigation.html:5
+#: templates/navigation.html:5 templates/sidebar.html:16
+#: templates/pda/index.html:37 templates/pda/index.html.py:40
+#: templates/pda/index.html:173
 msgid "FAQ"
 msgstr "FAQ"
 
-#: board/templates/navigation.html:6
+#: templates/navigation.html:6
 msgid "Not Safe For Work"
 msgstr ""
 "Not safe for work. Понизить / повысить прозрачность у всех картинок. Хорошо "
 "подходит когда за спиной сидит кто-то, кому не хотелось бы показывать "
 "контент имиджборды."
 
-#: board/templates/navigation.html:6
+#: templates/navigation.html:6
 msgid "NSFW"
 msgstr "NSFW"
 
-#: board/templates/navigation.html:7 board/templates/settings.html:3
+#: templates/navigation.html:7 templates/settings.html:3
+#: templates/sidebar.html:17 templates/pda/index.html:174
 msgid "Settings"
 msgstr "Настройки"
 
-#: board/templates/navigation.html:8
+#: templates/navigation.html:8 templates/sidebar.html:18
+#: templates/pda/index.html:180
 msgid "Mobile version"
 msgstr "Мобильная версия"
 
-#: board/templates/section_base.html:8
+#: templates/navigation.html:9 templates/sidebar.html:19
+msgid "PDA version"
+msgstr "КПК версия"
+
+#: templates/section_base.html:8
 msgid "Search"
 msgstr "Поиск"
 
-#: board/templates/section_base.html:9
+#: templates/section_base.html:9
 msgid "OP-post"
-msgstr "ОП-пост"
+msgstr "Первое сообщение"
 
-#: board/templates/section_base.html:18
+#: templates/section_base.html:18
 msgid "Delete posts"
 msgstr "Удалить сообщения"
 
-#: board/templates/section_base.html:18
+#: templates/section_base.html:18
 msgid "Cancel"
 msgstr "Отмена"
 
-#: board/templates/section_base.html:21
+#: templates/section_base.html:21
 msgid "Only files"
 msgstr "Только файлы"
 
-#: board/templates/section_base.html:25
+#: templates/section_base.html:25
 msgid "Delete all messages from that IP"
 msgstr "Удалить все сообщения с айпи"
 
-#: board/templates/section_base.html:28
+#: templates/section_base.html:28
 msgid "Ban IP"
 msgstr "Забанить айпи"
 
-#: board/templates/section_base.html:31
+#: templates/section_base.html:31
 msgid "Pin thread"
 msgstr "Прикрепить тред"
 
-#: board/templates/section_base.html:32
+#: templates/section_base.html:32
 msgid "Close thread"
 msgstr "Закрыть тред"
 
-#: board/templates/section_page.html:25 board/templates/section_posts.html:31
-#: board/templates/section_thread.html:20
-#: board/templates/section_threads.html:18
+#: templates/section_page.html:25 templates/section_posts.html:31
+#: templates/section_thread.html:20 templates/section_threads.html:18
 msgid "Everything"
 msgstr "Все"
 
-#: board/templates/section_thread.html:4
+#: templates/section_thread.html:4
 msgid "Thread title"
 msgstr "Тред"
 
-#: board/templates/section_thread.html:7
+#: templates/section_thread.html:7
 msgid "Go back"
 msgstr "Назад"
 
-#: board/templates/settings.html:9
+#: templates/settings.html:9
 msgid "Save preferences"
 msgstr "Сохранить настройки"
 
-#: board/templates/settings.html:13
+#: templates/settings.html:13
 msgid "Board style"
 msgstr "Скин"
 
-#: board/templates/settings.html:24
+#: templates/settings.html:24
 msgid "New style form"
 msgstr "Новая форма ответа"
 
-#: board/templates/settings.html:30
+#: templates/settings.html:30
+msgid "Move form to the bottom"
+msgstr "Переносить форму ответа вниз"
+
+#: templates/settings.html:36
 msgid "Disable post autoload"
 msgstr "Отключить автоподзагрузку"
 
-#: board/templates/settings.html:36
+#: templates/settings.html:42
 msgid "Old posting way"
 msgstr "Не переносить форму ответа под сообщения"
 
-#: board/templates/settings.html:42
+#: templates/settings.html:48
 msgid "Disable notifications"
 msgstr "Отключить информационные уведомления"
 
-#: board/templates/settings.html:49
+#: templates/settings.html:55
 msgid "Disable ajax"
 msgstr "Отключить AJAX-отправку сообщений"
 
-#: board/templates/settings.html:55
+#: templates/settings.html:61
 msgid "Hide markup panel"
 msgstr "Скрыть панель разметки"
 
-#: board/templates/settings.html:61 board/templates/sidebar.html:4
+#: templates/settings.html:67 templates/sidebar.html:4
 msgid "Hide sidebar"
 msgstr "Скрыть боковую панель"
 
-#: board/templates/settings.html:67
+#: templates/settings.html:73
 msgid "Hide navigation"
 msgstr "Скрыть списки разделов"
 
-#: board/templates/settings.html:73
+#: templates/settings.html:79
 msgid "Disable posts hide"
 msgstr "Отключить скрытие изображений"
 
-#: board/templates/settings.html:80
+#: templates/settings.html:85
+msgid "Hard posts hide"
+msgstr "Полное скрытие"
+
+#: templates/settings.html:92
 msgid "Disable posts preview"
 msgstr "Отключить предпосмотр ссылок"
 
-#: board/templates/settings.html:86
+#: templates/settings.html:98
 msgid "Disable answers map"
 msgstr "Отключить карту ответов"
 
-#: board/templates/settings.html:92
+#: templates/settings.html:104
 msgid "Disable bookmarks"
 msgstr "Не использовать закладки"
 
-#: board/templates/settings.html:98
+#: templates/settings.html:110
 msgid "Hide sections banner"
 msgstr "Скрыть баннеры разделов"
 
-#: board/templates/settings.html:104
+#: templates/settings.html:116
 msgid "Don't log visited threads"
 msgstr "Не сохранять список посещенных тредов"
 
-#: board/templates/settings.html:104
+#: templates/settings.html:116
 msgid "clear"
 msgstr "очистить"
 
-#: board/templates/settings.html:111
+#: templates/settings.html:123
 msgid "Visited threads"
 msgstr "Посещенные треды"
 
-#: board/templates/settings.html:112
+#: templates/settings.html:124
 msgid "Sorted by the"
 msgstr "Сортировка по"
 
-#: board/templates/settings.html:114
+#: templates/settings.html:126
 msgid "time of first visit"
 msgstr "времени первого визита"
 
-#: board/templates/settings.html:115
+#: templates/settings.html:127
 msgid "visits count"
 msgstr "количеству посещений"
 
-#: modpanel/templates/banlist.html:5 modpanel/templates/modindex.html:5
-msgid "Mod control panel"
-msgstr "Модераторская"
+#: templates/sidebar.html:14
+msgid "Links"
+msgstr "Ссылки"
+
+#: templates/mobile/base.html:6
+msgid "mobile"
+msgstr "мобильный"
+
+#: templates/mobile/index.html:6 templates/pda/index.html:179
+msgid "Default version"
+msgstr "Обычная версия"
+
+#: templates/mobile/section.html:10 templates/mobile/thread.html:13
+#: templates/pda/index.html:21 templates/pda/index.html.py:38
+#: templates/pda/section.html:10 templates/pda/thread.html:13
+msgid "Back"
+msgstr "Назад"
+
+#: templates/pda/index.html:10
+msgid "anonymous imageboard"
+msgstr "анонимный форум"
+
+#: templates/pda/index.html:16
+msgid "Close"
+msgstr "Закрыть"
+
+#: templates/pda/index.html:169
+msgid "Information"
+msgstr "Информация"
+
+#: templates/pda/index.html:182
+msgid "Ideas and suggestions"
+msgstr "Идеи и предложения"
+
+#: templates/pda/index.html:186
+msgid "Jabber"
+msgstr "Jabber"
+
+#: templates/pda/index.html:189
+msgid "Add this page to your home screen"
+msgstr "Добавьте эту страницу на ваш домашний экран"
 
 #~ msgid "No files"
 #~ msgstr "Без файлов"

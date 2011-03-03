@@ -242,13 +242,18 @@ em {font-style: italic;}
 .stats {border: 1px dashed; padding: 0 5px;}
 .overflow-hidden {overflow: hidden !important;}
 #container + iframe {display: none;} /* Recaptcha bug */
+.rss {
+    background-image: url('../images/sprites.png') no-repeat;
+    background-position: -20px -50px;
+}
 
 
-/* yeah */
+/* yeah 
 #container > b { display: block; position: fixed; top: 50%; left: -1em; width: 1em; height: 100%; z-index: -1; background: #f60; -webkit-transform: scale(1.5) rotate(-45deg); -webkit-transform-origin: 20% 0%; -moz-transform: scale(1.5) rotate(-45deg); -moz-transform-origin: 20% 0%; border: 1px dotted #f60; }
 #container > b.border-b { -webkit-transform: scale(1.5) rotate(45deg); -webkit-transform-origin: 80% 0%; -moz-transform: scale(1.5) rotate(45deg); -moz-transform-origin: 80% 0%; left: auto; right: -1em; }
 #container > b.border-c { -webkit-transform: scale(1.5) rotate(-45deg); -webkit-transform-origin: 20% 0%; -moz-transform: scale(1.5) rotate(-45deg); -moz-transform-origin: 20% 0%; left: 2em; top: 0; }
 #container > b.border-d { -webkit-transform: scale(1.5) rotate(45deg); -webkit-transform-origin: 80% 0%; -moz-transform: scale(1.5) rotate(45deg); -moz-transform-origin: 80% 0%; left: auto; right: 2em; top: 0; }
+*/
 
 /* Top */
 #container-wrap > header {border-bottom: 1px solid #aaa; margin-top: 7px; margin-bottom: 5px; padding-bottom: 5px;}
@@ -295,12 +300,13 @@ section fieldset dl:last-child > dd {margin-bottom: 10px;}
 fieldset {width: 620px;}
 fieldset dl {font-size: 1.1em;}
 fieldset dt {width: 150px; font-weight: bold;}
+.new-post .bbcode {display: none;}
 .new-post .message-d dt {margin-top: 80px;}
 .new-post textarea{width:34em;height:10em;}
 .new-style fieldset {width: 400px;}
 .new-style dt {display: none;}
 .new-style .message-d > dd {width: 390px; padding: 5px 0;}
-.new-style .bbcode {margin-top: 0;}
+.new-style .bbcode {display: block; margin-top: 0;}
 .new-style textarea {width: 100%;}
 .new-style input {min-width: 162px;}
 .new-style input[type="submit"] {margin-left: 5px;}
@@ -409,8 +415,8 @@ footer .copyright a {text-decoration: underline;}
 .notification-item-image{width:32px;height:32px;margin-top:-5px;margin-right:5px;float:left; background-image: url('../images/sprites.png'); background-repeat: no-repeat; background-position-y: -16px;}
 .notification-item-image-notice{background-position: -32px -16px;}
 .notification-item-image-success{background-position: -64px -16px;}
-.notification-item-image-warning{background-position: 0 -16px;}
-.notification-item-image-error{background-position: -96px -16px;}
+.notification-item-image-warning{background-position: -96px -16px;}
+.notification-item-image-error{background-position: 0px -16px;}
 .notification-type-notice{color:white;}
 .notification-type-success{color:white;}
 .notification-type-warning{color:white;border-color:#FCBD57;}

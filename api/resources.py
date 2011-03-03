@@ -63,7 +63,6 @@ class ThreadRootResource(RootModelResource):
     )
 
     def get(self, request, auth, *args, **kwargs):
-        #if kwargs.get('')
         return self.model.objects.filter(**kwargs)[:20]
 
 
@@ -104,12 +103,15 @@ class PostRootResource(RootModelResource):
     model = Post
     fields = (
         'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
-        'date', 'message', 'email', 'html',
+        'date', 'message', 'email',
         ('thread', ('id', ('section', ('id', 'slug')))),
+        'files',
     )
 
     def get(self, request, auth, *args, **kwargs):
-        return self.model.objects.all()[:20]
+        if request.GET.get('html'):
+            return self.model.objects.filter(**kwargs).values('html')[:20]
+        return self.model.objects.filter(**kwargs)[:20]
 
     def post(self, request, auth, content, *args, **kwargs):
         try:
@@ -130,13 +132,15 @@ class PostResource(ModelResource):
     model = Post
     fields = (
         'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
-        'date', 'message', 'email', 'html',
+        'date', 'message', 'email',
         ('thread', ('id', ('section', ('id', 'slug')))),
         'files',
     )
 
     def get(self, request, auth, *args, **kwargs):
         try:
+            if request.GET.get('html'):
+                return {'html': self.model.objects.get(**kwargs).html}
             return self.model.objects.get(**kwargs)
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)

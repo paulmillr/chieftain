@@ -157,7 +157,7 @@ class Thread(models.Model):
     deleted_objects = DeletedThreadManager()
 
     def posts(self):
-        return self.post_set.filter(is_deleted=False)
+        return self.post_set.all()
 
     def posts_html(self):
         return self.posts().values('html', 'ip')

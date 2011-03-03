@@ -1,8 +1,88 @@
-* {
-  float: none;       /* Screens are not big enough to account for floats */
-  background: #fff;  /*  As much contrast as possible */
-  color: #000;
+@charset "utf-8";
+
+body { 
+    padding: 8px; 
+    max-width: 380px; 
+    margin: auto; 
+    color: #333;
+    background-color: #fff; 
+    font-family: "Trebuchet MS", Trebuchet, tahoma, serif; 
+    font-size: medium;
 }
 
-/* Slightly reducing font size to reduce need to scroll */
-body { font-size: 80%; }
+#main { 
+    background-color: #eee; 
+}
+
+a { 
+    color: #f60; 
+} 
+a:hover { 
+    color: #06f; 
+}
+
+p {
+    margin: 0;
+}
+
+h1, h2 {
+    font-size: 1em;
+    padding: 0; 
+    margin: 0; 
+    margin-bottom: 0;
+}
+h2 {
+    background: #ddd; 
+    border: 1px solid #ccc;
+}
+h2.nav {
+    font-weight: normal;
+}
+
+hr { 
+    border-style: solid none none none; 
+    border-width: 1px; 
+    border-color: #bbb;
+}
+
+.cart {
+    text-align: right;
+    font-style: italic;
+}
+
+.post { 
+    background: #ddd; 
+    border: 1px solid #ccc; 
+    padding: 0; 
+    margin: 0; 
+    margin-bottom: 0;
+} 
+span.spoiler { 
+    background: #bbb;
+} 
+.green { 
+    color: #789922; 
+} 
+.tripcode {
+    color: #228854;
+}
+.reflink a { 
+    color: inherit; 
+    text-decoration: none;
+}
+.post .filesize { 
+    margin-left: 20px; 
+}
+.post .message {overflow: hidden;}
+.gray { 
+    color: gray; 
+} 
+.reflink {
+    font-size: .8em;
+    font-weight: bold;
+}
+.thumb {    
+    float: left;
+    border: 1px solid #bbb;
+    margin: 5px 15px 5px 10px;
+}

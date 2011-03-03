@@ -1,0 +1,18 @@
+{% extends "mobile/base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% trans "Welcome back" %}.</h1> 
+<a href="/">{% trans "Default version" %}</a><br/>
+<a href="/pda/">{% trans "PDA version"}</a>
+<h2>{% trans "Sections" %}</h2> 
+{% for group in navigation %}
+{% if not group.is_hidden %}
+<ul data-id="{{group.id}}" class="group">
+    {% for section in group.sections %}
+    <li><a href="{{section.slug}}/">{{section.slug}} - {{section.name}}</a></li>{% endfor %}
+</ul>
+{% endif %}
+{% endfor %}
+
+{% endblock %}

@@ -22,6 +22,8 @@ urlpatterns = patterns('board.views',
     # list of posts
     (r'^post/$', PostRootResource.as_view()),
     (r'^post/(?P<thread__section__slug>\w+)/$', PostRootResource.as_view()),
+    (r'^post/(?P<thread__section__slug>\w+)/first/$',
+        PostRootResource.as_view(), {'is_op_post': True}),
     # single posts
     (r'^post/(?P<id>\d+)$', PostResource.as_view()),
     (r'^post/(?P<thread__section__slug>\w+)/(?P<pid>\d+)$',
