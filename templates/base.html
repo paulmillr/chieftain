@@ -1,4 +1,4 @@
-{% load cache %}{% load i18n %}
+{% load cache %}{% load i18n %}{% load macros %}
 <!DOCTYPE html>  
 <!--[if lt IE 8 ]> <html lang="en" id="photon" class="ie6"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="en" id="photon" class="ie8"> <![endif]-->
@@ -6,7 +6,10 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-    <title>{{settings.SITE_TITLE}}</title>
+    {% macro title %}
+        {% block title %}{% endblock %}
+    {% endmacro %}
+    <title>{{settings.SITE_TITLE}}. {% usemacro title %}</title>
     <meta name="description" content="{{settings.SITE_TITLE}} - {{settings.SITE_DESCRIPTION}}.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{settings.STATIC_URL}}favicon.ico">
@@ -27,7 +30,7 @@
                 {% block search %}{% endblock %}
                 <div class="logo"><h1><a href=".">
                     {{settings.SITE_TITLE}}&nbsp;&mdash;
-                    {% block title %}{% endblock %}</a></h1></div>
+                    {% usemacro title %}</a></h1></div>
                 <div class="menu"></div>
                 <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{settings.STATIC_URL}}images/aa.png" alt="/aa/" width="300" height="100"></a></div>
             </header>
