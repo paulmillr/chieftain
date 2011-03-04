@@ -1,4 +1,4 @@
-{% load md2 %}{% load settings %}
+{% load md2 %}{% load i18n %}{% load settings %}
 <article class="post clearfix" id="post{{post.pid}}" data-id="{{post.id}}">
     <div class="post-wrapper">
         <header class="clearfix">
@@ -7,7 +7,17 @@
                 {% if post.thread.is_pinned %}<span class="is_pinned"></span>{% endif %}
                 {% if post.thread.is_closed %}<span class="is_closed"></span>{% endif %}
                 {% endif %}
-                {% if post.country %}<span class="country"><img src="{% setting 'STATIC_URL' %}/images/flags/{{post.country|lower}}.png" alt="{{post.country}}" title="{{post.country}}"></span>
+                {% if post.data %}
+                    {% if post.data.country %}
+                        <span class="country">
+                            <img src="{% setting 'STATIC_URL' %}/images/flags/{{post.data.country|lower}}.png" alt="{{post.data.country}}" title="{{post.data.country}}">
+                        </span>
+                    {% endif %}
+                    {% if post.data.useragent %}
+                        <span class="useragent">
+                            <img src="{% setting 'STATIC_URL' %}images/useragents/{{post.data.useragent.name|lower}}.png" alt="{{post.data.useragent.name}}" title="{{post.data.useragent.raw}}">
+                        </span>
+                    {% endif %}
                 {% endif %}
                 <span class="number"><a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">{{post.pid}}</a></span>
                 <time datetime="{{post.date|date:'c'}}" pubdate>{{post.date|date:"d.m.Y H:i:s"}}</time>
@@ -15,6 +25,8 @@
                 <span class="tripcode">{{post.tripcode}}</span>
                 <span class="topic">{{post.topic}}</span>
             </div>
+            <span title="{% trans 'Add to bookmarks' %}" class="bookmark add"></span>
+            <span title="{% trans 'Hide' %}" class="hide add"></span></header>
         </header>
         <div class="content">
             {% if post.file_count > 0 %}

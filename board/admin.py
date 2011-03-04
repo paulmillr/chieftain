@@ -22,7 +22,7 @@ class ThreadAdmin(admin.ModelAdmin):
 
 class PostAdmin(admin.ModelAdmin):
     search_fields = ('pid', 'thread__section__slug')
-    exclude = ('html',)
+    exclude = ('html', 'is_op_post')
 
 admin.site.register(Thread, ThreadAdmin)
 admin.site.register(Post, PostAdmin)

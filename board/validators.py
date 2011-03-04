@@ -90,12 +90,12 @@ def post(request, no_captcha=True):
                 'you cannot post to it.'))
 
     section_is_feed = (thread.section.type == 3)
-    section_no_files = not thread.section.filetypes.count()
+    section_force_files = thread.section.force_files
 
     if not post.message and not post.file_count:
         raise ValidationError(_('Enter post message or attach '
             'a file to your post'))
-    elif new_thread and not post.file_count and not section_no_files:
+    elif new_thread and not post.file_count and section_force_files:
         raise ValidationError(_('You need to '
             'upload file to create new thread.'))
     elif Wordfilter.objects.scan(post.message):
@@ -137,7 +137,22 @@ def post(request, no_captcha=True):
         post.poster = post.email = post.topic = s * 10
         post.message = (s + u' ') * 50
     if thread.section.type == 4:  # international
-        post.country = GeoIP().country(post.ip)['country_code']
+        post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
+    elif thread.section.type == 5:  # show useragent
+        ua = request.META['HTTP_USER_AGENT']
+        parsed = tools.parse_user_agent(ua)
+        v = ''
+        b = parsed.get('browser') or {'name': 'Unknown', 'version': ''}
+        os = parsed.get('os') or {'name': 'Unknown'}
+        if parsed.get('flavor'):
+            v = parsed['flavor'].get('version') or ''
+        post.data = {'useragent': {
+            'name': b['name'],
+            'version': b['version'],
+            'os_name': os,
+            'os_version': v,
+            'raw': ua,
+        }}
     if new_thread:
         thread.save(rebuild_cache=False)
         post.thread = thread

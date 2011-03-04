@@ -546,7 +546,7 @@ msgstr "Скрыть списки разделов"
 
 #: templates/settings.html:79
 msgid "Disable posts hide"
-msgstr "Отключить скрытие изображений"
+msgstr "Отключить скрытие сообщений"
 
 #: templates/settings.html:85
 msgid "Hard posts hide"

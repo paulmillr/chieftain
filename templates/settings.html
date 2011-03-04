@@ -18,6 +18,7 @@
                 </select>
             </dt>
         </dl>
+        <h3>{% trans "Features" %}</h3>
         <dl>
             <dt>
                 <input type="checkbox" name="newForm" id="newForm">
@@ -32,29 +33,18 @@
         </dl>
         <dl>
             <dt>
-                <input type="checkbox" name="disablePubSub" id="disablePubSub">
-                <label for="disablePubSub">{% trans "Disable post autoload" %}</label>
+                <input type="checkbox" name="hardHide" id="hardHide">
+                <label for="hardHide">{% trans "Hard posts hide" %}</label>
             </dt>
         </dl>
+
+        <h3>{% trans "Disabling" %}</h3>
         <dl>
             <dt>
                 <input type="checkbox" name="oldInsert" id="oldInsert">
                 <label for="oldInsert">{% trans "Old posting way" %}</label>
             </dt>
         </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="hideNotifications" id="hideNotifications">
-                <label for="hideNotifications">{% trans "Disable notifications" %}</label>
-            </dt>
-        </dl>
-        <!--
-        <dl>
-            <dt>
-                <input type="checkbox" name="noAJAX" id="noAJAX">
-                <label for="noAJAX">{% trans "Disable ajax" %}</label>
-            </dt>
-        </dl>-->
         <dl>
             <dt>
                 <input type="checkbox" name="hideBBCodes" id="hideBBCodes">
@@ -75,17 +65,22 @@
         </dl>
         <dl>
             <dt>
+                <input type="checkbox" name="hideSectBanner" id="hideSectBanner">
+                <label for="hideSectBanner">{% trans "Hide sections banner" %}</label>
+            </dt>
+        </dl>
+        <dl>
+            <dt>
                 <input type="checkbox" name="disableHidden" id="disableHidden">
                 <label for="disableHidden">{% trans "Disable posts hide" %}</label>
             </dt>
         </dl>
         <dl>
             <dt>
-                <input type="checkbox" name="hardHide" id="hardHide">
-                <label for="hardHide">{% trans "Hard posts hide" %}</label>
+                <input type="checkbox" name="disablePubSub" id="disablePubSub">
+                <label for="disablePubSub">{% trans "Disable post autoload" %}</label>
             </dt>
         </dl>
-
         <dl>
             <dt>
                 <input type="checkbox" name="disablePostsPreview" id="disablePostsPreview">
@@ -98,16 +93,11 @@
                 <label for="disableAnswersMap">{% trans "Disable answers map" %}</label>
             </dt>
         </dl>
+        <h3>{% trans "Storage" %}</h3>
         <dl>
             <dt>
                 <input type="checkbox" name="disableBookmarks" id="disableBookmarks">
-                <label for="disableBookmarks">{% trans "Disable bookmarks" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="hideSectBanner" id="hideSectBanner">
-                <label for="hideSectBanner">{% trans "Hide sections banner" %}</label>
+                <label for="disableBookmarks">{% trans "Disable bookmarks" %} (<a href="?clear" class="clearBookmarks">{% trans "clear" %}</a>)</label>
             </dt>
         </dl>
         <dl>

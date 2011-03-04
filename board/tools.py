@@ -8,6 +8,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import os
 import re
+import httpagentparser
 import tempfile
 from PIL import Image
 from django.core.files import File as DjangoFile
@@ -19,7 +20,8 @@ from klipped import settings
 from datetime import datetime
 from board.models import File, FileType
 
-__all__ = ['handle_uploaded_file', 'tripcode', 'key']
+
+__all__ = ['handle_uploaded_file', 'tripcode', 'key', 'parse_user_agent']
 
 
 def handle_uploaded_file(file, file_hash, extension, post):
@@ -78,6 +80,10 @@ def tripcode(text):
 def key(text):
     """Generates key for passwords etc."""
     return sha1(text).hexdigest()
+
+
+def parse_user_agent(user_agent):
+    return httpagentparser.detect(user_agent)
 
 
 def from_timestamp(timestamp):

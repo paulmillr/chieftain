@@ -39,6 +39,7 @@ SECTION_TYPES = (
     (3, _('News')),
 # TODO
     (4, _('International')),
+    (5, _('Software')),
 #    (5, _('Private')),
 #    (6, _('Chat')),
 )
@@ -181,7 +182,11 @@ class Thread(models.Model):
 
     @property
     def op_post(self):
-        return self.post_set.filter(is_op_post=True)[0]
+        if not self.is_deleted:
+            post_set = self.post_set
+        else:
+            post_set = Post.deleted_objects.filter(thread=self)
+        return post_set.filter(is_op_post=True).get()
 
     def un_lp(self, offset, limit):
         fields = ('thread_id', 'html')
@@ -267,8 +272,10 @@ class Post(models.Model):
     file_count = models.SmallIntegerField(default=0,
         verbose_name=_('File count'), blank=True)
     ip = models.IPAddressField(verbose_name=_('Post ip'), blank=True)
-    country = models.CharField(max_length=5, blank=True,
-        verbose_name=_('Country code'))  # used for /int/-like sections
+    data = fields.JSONField(max_length=1024, blank=True, null=True,
+        verbose_name=_('Data'))
+    #country = models.CharField(max_length=5, blank=True,
+    #    verbose_name=_('Country code'))  # used for /int/-like sections
     poster = models.CharField(max_length=32, blank=True, null=True,
         verbose_name=_('Poster'))
     tripcode = models.CharField(max_length=32, blank=True,
@@ -410,6 +417,8 @@ class Section(models.Model):
         verbose_name=_('Type'))
     group = models.ForeignKey('SectionGroup',
         verbose_name=_('Group'))
+    force_files = models.BooleanField(default=True,
+        verbose_name=_('Force to post file on thread creation'))
     filesize_limit = models.PositiveIntegerField(default=MEGABYTE * 5,
         verbose_name=_('Filesize limit'))
     anonymity = models.BooleanField(default=False,
@@ -427,7 +436,8 @@ class Section(models.Model):
     ONPAGE = 20
 
     def threads(self):
-        return self.thread_set.order_by('-is_pinned', '-bump', '-id')
+        return Thread.objects.filter(section=self.id).order_by(
+            '-is_pinned', '-bump', '-id')
 
     def op_posts(self):
         return Post.objects.filter(is_op_post=True,
@@ -480,7 +490,7 @@ class Section(models.Model):
         return pid
 
     def save(self):
-        super(self.__class__, self).save()
+        super(Section, self).save()
         cache.delete('sections')
         template.rebuild_cache()
 

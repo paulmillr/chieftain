@@ -209,8 +209,8 @@ function PostContainer(span, post) {
     this.id = getPostId(this.post);
     this.text_data = {
         'section': currentPage.section,
-        'first': !isposts ? '':'',//getPostPid(this.first) : '',
-        'pid': ''//getPostPid(this.post),
+        'first': getPostPid(this.first),
+        'pid': getPostPid(this.post),
     };
 }
 
@@ -988,15 +988,16 @@ function initButtons(selector) {
                 list = container.list(),
                 className = item.className;
 
+            $('.threads').addClass('with' + item.container);
+
             selector.each(function(x) {
-                var span = $('<span/>').attr('title', gettext(className))
-                    .addClass(className).addClass('add'),
-                    post = $(this);
+                var post = $(this),
+                    span = post.find('.' + className);
 
                 if (getPostId(post) in list) {
                     span.removeClass('add').addClass('remove');
                 }
-                span.appendTo(post.find('header'));
+
                 if (!!item.onInit) {
                     item.onInit(new PostContainer(span, post));
                 }
@@ -1014,6 +1015,7 @@ function initButtons(selector) {
                     dt = dataCopy[className];
                 if (span.hasClass('add')) {  // add
                     span.removeClass('add').addClass('remove');
+                    console.log(post.text_data)
                     container.set(post.id, post.text_data);
                     if (dt.onAdd) {
                         dt.onAdd(post);
@@ -1163,6 +1165,7 @@ function initAJAX() {
                 successCallback(data) :
                 errorCallback(data);
         },
+        error: errorCallback,
         url: window.api.url + '/post/?html=1&_accept=text/plain',
         dataType: 'json',
     });

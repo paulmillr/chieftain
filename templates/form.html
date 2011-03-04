@@ -66,7 +66,8 @@
     </fieldset>
 </form>
 <div class="info">
-    <h3><a href="http://2-ch.ru/pr/res/11610.html">О багах писать сюда</a></h3>
-    <h5>Боковая панель (ранее фрейм) скрывается либо в <a href="/settings">настройках</a>, либо по клику на кнопочке под названием сайта</h5>
-    <p class="sectionDescription">{{section.description}}</p>
+    <ul>
+        <li><a href="/bugs/">О багах писать сюда</a></li>
+        {% if section.description %}<li class="sectionDescription">{{section.description}}</li>{% endif %}
+    </ul>
 </div>
