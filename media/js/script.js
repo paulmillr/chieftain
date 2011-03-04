@@ -22,6 +22,7 @@ var api = {
         gettext('hidden'),
         gettext('bookmark'),
         gettext('hide'),
+        gettext('Replies'),
     ];
     })(),
     // page detector
@@ -128,7 +129,12 @@ function getPostPid(post) {
 }
 
 function getPostLinkPid(postlink) {
-    return postlink.href.replace(/(.*\/)?(\d+)/, '$2');
+    var re = /(.*\/)?(\d+)(#.+)?/;
+        match = postlink.href.match(re);
+    if (match[3]) {
+        return match[3].replace('#post', '');
+    }
+    return match[2];
 }
 
 function BoardContainer(storageName) {
@@ -467,6 +473,8 @@ function init() {
                 map[href] = [pid];
             }
         });
+        
+        console.log(map)
 
         for (var i in map) {
             var div = $('<div class="answer-map"/>'),
@@ -481,13 +489,15 @@ function init() {
     }
     
     function previewPosts() {
-        $('.postlink').each(function(x) {
-            var pid = getPostLinkPid(this);
-            if ($('#post' + pid).length === 0) {
-                return true;
-            }
-            this.href = '#post' + pid;
-        });
+        if (currentPage.type === 'thread') {
+            $('.postlink').each(function(x) {
+                var pid = getPostLinkPid(this);
+                if ($('#post' + pid).length === 0) {
+                    return true;
+                }
+                this.href = '#post' + pid;
+            });
+        }
         
         $('.threads').delegate('.postlink', 'mouseover', function(event) {
             event.preventDefault();
@@ -636,9 +646,11 @@ function init() {
     });
     
     $('.threads').delegate('.number > a', 'click', function(e) {
-        if (!$.settings('oldInsert') && currentPage.type != 'section') {
-            var n = $('#post' + $(this).text());
-            $('.new-post').insertAfter(n);
+        if (currentPage.type != 'section') {
+            if (!$.settings('oldInsert')) {
+                var n = $('#post' + $(this).text());
+                $('.new-post').insertAfter(n);
+            }
             textArea.insert('>>' + e.target.innerHTML + ' ');
             return false
         } else {
@@ -718,16 +730,24 @@ function initSettings() {
             hideBBCodes: function(x) {
                 $('.bbcode').hide();
             },
+            
+            miniForm: function(x) {
+                $('.username-d, .topic-d, .email-d, .password-d').toggle();
+                $('.new-style2')
+            },
         };
-        
-    for (var x in s) {
-        $.settings(x, s[x]);
+    
+    if ('forced' in s) {
+        delete s['forced']
+        for (var x in s) {
+            $.settings(x, s[x]);
+        }
     }
     
     settings.each(function(x) {
         var s = $.settings(this.id),
             t = parseQs(this.id);
-        if (!!t) {
+        if (!!t && 'forced' in t) {
             $.settings(this.id, t);
             s = t;
         }
@@ -743,8 +763,8 @@ function initSettings() {
             }
         }
     });
-    
-    
+
+
     settings.change(function(event) {
         var value = this.value;
         if (this.checked !== undefined) {
@@ -752,7 +772,6 @@ function initSettings() {
         }
         console.log('Setting %s changed to "%s".', this.id, value);
         $.settings(this.id, value);
-        console.log('Current setting %s is "%s".', this.id, $.settings(this.id));
     });
     
     $('#sidebar .hide').click(function(event) {
@@ -823,6 +842,45 @@ function initStyle() {
         if (post.find('.is_closed').length == 0) {
             span.insertBefore(post.find('.number'));
         }
+    });
+
+    // Force english keys in captcha
+    $('#main').delegate('#recaptcha_response_field', 'keypress', function(e) {
+        var key;
+        if (e.which < 1040 || e.which > 1279) {
+            return true;
+        }
+        e.preventDefault();
+        switch(e.which) {
+            case 1081: key='q'; break;
+            case 1094: key='w'; break;
+            case 1091: key='e'; break;
+            case 1082: key='r'; break;
+            case 1077: key='t'; break;
+            case 1085: key='y'; break;
+            case 1075: key='u'; break;
+            case 1096: key='i'; break;
+            case 1097: key='o'; break;
+            case 1079: key='p'; break;
+            case 1092: key='a'; break;
+            case 1099: key='s'; break;
+            case 1074: key='d'; break;
+            case 1072: key='f'; break;
+            case 1087: key='g'; break;
+            case 1088: key='h'; break;
+            case 1086: key='j'; break;
+            case 1083: key='k'; break;
+            case 1076: key='l'; break;
+            case 1103: key='z'; break;
+            case 1095: key='x'; break;
+            case 1089: key='c'; break;
+            case 1084: key='v'; break;
+            case 1080: key='b'; break;
+            case 1090: key='n'; break;
+            case 1100: key='m'; break;
+            default: return true;
+        }
+        e.target.value = e.target.value+key;
     });
     
     // images resize
@@ -1015,7 +1073,6 @@ function initButtons(selector) {
                     dt = dataCopy[className];
                 if (span.hasClass('add')) {  // add
                     span.removeClass('add').addClass('remove');
-                    console.log(post.text_data)
                     container.set(post.id, post.text_data);
                     if (dt.onAdd) {
                         dt.onAdd(post);
@@ -1095,9 +1152,6 @@ function initHotkeys() {
 function initAJAX() {
     if (!$('#password').val()) {
         $('#password').val(randomString(8));
-    }
-    if ($.settings('noAJAX')) {
-        return true;
     }
     function errorCallback(data) {
         //document.write(data.responseText); // for debugging

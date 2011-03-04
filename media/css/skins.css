@@ -3,7 +3,7 @@
 #photon a:link,
 #photon a:visited{color:#f60;}
 #photon a:hover{color:#06f;}
-#photon #sidebar h4{background:#ddd;border:1px solid #ccc;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px;}
+#photon #sidebar h4{background:#ddd;border:1px solid #ccc;border-radius:5px;-moz-border-radius:5px;-webkit-border-radius:5px; padding: 2px; cursor: pointer; width: 200px;}
 #photon #sidebar ul{border-left:1px solid #ccc;}
 /* New post */
 #photon .new-post dl{clear:both;padding:5px 0;font-size:1.1em;}
@@ -230,6 +230,7 @@
 #neutron .tripcode {
 	color: #228854;
 	}
+#neutron .tripcode.staff{color:#FFB600;}
 #neutron time {
 	margin-right: 1em;
 	}

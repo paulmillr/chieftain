@@ -267,10 +267,12 @@ em {font-style: italic;}
 nav {font-size: 0.95em;}
 nav ul {display: inline;}
 nav li {float: left;}
-.group {margin-right: 5px;}
+
 .group, nav li {margin-left: 0;}
 .group li {display: inline; margin-left: -0.6em;}
-.group li:first-child {margin-left: 0}
+.group li:first-child {margin-left: 0;}
+nav .group li:first-child {margin-left: 5px;}
+nav .group:first-child li:first-child {margin-left: 0;}
 .group li:first-child:before {content: " ["; padding-left: 2px;}
 .group li:first-child a, .group li:first-child span { padding: 0; }
 .group li:after {content: " /";}
@@ -279,15 +281,14 @@ nav li {float: left;}
 .group a {text-decoration: underline;}
 
 #container-wrap {float: left; width: 100%;}
-#container-wrap > * {margin-left: 280px; margin-right: 10px;}
+#container-wrap > * {margin-left: 250px; margin-right: 10px;}
 #container-wrap.no-sidebar > * {margin-left: 10px;}
-#sidebar {width: 280px; float: left; font-size: 1.1em; margin-left: -100%;}
-#sidebar aside {position: fixed; overflow: hidden; width: 240px; padding-right: 20px;}
+#sidebar {width: 260px; float: left; font-size: 1.1em; margin-left: -100%;}
+#sidebar aside {position: fixed; overflow: hidden; width: 220px; padding-right: 5px; margin: 0 1em;}
 #sidebar h2 {margin-bottom: 10px;}
-#sidebar .hide {margin: -20px -15px 0 0; width: auto; background: none; font-size: 0.9em;}
+#sidebar .hide {margin: -20px 0px 0 0; width: auto; background: none; font-size: 0.9em;}
 #sidebar h4 {font-size: 1em; margin-bottom: 1px;}
 #sidebar li {list-style: none;}
-#sidebar aside {margin: 0 1em;}
 #sidebar ul {margin-left: 1em; padding-left: 0.5em;}
 
 /* Main content */
@@ -360,7 +361,7 @@ label.placeholder {
 .post.resized .content {max-height: none;}
 .post.resized .files {max-width: none; max-height: none;}
 .post span:empty {margin: 0;}
-.post .answer-map {margin-top: 5px; font-style: italic;}
+.post .answer-map {margin-top: 5px; font-style: italic; font-size: 0.95em;}
 .post .answer-map .postlink {margin-left: 3px; font-size: 0.85em;}
 .deleted {background: #e44;}
 .info-wrapper {float: left;}
