@@ -1,36 +1,43 @@
-/* Author: Paul Bagwell
+/**
+ * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
+ * Dual licensed under the MIT and GPL licenses:
+ * http://www.opensource.org/licenses/mit-license.php
+ * http://www.gnu.org/licenses/gpl.html
+ */
 
-*/
+// workaround
 if (typeof Recaptcha !== 'undefined') {
-    // workaround
     Recaptcha.focus_response_field = function() {};
 }
 
 var api = {
-    url: '/api',
-    defaultType: 'text/plain'    
+    url: '/api',  // URL to klipped API
+    defaultType: 'text/plain'  // Default MIME type of queries to API
 },
+    queryString = parseQs(),
+    answersMap = {},
+    postButtons = {},
     // pre-localize messages because of django bug
     i18n = (function() {
-        var l = [
-        gettext('Reason'),
-        gettext('Reply'),
-        gettext('Message is too long.'),
-        gettext('Full text'),
-        gettext('Thread'),
-        gettext('Post'),
-        gettext('hidden'),
-        gettext('bookmark'),
-        gettext('hide'),
-        gettext('Replies'),
-    ];
+        gettext('Reason');
+        gettext('Reply');
+        gettext('Message is too long.');
+        gettext('Full text');
+        gettext('Thread');
+        gettext('Post');
+        gettext('hidden');
+        gettext('bookmark');
+        gettext('hide');
+        gettext('Replies');
     })(),
     // page detector
     currentPage = (function() {
     var loc = window.location.href.split('/').slice('3'),
         re = /(\d+)(?:.+)?/,
         data = {cache: {}};
-    if (loc[1] == null) { // main, settings or faq
+
+    // main, settings or faq
+    if (loc[1] == null) {
         l = loc[0];
         pages = ['settings', 'faq'];
         for (var i=0; i < pages.length; i++) {
@@ -63,12 +70,20 @@ var api = {
     return data;
 })();
 
-function PostArea(element) {
-    // listens textarea and adds some methods to it
+function isjQuery(object) {
+    return object instanceof jQuery;
+}
 
+/**
+ * Tools for textareas.
+ */
+function PostArea(element) {
     this.textarea = $(element)[0];
-    this.insert = function(text) {
+}
+
+$.extend(PostArea.prototype, {
     // inserts text in textarea and focuses on it
+    insert: function(text) {
         var textarea = this.textarea;
     	if (textarea) {
     		if (textarea.createTextRange && textarea.caretPos) { // IE
@@ -88,11 +103,11 @@ function PostArea(element) {
     		}
     		textarea.focus();
     	}
-    }
+    },
 
-    this.wrap = function(tagStart, tagEnd, eachLine) {
     // wraps selected text in tagStart text tagEnd
     // and inserts to textarea
+    wrap: function(tagStart, tagEnd, eachLine) {
         var textarea = this.textarea,
             size = (tagStart + tagEnd).length;
         
@@ -114,7 +129,7 @@ function PostArea(element) {
         }
         textarea.focus();
     }
-}
+});
 
 function getThreadId(thread) {
     return thread.attr('id').replace('thread', '');
@@ -129,19 +144,19 @@ function getPostPid(post) {
 }
 
 function getPostLinkPid(postlink) {
-    var re = /(.*\/)?(\d+)(#.+)?/;
-        match = postlink.href.match(re);
-    if (match[3]) {
-        return match[3].replace('#post', '');
-    }
-    return match[2];
+    return postlink.text.match(/>>(\/\w+\/)?(\d+)/)[2];
 }
 
-function BoardContainer(storageName) {
-    // Key-value database, based on localStorage
+/**
+ * Key-value database, based on localStorage
+ *
+ * Used for storing bookmarks, hidden posts and visited threads.
+ */
+function BoardStorage(storageName) {
     this.storageName = storageName;
 }
-$.extend(BoardContainer.prototype, {
+
+$.extend(BoardStorage.prototype, {
     storageName : '',
 
     // gets all keys
@@ -150,9 +165,6 @@ $.extend(BoardContainer.prototype, {
         return (typeof s !== 'undefined' && typeof s !== 'string' && s !== null) ? s : {};
     },
 
-    // checks if key is in container
-    // returns item if container is dictionary and 
-    // bool(inList) if container is list
     get: function(key) {
         return this.list()[key]
     },
@@ -177,8 +189,8 @@ $.extend(BoardContainer.prototype, {
         delete s[key];
         return $.storage(this.storageName, s);
     },
-    
-    // clears container
+
+    // Clears container.
     flush: function() {
         $.storage(this.storageName, '', 'flush');
     },
@@ -202,14 +214,20 @@ $.extend(BoardContainer.prototype, {
     }
 });
 
+
+/**
+ * Post container class.
+ *
+ * Used to push post data in various 'button-click' events.
+ */
 function PostContainer(span, post) {
-    if (!(span instanceof jQuery)) {
+    if (!isjQuery(span)) {
         span = $(span);
     }
     var isposts = (currentPage.type === 'posts');
     
     this.span = span;
-    this.post = post ? (!(post instanceof jQuery) ? post : $(post)) : span.closest('.post');
+    this.post = post ? (!isjQuery(post) ? post : $(post)) : span.closest('.post');
     this.thread = (currentPage.type === 'thread') ? currentPage.cache.thread : this.span.closest('.thread');
     this.first = (currentPage.type === 'thread') ? currentPage.cache.first : this.thread.find('.post:first-child');
     this.id = getPostId(this.post);
@@ -223,10 +241,7 @@ function PostContainer(span, post) {
 /**
  * Simple color container class.
  * 
- * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
- * Dual licensed under the MIT and GPL licenses:
- * http://www.opensource.org/licenses/mit-license.php
- * http://www.gnu.org/licenses/gpl.html
+ * Used for storage of canvas data.
  */
 function ColorContainer(red, green, blue, alpha) {
     if (!red) red = 0;
@@ -346,6 +361,7 @@ function checkForSidebarScroll() {
     }
 }
 
+// Changes all labels to input placeholders.
 function labelsToPlaceholders(list) {
     for (var i=0; i < list.length; i++) {
         var x = list[i],
@@ -355,13 +371,10 @@ function labelsToPlaceholders(list) {
         dd.attr('placeholder', t);
         dd.placeholder(t);
     }
-    //if ($('.bbcode').css('display') === 'none') {
-    //    $('.captcha-d').css({'margin-top' : '1px'})
-    //}
 }
 
+// Manipulates elements. Used for user styles.
 function manipulator(arr) {
-    // manipulates elements. Used for user styles.
     var cases = {
         after : function(from, to) {
             $(from).remove().insertAfter(to)
@@ -378,13 +391,8 @@ function manipulator(arr) {
     }
 }
 
-
-function styleDOM(style) {
-    // make page changes, that can't be afforded through CSS
-}
-
-function parseQs(key) {
-    // query string parser
+// Query string parser.
+function parseQs() {
     var d = location.href.split('?').pop().split('&'),
         parsed = {}, tmp;
         
@@ -393,13 +401,24 @@ function parseQs(key) {
         parsed[tmp[0]] = tmp[1];
     }
     
-    if (!key) {
-        return parsed;
+    return parsed;
+}
+
+/**
+ * Searches for post on the page.
+ *
+ * If not found, makes request to API.
+ */
+function searchPost(board, pid, callback) {
+    var p = $('#post' + pid);
+    if (p.length) {
+        return p;
     }
-    if (key in parsed && 'forced' in parsed) {
-        return parsed[key];
-    }
-    return false;
+
+    $.get(window.api.url + '/post/' + board + '/' + pid + '?html=1')
+        .success(function(data) {
+            callback(data.html);
+        });
 }
 
 function slideRemove(elem) {
@@ -414,32 +433,85 @@ function slideRemove(elem) {
 function init() {
     var textArea = new PostArea('#message'),
         set = $.settings('hideSectGroup'),
-        pass = $.settings('password');
+        pass = $.settings('password'),
+        buttons = {
+            'bookmark': {storageName: 'Bookmarks'},
+            'hide': {storageName: 'Hidden',
+                onInit : function(data) {
+                    if (data.span.hasClass('remove')) {
+                        this.onAdd(data);
+                    }
+                },
+
+                onAdd : function(data) {
+                    var first = false,
+                        post,
+                        hideClass = $.settings('hardHide') ? 'hard hidden' : 'hidden';
+                    if (data.id === getPostId(data.first)) {
+                        data.thread.addClass(hideClass);
+                        post = data.first;
+                        first = true;
+                    } else {
+                        post = data.post;
+                    }
+                    post.addClass(hideClass);
+                    var t = first ? gettext('Thread') : gettext('Post'),
+                        s = $('<span/>').addClass('skipped')
+                        .text(t +
+                            ' #'+ getPostPid(post) +
+                            //'('+ post.find('.message').text().split(0, 20) +')' +
+                            ' ' + gettext('hidden') + '.'
+                        ).appendTo(post.find('.post-wrapper')),
+                        b = post.find('.bookmark, .hide').appendTo(s);
+                },
+
+                onRemove: function(data) {
+                    var p;
+                    if (data.id === getPostId(data.first)) {
+                        data.thread.removeClass('hidden');
+                        post = data.first;
+                    } else {
+                        post = data.post;
+                    }
+                    post.find('.bookmark, .hide').appendTo(post.find('header'));
+                    post.find('.skipped').remove();
+                    post.removeClass('hidden');
+                }
+            }
+        }
+
     if (pass) {
         $('#password').val(pass);
     }
+
     $('#main').delegate('#password', 'change', function(event) {
         $.settings('password', this.value);
     });
-
-    function searchPost(board, pid, callback) {
-        var p = $('#post' + pid);
-        if (p.length) {
-            return p;
-        }
-        $.get(window.api.url + '/post/' + board + '/' + pid + '?html=1', function(data) {
-            callback(data.html);
-        });
-    }
     
     function removeIfPreview(element) {
-        element = element instanceof jQuery ? element : $(element);
+        element = isjQuery(element) ? element : $(element);
         var p = element.prev();
         if (p.hasClass('post-preview')) {
             removeIfPreview(p);
             p.remove();
         }
         element.remove();
+    }
+
+    for (var className in buttons) {
+        var button = buttons[className],
+            sname = button.storageName
+
+        // Check if current button set is not blocked by user.
+        if ($.settings('disable' + className)) {
+            continue;
+        }
+
+        button.storage = new BoardStorage(sname);
+        button.list = button.storage.list();
+
+        window.postButtons[className] = button;
+        $('.threads').addClass('with' + sname);
     }
 
     $('.bbcode a').click(function(e) {
@@ -460,45 +532,32 @@ function init() {
         window.location.hash = '#' + $(this).attr('href');
     });
     
-    function buildAnswersMap() {
-        var map = {};
-        
-        $('.postlink').each(function() {
-            var post = $(this).closest('.post'),
-                pid = parseInt(getPostPid(post)),
-                href = getPostLinkPid(this);
-            if (map[href]) {
-                map[href].push(pid);
-            } else {
-                map[href] = [pid];
-            }
-        });
-        
-        console.log(map)
+    $('.threads').delegate('.post-icon', 'click', function(event) {
+        event.preventDefault();
+        var cont = new PostContainer(this),
+            span = cont.span,
+            post = cont.post,
+            postId = cont.id,
+            className = this.className.split(' ')[1],
+            current = window.postButtons[className],
+            storage = current.storage;
 
-        for (var i in map) {
-            var div = $('<div class="answer-map"/>'),
-                links = [];
-            for (var j=0; j < map[i].length; j++) {
-                var text = map[i][j];
-                    links.push('<a class="postlink"  href="#post'+text+'">&gt;&gt;'+text+'</a>');
+        if (span.hasClass('add')) {  // add
+            span.removeClass('add').addClass('remove');
+            storage.set(postId, cont.text_data);
+            if (current.onAdd) {
+                current.onAdd(cont);
             }
-            div.html(gettext('Replies') + ':' + links.join(','));
-            $('#post' + i + ' .post-wrapper').append(div);
+        } else {  // remove
+            span.removeClass('remove').addClass('add');
+            storage.remove(postId);
+            if (current.onRemove) {
+                current.onRemove(cont);
+            }
         }
-    }
+    });
     
     function previewPosts() {
-        if (currentPage.type === 'thread') {
-            $('.postlink').each(function(x) {
-                var pid = getPostLinkPid(this);
-                if ($('#post' + pid).length === 0) {
-                    return true;
-                }
-                this.href = '#post' + pid;
-            });
-        }
-        
         $('.threads').delegate('.postlink', 'mouseover', function(event) {
             event.preventDefault();
             var t = $(this),
@@ -546,9 +605,6 @@ function init() {
     
     if (!$.settings('disablePostsPreview')) {
         previewPosts();
-    }
-    if (!$.settings('disableAnswersMap')) {
-        buildAnswersMap();
     }
     
     $('.deleteMode > input').click(function(event) {
@@ -954,191 +1010,136 @@ function initStyle() {
     return true;
 }
 
-function initHidden() {
-    var status = ('localStorage' in window && window['localStorage'] !== null);
-    if (!status) {
-        return false;
-    }
-    
-    if (!$.settings('dontLogVisits')) {
-        initVisitedThreads();
-    }
-    
-    // Thread visits counter
-    function initVisitedThreads() {
-        var container = new BoardContainer('visitedThreads', true),
-            visitedList = $('.' + container.storageName);
+function initPosts(selector) {
+    var posts = selector && typeof selector !== 'function' ? 
+            isjQuery(selector) ? selector : $(selector) : $('.post'),
+        buttons = window.postButtons,
+        map = {},
+        cache = {};
 
-        $('#dontLogVisits').click(function(event) {
-            visitedList.slideToggle();
-        });
+    for (var i=0; i < posts.length; i++) {
+        var p = posts[i],
+            post = $(p),
+            id = getPostId(post),
+            pid = getPostPid(post),
+            links = post.find('.postlink');
 
-        if (currentPage.type == 'thread') {
-            thread = currentPage.thread;
-            if (!(thread in container.list())) {
-                container.set(thread, {
-                    'first': currentPage.first, 
-                    'section': currentPage.section,
-                    'visits': 1,
-                    'first_visit': (new Date()).getTime(),
-                    'title': $('.post:first-child .title').text(),
-                    'description': (function() {
-                        var text = $('.post:first-child .message').text();
-                        if (text.length > 100) {
-                            text = text.substring(0, 100) + '...';
-                        } 
-                        return $.trim(text);
-                    })()
-                })
-            } else {
-                container.incr(thread, 'visits');
-            }
-        } else if (currentPage.type == 'settings') {
-            ul = visitedList.find('ul');
-            visitedList.show();
-            function makeList(list) {
-                for (var i=0; i < list.length; ++i) {
-                    var a = $('<a/>'),
-                        item = list[i],
-                        elem = $('<li/>'),
-                    // elem.data('visits', item.visits);
-                        tpl = '/'+item.section+'/'+item.first;
-                    a.attr('href', tpl);
-                    a.text(tpl + ': ' + item.description);
-                    ul.append(elem.append(a));
+        // Initialize answers map.
+        for (var j=0; j < links.length; j++) {
+            var href = getPostLinkPid(links[j]),
+                targetSelector = '#post' + href,
+                target = $(targetSelector);
+
+            if (href in map) {
+                if (map[href].indexOf(pid) === -1) {
+                    map[href].push(pid);
                 }
+            } else {
+                map[href] = [pid];
             }
-            makeList(container.sort('visits'));
-            $('.sortVisitedThreads').change(function(event) {
-                ul.find('li').remove();
-                makeList(container.sort(this.value));
-            });
-            $('.clearVisitedThreads').click(function(event) {
-                event.preventDefault();
-                container.flush();
-                ul.children('li').slideUp('normal', function() {
-                    $(this).remove();
-                });
-            });
+            
+            cache[href] = target
+
+            if (currentPage.type === 'thread' && target.length !== 0) {
+                target.attr('href', targetSelector);
+            }
         }
+
+        // Initialize post buttons.
+        for (var className in buttons) {
+            var button = buttons[className],
+                span = post.find('.' + className);
+
+            if (id in button.list) {
+                span.removeClass('add').addClass('remove');
+            }
+            
+            if (button.onInit) {
+                button.onInit(new PostContainer(span, post));
+            }
+        }
+    }
+
+    // Build or rebuild page answers map.
+    for (var i in map) {
+        var c = cache[i].find('.answer-map'),
+            cacheExists = !!c.length,
+            div = cacheExists ? c : $('<div class="answer-map"/>'),
+            links = [];
+        for (var j=0; j < map[i].length; j++) {
+            var text = map[i][j];
+            links.push('<a class="postlink" href="#post'+ text +'">&gt;&gt;'+ text +'</a>');
+        }
+
+        if (!cacheExists) {
+            div.html(gettext('Replies') + ':' + links.join(','));
+        } else {
+            div.html(div.html() + ',' + links.join(','));
+        }
+        
+        $('#post' + i + ' .post-wrapper').append(div);
     }
 }
 
-function initButtons(selector) {
-    var status = ('localStorage' in window && window['localStorage'] !== null),
-        selector = typeof selector == 'function' ? $('.post') : selector;
-    if (!status) {
-        return false;
+function initVisited() {
+    if ($.settings('dontLogVisits')) {
+        return true;
     }
-    function buttonInitializer(data) {
-        var dataCopy = {};
-        $.each(data, function() {
-            var item = this;
-            dataCopy[this.className] = this;
+    
+    // Thread visits counter
+    var storage = new BoardStorage('visitedThreads', true),
+        visitedList = $('.' + storage.storageName);
 
-            if (!!$.settings('disable' + item.container)) {
-                return true;
-            }
-            
-            dataCopy[item.className] = item;
+    $('#dontLogVisits').click(function(event) {
+        visitedList.slideToggle();
+    });
 
-            var container = new BoardContainer(item.container),
-                list = container.list(),
-                className = item.className;
-
-            $('.threads').addClass('with' + item.container);
-
-            selector.each(function(x) {
-                var post = $(this),
-                    span = post.find('.' + className);
-
-                if (getPostId(post) in list) {
-                    span.removeClass('add').addClass('remove');
-                }
-
-                if (!!item.onInit) {
-                    item.onInit(new PostContainer(span, post));
-                }
-            });
-            
-            if (window.buttonsInitialized) {
-                return true;
-            }
-
-            $('.threads').delegate('.' + className, 'click', function(event) {
-                event.preventDefault();
-                var post = new PostContainer(this),
-                    span = post.span,
-                    className = this.className.split(' ')[0],
-                    dt = dataCopy[className];
-                if (span.hasClass('add')) {  // add
-                    span.removeClass('add').addClass('remove');
-                    container.set(post.id, post.text_data);
-                    if (dt.onAdd) {
-                        dt.onAdd(post);
-                    }
-                } else {  // remove
-                    span.removeClass('remove').addClass('add');
-                    container.remove(post.id);
-                    if (dt.onRemove) {
-                       dt.onRemove(post);
-                    }
-                }
-            });
-        });
-    }
-
-    buttonInitializer([
-        {
-            container: 'Bookmarks', 
-            className: 'bookmark'
-        },
-        {
-            container: 'Hidden', 
-            className: 'hide',
-            onInit : function(data) {
-                if (data.span.hasClass('remove')) {
-                    this.onAdd(data);
-                }
-            },
-
-            onAdd : function(data) {
-                var first = false, post,
-                    hideClass = $.settings('hardHide') ? 'hard hidden' : 'hidden';
-                if (data.id === getPostId(data.first)) {
-                    data.thread.addClass(hideClass);
-                    post = data.first;
-                    first = true;
-                } else {
-                    post = data.post;
-                }
-                post.addClass(hideClass);
-                var t = first ? gettext('Thread') : gettext('Post'),
-                    s = $('<span/>').addClass('skipped')
-                    .text(t +
-                        ' #'+ getPostPid(post) +
-                        //'('+ post.find('.message').text().split(0, 20) +')' +
-                        ' ' + gettext('hidden') + '.'
-                    ).appendTo(post.find('.post-wrapper')),
-                    b = post.find('.bookmark, .hide').appendTo(s);
-            },
-
-            onRemove: function(data) {
-                var p;
-                if (data.id === getPostId(data.first)) {
-                    data.thread.removeClass('hidden');
-                    post = data.first;
-                } else {
-                    post = data.post;
-                }
-                post.find('.bookmark, .hide').appendTo(post.find('header'));
-                post.find('.skipped').remove();
-                post.removeClass('hidden');
+    if (currentPage.type == 'thread') {
+        thread = currentPage.thread;
+        if (!(thread in storage.list())) {
+            storage.set(thread, {
+                'first': currentPage.first, 
+                'section': currentPage.section,
+                'visits': 1,
+                'first_visit': (new Date()).getTime(),
+                'title': $('.post:first-child .title').text(),
+                'description': (function() {
+                    var text = $('.post:first-child .message').text();
+                    if (text.length > 100) {
+                        text = text.substring(0, 100) + '...';
+                    } 
+                    return $.trim(text);
+                })()
+            })
+        } else {
+            storage.incr(thread, 'visits');
+        }
+    } else if (currentPage.type == 'settings') {
+        ul = visitedList.find('ul');
+        visitedList.show();
+        function makeList(list) {
+            for (var i=0; i < list.length; ++i) {
+                var a = $('<a/>'),
+                    item = list[i],
+                    elem = $('<li/>'),
+                    tpl = '/' + item.section + '/' + item.first;
+                a.attr('href', tpl);
+                a.text(tpl + ': ' + item.description);
+                ul.append(elem.append(a));
             }
         }
-    ]);
-    if (!window.buttonsInitialized) {
-        window.buttonsInitialized = true;
+        makeList(storage.sort('visits'));
+        $('.sortVisitedThreads').change(function(event) {
+            ul.find('li').remove();
+            makeList(storage.sort(this.value));
+        });
+        $('.clearVisitedThreads').click(function(event) {
+            event.preventDefault();
+            storage.flush();
+            ul.children('li').slideUp('normal', function() {
+                $(this).remove();
+            });
+        });
     }
 }
 
@@ -1148,6 +1149,7 @@ function initHotkeys() {
         return false;
     });
 }
+
 
 function initAJAX() {
     if (!$('#password').val()) {
@@ -1184,7 +1186,7 @@ function initAJAX() {
                 .appendTo('.thread')
                 .fadeIn(500);
             post.find('.tripcode:contains("!")').addClass('staff');
-            initButtons(post);
+            initPosts(post);
         }
 
         var newpost = $('.new-post');
@@ -1225,6 +1227,11 @@ function initAJAX() {
     });
 }
 
+/**
+ * Realtime publish-subscribe system.
+ * 
+ * Uses long polling to check for new posts.
+ */
 function initPubSub() {
     if (currentPage.type !== 'thread' || $.settings('disablePubSub')) {
         return false;
@@ -1269,7 +1276,7 @@ function initPubSub() {
                         .appendTo('.thread')
                         .fadeIn(500);
                         post.find('.tripcode:contains("!")').addClass('staff');
-                        initButtons(post);
+                        initPosts(post);
                 }
                 window.setTimeout(pubsub.poll, 0);
             });
@@ -1283,8 +1290,8 @@ function initPubSub() {
 $(init);
 $(initSettings);
 $(initStyle);
-$(initHidden);
-$(initButtons);
+$(initPosts);
+$(initVisited);
 $(initHotkeys);
 $(initAJAX);
 $(initPubSub);

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-03 23:40+0200\n"
+"POT-Creation-Date: 2011-03-05 02:55+0200\n"
 "PO-Revision-Date: 2011-01-23 19:23+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -19,23 +19,23 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: api/resources.py:163
+#: api/resources.py:167
 msgid "You need to enter ban reason"
 msgstr "Необходимо ввести причину блокировки"
 
-#: api/resources.py:183
+#: api/resources.py:187
 msgid "Error on deleting post #"
 msgstr "Ошибка при удалении сообщения №"
 
-#: api/resources.py:184 api/resources.py:252
+#: api/resources.py:188 api/resources.py:256
 msgid "Password mismatch"
 msgstr "Неправильный пароль"
 
-#: api/resources.py:251
+#: api/resources.py:255
 msgid "Error on deleting file #"
 msgstr "Ошибка при удалении файла №"
 
-#: board/fields.py:24
+#: board/fields.py:26
 msgid "Invalid captcha"
 msgstr "Неправильный код"
 
@@ -51,265 +51,273 @@ msgstr "Новостной"
 msgid "International"
 msgstr "Интернациональный"
 
-#: board/models.py:148 board/models.py:264
+#: board/models.py:42
+msgid "Software"
+msgstr ""
+
+#: board/models.py:149 board/models.py:269
 msgid "Bump date"
 msgstr "Дата бампа"
 
-#: board/models.py:150 board/models.py:266 board/models.py:341
+#: board/models.py:151 board/models.py:271 board/models.py:348
 msgid "Is deleted"
 msgstr "Удален"
 
-#: board/models.py:152
+#: board/models.py:153
 msgid "Is pinned"
 msgstr "Прикреплен"
 
-#: board/models.py:154
+#: board/models.py:155
 msgid "Is closed"
 msgstr "Закрыт"
 
-#: board/models.py:155 board/models.py:283
+#: board/models.py:156 board/models.py:290
 msgid "HTML cache"
 msgstr "Кэш"
 
-#: board/models.py:249 board/models.py:260 board/models.py:614
+#: board/models.py:254 board/models.py:265 board/models.py:624
 #: templates/mobile/thread.html:6 templates/pda/thread.html:6
 msgid "Thread"
 msgstr "Тред"
 
-#: board/models.py:250 templates/section_page.html:26
+#: board/models.py:255 templates/section_page.html:26
 #: templates/section_posts.html:32 templates/section_thread.html:21
 #: templates/section_threads.html:19
 msgid "Threads"
 msgstr "Треды"
 
-#: board/models.py:258
+#: board/models.py:263
 msgid "PID"
 msgstr "Идентификатор"
 
-#: board/models.py:262
+#: board/models.py:267
 msgid "First post in thread"
 msgstr "Стартует тред"
 
-#: board/models.py:268
+#: board/models.py:273
 msgid "File count"
 msgstr "Количество файлов"
 
-#: board/models.py:269
+#: board/models.py:274
 msgid "Post ip"
 msgstr "IP-адрес"
 
-#: board/models.py:271
-msgid "Country code"
-msgstr "Код страны"
+#: board/models.py:276
+msgid "Data"
+msgstr "Метадата"
 
-#: board/models.py:273
+#: board/models.py:280
 msgid "Poster"
 msgstr "Имя"
 
-#: board/models.py:275
+#: board/models.py:282
 msgid "Tripcode"
 msgstr "Трипкод"
 
-#: board/models.py:277 templates/pda/index.html:185
+#: board/models.py:284 templates/pda/index.html:185
 msgid "Email"
 msgstr "Email"
 
-#: board/models.py:279
+#: board/models.py:286
 msgid "Topic"
 msgstr "Тема"
 
-#: board/models.py:281
+#: board/models.py:288
 msgid "Password"
 msgstr "Пароль"
 
-#: board/models.py:282
+#: board/models.py:289
 msgid "Message"
 msgstr "Текст"
 
-#: board/models.py:327 board/models.py:335 board/models.py:654
+#: board/models.py:334 board/models.py:342 board/models.py:664
 msgid "Post"
 msgstr "Сообщение"
 
-#: board/models.py:328 templates/section_page.html:27
+#: board/models.py:335 templates/section_page.html:27
 #: templates/section_posts.html:33 templates/section_thread.html:22
 #: templates/section_threads.html:20
 msgid "Posts"
 msgstr "Сообщения"
 
-#: board/models.py:337
+#: board/models.py:344
 msgid "Original name"
 msgstr "Оригинальное имя"
 
-#: board/models.py:338 board/models.py:410
+#: board/models.py:345 board/models.py:417
 msgid "Type"
 msgstr "Тип"
 
-#: board/models.py:339
+#: board/models.py:346
 msgid "Size"
 msgstr "Размер"
 
-#: board/models.py:343
+#: board/models.py:350
 msgid "Image width"
 msgstr "Ширина изображения"
 
-#: board/models.py:345
+#: board/models.py:352
 msgid "Image height"
 msgstr "Высота изображения"
 
-#: board/models.py:347
+#: board/models.py:354
 msgid "Hash"
 msgstr "Хэш"
 
-#: board/models.py:349
+#: board/models.py:356
 msgid "Location"
 msgstr "Расположение"
 
-#: board/models.py:351
+#: board/models.py:358
 msgid "Thumbnail"
 msgstr "Иконка"
 
-#: board/models.py:366 templates/form.html:43
+#: board/models.py:373 templates/form.html:43
 msgid "File"
 msgstr "Файл"
 
-#: board/models.py:367
+#: board/models.py:374
 msgid "Files"
 msgstr "Файлы"
 
-#: board/models.py:373
+#: board/models.py:380
 msgid "Extension"
 msgstr "Разрешение"
 
-#: board/models.py:375
+#: board/models.py:382
 msgid "MIME"
 msgstr "MIME-тип"
 
-#: board/models.py:377 board/models.py:412
+#: board/models.py:384 board/models.py:419
 msgid "Group"
 msgstr "Группа"
 
-#: board/models.py:383
+#: board/models.py:390
 msgid "File type"
 msgstr "Тип файлов"
 
-#: board/models.py:384 board/models.py:420
+#: board/models.py:391 board/models.py:429
 msgid "File types"
 msgstr "Типы файлов"
 
-#: board/models.py:390 board/models.py:406 board/models.py:498
+#: board/models.py:397 board/models.py:413 board/models.py:508
 msgid "Name"
 msgstr "Название"
 
-#: board/models.py:397 board/models.py:398
+#: board/models.py:404 board/models.py:405
 msgid "File type group"
 msgstr "Категория файлов"
 
-#: board/models.py:404
+#: board/models.py:411
 msgid "Slug"
 msgstr "Адрес"
 
-#: board/models.py:408
+#: board/models.py:415
 msgid "Description"
 msgstr "Описание"
 
-#: board/models.py:414
+#: board/models.py:421
+msgid "Force to post file on thread creation"
+msgstr "Обязательное приложение файла при создании темы"
+
+#: board/models.py:423
 msgid "Filesize limit"
 msgstr "Максимальный размер файла"
 
-#: board/models.py:416
+#: board/models.py:425
 msgid "Force anonymity"
 msgstr "Принудительная анонимность"
 
-#: board/models.py:417
+#: board/models.py:426
 msgid "Anonymous"
 msgstr "Аноним"
 
-#: board/models.py:418
+#: board/models.py:427
 msgid "Default poster name"
 msgstr "Имя автора по-умолчанию"
 
-#: board/models.py:422
+#: board/models.py:431
 msgid "Max posts in thread"
 msgstr "Бамплимит"
 
-#: board/models.py:424
+#: board/models.py:433
 msgid "Max threads"
 msgstr "Максимальное количество тредов"
 
-#: board/models.py:491
+#: board/models.py:501
 msgid "Section"
 msgstr "Раздел"
 
-#: board/models.py:492 templates/mobile/index.html:8
+#: board/models.py:502 templates/mobile/index.html:8
 #: templates/pda/index.html:20 templates/pda/index.html.py:172
 msgid "Sections"
 msgstr "Разделы"
 
-#: board/models.py:499
+#: board/models.py:509
 msgid "Order"
 msgstr "Порядок"
 
-#: board/models.py:500
+#: board/models.py:510
 msgid "Is hidden"
 msgstr "Скрыта"
 
-#: board/models.py:512
+#: board/models.py:522
 msgid "Section group"
 msgstr "Группа разделов"
 
-#: board/models.py:513
+#: board/models.py:523
 msgid "Section groups"
 msgstr "Группы разделов"
 
-#: board/models.py:520
+#: board/models.py:530
 msgid "User owned sections"
 msgstr "Модерируемые секции"
 
-#: board/models.py:534
+#: board/models.py:544
 msgid "User profile"
 msgstr "Модератор"
 
-#: board/models.py:535
+#: board/models.py:545
 msgid "User profiles"
 msgstr "Модераторы"
 
-#: board/models.py:541
+#: board/models.py:551
 msgid "Word"
 msgstr "Слово"
 
-#: board/models.py:548
+#: board/models.py:558
 msgid "Wordfilter"
 msgstr "Вордфильтр"
 
-#: board/models.py:549
+#: board/models.py:559
 msgid "Wordfilters"
 msgstr "Вордфильтры"
 
-#: board/models.py:554
+#: board/models.py:564
 msgid "IP network"
 msgstr "IP-адрес"
 
-#: board/models.py:555
+#: board/models.py:565
 msgid "Either IP address or IP network specification"
 msgstr "IP или подсеть"
 
-#: board/models.py:556
+#: board/models.py:566
 msgid "Ban reason"
 msgstr "Причина бана"
 
-#: board/models.py:567
+#: board/models.py:577
 msgid "Denied IP"
 msgstr "Заблокированный IP"
 
-#: board/models.py:568
+#: board/models.py:578
 msgid "Denied IPs"
 msgstr "Заблокированные IP"
 
-#: board/models.py:598 board/models.py:606
+#: board/models.py:608 board/models.py:616
 msgid "Last threads of section"
 msgstr "Последние сообщения раздела"
 
-#: board/models.py:639 board/models.py:647
+#: board/models.py:649 board/models.py:657
 msgid "Last posts of thread"
 msgstr "Последние сообщения треда"
 
@@ -451,6 +459,14 @@ msgstr "Мобильная версия"
 msgid "PDA version"
 msgstr "КПК версия"
 
+#: templates/post.html:28
+msgid "Add to bookmarks"
+msgstr "Добавить в закладки"
+
+#: templates/post.html:29 templates/sidebar.html:4
+msgid "Hide"
+msgstr "Скрыть"
+
 #: templates/section_base.html:9
 msgid "Search"
 msgstr "Поиск"
@@ -508,93 +524,97 @@ msgstr "Сохранить настройки"
 msgid "Board style"
 msgstr "Скин"
 
-#: templates/settings.html:24
+#: templates/settings.html:21
+msgid "Features"
+msgstr "Возможности"
+
+#: templates/settings.html:25
 msgid "New style form"
 msgstr "Новая форма ответа"
 
-#: templates/settings.html:30
+#: templates/settings.html:31
 msgid "Move form to the bottom"
 msgstr "Переносить форму ответа вниз"
 
-#: templates/settings.html:36
-msgid "Disable post autoload"
-msgstr "Отключить автоподзагрузку"
-
-#: templates/settings.html:42
-msgid "Old posting way"
-msgstr "Не переносить форму ответа под сообщения"
-
-#: templates/settings.html:48
-msgid "Disable notifications"
-msgstr "Отключить информационные уведомления"
-
-#: templates/settings.html:55
-msgid "Disable ajax"
-msgstr "Отключить AJAX-отправку сообщений"
-
-#: templates/settings.html:61
-msgid "Hide markup panel"
-msgstr "Скрыть панель разметки"
-
-#: templates/settings.html:67 templates/sidebar.html:4
-msgid "Hide sidebar"
-msgstr "Скрыть боковую панель"
-
-#: templates/settings.html:73
-msgid "Hide navigation"
-msgstr "Скрыть списки разделов"
-
-#: templates/settings.html:79
-msgid "Disable posts hide"
-msgstr "Отключить скрытие сообщений"
-
-#: templates/settings.html:85
+#: templates/settings.html:37
 msgid "Hard posts hide"
 msgstr "Полное скрытие"
 
-#: templates/settings.html:92
-msgid "Disable posts preview"
-msgstr "Отключить предпосмотр ссылок"
+#: templates/settings.html:43
+msgid "Minimalistic form"
+msgstr "Минималистичная форма ответа"
 
-#: templates/settings.html:98
-msgid "Disable answers map"
-msgstr "Отключить карту ответов"
+#: templates/settings.html:47
+msgid "Disabling"
+msgstr "Отключение"
 
-#: templates/settings.html:104
-msgid "Disable bookmarks"
-msgstr "Не использовать закладки"
+#: templates/settings.html:51
+msgid "Old posting way"
+msgstr "Не переносить форму ответа под сообщения"
 
-#: templates/settings.html:110
+#: templates/settings.html:57
+msgid "Hide markup panel"
+msgstr "Скрыть панель разметки"
+
+#: templates/settings.html:63 templates/sidebar.html:4
+msgid "Hide sidebar"
+msgstr "Скрыть боковую панель"
+
+#: templates/settings.html:69
+msgid "Hide navigation"
+msgstr "Скрыть списки разделов"
+
+#: templates/settings.html:75
 msgid "Hide sections banner"
 msgstr "Скрыть баннеры разделов"
 
-#: templates/settings.html:116
-msgid "Don't log visited threads"
-msgstr "Не сохранять список посещенных тредов"
+#: templates/settings.html:81
+msgid "Disable posts hide"
+msgstr "Отключить скрытие сообщений"
 
-#: templates/settings.html:116
+#: templates/settings.html:87
+msgid "Disable post autoload"
+msgstr "Отключить автоподзагрузку"
+
+#: templates/settings.html:93
+msgid "Disable posts preview"
+msgstr "Отключить предпросмотр ссылок"
+
+#: templates/settings.html:99
+msgid "Disable answers map"
+msgstr "Отключить карту ответов"
+
+#: templates/settings.html:102
+msgid "Storage"
+msgstr "Хранение"
+
+#: templates/settings.html:106
+msgid "Disable bookmarks"
+msgstr "Не использовать закладки"
+
+#: templates/settings.html:106 templates/settings.html.py:112
 msgid "clear"
 msgstr "очистить"
 
-#: templates/settings.html:123
+#: templates/settings.html:112
+msgid "Don't log visited threads"
+msgstr "Не сохранять список посещенных тредов"
+
+#: templates/settings.html:119
 msgid "Visited threads"
 msgstr "Посещенные треды"
 
-#: templates/settings.html:124
+#: templates/settings.html:120
 msgid "Sorted by the"
 msgstr "Сортировка по"
 
-#: templates/settings.html:126
+#: templates/settings.html:122
 msgid "time of first visit"
 msgstr "времени первого визита"
 
-#: templates/settings.html:127
+#: templates/settings.html:123
 msgid "visits count"
 msgstr "количеству посещений"
-
-#: templates/sidebar.html:4
-msgid "Hide"
-msgstr "Скрыть"
 
 #: templates/sidebar.html:14
 msgid "Links"
@@ -637,6 +657,15 @@ msgstr "Jabber"
 #: templates/pda/index.html:189
 msgid "Add this page to your home screen"
 msgstr "Добавьте эту страницу на ваш домашний экран"
+
+#~ msgid "Country code"
+#~ msgstr "Код страны"
+
+#~ msgid "Disable notifications"
+#~ msgstr "Отключить информационные уведомления"
+
+#~ msgid "Disable ajax"
+#~ msgstr "Отключить AJAX-отправку сообщений"
 
 #~ msgid "No files"
 #~ msgstr "Без файлов"

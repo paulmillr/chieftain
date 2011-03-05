@@ -53,6 +53,10 @@ class RootModelResource(RootModelResource, Resource):
     pass
 
 
+#def admin(request, mode):
+    
+
+
 class ThreadRootResource(RootModelResource):
     """A create/list resource for Thread."""
     allowed_methods = anon_allowed_methods = ('GET',)

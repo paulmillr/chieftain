@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-02-28 00:28+0200\n"
+"POT-Creation-Date: 2011-03-05 02:55+0200\n"
 "PO-Revision-Date: 2011-02-26 17:38+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -19,41 +19,42 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
 
-#: media/js/script.js:13
+#: media/js/script.js:21
 msgid "Reason"
 msgstr "Причина"
 
-#: media/js/script.js:14
+#: media/js/script.js:22
 msgid "Reply"
 msgstr "Ответ"
 
-#: media/js/script.js:15
+#: media/js/script.js:23
 msgid "Message is too long."
 msgstr "Комментарий слишком слишком длинный."
 
-#: media/js/script.js:16
+#: media/js/script.js:24
 msgid "Full text"
 msgstr "Полный текст"
 
-#: media/js/script.js:17
+#: media/js/script.js:25
 msgid "Thread"
 msgstr "Тред"
 
-#: media/js/script.js:18
+#: media/js/script.js:26
 msgid "Post"
 msgstr "Пост"
 
-#: media/js/script.js:19
+#: media/js/script.js:27
 msgid "hidden"
 msgstr "скрыт"
 
-#: media/js/script.js:20
+#: media/js/script.js:28
 msgid "bookmark"
 msgstr "Добавить в закладки"
 
-#: media/js/script.js:21
+#: media/js/script.js:29
 msgid "hide"
 msgstr "Скрыть"
 
-#~ msgid "Replies"
-#~ msgstr "Ответы"
+#: media/js/script.js:30
+msgid "Replies"
+msgstr "Ответы"
