@@ -358,7 +358,7 @@ label.placeholder {
 .post blockquote {color: #789922;}
 .post blockquote > p {display: inline;}
 .post .files {margin-right: 10px; float:left; max-width: 220px; max-height: 220px;}
-.post.resized .content {max-height: none;}
+.post.resized .content {max-height: none; overflow: visible;}
 .post.resized .files {max-width: none; max-height: none;}
 .post span:empty {margin: 0;}
 .post .answer-map {margin-top: 5px; font-style: italic; font-size: 0.95em;}
