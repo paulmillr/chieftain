@@ -250,30 +250,17 @@ function ColorContainer(red, green, blue, alpha) {
     if (!alpha) alpha = 1;
     this.data = [red, green, blue, alpha];
 }
-/*
-ColorContainer.prototype = {
-    data : [0, 0, 0, 1],
-    get red() {return this.data[0]},
-    get green() {return this.data[1]},
-    get blue() {return this.data[2]},
-    get alpha() {return this.data[3]},
-    set red(value) {this.data[0] = value},
-    set green(value) {this.data[1] = value},
-    set blue(value) {this.data[2] = value},
-    set alpha(value) {this.data[3] = value},
 
-    get rgb() {
-        return this.torgb(this.data)
-    },
-    get rgba() {
-        return this.torgba(this.data)
-    },
-    get hex() {
-        return this.tohex(this.data.slice(0,3))
-    },
-    get hsl() {
-        return this.tohsl(this.data.slice(0,3))
-    },
+$.extend(ColorContainer.prototype, {
+    data : [0, 0, 0, 1],
+    red: function(v) {if (!v) return this.data[0]; else this.data[0] = v;},
+    green: function(v) {if (!v) return this.data[1]; else this.data[1] = v;},
+    blue: function(v) {if (!v) return this.data[2]; else this.data[2] = v;},
+    alpha: function(v) {if (!v) return this.data[3]; else this.data[3] = v;},
+    rgb: function() {return this.torgb(this.data);},
+    rgba: function() {return this.torgba(this.data)},
+    hex: function() {return this.tohex(this.data.slice(0,3))},
+    hsl: function() {return this.tohsl(this.data.slice(0,3))},
     
     torgba: function(arr) {
         return 'rgba(' + arr.join(',') + ')';
@@ -327,7 +314,7 @@ ColorContainer.prototype = {
 
         return [Math.floor(h * 360), Math.floor(s * 100), Math.floor(l * 100)];
     },
-}*/
+});
 
 function randomString(length) {
     function randomChar() {
@@ -885,9 +872,10 @@ function initStyle() {
     checkForSidebarScroll();
 
     $('.tripcode:contains("!")').addClass('staff');
-
+    
     document.onscroll = function() {
-        $('.sidebar').css('left', '-' + document.body.scrollLeft + 'px')
+        var val = window.pageXOffset || document.body.scrollLeft;
+        $('.sidebar').css('left', '-' + val + 'px')
     };
     
     $('.section .post:first-child').each(function(x) {
@@ -940,19 +928,20 @@ function initStyle() {
     });
     
     // images resize
-    $('.threads').delegate('.post:not(.resized) .files a', 'click', function(event) {
+    $('.threads').delegate('.post .files a', 'click', function(event) {
         event.preventDefault();
-        var children = $(this).children();
-        children.data('thumb', children.attr('src'));
-        children.attr('src', $(this).attr('href'));
-        $(this).closest('.post').addClass('resized');
-    });
-    
-    $('.threads').delegate('.post.resized .files a', 'click', function(event) {
-        event.preventDefault();
-        var children = $(this).children();
-        $(this).closest('.post').removeClass('resized');
-        children.attr('src', children.data('thumb'));
+        var t = $(this),
+            children = t.children(),
+            p = t.closest('.post'),
+            isResized = p.hasClass('resized');
+
+        if (!isResized) {
+            children.data('thumb', children.attr('src'));
+            children.attr('src', $(this).attr('href'));
+        } else {
+            children.attr('src', children.data('thumb'));
+        }
+        p.toggleClass('resized');
     });
 
     // strip long posts at section page
