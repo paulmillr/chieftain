@@ -869,11 +869,12 @@ function initStyle() {
     checkForSidebarScroll();
 
     $('.tripcode:contains("!")').addClass('staff');
-
-    document.onscroll = function() {
-        var val = window.pageXOffset || document.body.scrollLeft;
-        $('.sidebar').css('left', '-' + val + 'px')
-    };
+    
+    $(document).scroll(function() {
+        var pxo = window.pageXOffset,
+            val = typeof pxo === 'number' ? pxo : document.body.scrollLeft;
+        $('.sidebar').css('left', '-' + val + 'px');
+    });
 
     $('.section .post:first-child').each(function(x) {
         var post = $(this),
@@ -921,7 +922,7 @@ function initStyle() {
             case 1100: key='m'; break;
             default: return true;
         }
-        e.target.value = e.target.value+key;
+        e.target.value = e.target.value + key;
     });
 
     // images resize

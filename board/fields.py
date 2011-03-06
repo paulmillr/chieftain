@@ -87,9 +87,11 @@ class JSONField(models.TextField):
 
     def post_init(self, **kwargs):
         if 'sender' in kwargs and 'instance' in kwargs:
-            if kwargs['sender'] == self.class_name and hasattr(kwargs['instance'], self.attname):
+            if (kwargs['sender'] == self.class_name and
+                hasattr(kwargs['instance'], self.attname)):
                 value = self.value_from_object(kwargs['instance'])
                 if (value):
-                    setattr(kwargs['instance'], self.attname, self._loads(value))
+                    setattr(kwargs['instance'], self.attname,
+                        self._loads(value))
                 else:
                     setattr(kwargs['instance'], self.attname, None)

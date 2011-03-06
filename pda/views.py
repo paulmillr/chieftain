@@ -18,6 +18,7 @@ from board.shortcuts import *
 def index(request):
     return rtr('pda/index.html', request)
 
+
 def section(request, section_slug, page):
     """
     Gets 20 threads from current section with

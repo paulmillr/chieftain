@@ -345,7 +345,7 @@ label.placeholder {
 .post .ip {float: right; color: #f00; font-weight: bold;}
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
-.post .tripcode.staff {color: #f14a29;}
+.post .tripcode.staff {color: #800080;}
 .post .topic {font-weight: bold;}
 .post .content {max-height: 400px; overflow: auto;}
 .post .file-info {margin: -20px 0 5px 0; position: absolute;}

@@ -20,7 +20,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
 from ipcalc import Network
-from board import fields, template
+from board import fields, template, tools
 
 
 __all__ = [
@@ -136,10 +136,48 @@ class WordfilterManager(models.Manager):
     """Manager for Wordfilter."""
 
     def words(self):
-        return [i[0] for i in self.values_list('word')]
+        return tools.take_first(self.values_list('word'))
 
     def scan(self, message):
         return any(word in message for word in self.words())
+
+
+class Poll(models.Model):
+    """Thread polls."""
+    question = models.CharField(max_length=200, verbose_name=_('Question'))
+
+    def __unicode__(self):
+        return self.question
+
+    class Meta:
+        verbose_name = _('Poll')
+        verbose_name_plural = _('Polls')
+
+
+class PollChoice(models.Model):
+    """Thread poll answers."""
+    name = models.CharField(max_length=100, verbose_name=_('Name'))
+    poll = models.ForeignKey('Poll', verbose_name=_('Poll'))
+
+    def __unicode__(self):
+        return '{0} - {1}'.format(self.poll, self.name)
+
+    class Meta:
+        verbose_name = _('Poll choice')
+        verbose_name_plural = _('Poll choices')
+
+
+class PollVote(models.Model):
+    """Thread poll votes."""
+    choice = models.ForeignKey('PollChoice', verbose_name=_('Choice'))
+    ip = models.IPAddressField(verbose_name=_('IP'), blank=True)
+
+    def __unicode__(self):
+        return '{0}, {1}'.format(self.choice, self.ip)
+
+    class Meta:
+        verbose_name = _('Poll vote')
+        verbose_name_plural = _('Poll votes')
 
 
 class Thread(models.Model):
@@ -153,18 +191,22 @@ class Thread(models.Model):
         verbose_name=_('Is pinned'))
     is_closed = models.BooleanField(default=False,
         verbose_name=_('Is closed'))
+    poll = models.ForeignKey('Poll', blank=True, null=True,
+        verbose_name=_('Poll'))
     html = models.TextField(blank=True, verbose_name=_('HTML cache'))
     objects = ThreadManager()
     deleted_objects = DeletedThreadManager()
 
     def posts(self):
+        """Returns thread posts."""
         return self.post_set.all()
 
     def posts_html(self):
         return self.posts().values('html', 'ip')
 
-    @cached(1)
+    #@cached(1)
     def count(self):
+        """Returns dict, that contains info about thread files and posts."""
         lp = 5
         ps = self.posts()
         stop = ps.count()
@@ -172,12 +214,15 @@ class Thread(models.Model):
             return {'total': stop, 'skipped': 0, 'skipped_files': 0}
         else:
             start = stop - lp
+            skipped_ids = tools.take_first(ps[:stop - lp].values_list('id'))
+            skipped_ids.pop(0)  # remove first post
             return {
                 'total': stop,
                 'start': start,
                 'stop': stop,
                 'skipped': start - 1,
-                'skipped_files': ps.filter(file_count__gt=0).count()
+                'skipped_files': ps.filter(id__in=skipped_ids,
+                    file_count__gt=0).count()
             }
 
     @property
@@ -239,9 +284,9 @@ class Thread(models.Model):
     def save(self, rebuild_cache=True):
         """Saves thread and rebuilds cache."""
         if rebuild_cache:
-            super(self.__class__, self).save()
+            super(Thread, self).save()
             self.rebuild_cache()
-        super(self.__class__, self).save()
+        super(Thread, self).save()
         # remove first thread in section
         ts = self.section.thread_set.filter(is_pinned=False)
         if ts.count() > self.section.threadlimit:
@@ -271,7 +316,7 @@ class Post(models.Model):
         verbose_name=_('Is deleted'))
     file_count = models.SmallIntegerField(default=0,
         verbose_name=_('File count'), blank=True)
-    ip = models.IPAddressField(verbose_name=_('Post ip'), blank=True)
+    ip = models.IPAddressField(verbose_name=_('IP'), blank=True)
     data = fields.JSONField(max_length=1024, blank=True, null=True,
         verbose_name=_('Data'))
     #country = models.CharField(max_length=5, blank=True,
@@ -317,12 +362,12 @@ class Post(models.Model):
     def save(self, rebuild_cache=True):
         if rebuild_cache:
             if not self.id:
-                super(self.__class__, self).save()
+                super(Post, self).save()
             self.rebuild_cache()
-        super(self.__class__, self).save()
+        super(Post, self).save()
 
     def delete(self):
-        super(self.__class__, self).delete()
+        super(Post, self).delete()
         if self.is_op_post:
             self.thread.delete()
         self.file_set.delete()
@@ -511,7 +556,7 @@ class SectionGroup(models.Model):
     objects = SectionGroupManager()
 
     def save(self):
-        super(self.__class__, self).save()
+        super(SectionGroup, self).save()
         cache.delete('sections')
         template.rebuild_cache()
 
@@ -531,7 +576,7 @@ class UserProfile(models.Model):
 
     def modded(self):
         """List of modded section slugs."""
-        return [i[0] for i in self.sections.values_list('slug')]
+        return tools.take_first(self.sections.values_list('slug'))
 
     def moderates(self, section_slug):
         """Boolean value of user moderation rights of section_slug."""

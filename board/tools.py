@@ -18,14 +18,18 @@ from string import maketrans
 from crypt import crypt
 from klipped import settings
 from datetime import datetime
-from board.models import File, FileType
 
 
-__all__ = ['handle_uploaded_file', 'tripcode', 'key', 'parse_user_agent']
+__all__ = [
+    'handle_uploaded_file', 'tripcode', 'key', 'parse_user_agent',
+    'take_first', 'from_timestamp'
+]
 
 
 def handle_uploaded_file(file, file_hash, extension, post):
     """Moves uploaded file to files directory and makes thumb."""
+    from board.models import File, FileType
+
     def make_path(dir):
         args = settings.MEDIA_ROOT, dir, post.section_slug()
         return os.path.join(*args)
@@ -84,6 +88,11 @@ def key(text):
 
 def parse_user_agent(user_agent):
     return httpagentparser.detect(user_agent)
+
+
+def take_first(list):
+    """Returns first elements of list."""
+    return [i[0] for i in list]
 
 
 def from_timestamp(timestamp):
