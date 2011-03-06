@@ -6,3 +6,6 @@
 .htpasswd
 .htaccess
 /cache/*
+/files/thumbs/
+/files/section/
+/contrib/

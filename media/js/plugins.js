@@ -16,7 +16,6 @@ window.log = function(){
     };
 })(document);
 
-
 /*
  * Crypto-JS v2.0.0
  * http://code.google.com/p/crypto-js/
@@ -35,7 +34,7 @@ $.extend({
      * http://www.gnu.org/licenses/gpl.html
      *
      */
-    cookie : function(name, value, options) {
+    cookie: function(name, value, options) {
         if (typeof value !== 'undefined') { // name and value given, set cookie
             options = options || {};
             var path = options.path ? '; path=' + (options.path) : '; path=/',
@@ -74,20 +73,20 @@ $.extend({
             return cookieValue;
         }
     },
-    
-    settingsFactory : function(prefix) {
+
+    settingsFactory: function(prefix) {
         return function(name, value, options) {
             name = prefix + name;
             return $.cookie(name, value, options);
         }
     },
-    
+
     // Little wrapper around $.cookie
-    settings : function(name, value, options) {
+    settings: function(name, value, options) {
         return this.settingsFactory('k_')(name, value, options);
     },
-    
-    storage : function(name, value, mode) {
+
+    storage: function(name, value, mode) {
         var res;
         name = 'k_' + name;
         if (mode === 'flush') {
@@ -99,14 +98,14 @@ $.extend({
             try {
                 res = JSON.parse(res);
             } catch(e) {}
-            
+
             return res;
         } else {
             window.localStorage[name] = JSON.stringify(value);
             return value;
         }
     },
-    
+
     /**
      * Canvas color picker class.
      * 
@@ -120,19 +119,19 @@ $.extend({
      * @param {Function} callback Function, that would be executed 
      * after clicking on the picker.
      */
-    colorPicker : function(image, canvas, current, callback) {
+    colorPicker: function(image, canvas, current, callback) {
         var cp = document.getElementById(canvas).getContext('2d'),
             out = $('#'+current),
             canv = $('#'+canvas),
             img = new Image(),
             self = this;
         this.color = new ColorContainer()
-        
+
         img.src = image;
         img.onload = function() {
             cp.drawImage(img, 0, 0);
         }
-        
+
         function colorMeter(event, type) {
             var x = event.pageX - event.currentTarget.offsetLeft,
                 y = event.pageY - event.currentTarget.offsetTop,
@@ -142,17 +141,17 @@ $.extend({
 
             return new ColorContainer(data[0], data[1], data[2], data[3]);
         }
-        
+
         $(canv).mousemove(function(event) {
             out.css({'backgroundColor' : colorMeter(event).rgba});
         });
-        
+
         $(canv).mousedown(function(event) {
             self.color = colorMeter(event);
             callback(self.color);
         });
     },
-    
+
     /**
      * Canvas drawer class.
      * 
@@ -160,7 +159,7 @@ $.extend({
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
      */
-    drawer : function(canvas, saveButton, saveCallback) {
+    drawer: function(canvas, saveButton, saveCallback) {
         var c = document.getElementById(canvas).getContext('2d'),
             ca = $('#'+canvas),
             pos = transform,
@@ -169,14 +168,14 @@ $.extend({
         this.draw = false;
         this.color = new ColorContainer();
         this.width = 4.0;
-        
+
         function transform(event) {
             if (event.offsetX) { // firefox doesn't support offsetX
                 return {x : event.offsetX, y : event.offsetY};
             }
             return {x : event.layerX, y : event.layerY};
         }
-        
+
         ca.mousemove(function(event) {
             if (!self.draw) {
                 return false;
@@ -194,27 +193,27 @@ $.extend({
             c.stroke();
             self.lastpos = pos;
         });
-        
+
         ca.mousedown(function(event) {
             self.draw = true;
             self.lastpos = transform(event)
         });
-        
+
         ca.mouseup(function(event) {
             self.draw = false;
         });
-        
+
         ca.bind('selectstart', function(event) { // disable 'text selection' on canvas
             event.preventDefault();
             event.target.style.cursor = 'crosshair';
         });
-        
+
         $(saveButton).click(function(event) {
             event.preventDefault();
             saveCallback(ca[0].toDataURL());
         });
     },
-    
+
     /*
      * Copyright 2010 akquinet
      * Licensed under the Apache License, Version 2.0 (the "License");
@@ -228,7 +227,7 @@ $.extend({
      * limitations under the License.
      */
     // Based on code of jquery.toastmessage, modified by Paul Bagwell
-    message : function(type, message, options) {
+    message: function(type, message, options) {
         var defaultSettings = {
             inEffect: {opacity: 'show'}, // in effect
             inEffectDuration: 600, // in effect duration in ms
@@ -241,13 +240,13 @@ $.extend({
                            // set to '' when you want to introduce an image via css
             close: null // callback function when the message is closed
         };
-        
+
         function init(options) {
             if (options) {
                 $.extend(defaultSettings, options);
             }
         }
-        
+
         function remove(obj, options) {
             obj.animate({opacity: '0'}, 600, function() {
                 obj.parent().animate({height: '0px'}, 300, function() {
@@ -259,7 +258,7 @@ $.extend({
                 options.close();
             }
         }
-        
+
         function show(options) {
             var localSettings = $.extend(defaultSettings, options),
                 notificationWrapAll = (!$('.notification-container').length) ? 
@@ -297,18 +296,18 @@ $.extend({
             }
             return notificationItemInner;
         }
-        
+
         if (!message) {
             message = type;
             type = 'notice';
         }
-        
+
         return show({
             'text': message, 
             'type': type || 'notice',
         });
     },
-    
+
     /**
      * jQuery multipart uploader class.
      * 
@@ -316,32 +315,32 @@ $.extend({
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
      */
-    mpu : function(uri, form) {
+    mpu: function(uri, form) {
         function MultipartUploader(uri, form) {
             if (typeof form === 'string') {
                 form = $(form);
             }
-            
+
             this.uri = uri;
             this.form = form;
             this.send();
         }
-        
+
         $.extend(MultipartUploader.prototype, {
             boundary : 'gc0p4Jq0M2Yt08jU534c0p',
-            errorCallback : function(data) {},
-            successCallback : function(data) {},
-            error : function(callback) {
+            errorCallback: function(data) {},
+            successCallback: function(data) {},
+            error: function(callback) {
                 this.errorCallback = callback;
                 return this;
             },
 
-            success : function(callback) {
+            success: function(callback) {
                 this.successCallback = callback;
                 return this;
             },
 
-            makeMultipartItem : function(name, value) {
+            makeMultipartItem: function(name, value) {
                 var res = '';
                 res += '--' + this.boundary + '\r\n';
                 res += 'Content-Disposition: form-data; ';
@@ -350,7 +349,7 @@ $.extend({
                 return res;
             },
 
-            serializedToMultipart : function(list) {
+            serializedToMultipart: function(list) {
                 // convert jQuery.serializeArray(arr) to multipart data
                 var res = '';
                 for (var i=0; i < list.length; i++) {
@@ -359,7 +358,7 @@ $.extend({
                 return res;
             },
 
-            fileToMultipart : function(fileInput, callback) {
+            fileToMultipart: function(fileInput, callback) {
                 var files = fileInput.attr('files'),
                     fr = new FileReader(),
                     file = files[0],
@@ -368,7 +367,7 @@ $.extend({
                 if (!file) {
                     return callback('');
                 }
-                
+
                 function wrapFile(fileData) {
                     var res = '';
                     res += '--' + self.boundary + '\r\n'
@@ -379,18 +378,18 @@ $.extend({
                     res += '--' + self.boundary + '--\r\n';
                     return res
                 }
-                
+
                 fr.onload = function(event) {
                     if (event.loaded !== event.total) {
                         return false;
                     }
                     callback(wrapFile(event.currentTarget.result));
                 };
-                
+
                 fr.readAsBinaryString(file);
             },
 
-            send : function() {
+            send: function() {
                 var fr = new FileReader(),
                     xhr = new XMLHttpRequest(),
                     body = '', // request body
@@ -411,7 +410,7 @@ $.extend({
                 body += this.serializedToMultipart(this.form.serializeArray());
                 this.fileToMultipart(fileInput, function(fileData) {
                     body += fileData;
-                    
+
                     if (xhr.sendAsBinary) { // native support by Firefox
                         xhr.sendAsBinary(body);
                     } else if (Uint8Array) { // use FileWriter API in Chrome
@@ -426,12 +425,12 @@ $.extend({
                     } else { // send raw data
                         xhr.send(body);
                     }
-                    
+
                 });
                 return this;
             },
         });
-        
+
         return new MultipartUploader(uri, form);
     }
 });
@@ -472,7 +471,7 @@ function keyHandler( handleObj ) {
 	if ( typeof handleObj.data !== "string" ) {
 		return;
 	}
-	
+
 	var origHandler = handleObj.handler,
 		keys = handleObj.data.toLowerCase().split(" ");
 
@@ -482,7 +481,7 @@ function keyHandler( handleObj ) {
 			 event.target.type === "text") ) {
 			return;
 		}
-		
+
 		// Keypress represents characters, not special keys
 		var special = event.type !== "keypress" && $.hotkeys.specialKeys[ event.which ],
 			character = String.fromCharCode( event.which ).toLowerCase(),
@@ -496,7 +495,7 @@ function keyHandler( handleObj ) {
 		if ( event.ctrlKey && special !== "ctrl" ) {
 			modif += "ctrl+";
 		}
-		
+
 		// TODO: Need to make sure this works consistently across platforms
 		if ( event.metaKey && !event.ctrlKey && special !== "meta" ) {
 			modif += "meta+";
@@ -549,8 +548,6 @@ Dual licensed under the MIT and GPL licenses:
 (function(a){function f(){var b=a(this);a(b.data(e)).css("display","none")}function i(){var b=this;setTimeout(function(){var c=a(b);a(c.data(e)).css("top",c.position().top+"px").css("left",c.position().left+"px").css("display",c.val()?"none":"block")},200)}var e="PLACEHOLDER-LABEL",j=false,k={labelClass:"placeholder"},g=document.createElement("input");if("placeholder"in g){a.fn.placeholder=a.fn.unplaceholder=function(){};delete g}else{delete g;a.fn.placeholder=function(b){if(!j){a(".PLACEHOLDER-INPUT").live("click",
 f).live("focusin",f).live("focusout",i);j=bound=true}var c=a.extend(k,b);this.each(function(){var l=Math.random().toString(32).replace(/\./,""),d=a(this),h=a('<label style="position:absolute;display:none;top:0;left:0;"></label>');if(!(!d.attr("placeholder")||d.data("PLACEHOLDER-INPUT")==="PLACEHOLDER-INPUT")){d.attr("id")||(d.attr("id")="input_"+l);h.attr("id",d.attr("id")+"_placeholder").data("PLACEHOLDER-INPUT","#"+d.attr("id")).attr("for",d.attr("id")).addClass(c.labelClass).addClass(c.labelClass+
 "-for-"+this.tagName.toLowerCase()).addClass(e).text(d.attr("placeholder"));d.data(e,"#"+h.attr("id")).data("PLACEHOLDER-INPUT","PLACEHOLDER-INPUT").addClass("PLACEHOLDER-INPUT").after(h);f.call(this);i.call(this)}})};a.fn.unplaceholder=function(){this.each(function(){var b=a(this),c=a(b.data(e));if(b.data("PLACEHOLDER-INPUT")==="PLACEHOLDER-INPUT"){c.remove();b.removeData("PLACEHOLDER-INPUT").removeData(e).removeClass("PLACEHOLDER-INPUT")}})}}})(jQuery);
-
-
 
 /*!
  * jQuery Form Plugin

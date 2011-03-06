@@ -7,9 +7,12 @@
         canvas {border: 1px solid #888; }
         #color-current, #color-selected {width: 50px; height: 25px}
     </style>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.js"></script>
-    <script src="/media/js/plugins.js"></script>
-    <script src="/media/js/script.js"></script>
+    <script>
+        var gettext = function() {};
+    </script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+    <script src="http://static.2ch.pbagwl.com/media/js/plugins.js"></script>
+    <script src="http://static.2ch.pbagwl.com/media/js/script.js"></script>
 </head>
 <body>
     
@@ -58,7 +61,7 @@
         inp.appendTo('head');
         inp.val(data);
     }),
-        cp = new $.colorPicker('/media/images/color-picker.png', 
+        cp = new $.colorPicker('http://static.2ch.pbagwl.com/media/images/color-picker.png', 
         'color-picker', 'color-current', function(color) {
         var alpha = d.color.data[3];
         d.color.data = color.data;

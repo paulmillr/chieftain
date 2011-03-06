@@ -66,7 +66,7 @@ var api = {
             }
         }
     }
-    
+
     return data;
 })();
 
@@ -110,8 +110,7 @@ $.extend(PostArea.prototype, {
     wrap: function(tagStart, tagEnd, eachLine) {
         var textarea = this.textarea,
             size = (tagStart + tagEnd).length;
-        
-        
+
         if (typeof textarea.selectionStart != "undefined") {
             var begin = textarea.value.substr(0, textarea.selectionStart),
                 selection = textarea.value.substr(textarea.selectionStart, textarea.selectionEnd - textarea.selectionStart),
@@ -157,7 +156,7 @@ function BoardStorage(storageName) {
 }
 
 $.extend(BoardStorage.prototype, {
-    storageName : '',
+    storageName: '',
 
     // gets all keys
     list: function() {
@@ -168,13 +167,13 @@ $.extend(BoardStorage.prototype, {
     get: function(key) {
         return this.list()[key]
     },
-    
+
     set: function(key, value) {
         var l = this.list();
         l[key] = value;
         return $.storage(this.storageName, l);
     },
-    
+
     incr: function(key, item) {
         var dict = this.get(key);
         if (typeof dict === 'object' && item in dict) {
@@ -194,7 +193,7 @@ $.extend(BoardStorage.prototype, {
     flush: function() {
         $.storage(this.storageName, '', 'flush');
     },
-    
+
     sort: function(key) {
         var items = [],
             l = this.list();
@@ -214,7 +213,6 @@ $.extend(BoardStorage.prototype, {
     }
 });
 
-
 /**
  * Post container class.
  *
@@ -225,7 +223,7 @@ function PostContainer(span, post) {
         span = $(span);
     }
     var isposts = (currentPage.type === 'posts');
-    
+
     this.span = span;
     this.post = post ? (!isjQuery(post) ? post : $(post)) : span.closest('.post');
     this.thread = (currentPage.type === 'thread') ? currentPage.cache.thread : this.span.closest('.thread');
@@ -261,15 +259,15 @@ $.extend(ColorContainer.prototype, {
     rgba: function() {return this.torgba(this.data)},
     hex: function() {return this.tohex(this.data.slice(0,3))},
     hsl: function() {return this.tohsl(this.data.slice(0,3))},
-    
+
     torgba: function(arr) {
         return 'rgba(' + arr.join(',') + ')';
     },
-    
+
     torgb: function(arr) {
         return 'rgb(' + arr.slice(0,3).join(',') + ')';
     },
-    
+
     tohex: function(arr) {
         function hex(number) {
             if (number instanceof Array) {
@@ -292,7 +290,7 @@ $.extend(ColorContainer.prototype, {
         }
         return '#'+hex(arr);
     },
-    
+
     tohsl: function(arr) {
         var r = arr[0], g = arr[1], b = arr[2];
         r /= 255, g /= 255, b /= 255;
@@ -370,7 +368,7 @@ function manipulator(arr) {
             $(from).remove().insertBefore(to)
         },
     };
-    
+
     for (var i in arr) {
         for (var e=0; e < arr[i].length; e++) {
             cases[i](arr[i][e][0], arr[i][e][1])
@@ -382,12 +380,12 @@ function manipulator(arr) {
 function parseQs() {
     var d = location.href.split('?').pop().split('&'),
         parsed = {}, tmp;
-        
+
     for (var i=0; i < d.length; i++) {
         var tmp = d[i].split('='); 
         parsed[tmp[0]] = tmp[1];
     }
-    
+
     return parsed;
 }
 
@@ -474,7 +472,7 @@ function init() {
     $('#main').delegate('#password', 'change', function(event) {
         $.settings('password', this.value);
     });
-    
+
     function removeIfPreview(element) {
         element = isjQuery(element) ? element : $(element);
         var p = element.prev();
@@ -510,15 +508,15 @@ function init() {
         if (end == undefined) {
             end = start;
         }
-        
+
         textArea.wrap(start, end, code);
     });
-    
+
     $('.thread').delegate('.postlink', 'clicka', function(event) {
         event.preventDefault();
         window.location.hash = '#' + $(this).attr('href');
     });
-    
+
     $('.threads').delegate('.post-icon', 'click', function(event) {
         event.preventDefault();
         var cont = new PostContainer(this),
@@ -543,7 +541,7 @@ function init() {
             }
         }
     });
-    
+
     function previewPosts() {
         $('.threads').delegate('.postlink', 'mouseover', function(event) {
             event.preventDefault();
@@ -589,11 +587,11 @@ function init() {
                 });
         });
     }
-    
+
     if (!$.settings('disablePostsPreview')) {
         previewPosts();
     }
-    
+
     $('.deleteMode > input').click(function(event) {
         var tmp = this.value,
             t = $(this),
@@ -613,7 +611,7 @@ function init() {
             t.addClass('toggled');
         }
     });
-    
+
     $('#ban_ip').click(function(event) {
         var t = $(this),
             i = $('<input type="text" id="ban_reason" name="ban_reason"/>')
@@ -624,7 +622,7 @@ function init() {
             $('#ban_reason').remove();
         }
     });
-    
+
     // Posts deletion
     $('#main').delegate('.post', 'click', function(event) {
         if ($('.deleteMode input').attr('class') !== 'toggled') {
@@ -682,12 +680,12 @@ function init() {
             slideRemove(thread);
         });
     });
-    
+
     $('#main > .thread').delegate('.edit', 'click', function(event) {
         event.preventDefault();
         var c = new Canvas;
     });
-    
+
     $('.threads').delegate('.number > a', 'click', function(e) {
         if (currentPage.type != 'section') {
             if (!$.settings('oldInsert')) {
@@ -700,13 +698,13 @@ function init() {
             return true;
         }
     });
-    
+
     // sidebar-related
     if (!set) {
         return false;
     }
     set = set.split(',');
-    
+
     for (var i = 0; i < set.length; i++) {
         $('#list-group' + set[i]).slideToggle(0);
     }
@@ -722,7 +720,7 @@ function initSettings() {
                     $('html').attr('id',  x);
                 }
             },
-            
+
             toggleNsfw: function(x) {
                 if (x) {
                     $('.post img').addClass('nsfw');
@@ -730,7 +728,7 @@ function initSettings() {
                     $('.post img').removeClass('nsfw');
                 }
             },
-            
+
             hideSidebar: function(x) {
                 $('#container-wrap').toggleClass('no-sidebar');
                 $('#sidebar').toggle(0, null);
@@ -743,12 +741,12 @@ function initSettings() {
             hideSectBanner: function(x) {
                 $('.section-banner').toggle();
             },
-            
+
             newForm: function(x) {
                 if (!x) {
                     return false;
                 }
-                
+
                 var styleInfo = {
                     after : [
                         ['.new-post input[type="submit"]', '.captcha'],
@@ -762,31 +760,31 @@ function initSettings() {
                 $('.empty').remove();
                 manipulator(styleInfo);
             },
-            
+
             bottomForm: function(x) {
                 x = $.settings(x);
                 if (x && currentPage.type === 'thread') {
                     $('.new-post').insertAfter('.deleteMode');
                 }
             },
-            
+
             hideBBCodes: function(x) {
                 $('.bbcode').hide();
             },
-            
+
             miniForm: function(x) {
                 $('.username-d, .topic-d, .email-d, .password-d').toggle();
                 $('.new-style2')
             },
         };
-    
+
     if ('forced' in s) {
         delete s['forced']
         for (var x in s) {
             $.settings(x, s[x]);
         }
     }
-    
+
     settings.each(function(x) {
         var s = $.settings(this.id),
             t = parseQs(this.id);
@@ -798,7 +796,7 @@ function initSettings() {
             if (s === 'false') {
                 s = false;
             }
-            
+
             if (this.checked == null) {
                 this.value = s;
             } else {
@@ -807,16 +805,15 @@ function initSettings() {
         }
     });
 
-
     settings.change(function(event) {
         var value = this.value;
         if (this.checked !== undefined) {
             value = this.checked ? true : '';
         }
-        console.log('Setting %s changed to "%s".', this.id, value);
+        //console.log('Setting %s changed to "%s".', this.id, value);
         $.settings(this.id, value);
     });
-    
+
     $('#sidebar .hide').click(function(event) {
         event.preventDefault();
         var k = 'hideSidebar',
@@ -824,7 +821,7 @@ function initSettings() {
         $.settings(k, h);
         changes[k](h);
     });
-    
+
     $('#sidebar h4').click(function(e) {
         var num = this.id.split('group').pop(),
             key = 'hideSectGroup',
@@ -832,21 +829,21 @@ function initSettings() {
             ul = $('#list-group' + num),
             hidden = (ul.css('display') == 'none');
         set = set ? set.split(',') : [];
-        
+
         if (hidden && set.indexOf(num) !== -1) {
             set.splice(set.indexOf(num), 1);
         } else {
             set.push(num);
         }
-        
+
         $.settings(key, set);
         ul.slideToggle(500, checkForSidebarScroll);
     });
-    
+
     $('.threads').delegate('.nsfw', 'hover', function(event) {
         $(this).toggleClass('nsfw');
     });
-    
+
     $('.toggleNsfw').click(function(event) {
         event.preventDefault();
         var k = 'toggleNsfw',
@@ -855,7 +852,7 @@ function initSettings() {
         $.settings(k, v);
         changes.toggleNsfw(v);
     });
-    
+
     for (var id in changes) {
         var func = changes[id],
             c = $.settings(id);
@@ -868,16 +865,16 @@ function initSettings() {
 function initStyle() {
     var key = 'ustyle',
         style = $.settings(key);
-    
+
     checkForSidebarScroll();
 
     $('.tripcode:contains("!")').addClass('staff');
-    
+
     document.onscroll = function() {
         var val = window.pageXOffset || document.body.scrollLeft;
         $('.sidebar').css('left', '-' + val + 'px')
     };
-    
+
     $('.section .post:first-child').each(function(x) {
         var post = $(this),
             href = post.find('.number a').attr('href'),
@@ -926,7 +923,7 @@ function initStyle() {
         }
         e.target.value = e.target.value+key;
     });
-    
+
     // images resize
     $('.threads').delegate('.post .files a', 'click', function(event) {
         event.preventDefault();
@@ -963,19 +960,19 @@ function initStyle() {
             .appendTo(span);
         }
     });
-    
+
     // modpanel
     $('.ip').each(function(x) {
         var t = $(this);
         t.insertBefore(t.prev().find('.number'));
     });
-    
+
     if (!style) {
         return false;
     }
-    
+
     $('html').attr('id', style);
-    
+
     if (style === 'klipton') {
         function removeSel() {
             $('.postlist').remove();
@@ -995,7 +992,7 @@ function initStyle() {
             return false;
         });
     }
-    
+
     return true;
 }
 
@@ -1026,7 +1023,7 @@ function initPosts(selector) {
             } else {
                 map[href] = [pid];
             }
-            
+
             cache[href] = target
 
             if (currentPage.type === 'thread' && target.length !== 0) {
@@ -1042,7 +1039,7 @@ function initPosts(selector) {
             if (id in button.list) {
                 span.removeClass('add').addClass('remove');
             }
-            
+
             if (button.onInit) {
                 button.onInit(new PostContainer(span, post));
             }
@@ -1065,7 +1062,7 @@ function initPosts(selector) {
         } else {
             div.html(div.html() + ',' + links.join(','));
         }
-        
+
         $('#post' + i + ' .post-wrapper').append(div);
     }
 }
@@ -1074,7 +1071,7 @@ function initVisited() {
     if ($.settings('dontLogVisits')) {
         return true;
     }
-    
+
     // Thread visits counter
     var storage = new BoardStorage('visitedThreads', true),
         visitedList = $('.' + storage.storageName);
@@ -1138,7 +1135,6 @@ function initHotkeys() {
         return false;
     });
 }
-
 
 function initAJAX() {
     if (!$('#password').val()) {
@@ -1234,7 +1230,7 @@ function initPubSub() {
             if (pubsub.cursor) {
                 args.cursor = pubsub.cursor;
             }
-            
+
             $.ajax('/api/stream/'+ currentPage.thread +'/subscribe', {
                 type: 'POST',
                 dataType: 'text',
@@ -1244,8 +1240,8 @@ function initPubSub() {
                 if (pubsub.sleepTime > 60000) {
                     pubsub.sleepTime = 4000;
                 }
-                
-                console.log('Poll error; sleeping for', pubsub.sleepTime, 'ms');
+
+                //console.log('Poll error; sleeping for', pubsub.sleepTime, 'ms');
                 window.setTimeout(pubsub.poll, pubsub.sleepTime);
             })
             .success(function(response) {
@@ -1274,7 +1270,6 @@ function initPubSub() {
 
     pubsub.poll();
 }
-
 
 $(init);
 $(initSettings);
