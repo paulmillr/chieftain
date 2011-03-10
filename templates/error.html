@@ -2,22 +2,18 @@
 <title>{% block title %}{% endblock %}</title>
 
 <style>
-body { text-align: center;}
-h1 { font-size: 50px; }
-body { font: 20px Constantia, 'Hoefler Text',  "Adobe Caslon Pro", Baskerville, Georgia, Times, serif; color: #999; text-shadow: 2px 2px 2px rgba(200, 200, 200, 0.5); }
+body { font: 20px Constantia, 'Hoefler Text',  'Adobe Caslon Pro', Baskerville, Georgia, Times, serif; color: #999; text-shadow: 2px 2px 2px rgba(200, 200, 200, 0.5); text-align: center;}
 ::-moz-selection{ background:#F14A29; color:#fff; }
-::selection { background:#F14A29; color:#fff; } 
+::selection { background:#F14A29; color:#fff; }
 details { display:block; }
 a { color: rgb(36, 109, 56); text-decoration:none; }
-a:hover { color: rgb(96, 73, 141) ; text-shadow: 2px 2px 2px rgba(36, 109, 56, 0.5); }
+a:hover { color: rgb(96, 73, 141); text-shadow: 2px 2px 2px rgba(36, 109, 56, 0.5); }
+summary { font-size: 50px; display: block; margin: 0.67em 0px; font-weight: bold; }
 span { display:inline-block; color: #bbb; }
 </style>
 
-
-
-
 <details>
-  <summary><h1>{% block summary %}{% endblock %}</h1></summary>
+  <summary>{% block summary %}{% endblock %}</summary>
   <p>{% block details %}{% endblock %}</p>
   <p><span><a href="/">{% setting 'SITE_TITLE' %}</a></span></p>
 </details>
