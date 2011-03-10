@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}Ошибка{% endblock %}
+{% block content %}
+<h2>Ошибка</h2>
+<h2><a href="." class="goBack">Назад</a></h2>
+<p>{% autoescape off %}
+{% if details %}
+{{details}}
+{% else %}
+{% for k, error in errors.items %}
+    {{k}}
+    {{error}}
+{% endfor %}
+{% endif %}
+{% endautoescape %}</p>
+{% endblock %}

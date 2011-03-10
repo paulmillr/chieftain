@@ -14,4 +14,4 @@ register = template.Library()
 
 @register.simple_tag
 def setting(name):
-    return str(settings.__getattr__(name))
+    return unicode(settings.__getattr__(name))
