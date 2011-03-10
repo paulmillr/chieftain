@@ -20,15 +20,18 @@ define("port", default=8888, help="run on the given port", type=int)
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r'/api/stream/(\d+)/publish', MessageNewHandler),
-            (r'/api/stream/(\d+)/subscribe', MessageUpdatesHandler),
+            (r'/api/stream/(\d+)', MessageUpdatesHandler),
+            (r'/api/streamp/(\d+)', MessageNewHandler),
         ]
         tornado.web.Application.__init__(self, handlers)
 
 
 class MainHandler(tornado.web.RequestHandler):
     def get(self):
-        json.dumps(MessageMixin.cache)
+        try:
+            json.dumps(MessageMixin.cache)
+        except KeyError:
+            raise tornado.web.HTTPError(404)
 
 
 class MessageMixin(object):
@@ -94,8 +97,11 @@ class MessageUpdatesHandler(MainHandler, MessageMixin):
     @tornado.web.asynchronous
     def post(self, thread_id):
         self.thread_id = thread_id
-        self.wait_for_messages(self.async_callback(self.on_new_messages),
-            cursor=self.get_argument('cursor', None))
+        try:
+            self.wait_for_messages(self.async_callback(self.on_new_messages),
+                cursor=self.get_argument('cursor', None))
+        except KeyError:
+            raise tornado.web.HTTPError(404)
 
     def on_new_messages(self, posts):
         # Closed client connection

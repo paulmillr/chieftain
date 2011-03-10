@@ -7,7 +7,6 @@ Created by Paul Bagwell on 2011-02-07.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 
-import re
 from django.contrib.gis.utils import GeoIP
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime

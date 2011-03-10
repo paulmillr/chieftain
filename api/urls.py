@@ -11,6 +11,12 @@ from api.resources import *
 
 urlpatterns = patterns('board.views',
     (r'^$', 'api'),
+    (r'^poll/$', PollRootResource.as_view()),
+    (r'^poll/(?P<id>\d+)$', PollResource.as_view()),
+    (r'^choice/$', ChoiceRootResource.as_view()),
+    (r'^choice/(?P<id>\d+)$', ChoiceResource.as_view()),
+    (r'^vote/$', VoteRootResource.as_view()),
+    (r'^vote/(?P<id>\d+)', VoteResource.as_view()),
     # list of threads with all their posts
     (r'^thread/$', ThreadRootResource.as_view()),
     (r'^thread/(?P<section__slug>\w+)/$', ThreadRootResource.as_view()),

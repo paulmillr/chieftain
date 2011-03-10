@@ -10,7 +10,6 @@ from django.core.paginator import Paginator
 from django.http import Http404, HttpResponseRedirect,\
     HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
-from django.views.decorators.cache import cache_page
 from django.utils.translation import ugettext_lazy as _
 from board import validators, template
 from board.models import *
@@ -115,6 +114,7 @@ def posts(request, section_slug, page):
 
 def images(request, section_slug, page):
     """List of images in section."""
+    # TODO
     section = get_object_or_404(Section, slug=section_slug)
     images_page = Paginator(section.images(), 100)
 
@@ -126,16 +126,21 @@ def thread(request, section_slug, op_post):
     post = get_object_or_404(Post, thread__section__slug=section_slug,
         pid=op_post)
     thread = post.thread
+    if thread.poll_id:
+        ip = request.META['REMOTE_ADDR']
+        thread.poll.vote_data = thread.poll.get_vote_data(ip)
     if thread.is_deleted:
         raise Http404
     if not post.is_op_post:
         return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
-    mod = is_mod(request, section_slug)
     return template.handle_file_cache(
         'section_thread.html',
         '{0}/thread/{1}.html'.format(section_slug, op_post),
         request,
-        update_context({'thread': thread, 'form': PostForm(),
-        'mod': is_mod(request, section_slug)})
+        update_context({
+            'thread': thread,
+            'form': PostForm(),
+            'mod': is_mod(request, section_slug),
+        })
     )

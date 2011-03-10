@@ -8,7 +8,6 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import urllib
 import urllib2
-from datetime import datetime
 from django.utils.translation import ugettext as _
 from djangorestframework import status
 from djangorestframework.resource import Resource
@@ -21,8 +20,11 @@ from modpanel.views import is_mod
 
 __all__ = [
     'Resource', 'ModelResource', 'RootModelResource',
-    'PostRootResource', 'PostResource',
+    'PollRootResource', 'PollResource',
+    'ChoiceRootResource', 'ChoiceResource',
+    'VoteRootResource', 'VoteResource',
     'ThreadRootResource', 'ThreadResource',
+    'PostRootResource', 'PostResource',
     'SectionRootResource', 'SectionResource',
     'FileRootResource', 'FileResource',
     'FileTypeRootResource', 'FileTypeResource',
@@ -33,6 +35,7 @@ __all__ = [
 
 class Resource(Resource):
     """Replacer for Resource."""
+    allowed_methods = anon_allowed_methods = ('GET',)
     emitters = [
         emitters.JSONEmitter,
         emitters.XMLEmitter,
@@ -54,17 +57,61 @@ class RootModelResource(RootModelResource, Resource):
 
 
 #def admin(request, mode):
-    
+
+class PollRootResource(RootModelResource):
+    """A list resource for Poll."""
+    model = Poll
+
+
+class PollResource(ModelResource):
+    """A read resource for Poll."""
+    model = Poll
+
+
+class ChoiceRootResource(RootModelResource):
+    """A list resource for Choice."""
+    model = Choice
+
+
+class ChoiceResource(ModelResource):
+    """A read resource for Choice."""
+    model = Choice
+
+
+class VoteRootResource(RootModelResource):
+    """A list/create resource for Vote."""
+    allowed_methods = anon_allowed_methods = ('GET', 'POST')
+    model = Vote
+
+    def post(self, request, auth, *args, **kwargs):
+        try:
+            choice = Choice.objects.get(id=request.POST['choice'])
+        except Choice.DoesNotExist:
+            raise ResponseException(status.NOT_FOUND)
+        ip = request.META['REMOTE_ADDR']
+        check = Vote.objects.filter(ip=ip, poll=choice.poll)
+        if check:
+            vote = check.get()
+            vote.choice.vote_count -= 1
+            vote.choice.save()
+            vote.choice = choice
+            vote.poll = choice.poll
+        else:
+            vote = Vote(poll=choice.poll, choice=choice, ip=ip)
+        vote.save()
+        choice.vote_count += 1
+        choice.save()
+        return Response(status.CREATED, choice.poll.choices().values())
+
+
+class VoteResource(ModelResource):
+    """A read resource for Vote."""
+    model = Vote
 
 
 class ThreadRootResource(RootModelResource):
     """A create/list resource for Thread."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = Thread
-    fields = (
-        'id', 'section_id', 'bump', 'is_pinned',
-        'is_closed', 'html',
-    )
 
     def get(self, request, auth, *args, **kwargs):
         return self.model.objects.filter(**kwargs)[:20]
@@ -75,10 +122,6 @@ class ThreadResource(ModelResource):
     allowed_methods = ('GET', 'DELETE')
     anon_allowed_methods = ('GET',)
     model = Thread
-    fields = (
-        'id', 'section_id', 'bump', 'is_pinned',
-        'is_closed', 'html',
-    )
 
     def get(self, request, auth, *args, **kwargs):
         slug = kwargs.get('section__slug')
@@ -105,17 +148,12 @@ class PostRootResource(RootModelResource):
     allowed_methods = anon_allowed_methods = ('GET', 'POST')
     form = PostForm
     model = Post
-    fields = (
-        'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
-        'date', 'message', 'email',
-        ('thread', ('id', ('section', ('id', 'slug')))),
-        'files',
-    )
 
     def get(self, request, auth, *args, **kwargs):
+        qs = self.model.objects.filter(**kwargs).reverse()
         if request.GET.get('html'):
-            return self.model.objects.filter(**kwargs).values('html')[:20]
-        return self.model.objects.filter(**kwargs)[:20]
+            return qs.values('html')[:20]
+        return qs[:20]
 
     def post(self, request, auth, content, *args, **kwargs):
         try:
@@ -124,9 +162,9 @@ class PostRootResource(RootModelResource):
             return Response(status.BAD_REQUEST, {'detail': e})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
-        url = 'http://127.0.0.1:8888/api/stream/{0}/publish'
-        urllib2.urlopen(url.format(instance.thread.id),
-            urllib.urlencode({'html': instance.html.encode('utf-8')}))
+        url = 'http://127.0.0.1:8888/api/streamp/{0}'
+        data = urllib.urlencode({'html': instance.html.encode('utf-8')})
+        urllib2.urlopen(url.format(instance.thread.id), data)
         return Response(status.CREATED, instance)
 
 
@@ -134,18 +172,13 @@ class PostResource(ModelResource):
     """A read/delete resource for Post."""
     allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
     model = Post
-    fields = (
-        'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
-        'date', 'message', 'email',
-        ('thread', ('id', ('section', ('id', 'slug')))),
-        'files',
-    )
 
     def get(self, request, auth, *args, **kwargs):
         try:
+            post = self.model.objects.get(**kwargs)
             if request.GET.get('html'):
-                return {'html': self.model.objects.get(**kwargs).html}
-            return self.model.objects.get(**kwargs)
+                return {'html': post.html}
+            return post
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
 
@@ -192,54 +225,33 @@ class PostResource(ModelResource):
 
 class SectionRootResource(RootModelResource):
     """A list resource for Section."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = Section
-    fields = (
-        'id', 'last_post_pid', 'bumplimit', 'description',
-        'filesize_limit', 'default_name', 'anonymity', 'threadlimit',
-        'group_id', 'type', 'slug', 'name'
-    )
 
 
 class SectionResource(ModelResource):
     """A read resource for Section."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = Section
-    fields = (
-        'id', 'last_post_pid', 'bumplimit', 'description',
-        'filesize_limit', 'default_name', 'anonymity', 'threadlimit',
-        'group_id', 'type', 'slug', 'name'
-    )
 
 
 class SectionGroupRootResource(RootModelResource):
     """A list resource for SectionGroup."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = SectionGroup
-    fields = ('id', 'name', 'order', 'is_hidden')
 
 
 class SectionGroupResource(ModelResource):
     """A read resource for SectionGroup."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = SectionGroup
-    fields = ('id', 'name', 'order', 'is_hidden')
 
 
 class FileRootResource(RootModelResource):
     """A list resource for File."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = File
-    fields = ('id', 'post', 'name', 'type', 'size',
-        'image_width', 'image_height', 'hash', 'file', 'thumb')
 
 
 class FileResource(ModelResource):
     """A list resource for File."""
     allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
     model = File
-    fields = ('id', 'post', 'name', 'type', 'size',
-        'image_width', 'image_height', 'hash', 'file', 'thumb')
 
     def delete(self, request, auth, *args, **kwargs):
         """Deletes attachment."""
@@ -262,27 +274,19 @@ class FileResource(ModelResource):
 
 class FileTypeRootResource(RootModelResource):
     """A list resource for FileType."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = FileType
-    fields = ('id', 'category_id', 'type', 'extension')
 
 
 class FileTypeResource(ModelResource):
     """A read resource for FileType."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = FileType
-    fields = ('id', 'category_id', 'type', 'extension')
 
 
 class FileTypeGroupRootResource(RootModelResource):
     """A list resource for FileTypeGroup."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = FileTypeGroup
-    fields = ('id', 'name')
 
 
 class FileTypeGroupResource(ModelResource):
     """A read resource for FileTypeGroup."""
-    allowed_methods = anon_allowed_methods = ('GET',)
     model = FileTypeGroup
-    fields = ('id', 'name')

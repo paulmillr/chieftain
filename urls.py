@@ -1,7 +1,5 @@
 from django.conf.urls.defaults import *
 from django.contrib import admin
-from piston.resource import Resource
-from board.handlers import PostHandler
 admin.autodiscover()
 
 packages = {'packages': ('klipped.board',), }

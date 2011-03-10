@@ -7,10 +7,8 @@ Created by Paul Bagwell on 2011-03-01.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.paginator import Paginator
-from django.http import Http404, HttpResponseRedirect,\
-    HttpResponsePermanentRedirect
+from django.http import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import get_object_or_404
-from board import template
 from board.models import *
 from board.shortcuts import *
 

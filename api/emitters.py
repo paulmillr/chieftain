@@ -6,15 +6,15 @@ emitters.py
 Created by Paul Bagwell on 2011-02-03.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from djangorestframework.emitters import *
+from djangorestframework.response import NoContent
+from djangorestframework.emitters import BaseEmitter, JSONEmitter
 
 __all__ = ['YAMLEmitter', 'BaseEmitter']
 
 try:
     import yaml
 except ImportError:
-    yaml = None
-    YAMLEmitter = None
+    pass
 else:
     class YAMLEmitter(BaseEmitter):
         """Emitter which serializes to YAML"""

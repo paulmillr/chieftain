@@ -17,6 +17,7 @@ var api = {
     queryString = parseQs(),
     answersMap = {},
     postButtons = {},
+    votedPolls = new BoardStorage('polls'),
     // pre-localize messages because of django bug
     i18n = (function() {
         gettext('Reason');
@@ -29,9 +30,10 @@ var api = {
         gettext('bookmark');
         gettext('hide');
         gettext('Replies');
+        gettext('New message in thread #');
     })(),
     // page detector
-    currentPage = (function() {
+    curPage = (function() {
     var loc = window.location.href.split('/').slice('3'),
         re = /(\d+)(?:.+)?/,
         data = {cache: {}};
@@ -222,15 +224,15 @@ function PostContainer(span, post) {
     if (!isjQuery(span)) {
         span = $(span);
     }
-    var isposts = (currentPage.type === 'posts');
+    var isposts = (curPage.type === 'posts');
 
     this.span = span;
     this.post = post ? (!isjQuery(post) ? post : $(post)) : span.closest('.post');
-    this.thread = (currentPage.type === 'thread') ? currentPage.cache.thread : this.span.closest('.thread');
-    this.first = (currentPage.type === 'thread') ? currentPage.cache.first : this.thread.find('.post:first-child');
+    this.thread = (curPage.type === 'thread') ? curPage.cache.thread : this.span.closest('.thread');
+    this.first = (curPage.type === 'thread') ? curPage.cache.first : this.thread.find('.post:first-child');
     this.id = getPostId(this.post);
     this.text_data = {
-        'section': currentPage.section,
+        'section': curPage.section,
         'first': getPostPid(this.first),
         'pid': getPostPid(this.post),
     };
@@ -401,8 +403,8 @@ function searchPost(board, pid, callback) {
     }
 
     $.get(window.api.url + '/post/' + board + '/' + pid + '?html=1')
-        .success(function(data) {
-            callback(data.html);
+        .success(function(response) {
+            callback(response.html);
         });
 }
 
@@ -413,6 +415,35 @@ function slideRemove(elem) {
     elem.slideUp(600, function() {
         $(this).remove();
     });
+}
+
+function showNewPostNotification(text, section, thread) {
+    var nm = gettext('New message in thread '),
+        title = nm + '/' + section + '/' + thread;
+    if ($.dNotification.check()) {
+        $.dNotification.show(text, 3000, title);
+    }
+}
+
+function defaultErrorCallback(response) {
+    //document.write(data.responseText); // for debugging
+    var rt = response,
+        errors,
+        errorText,
+        t = [], l;
+    if (response['field-errors']) {
+        errors = response['field-errors'];
+        for (var i in errors) {
+            // Get label text of current field
+            l = $('label[for="'+i+'"]').text();
+            t.push(l + ': ' + errors[i].join(', '));
+        }
+        errorText = t.join('<br/>')
+    } else {
+        errorText = rt['detail'];
+    }
+
+    $.notification('error', errorText);
 }
 
 function init() {
@@ -548,7 +579,7 @@ function init() {
             var t = $(this),
                 m = t.attr('href').match(/(?:\/(\w+)\/)?(\d+)/),
                 globalLink = !!m[1],
-                board = globalLink ? m[1] : currentPage.section,
+                board = globalLink ? m[1] : curPage.section,
                 pid = m[2],
                 post = t.closest('.post'),
                 timestamp = getCurrentTimestamp(),
@@ -643,10 +674,11 @@ function init() {
         target.addClass('deleted');
         $.ajax({
             'url': url,
+            'dataType': 'json',
             'type': 'DELETE',
         })
-        .error(function(data) {
-            $.message('error', $.parseJSON(data.responseText)['detail']);
+        .error(function(response) {
+            $.notification('error', $.parseJSON(response.responseText)['detail']);
             target.removeClass('deleted');
         })
         .success(function(data) {
@@ -671,7 +703,7 @@ function init() {
             }
 
             // remove whole thread
-            if (currentPage.type === 'thread') {
+            if (curPage.type === 'thread') {
                 window.location.href = './';
                 return true;
             }
@@ -687,7 +719,7 @@ function init() {
     });
 
     $('.threads').delegate('.number > a', 'click', function(e) {
-        if (currentPage.type != 'section') {
+        if (curPage.type != 'section') {
             if (!$.settings('oldInsert')) {
                 var n = $('#post' + $(this).text());
                 $('.new-post').insertAfter(n);
@@ -713,7 +745,10 @@ function init() {
 function initSettings() {
     // those things depend on cookie settings
     var s = parseQs(), 
-        settings = $('.settings').find('select, input'),
+        settings = $('.settings').find('select, input[type="checkbox"]'),
+        dn = $('#enableDesktopNotifications').click(function() {
+            $.dNotification.request();
+        }),
         changes = { // description of all functions on settings pages
             ustyle: function(x) {
                 if (x !== 'ustyle') {
@@ -763,7 +798,7 @@ function initSettings() {
 
             bottomForm: function(x) {
                 x = $.settings(x);
-                if (x && currentPage.type === 'thread') {
+                if (x && curPage.type === 'thread') {
                     $('.new-post').insertAfter('.deleteMode');
                 }
             },
@@ -778,12 +813,17 @@ function initSettings() {
             },
         };
 
+    if (!$.dNotification.checkSupport() || $.dNotification.check()) {
+        dn.closest('dl').hide();
+    }
+
     if ('forced' in s) {
         delete s['forced']
         for (var x in s) {
             $.settings(x, s[x]);
         }
     }
+
 
     settings.each(function(x) {
         var s = $.settings(this.id),
@@ -941,6 +981,30 @@ function initStyle() {
         }
         p.toggleClass('resized');
     });
+    
+    $('.threads').delegate('.poll input[type="radio"]', 'click', function() {
+        var radio = $(this);
+        $.post(window.api.url + '/vote/', {'choice': this.value})
+        .error(defaultErrorCallback)
+        .success(function(data) {
+            var total = 0,
+                info = [],
+                item,
+                length,
+                poll = radio.closest('dl'),
+                pollId = parseInt(poll.attr('id').replace('poll', ''))
+            
+            for (var i=0; i < data.length; i++) {
+                item = data[i];
+                length = item.vote_count > 0 ? total / item.vote_count : 0;
+                $('#vote-result' + item.id).text(item.vote_count);
+            }
+
+            $('.hbg-title').remove()
+            window.votedPolls.set(pollId, radio.attr('value'));
+            poll.horizontalBarGraph({interval: 0.1});
+        });
+    });
 
     // strip long posts at section page
     $('.section .post .content').each(function() {
@@ -1027,7 +1091,7 @@ function initPosts(selector) {
 
             cache[href] = target
 
-            if (currentPage.type === 'thread' && target.length !== 0) {
+            if (curPage.type === 'thread' && target.length !== 0) {
                 target.attr('href', targetSelector);
             }
         }
@@ -1081,12 +1145,12 @@ function initVisited() {
         visitedList.slideToggle();
     });
 
-    if (currentPage.type == 'thread') {
-        thread = currentPage.thread;
+    if (curPage.type == 'thread') {
+        thread = curPage.thread;
         if (!(thread in storage.list())) {
             storage.set(thread, {
-                'first': currentPage.first, 
-                'section': currentPage.section,
+                'first': curPage.first, 
+                'section': curPage.section,
                 'visits': 1,
                 'first_visit': (new Date()).getTime(),
                 'title': $('.post:first-child .title').text(),
@@ -1101,7 +1165,7 @@ function initVisited() {
         } else {
             storage.incr(thread, 'visits');
         }
-    } else if (currentPage.type == 'settings') {
+    } else if (curPage.type == 'settings') {
         ul = visitedList.find('ul');
         visitedList.show();
         function makeList(list) {
@@ -1141,29 +1205,9 @@ function initAJAX() {
     if (!$('#password').val()) {
         $('#password').val(randomString(8));
     }
-    function errorCallback(data) {
-        //document.write(data.responseText); // for debugging
-        var rt = data,
-            errors,
-            errorText,
-            t = [], l;
-        if (rt['field-errors']) {
-            errors = rt['field-errors'];
-            for (var i in errors) {
-                // Get label text of current field
-                l = $('label[for="'+i+'"]').text();
-                t.push(l + ': ' + errors[i].join(', '));
-            }
-            errorText = t.join('<br/>')
-        } else {
-            errorText = rt['detail'];
-        }
-
-        $.message('error', errorText);
-    }
 
     function successCallback(data) {
-        if (currentPage.type === 'section') { // redirect
+        if (curPage.type === 'section') { // redirect
             window.location.href = './' + data.pid;
             return true;
         }
@@ -1202,12 +1246,12 @@ function initAJAX() {
     }
     $('.new-post').ajaxForm({ 
         target: 'body',
-        success: function(data) {
-            return !data['field-errors'] && !data['detail'] ? 
-                successCallback(data) :
-                errorCallback(data);
+        success: function(response) {
+            return !response['field-errors'] && !response['detail'] ? 
+                successCallback(response) :
+                defaultErrorCallback(response);
         },
-        error: errorCallback,
+        error: defaultErrorCallback,
         url: window.api.url + '/post/?html=1&_accept=text/plain',
         dataType: 'json',
     });
@@ -1219,11 +1263,12 @@ function initAJAX() {
  * Uses long polling to check for new posts.
  */
 function initPubSub() {
-    if (currentPage.type !== 'thread' || $.settings('disablePubSub')) {
+    if (curPage.type !== 'thread' || $.settings('disablePubSub')) {
         return false;
     }
     var pubsub = {
         sleepTime: 500,
+        maxSleepTime: 1000 * 60 * 15,
         cursor: null,
 
         poll: function() {
@@ -1232,28 +1277,28 @@ function initPubSub() {
                 args.cursor = pubsub.cursor;
             }
 
-            $.ajax('/api/stream/'+ currentPage.thread +'/subscribe', {
-                type: 'POST',
-                dataType: 'text',
+            $.ajax('/api/stream/'+ curPage.thread, {
+                'type': 'POST',
+                'dataType': 'json'
             })
             .error(function() {
-                pubsub.sleepTime *= 2;
-                if (pubsub.sleepTime > 60000) {
-                    pubsub.sleepTime = 4000;
+                if (pubsub.sleepTime < pubsub.maxSleepTime) {
+                    pubsub.sleepTime *= 2;
+                } else {
+                    pubsub.sleepTime = pubsub.maxSleepTime;
                 }
 
                 //console.log('Poll error; sleeping for', pubsub.sleepTime, 'ms');
                 window.setTimeout(pubsub.poll, pubsub.sleepTime);
             })
             .success(function(response) {
-                try {
-                    response = $.parseJSON(response);
-                } catch(e) {}
                 if (!response.posts) {
                     return false;
                 }
                 pubsub.cursor = response.cursor;
-                var posts = response.posts;
+                var posts = response.posts,
+                    text;
+
                 pubsub.cursor = posts[posts.length - 1].id;
                 //console.log(posts.length, 'new msgs', pubsub.cursor);
 
@@ -1261,9 +1306,12 @@ function initPubSub() {
                     var post = $(posts[i]).hide()
                         .appendTo('.thread')
                         .fadeIn(500);
-                        post.find('.tripcode:contains("!")').addClass('staff');
-                        initPosts(post);
+                    post.find('.tripcode:contains("!")').addClass('staff');
+                    initPosts(post);
                 }
+                
+                text = post.find('.message').text();
+                showNewPostNotification(text, curPage.section, curPage.first);
                 window.setTimeout(pubsub.poll, 0);
             });
         },
@@ -1272,11 +1320,13 @@ function initPubSub() {
     pubsub.poll();
 }
 
-$(init);
-$(initSettings);
-$(initStyle);
-$(initPosts);
-$(initVisited);
-$(initHotkeys);
-$(initAJAX);
-$(initPubSub);
+$(function() {
+    init();
+    initSettings();
+    initStyle();
+    initPosts();
+    initVisited();
+    initHotkeys();
+    initAJAX();
+    initPubSub();
+});

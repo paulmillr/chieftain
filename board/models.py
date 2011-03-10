@@ -9,11 +9,10 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
-from django.contrib.syndication.views import Feed, FeedDoesNotExist
+from django.contrib.syndication.views import Feed
 from django.core.cache import cache
-from django.core.paginator import Paginator
 from django.db import models, connection
-from django.forms import ModelForm, CharField, IntegerField, FileField
+from django.forms import ModelForm, CharField, FileField
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -26,6 +25,7 @@ from board import fields, template, tools
 __all__ = [
     'DAY', 'cached',
     'PostManager', 'SectionManager', 'SectionGroupManager',
+    'Poll', 'Choice', 'Vote',
     'Thread', 'Post', 'File', 'FileTypeGroup', 'FileType', 'Section',
     'SectionGroup', 'UserProfile', 'PostForm', 'PostFormNoCaptcha',
     'SectionFeed', 'ThreadFeed', 'DeniedIP', 'Wordfilter',
@@ -145,6 +145,18 @@ class WordfilterManager(models.Manager):
 class Poll(models.Model):
     """Thread polls."""
     question = models.CharField(max_length=200, verbose_name=_('Question'))
+    expires = models.DateTimeField(verbose_name=_('Expire date'))
+
+    allowed_fields = ('id', 'question', ('choices', ('name', 'vote_count')))
+
+    def choices(self):
+        return self.choice_set.all()
+
+    def get_vote_data(self, ip):
+        f = Vote.objects.filter(ip=ip, poll=self)
+        if not f:
+            return False
+        return f.get()
 
     def __unicode__(self):
         return self.question
@@ -154,26 +166,34 @@ class Poll(models.Model):
         verbose_name_plural = _('Polls')
 
 
-class PollChoice(models.Model):
+class Choice(models.Model):
     """Thread poll answers."""
-    name = models.CharField(max_length=100, verbose_name=_('Name'))
+    name = models.CharField(max_length=100, verbose_name=_('Choice name'))
     poll = models.ForeignKey('Poll', verbose_name=_('Poll'))
+    vote_count = models.PositiveIntegerField(default=0,
+        verbose_name=_('Vote count'))
+
+    allowed_fields = ('id', 'name', 'vote_count', ('poll', ('question',)))
 
     def __unicode__(self):
-        return '{0} - {1}'.format(self.poll, self.name)
+        return u'{0} - {1}'.format(self.poll, self.name)
 
     class Meta:
         verbose_name = _('Poll choice')
         verbose_name_plural = _('Poll choices')
 
 
-class PollVote(models.Model):
+class Vote(models.Model):
     """Thread poll votes."""
-    choice = models.ForeignKey('PollChoice', verbose_name=_('Choice'))
-    ip = models.IPAddressField(verbose_name=_('IP'), blank=True)
+    poll = models.ForeignKey('Poll', blank=True, null=True,
+        verbose_name=_('Poll'))
+    choice = models.ForeignKey('Choice', verbose_name=_('Choice'))
+    ip = models.IPAddressField(blank=True, verbose_name=_('IP'))
+
+    allowed_fields = ('id', 'choice')
 
     def __unicode__(self):
-        return '{0}, {1}'.format(self.choice, self.ip)
+        return u'{0}, {1}'.format(self.choice, self.ip)
 
     class Meta:
         verbose_name = _('Poll vote')
@@ -196,6 +216,11 @@ class Thread(models.Model):
     html = models.TextField(blank=True, verbose_name=_('HTML cache'))
     objects = ThreadManager()
     deleted_objects = DeletedThreadManager()
+
+    allowed_fields = (
+        'id', 'section_id', 'bump', 'is_pinned',
+        'is_closed', 'html',
+    )
 
     def posts(self):
         """Returns thread posts."""
@@ -336,6 +361,13 @@ class Post(models.Model):
     objects = PostManager()
     deleted_objects = DeletedPostManager()
 
+    allowed_fields = (
+        'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
+        'date', 'message', 'email', 'data',
+        ('thread', ('id', ('section', ('id', 'slug')))),
+        'files',
+    )
+
     def section(self):
         return self.thread.section
 
@@ -404,6 +436,9 @@ class File(models.Model):
     objects = FileManager()
     deleted_objects = DeletedFileManager()
 
+    allowed_fields = ('id', 'post', 'name', 'type', 'size',
+        'image_width', 'image_height', 'hash', 'file', 'thumb')
+
     def remove(self):
         """Visually deletes file."""
         self.is_deleted = True
@@ -428,6 +463,8 @@ class FileType(models.Model):
     group = models.ForeignKey('FileTypeGroup',
         verbose_name=_('Group'))
 
+    allowed_fields = ('id', 'category_id', 'type', 'extension')
+
     def __unicode__(self):
         return self.extension
 
@@ -441,6 +478,8 @@ class FileTypeGroup(models.Model):
     name = models.CharField(max_length=32,
         verbose_name=_('Name'))
     default_image = models.ImageField(upload_to='default/')
+
+    allowed_fields = ('id', 'name')
 
     def __unicode__(self):
         return self.name
@@ -479,6 +518,11 @@ class Section(models.Model):
     objects = SectionManager()
 
     ONPAGE = 20
+    allowed_fields = (
+        'id', 'last_post_pid', 'bumplimit', 'description',
+        'filesize_limit', 'default_name', 'anonymity', 'threadlimit',
+        'group_id', 'type', 'slug', 'name'
+    )
 
     def threads(self):
         return Thread.objects.filter(section=self.id).order_by(
@@ -554,6 +598,7 @@ class SectionGroup(models.Model):
     order = models.SmallIntegerField(verbose_name=_('Order'))
     is_hidden = models.BooleanField(default=False, verbose_name=_('Is hidden'))
     objects = SectionGroupManager()
+    allowed_fields = ('id', 'name', 'order', 'is_hidden')
 
     def save(self):
         super(SectionGroup, self).save()

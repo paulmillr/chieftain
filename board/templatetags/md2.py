@@ -7,7 +7,7 @@ This code is based on django's markup contrib.
 
 from django import template
 from django.conf import settings
-from django.utils.encoding import smart_str, force_unicode
+from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 
 register = template.Library()

@@ -6,10 +6,8 @@ utils.py
 Created by Paul Bagwell on 2011-01-22.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-import glob
 import os
 import shutil
-import urllib2
 import sys
 from board.models import *
 from django.template.loader import render_to_string
@@ -66,9 +64,9 @@ def wipe(posts=10, thread_or_slug='', domain='http://b.2-ch.ru/'):
 
 def clear():
     """Clears board."""
-    threads = Thread.objects.all().delete()
-    posts = Post.objects.all().delete()
-    files = File.objects.all().delete()
+    Thread.objects.all().delete()
+    Post.objects.all().delete()
+    File.objects.all().delete()
     cache.clear()
     make_path = lambda x: os.path.join(settings.MEDIA_ROOT, x)
     for d in [make_path(x) for x in ['section', 'thumbs']]:

@@ -12,14 +12,13 @@ import os
 import hotshot
 import tempfile
 import StringIO
-from operator import add
 from time import time
 from django.db import connection
 from django.template import Template, Context
 from django.conf import settings
 
 __all__ = [
-    'SQLLogToConsoleMiddleware', 'StatsMiddleware', 'ProfilingMiddleware'
+    'SQLLogToConsoleMiddleware', 'StatsMiddleware', 'ProfileMiddleware',
 ]
 
 words_re = re.compile(r'\s+')
@@ -34,7 +33,7 @@ group_prefix_re = [
 class SQLLogToConsoleMiddleware:
     def process_response(self, request, response):
         if settings.DEBUG and connection.queries:
-            time = sum([float(q['time']) for q in connection.queries])
+            total_time = sum(float(q['time']) for q in connection.queries)
             t = Template("{{count}} quer{{count|pluralize:\"y,ies\"}} "
                 "in {{time}} seconds:\n\n{% for sql in sqllog %}"
                 "[{{forloop.counter}}] {{sql.time}}s: {{sql.sql|safe}}"
@@ -43,7 +42,7 @@ class SQLLogToConsoleMiddleware:
             print t.render(Context({
                 'sqllog': connection.queries,
                 'count': len(connection.queries),
-                'time': time
+                'time': total_time
             }))
         return response
 

@@ -331,6 +331,10 @@ label.placeholder {
 .thread.hidden.hard, .post.hidden.hard {display: none;}
 .thread.hidden .post:not(:first-child), .thread.hidden div.skipped {display: none;}
 .skipped {color: #666;}
+.poll {margin-bottom: 5px; padding: 5px; background: #ddd; display: block; line-height: 1em;}
+.hbg-bar { padding-left: 5px; background-color: #369; color: #fff; font-weight: bold; height: 1em;}
+.hbg-title { text-align: center; font-weight: bold; }
+
 .post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}
 .post.hidden header, .post.hidden .content {display: none;}
 .post-preview {position: absolute; z-index: 10;}

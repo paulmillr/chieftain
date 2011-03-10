@@ -86,22 +86,29 @@ $.extend({
         return this.settingsFactory('k_')(name, value, options);
     },
 
+    /**
+     * HTML5 Local storage jquery class.
+     * 
+     * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
+     * Licensed under the MIT license:
+     * http://www.opensource.org/licenses/mit-license.php
+     */
     storage: function(name, value, mode) {
         var res;
         name = 'k_' + name;
         if (mode === 'flush') {
-            window.localStorage[name] = ''
+            window.localStorage.setItem(name, '');
             return true;
         }
         if (value === undefined) {
-            res = window.localStorage[name];
+            res = window.localStorage.getItem(name);
             try {
                 res = JSON.parse(res);
             } catch(e) {}
 
             return res;
         } else {
-            window.localStorage[name] = JSON.stringify(value);
+            window.localStorage.setItem(name, JSON.stringify(value));
             return value;
         }
     },
@@ -214,8 +221,12 @@ $.extend({
         });
     },
 
-    /*
-     * Copyright 2010 akquinet
+    /**
+     * Copyright 2010 (c) akquinet.
+     *
+     * jQuery notification plugin is based on code of jquery.toastmessage, 
+     * modified by Paul Bagwell.
+     *
      * Licensed under the Apache License, Version 2.0 (the "License");
      * you may not use this file except in compliance with the License.
      * You may obtain a copy of the License at
@@ -226,8 +237,7 @@ $.extend({
      * See the License for the specific language governing permissions and
      * limitations under the License.
      */
-    // Based on code of jquery.toastmessage, modified by Paul Bagwell
-    message: function(type, message, options) {
+    notification: function(type, message, options) {
         var defaultSettings = {
             inEffect: {opacity: 'show'}, // in effect
             inEffectDuration: 600, // in effect duration in ms
@@ -306,6 +316,47 @@ $.extend({
             'text': message, 
             'type': type || 'notice',
         });
+    },
+    
+    /**
+     * jQuery desktop notification class.
+     * 
+     * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
+     * Licensed under the MIT license:
+     * http://www.opensource.org/licenses/mit-license.php
+     */
+    dNotification: {
+        n: window.webkitNotifications,
+        show: function(text, timeout, title, icon) {
+            if (!timeout) timeout = 3000;
+            if (!title) {
+                $.trim($('title').text()).split(' ');
+                title = currentPage.title;
+            }
+            if (!icon) {
+                icon = $('link[rel="apple-touch-icon"]').attr('href');
+            }
+
+            instance = this.n.createNotification(icon, title, text);
+            instance.show();
+            setTimeout(function() {instance.cancel()}, timeout);
+        },
+
+        request: function(callback) {
+            if (!callback) callback = function() {};
+            if (!this.checkSupport()) {
+                return false;
+            }
+            this.n.requestPermission(callback);
+        },
+
+        check: function() {
+            return (this.checkSupport() && this.n.checkPermission() === 0);
+        },
+        
+        checkSupport: function() {
+            return !!this.n;
+        }
     },
 
     /**
@@ -532,8 +583,137 @@ $.each([ "keydown", "keyup", "keypress" ], function() {
 
 $.fn.hasScrollBar = function() {
     return this.get(0).scrollHeight - 1 > this.height();
-}
+};
 
+})(jQuery);
+
+/*
+ * Horizontal Bar Graph for jQuery
+ * version 0.1a
+ *
+ * http://www.dumpsterdoggy.com/plugins/horiz-bar-graph
+ *
+ * Copyright (c) 2009 Chris Missal
+ * Dual licensed under the MIT (MIT-LICENSE.txt)
+ * and GPL (GPL-LICENSE.txt) licenses.
+ */
+(function($) {
+	$.fn.horizontalBarGraph = function(options) {
+	
+		var opts = $.extend({}, $.fn.horizontalBarGraph.defaults, options);
+		
+		this.children("dt,dd").each(function(i) {
+		
+			var el = $(this);
+			if(el.is("dt")) {
+				el.css({display: "block", float: "left", clear: "left"}).addClass("hbg-label"); return;
+			} else {
+				(isTitleDD(el) && opts.hasTitles ? createTitle : createBar)(el, opts);
+			}
+			setBarHover(el, opts);
+		});
+		
+		tryShowTitle(this);
+		
+		if(opts.animated) {
+			createShowButton(opts, this).insertBefore(this);
+		}
+		if(opts.colors.length) {
+			setColors(this.children("dd"), opts);
+		}
+		if(opts.hoverColors.length) {
+			setHoverColors(this.children("dd"), opts);
+		}
+		
+		scaleGraph(this);
+		
+		return this;
+	};
+	
+	function scaleGraph(graph) {
+		var maxWidth = 0;
+		graph.children("dt").each(function() {
+			maxWidth = Math.max($(this).width(), maxWidth);
+		}).css({width: maxWidth+"px"});
+	}
+	
+	function setBarHover(bar, opts) {
+		bar.hover(function() {
+			bar.addClass("hbg-bar-hover");
+		}, function() {
+			bar.removeClass("hbg-bar-hover");
+		});
+	}
+	
+	function createShowButton(opts, graph) {
+		var button = $("<span />").text(opts.button).addClass("hbg-show-button");
+		button.click(function() {
+			graph.children("dd").show('slow', function() { button.fadeOut('normal'); });
+		});
+		return button;
+	}
+	
+	function createBar(e, opts) {
+		var val = e.text();
+		e.css({marginLeft: e.prev().is("dt") ? "5px" : "0px", width: Math.floor(val/opts.interval)+"px"});
+		e.html($("<span/>").html(val).addClass("hbg-value"));
+		applyOptions(e, opts);
+	}
+	
+	function createTitle(e, opts) {
+		var title = e.text();
+		e.prev().attr("title", title);
+		e.remove();
+	}
+	
+	function tryShowTitle(graph) {
+		var title = graph.attr("title");
+		if(title) {
+			$("<div/>").text(title).addClass("hbg-title").insertBefore(graph);
+			graph.css({overflow: "hidden"});
+		}
+	}
+	
+	function setColors(bars, opts) {
+		var i = 0;
+		bars.each(function() { 
+			var c = i++ % opts.colors.length;
+			$(this).css({backgroundColor: opts.colors[c]});
+		});
+	}
+	
+	function setHoverColors(bars, opts) {
+		var i = 0;
+		bars.each(function(i) {
+			var bar = $(this);
+			var c = bar.css("background-color");
+			var hc = opts.hoverColors[i++ % opts.hoverColors.length];
+			bar.hover(function() {
+				$(this).css({backgroundColor: hc});
+			}, function() {
+				$(this).css({backgroundColor: c});
+			});
+		});
+	}
+	
+	function applyOptions(e, opts) {
+		e.css({float: "left"}).addClass("hbg-bar");
+		if(opts.animated) { e.hide(); }
+	}
+	
+	function isTitleDD(e) {
+		return (e.is(":even") && e.prev().is("dd"));
+	}
+	
+	$.fn.horizontalBarGraph.defaults = {
+		interval: 1,
+		hasTitles: false,
+		animated: false,
+		button: 'Show Values',
+		colors: [],
+		hoverColors: []
+	};
+	
 })(jQuery);
 
 /*
@@ -548,6 +728,7 @@ Dual licensed under the MIT and GPL licenses:
 (function(a){function f(){var b=a(this);a(b.data(e)).css("display","none")}function i(){var b=this;setTimeout(function(){var c=a(b);a(c.data(e)).css("top",c.position().top+"px").css("left",c.position().left+"px").css("display",c.val()?"none":"block")},200)}var e="PLACEHOLDER-LABEL",j=false,k={labelClass:"placeholder"},g=document.createElement("input");if("placeholder"in g){a.fn.placeholder=a.fn.unplaceholder=function(){};delete g}else{delete g;a.fn.placeholder=function(b){if(!j){a(".PLACEHOLDER-INPUT").live("click",
 f).live("focusin",f).live("focusout",i);j=bound=true}var c=a.extend(k,b);this.each(function(){var l=Math.random().toString(32).replace(/\./,""),d=a(this),h=a('<label style="position:absolute;display:none;top:0;left:0;"></label>');if(!(!d.attr("placeholder")||d.data("PLACEHOLDER-INPUT")==="PLACEHOLDER-INPUT")){d.attr("id")||(d.attr("id")="input_"+l);h.attr("id",d.attr("id")+"_placeholder").data("PLACEHOLDER-INPUT","#"+d.attr("id")).attr("for",d.attr("id")).addClass(c.labelClass).addClass(c.labelClass+
 "-for-"+this.tagName.toLowerCase()).addClass(e).text(d.attr("placeholder"));d.data(e,"#"+h.attr("id")).data("PLACEHOLDER-INPUT","PLACEHOLDER-INPUT").addClass("PLACEHOLDER-INPUT").after(h);f.call(this);i.call(this)}})};a.fn.unplaceholder=function(){this.each(function(){var b=a(this),c=a(b.data(e));if(b.data("PLACEHOLDER-INPUT")==="PLACEHOLDER-INPUT"){c.remove();b.removeData("PLACEHOLDER-INPUT").removeData(e).removeClass("PLACEHOLDER-INPUT")}})}}})(jQuery);
+
 
 /*!
  * jQuery Form Plugin
