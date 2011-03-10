@@ -7,9 +7,7 @@ Created by Paul Bagwell on 2011-02-03.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from djangorestframework.response import NoContent
-from djangorestframework.emitters import BaseEmitter, JSONEmitter
-
-__all__ = ['YAMLEmitter', 'BaseEmitter']
+from djangorestframework.emitters import *
 
 try:
     import yaml
