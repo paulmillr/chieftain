@@ -4,35 +4,18 @@
 {% load macros %}
 
 {% block title %}{{section.name}}{% endblock %}
+{% block newpost %}{% include "form.html" %}{% endblock %}
 {% block search %}
-<form action="search" method="get" accept-charset="utf-8" class="search">
-    <p><input type="search" name="q" placeholder="{% trans 'Search' %}" id="q">
-    <label for="is_op_post">{% trans 'OP-post' %}</label>
-    <input type="checkbox" name="is_op_post" id="is_op_post">
-    <input type="submit" value="&rarr;"></p>
-</form>
+<div class="searchbox">
+    <form action="search" method="get" accept-charset="utf-8">
+        <p><input name="q" placeholder="{% trans 'Search' %}" id="q" type="search">
+        <label for="is_op_post">{% trans 'OP-post' %}</label>
+        <input name="is_op_post" id="is_op_post" type="checkbox">
+        <input value="&#x2192;" type="submit"></p>
+    </form>
+</div>
 {% endblock %}
 
 {% block content %}
     {% block section %}{% endblock %}
-    <form class="deleteMode">
-        <input type="button" value="{% trans 'Delete posts' %}" data-back="{% trans 'Cancel' %}" class="toggle">
-        <div class="hidden">
-            <p><input type="checkbox" name="only_files" id="only_files">
-            <label for="only_files">{% trans "Only files" %}</label></p>
-            
-            <div class="modPanel">
-                <p><input type="checkbox" name="delete_all" id="delete_all">
-                <label for="delete_all">{% trans "Delete all messages from that IP" %}</label></p>
-
-                <p><input type="checkbox" name="ban_ip" id="ban_ip">
-                <label for="ban_ip">{% trans "Ban IP" %}</label></p>
-
-                {% if thread %}
-                <p><input type="button" name="pin_thread" value="{% trans 'Pin thread' %}" id="pin_thread">
-                <input type="button" name="close_thread" value="{% trans 'Close thread' %}" id="close_thread"></p>
-                {% endif %}
-            </div>
-        </div>
-    </form>
 {% endblock %}

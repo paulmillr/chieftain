@@ -2,10 +2,12 @@
 {% load haship %}
 {% load i18n %}
 {% block title %}{% trans "Thread title" %} {{thread.op_post.pid}}{% endblock %}
-
-{% block section %}
+{% block role %}thread{% endblock %}
+{% block newpost %}
     <a href=".">{% trans "Go back" %}</a>
     {% include "form.html" %}
+{% endblock %}
+{% block section %}
     <section class="threads">
         <section class="thread" id="thread{{thread.id}}">
             {% if thread.poll_id %}
@@ -31,9 +33,11 @@
             {% endautoescape %}
         </section>
     </section>
-    <ul class="group">
-        <li><a href=".">{% trans "Everything" %}</a></li>
-        <li><a href="threads">{% trans "Threads" %}</a></li>
-        <li><a href="posts">{% trans "Posts" %}</a></li>
-    </ul>
+    <section class="actions">
+        <ul class="pagination">
+            <li><a href=".">{% trans "Everything" %}</a></li>
+            <li><a href="threads">{% trans "Threads" %}</a></li>
+            <li><a href="posts">{% trans "Posts" %}</a></li>
+        </ul>
+    </section>
 {% endblock %}

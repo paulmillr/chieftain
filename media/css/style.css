@@ -1,3 +1,299 @@
+* {
+    margin: 0px;
+    padding: 0px;
+    font-family: "Trebuchet MS", Trebuchet, tahoma, serif;
+    font-size: 15px;
+}
+
+header, nav, article, footer, address, section {
+    display: block;
+}
+
+html {
+    background-color: #EEE;
+    color: #333;
+}
+
+a:link, a:visited {color:#f60;}
+a:hover {color:#06f;}
+
+#container {
+    height: 100%;
+    margin-right: 10px;
+    padding-left: 10px;
+}
+
+/* Header */
+
+#sidebar {
+    position: fixed;
+    padding-left: 15px;
+    width: 225px;
+    float: left;
+    padding-top: 2px;
+    display: none;
+}
+
+.withSidebar #sidebar {display: block;}
+.withSidebar #container {padding-left: 250px;}
+
+#sidebar h2 {
+    font-size: 2em;
+    color: #f60;
+}
+
+#sidebar h2 a {
+    font-size: 1em;
+}
+
+.hidelink {
+    display: block;
+    text-align: right;
+    font-size: 0.9em;
+    text-decoration: none;
+    margin: 4px;
+}
+
+#sidebar h3 {
+    background-color: #DDD;
+    line-height: 23px;
+    padding-left: 3px;
+    margin-right: 5px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+#sidebar ul {
+    list-style-type: none;
+    border-left: 1px solid #ddd;
+    margin-left: 15px;
+    padding-left: 7px;
+}
+
+#sidebar ul li {
+    padding: 1px 0 1px 0;
+}
+
+#sidebar a {
+    text-decoration: none;
+}
+
+/* Header */
+
+#site-header {
+    border-bottom: 1px solid #AAA;
+}
+
+#site-header nav {
+    overflow: hidden;
+    _zoom: 1;
+    padding-top: 10px;
+}
+
+#site-header nav ul {
+    display: inline;
+    list-style-type: none;
+    margin-right: 2px;
+}
+
+#site-footer nav ul {
+    display: inline;
+    margin: 6px 0 6px 0;
+}
+
+ul.pagination li {
+    display: inline;
+    font-weight: bold;
+}
+
+ul.pagination:before {
+    content: '[';
+}
+
+ul.pagination:after {
+    content: ']';
+}
+
+ul.pagination li:after {
+    content: ' / ';
+}
+
+ul.pagination li:last-child:after {
+    content: '';
+}
+
+ul.pagination li a {
+    font-size: 0.95em;
+}
+
+#site-header .searchbox {
+    clear: both;
+    overflow: hidden;
+    _zoom: 1;
+    margin-top: 5px;
+    padding-right: 15px;
+}
+
+#site-header .searchbox form {
+    display: block;
+    float: right;
+}
+
+#site-header h1 {
+    display: block;
+    clear: both;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+#site-header h1 a {
+    text-decoration: none;
+    font-size: 34px;
+}
+
+/* New Post */
+
+.newpost {
+    border-bottom: 1px solid #AAA;
+}
+
+.newpost form {
+    width: 650px;
+    margin: 0 auto;
+}
+
+.newpost label {
+    float: left;
+    width: 130px;
+    font-weight: bold;
+    color: #024;
+}
+
+.newpost textarea {width: 450px;}
+
+.newpost dd {
+    display: block;
+    overflow: hidden;
+}
+.new-style form {width: 455px;}
+.new-style dt {display: none;}
+.new-style .file-d {float: left;}
+.new-style input[type="submit"] {float: right;}
+
+fieldset {border: 0;}
+.newpost fieldset {
+    padding-top: 15px;
+}
+#main[role="settings"] fieldset {
+    padding: 10px 0;
+}
+
+.newpost fieldset dl {
+    margin-bottom: 5px;
+}
+
+.newpost .info {
+    clear: both;
+    text-align: center;
+    padding-bottom: 15px;
+}
+
+.newpost .info li {list-style: none;}
+
+.post .title, .post .number {
+    font-weight: bold;
+}
+
+.post .number:before {content: "№";}
+
+#main .replylink {
+    text-decoration: none;
+}
+
+#main .replylink:before {
+    content: '[ ';
+}
+
+#main .replylink:after {
+    content: ' ]';
+}
+
+#main .filemeta {
+    font-style: italic;
+    margin-bottom: 2px;
+    font-size: 0.85em;
+}
+
+.filemeta * {font-size: 1em;}
+
+.answer-map {font-style: italic; margin-top: 4px; font-size: 0.85em;}
+.answer-map a {font-size: 1em;}
+
+a.file img {
+    border: none;
+    float: left;
+    margin: 0 6px 6px 0;
+}
+
+.skipped {
+    display: block;
+    color: #666;
+    margin-top: 5px;
+}
+
+.thread {
+    border-bottom: 1px solid #AAA;
+    padding: 5px 0 5px 0;
+    overflow: hidden;
+    _zoom: 1;
+}
+
+.post {
+    background-color: #ddd;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    display: table;
+    _zoom: 1;
+    margin: 5px 0 5px 0;
+    padding: 6px;
+    -webkit-border-radius: 4px;
+    -moz-border-radius: 4px;
+    border-radius: 4px;
+}
+
+.post-preview {position: absolute;}
+
+/*
+.post .message {
+    max-height: 300px;
+    overflow: auto;
+}*/
+
+.post:first-child {
+    background-color: #eee;
+    border: 0;
+    overflow: visible;
+    display: block;
+    _zoom: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+}
+.ie7 .post {float: left;}
+.ie7 .post:first-child {float: none;}
+
+.actions .pagination {
+    margin: 6px 0 6px 0;
+}
+
+.copyright {
+    clear: both;
+    text-align: center;
+}
+
 /*
   HTML5 ✰ Boilerplate
 
@@ -10,241 +306,37 @@
     praegnanz.de/weblog/htmlcssjs-kickstart
 */
 
-/*
-  html5doctor.com Reset Stylesheet (Eric Meyer's Reset Reloaded + HTML5 baseline)
-  v1.6.1 2010-09-17 | Authors: Eric Meyer & Richard Clark
-  html5doctor.com/html-5-reset-stylesheet/
-*/
-
-html, body, div, span, object, iframe,
-h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-abbr, address, cite, code,
-del, dfn, em, img, ins, kbd, q, samp,
-small, strong, sub, sup, var,
-b, i,
-dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend,
-table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, canvas, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section, summary,
-time, mark, audio, video {
-  margin:0;
-  padding:0;
-  border:0;
-  outline:0;
-  font-size:100%;
-  font: inherit;
-  vertical-align:baseline;
-}
-
-article, aside, details, figcaption, figure,
-footer, header, hgroup, menu, nav, section {
-    display:block;
-}
-
-nav ul { list-style:none; }
-
-blockquote, q { quotes:none; }
-
-blockquote:before, blockquote:after,
-q:before, q:after { content:''; content:none; }
-
-a { margin:0; padding:0; font-size:100%; vertical-align:baseline; background:transparent; }
-
-ins { background-color:#ff9; color:#000; text-decoration:none; }
-
-mark { background-color:#ff9; color:#000; font-style:italic; font-weight:bold; }
-
-del { text-decoration: line-through; }
-
-abbr[title], dfn[title] { border-bottom:1px dotted; cursor:help; }
-
-table { border-collapse:collapse; border-spacing:0; }
-
-hr { display:block; height:1px; border:0; border-top:1px solid #ccc; margin:1em 0; padding:0; }
-
-input, select { vertical-align:middle; }
-
-/* END RESET CSS */
-
-
-/* fonts.css from the YUI Library: developer.yahoo.com/yui/
-   refer to developer.yahoo.com/yui/3/cssfonts/ for font sizing percentages
-
-  there are three custom edits:
-   * remove arial, helvetica from explicit font stack
-   * we normalize monospace styles ourselves
-   * table font-size is reset in the HTML5 reset above so there is no need to repeat
-*/ /*13px/1.231*/
-body { *font-size:small; } /* hack retained to preserve specificity */
-
-select, input, textarea, button { font:99% sans-serif; }
-
-/* normalize monospace sizing
- * en.wikipedia.org/wiki/MediaWiki_talk:Common.css/Archive_11#Teletype_style_fix_for_Chrome
- */
-pre, code, kbd, samp { font-family: monospace, sans-serif; }
-
-
-/*
- * minimal base styles
- */
-
-
-body, select, input, textarea {
-  /* #444 looks better than black: twitter.com/H_FJ/statuses/11800719859 */
-  color: #444;
-  /* set your base font here, to apply evenly */
-  /* font-family: Georgia, serif;  */
-}
-
-/* headers (h1,h2,etc) have no default font-size or margin,
-   you'll want to define those yourself. */
-h1,h2,h3,h4,h5,h6 { font-weight: bold; }
-
-/* always force a scrollbar in non-IE: */
-html { overflow-y: scroll; }
-
-
-/* accessible focus treatment: people.opera.com/patrickl/experiments/keyboard/test */
-a:hover, a:active { outline: none; }
-
-a, a:active, a:visited { color: #607890; }
-a:hover { color: #036; }
-
-
-ul, ol { margin-left: 2em; }
-ol { list-style-type: decimal; }
-
-/* remove margins for navigation lists */
-nav ul, nav li { margin: 0; }
-
-small { font-size: 85%; }
-strong, th { font-weight: bold; }
-
-td { vertical-align: top; }
-
-/* set sub, sup without affecting line-height: gist.github.com/413930*/
-sub, sup { font-size: 75%; line-height: 0; position: relative; }
-sup { top: -0.5em; }
-sub { bottom: -0.25em; }
-
-pre {
-  /* www.pathf.com/blogs/2008/05/formatting-quoted-code-in-blog-posts-css21-white-space-pre-wrap/ */
-  white-space: pre; white-space: pre-wrap; 
-  /* white-space: pre-line; */
-  word-wrap: break-word;
-  padding: 15px;
-}
-
-textarea { overflow: auto; } /* www.sitepoint.com/blogs/2010/08/20/ie-remove-textarea-scrollbars/ */
-
-.ie6 legend, .ie7 legend { margin-left: -7px; } /* thnx ivannikolic! */
-
-/* align checkboxes, radios, text inputs with their label by: Thierry Koblentz tjkdesign.com/ez-css/css/base.css  */
-input[type="radio"] { vertical-align: text-bottom; }
-input[type="checkbox"] { vertical-align: bottom; }
-.ie7 input[type="checkbox"] { vertical-align: baseline; }
-.ie6 input { vertical-align: text-bottom; }
-
-/* hand cursor on clickable input elements */
-label, input[type="button"], input[type="submit"], input[type="image"], button { cursor: pointer; }
-
-/* webkit browsers add a 2px margin outside the chrome of form elements */
-button, input, select, textarea { margin: 0; }
-
-/* colors for form validity */
-input:valid, textarea:valid   {  }
-input:invalid, textarea:invalid {
-      border-radius: 1px;
-    -moz-box-shadow: 0px 0px 5px red;
- -webkit-box-shadow: 0px 0px 5px red;
-         box-shadow: 0px 0px 5px red;
-}
-.no-boxshadow input:invalid,
-.no-boxshadow textarea:invalid { background-color: #f0dddd; }
-
-::-moz-selection { background: #F14A29; color:#fff; text-shadow: none; }
-::selection { background:#F14A29; color:#fff; text-shadow: none; }
-
-/*  j.mp/webkit-tap-highlight-color */
-a:link { -webkit-tap-highlight-color: #FF5E99; }
-
-/* make buttons play nice in IE:
-   www.viget.com/inspire/styling-the-button-element-in-internet-explorer/ */
-button {  width: auto; overflow: visible; }
-
-/* bicubic resizing for non-native sized IMG:
-   code.flickr.com/blog/2008/11/12/on-ui-quality-the-little-things-client-side-image-resizing/ */
-.ie7 img { -ms-interpolation-mode: bicubic; }
-
-
-
-/*
- * Non-semantic helper classes
- */
-
-/* for image replacement */
-.ir { display: block; text-indent: -999em; overflow: hidden; background-repeat: no-repeat; text-align: left; direction: ltr; }
-
-/* Hide for both screenreaders and browsers
-   css-discuss.incutio.com/wiki/Screenreader_Visibility */
-.hidden { display: none; }
-
-/* Hide only visually, but have it available for screenreaders: by Jon Neal
-  www.webaim.org/techniques/css/invisiblecontent/  &  j.mp/visuallyhidden */
-.visuallyhidden {
-    border: 0 !important;
-    clip: rect(0 0 0 0);
-    height: 1px !important;
-    margin: -1px !important;
-    overflow: hidden !important;
-    padding: 0 !important;
-    position: absolute !important;
-    width: 1px !important;
-}
-
-/* Hide visually and from screenreaders, but maintain layout */
-.invisible { visibility: hidden; }
-
-/* >> The Magnificent CLEARFIX: Updated to prevent margin-collapsing on child elements << j.mp/bestclearfix */
-.clearfix:before, .clearfix:after { content: "\0020"; display: block; height: 0; visibility: hidden; }
-.clearfix:after { clear: both; }
-/* fix clearfix: blueprintcss.lighthouseapp.com/projects/15318/tickets/5-extra-margin-padding-bottom-of-page */
-.clearfix { zoom: 1; }
-
-
-
-
-
-
  /* Primary Styles
     Author: Paul Bagwell
  */
 
-body {
-    color: #333; 
-    background: #eee;
-    font-size: 0.85em;
-}
-a:link, a:visited { text-decoration: none; }
-h1 {font-size: 2.5em; line-height: 1.5;}
-h2 {font-size: 2em; line-height: 1.4;}
-h3 {font-size: 1.6em; line-height: 1.3;}
-h4 {font-size: 1.3em; line-height: 1.2;}
-h5 {font-size: 1.1em; line-height: 1.1;}
-em {font-style: italic;}
-
-.menu {float: right;}
-.left {float: left;}
-.right {float: right;}
-.dashed { border: 1px dashed; }
+.number a {color: inherit; text-decoration: none;} 
+.dashed {border: 1px dashed;}
 .stats {border: 1px dashed; padding: 0 5px;}
-.overflow-hidden {overflow: hidden !important;}
 #container + iframe {display: none;} /* Recaptcha bug */
-.rss {
-    background-position: -20px -50px;
+.post .tripcode {color: #228854;}
+.post .tripcode:not(:empty):before {content: "!";}
+.post .tripcode.staff {color: #800080;}
+.is_closed, .is_pinned, .bookmark, .hide, .rss, .useragent, .useragent img {
+    width: 16px; 
+    height: 16px; 
 }
+.is_closed, .is_pinned, .bookmark, .hide, .rss {
+    background-image: url('../images/sprites.png');
+    background-repeat: no-repeat;
+}
+
+.is_closed {background-position: -16px 0;}
+.is_pinned {background-position: -48px 0;}
+.bookmark {background-position: 0 0;}
+.add {opacity: 0.3;filter:alpha(opacity=30);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";}
+.rss {background-position: -20px -50px;}
+.hide {background-position: -32px 0;}
+.useragent {vertical-align: bottom;}
+
+.underlined {border-bottom: 1px dashed;}
+.spoiler {background: #bbb; color: #bbb;}
+.spoiler:hover {color: #333;}
 
 
 /* yeah 
@@ -254,53 +346,8 @@ em {font-style: italic;}
 #container > b.border-d { -webkit-transform: scale(1.5) rotate(45deg); -webkit-transform-origin: 80% 0%; -moz-transform: scale(1.5) rotate(45deg); -moz-transform-origin: 80% 0%; left: auto; right: 2em; top: 0; }
 */
 
-/* Top */
-#container-wrap > header {border-bottom: 1px solid #aaa; margin-top: 7px; margin-bottom: 5px; padding-bottom: 5px;}
-.logo {display: table; margin: 10px auto 0 auto;}
-.section-banner {width: 300px; height: 100px; margin: 0 auto; display: none;}
-.search {position: absolute; right: 10px; text-align: right;}
-.search input[type="text"] {width: 5em;}
-.search input[type="search"], .search input[type="submit"] {vertical-align: top;}
-.search input[type="checkbox"] {vertical-align: middle;}
-
-/* Navigation panel */
-nav {font-size: 0.95em;}
-nav ul {display: inline;}
-nav li {float: left;}
-
-.group, nav li {margin-left: 0;}
-.group li {display: inline; margin-left: -0.6em;}
-.group li:first-child {margin-left: 0;}
-nav .group li:first-child {margin-left: 5px;}
-nav .group:first-child li:first-child {margin-left: 0;}
-.group li:first-child:before {content: " ["; padding-left: 2px;}
-.group li:first-child a, .group li:first-child span { padding: 0; }
-.group li:after {content: " /";}
-.group li:last-child:after {content: "]"; padding-right: 5px;}
-.group a, .group span {padding: 0 0 0 1em; white-space: nowrap; line-height: 1.5em; font-weight: bold;}
-.group a {text-decoration: underline;}
-
-#container-wrap {float: left; width: 100%;}
-#container-wrap > * {margin-left: 250px; margin-right: 10px;}
-#container-wrap.no-sidebar > * {margin-left: 10px;}
-#sidebar {width: 260px; float: left; font-size: 1.1em; margin-left: -100%;}
-#sidebar aside {position: fixed; overflow: hidden; width: 220px; padding-right: 5px; margin: 0 1em;}
-#sidebar h2 {margin-bottom: 10px;}
-#sidebar .hide {margin: -20px 0px 0 0; width: auto; background: none; font-size: 0.9em;}
-#sidebar h4 {font-size: 1em; margin-bottom: 1px;}
-#sidebar li {list-style: none;}
-#sidebar ul {margin-left: 1em; padding-left: 0.5em;}
-
-/* Main content */
-#main {font-size: 1.1em;margin-bottom: 20px;}
-
 /* New post */
-#main > .new-post fieldset {margin: 0px auto 10px auto;}
-#main > .info li {text-align: center; list-style: none;}
-section fieldset dl:last-child > dd {margin-bottom: 10px;}
-fieldset {width: 620px;}
-fieldset dl {font-size: 1.1em;}
-fieldset dt {width: 150px; font-weight: bold;}
+/*
 .new-post .bbcode {display: none;}
 .new-post .message-d dt {margin-top: 80px;}
 .new-post textarea{width:34em;height:10em;}
@@ -314,106 +361,11 @@ fieldset dt {width: 150px; font-weight: bold;}
 .new-post .captcha-img {vertical-align: bottom; margin:0; padding:0;}
 .new-style .username-d, .new-style .topic-d {float: left;}
 .new-style .email-d, .new-style .password-d {float: right;}
+
 label.placeholder {
     padding: 4px 4px 4px 4px;
     color: #999999;
 }
-
-.settings dt {width: auto; margin-bottom: 8px;}
-.settings input {vertical-align: top;}
-
-/* Threads and posts */
-.threads .bookmark, .threads .hide {display: none;}
-.withBookmarks .bookmark, .withHidden .hide {display: inline;}
-.thread {margin-bottom: 10px;}
-.thread, .faq {border-top: 1px solid; padding-top: 5px; margin-top: 5px;}
-.thread.hidden, .post.hidden {display: block;}
-.thread.hidden.hard, .post.hidden.hard {display: none;}
-.thread.hidden .post:not(:first-child), .thread.hidden div.skipped {display: none;}
-.skipped {color: #666;}
-.poll {margin-bottom: 5px; padding: 5px; background: #ddd; display: block; line-height: 1em;}
-.hbg-bar { padding-left: 5px; background-color: #369; color: #fff; font-weight: bold; height: 1em;}
-.hbg-title { text-align: center; font-weight: bold; }
-
-.post, .faq > li{background: #ddd; padding: 5px; margin-bottom: 5px;}
-.post.hidden header, .post.hidden .content {display: none;}
-.post-preview {position: absolute; z-index: 10;}
-.post:after {clear: both;}
-.post header {padding-bottom: 20px;}
-.post .answer {float: right;}
-.post .number:before {content: "№";}
-.post .number {font-weight: bold;}
-.post .number a, .post .number a:visited {color: inherit;}
-.post .number a:hover {color: #06f;}
-.post .poster a {text-decoration: underline;}
-.post .ip {float: right; color: #f00; font-weight: bold;}
-.post .tripcode {color: #228854;}
-.post .tripcode:not(:empty):before {content: "!";}
-.post .tripcode.staff {color: #800080;}
-.post .topic {font-weight: bold;}
-.post .content {max-height: 400px; overflow: auto;}
-.post .file-info {margin: -20px 0 5px 0; position: absolute;}
-.post .files {} 
-.post img.nsfw {opacity: 0.2; filter:alpha(opacity=20);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";}
-
-.post .message {display: block;}
-.post .message, .post .message * {vertical-align:top;}
-.post .message.poster ins {background: none; text-decoration: underline; font-weight: normal; color: inherit;}
-.post blockquote {color: #789922;}
-.post blockquote > p {display: inline;}
-.post .files {margin-right: 10px; float:left; max-width: 220px; max-height: 220px;}
-.post.resized .content {max-height: none; overflow: visible;}
-.post.resized .files {max-width: none; max-height: none;}
-.post span:empty {margin: 0;}
-.post .answer-map {margin-top: 5px; font-style: italic; font-size: 0.95em;}
-.post .answer-map .postlink {margin-left: 3px; font-size: 0.85em;}
-.deleted {background: #e44;}
-.info-wrapper {float: left;}
-.info-wrapper > * {float: left; margin: 0 5px 0 0;}
-.file-info a:link, .file-info a:hover {text-decoration: underline;}
-.file-info {color: #666; font-size: 0.85em;}
-
-.is_closed, .is_pinned, .bookmark, .hide, .rss, .useragent, .useragent img {
-    width: 16px; 
-    height: 16px; 
-}
-.is_closed, .is_pinned, .bookmark, .hide, .rss {
-    float: right;
-    background-image: url('../images/sprites.png');
-    background-repeat: no-repeat;
-}
-
-.is_closed {background-position: -16px 0;}
-.is_pinned {background-position: -48px 0;}
-.bookmark {background-position: 0 0;}
-.add {opacity: 0.3;filter:alpha(opacity=30);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";}
-.hide {background-position: -32px 0;}
-
-.underlined {border-bottom: 1px dashed;}
-.spoiler {background: #bbb; color: #bbb;}
-.spoiler:hover {color: #333;}
-
-.buttons {float: right; margin-left: 5px;}
-.buttons .fav:before {content: "F";}
-.buttons .hide:before {content: "X";}
-.bbcode {font-size: 1.4em; margin-top: 5px;}
-.bbcode a, .bbcode a:visited {
-    font-weight: bold; 
-    padding: 0 2px;
-}
-.bbcode > .b {font-weight: bold;}
-.bbcode > .i {font-style: italic;}
-.bbcode > .u {text-decoration: underline;}
-.bbcode > .s {text-decoration: line-through;}
-
-.deleteMode {margin: 5px 0;}
-.deleteMode > div {display: none;}
-.faq {list-style: none; margin-left: 0;}
-.faq li li {list-style: none;}
-
-footer {padding-bottom: 10px;}
-footer .copyright {text-align: center;}
-footer .copyright a {text-decoration: underline;}
 
 /* Notifications */
 .notification-container{width:280px;z-index:9999;}
@@ -445,6 +397,7 @@ pre {
     border: solid 1px #ccc;
     width: auto;
 }
+
 .codehilite .hll { background-color: #ffffcc }
 .codehilite .c { color: #008000 } /* Comment */
 .codehilite .err { border: 1px solid #FF0000 } /* Error */
@@ -478,6 +431,33 @@ pre {
 .codehilite .sr { color: #a31515 } /* Literal.String.Regex */
 .codehilite .s1 { color: #a31515 } /* Literal.String.Single */
 .codehilite .ss { color: #a31515 } /* Literal.String.Symbol */
+
+
+/* IE */
+.ie7 body {
+    background:url(about:blank);
+}
+
+.ie7 #sidebar {
+  position:absolute;
+  top:expression(eval(document.documentElement.scrollTop));
+}
+
+.ie7 .post .number {z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = "№" + this.innerHTML);}
+
+.ie7 ul.pagination, .ie7 .replylink {
+    z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = "[ " + this.innerHTML + " ]");
+}
+
+.ie7 ul.pagination li {
+    z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML += ' / ');
+}
+
+.ie7 ul.pagination li:last-child {
+    z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = '');
+}
+
+.ie7 .iewrap {clear:both;}
 
 /*
  * media queries for responsive design

@@ -4,8 +4,8 @@
 <!--[if IE 8 ]>    <html lang="en" id="photon" class="ie8"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--> <html lang="en" id="photon"> <!--<![endif]-->
 <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta http-equiv="content-type" content="text/html;charset=utf-8">
+    <!--<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">-->
     {% macro title %}
         {% block title %}{% endblock %}
     {% endmacro %}
@@ -14,39 +14,46 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{settings.STATIC_URL}}favicon.ico">
     <link rel="apple-touch-icon" href="{{settings.STATIC_URL}}icon.png">
-    <link rel="stylesheet" href="{{settings.STATIC_URL}}css/style.css?v=16">
+    <link rel="stylesheet" href="{{settings.STATIC_URL}}css/style.css?v=19">
+    <script>
+        document.createElement('header');
+        document.createElement('nav');
+        document.createElement('section');
+        document.createElement('article');
+        document.createElement('aside');
+        document.createElement('footer');
+    </script>
+    <!--
     <link rel="stylesheet" href="{{settings.STATIC_URL}}css/skins.css?v=16" class="ustyle">
-
+    -->
     <script src="{{settings.STATIC_URL}}js/preload.js?v=12"></script>
     <script src="{% url django.views.i18n.javascript_catalog %}"></script>
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-    <script>!window.jQuery && document.write(unescape('%3Cscript src="{{settings.STATIC_URL}}js/libs/jquery-1.5.0.min.js"%3E%3C/script%3E'))</script>
-    <script src="{{settings.STATIC_URL}}js/plugins.js?v=18"></script>
-    <script src="{{settings.STATIC_URL}}js/script.js?v=45"></script>
 </head>
 
 <body>
+    {% include "sidebar.html" %}
     <div id="container">
-        <div id="container-wrap">
-            <header class="clearfix">
-                {% include "navigation.html" %}
-                {% block search %}{% endblock %}
-                <div class="logo"><h1><a href=".">
-                    {{settings.SITE_TITLE}}&nbsp;&mdash;
-                    {% usemacro title %}</a></h1></div>
-                <div class="menu"></div>
-                <div class="section-banner"><a href="//2-ch.ru/aa/"><img src="{{settings.STATIC_URL}}images/aa.png" alt="/aa/" width="300" height="100"></a></div>
-            </header>
-            <div id="main" role="main">
-            {% block content %}{% endblock %}<!-- STATS: <div class="stats">Total: %(total_time).3fs. Python: %(py_time).3fs. Database: %(db_time).3fs. Queries: %(queries)d.</div> -->
+        <header id="site-header">
+            {% include "navigation.html" %}
+            {% block search %}{% endblock %}
+            <h1><a href=".">{{settings.SITE_TITLE}}&nbsp;&mdash; {% usemacro title %}</a></h1>
+        </header>
+        {% block newpost %}{% endblock %}
+        <section id="main" role="{% block role %}{% endblock %}">
+            {% block content %}{% endblock %}
+        </section>
+        <footer id="site-footer">
+            <!-- STATS: <div class="stats">Total: %(total_time).3fs. Python: %(py_time).3fs. Database: %(db_time).3fs. Queries: %(queries)d.</div> -->
+            {% include "navigation.html" %}
+            <div class="copyright">
+                Бегает на <a href="#">klipped</a> 0.9.7 &copy;
+                <a href="http://pbagwl.com">Paul Bagwell</a>
             </div>
-            <footer>
-                {% include "navigation.html" %}
-                <p class="copyright">{% trans "Runs on" %} <a href="http://klipped.pbagwl.com/">klipped</a> 0.9.6 &copy; <a href="http://pbagwl.com">Paul Bagwell</a></p>
-            </footer>
-        </div>
-        <div id="sidebar">{% include "sidebar.html" %}</div>
-    </div> <!-- end of #container -->
+        </footer>
+    </div>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+    <script src="{{settings.STATIC_URL}}js/plugins.js?v=18"></script>
+    <script src="{{settings.STATIC_URL}}js/script.js?v=46"></script>
     <!--
     <script src="{{settings.STATIC_URL}}js/profiling/yahoo-profiling.min.js"></script>   
     <script src="{{settings.STATIC_URL}}js/profiling/config.js"></script>

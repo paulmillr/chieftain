@@ -1,73 +1,73 @@
-{% load i18n %}<form novalidate method="post" enctype="multipart/form-data" class="new-post">
-    <fieldset>
-        <dl class="username-d">
-            <dt><label for="username">{{form.poster.label}}</label></dt>
-            <dd>
-                <input type="text" name="poster" id="username" size="16" maxlength="32">
-                <span class="empty">{% trans "Left this field empty" %}</span>
-            </dd>
-        </dl>
+{% load i18n %}<div class="newpost">
+    <form novalidate method="post" enctype="multipart/form-data">
+        <fieldset>
+            <dl class="username-d">
+                <dt><label for="username">{{form.poster.label}}</label></dt>
+                <dd>
+                    <input type="text" name="poster" id="username" size="16" maxlength="32">
+                    <span class="empty">{% trans "Left this field empty" %}</span>
+                </dd>
+            </dl>
 
-        <dl class="email-d">
-            <dt><label for="email">{{form.email.label}}</label></dt>
-            <dd><input type="email" name="email" id="email" size="16" maxlength="32"></dd>
-        </dl>
-        
-        <dl class="topic-d">
-            <dt><label for="topic">{{form.topic.label}}</label></dt>
-            <dd>
-                <input type="text" name="topic" id="topic" size="16" maxlength="48">
-                <input type="submit" value="{% trans 'Submit' %}">
-            </dd>
-        </dl>
-        
-        <dl class="message-d">
-            <dt><label for="message">{{form.message.label}}</label></dt>
-            <dd>
-                <div class="bbcode">
-                    <a href="#" class="b" data-tag="**" title="Жирный">Ж</a>
-                    <a href="#" class="i" data-tag="*" title="Курсив">К</a>
-                    <a href="#" class="s" data-tag="--" title="Зачеркнутый">З</a>
-                    <a href="#" class="u" data-tag="__" title="Подчеркнутый">П</a>
-                    <a href="#" class="spoiler" data-tag="%%" title="Спойлер">С</a>
-                    <a href="#" class="quote" data-tag=">" data-tagEnd="" title="Цитата">Ц</a>
-                    <a href="#" class="code" data-tag="    " data-tagEnd="" title="Код">Код</a>
-                </div>
-                <textarea name="message" id="message" class="message" rows="8" cols="40" required></textarea>
-                {% if thread %}<input name="thread" id="thread" value="{{thread.id}}" type="hidden">
-                {% else %}
-                <input name="section" id="section" value="{{section.id}}" type="hidden">{% endif %}
-            </dd>
-        </dl>
-        <dl class="file-d">
-            <dt><label for="file">{% trans "File" %}</label></dt>
-            <dd><input type="file" name="file" id="file"></dd>
-        </dl>
-        {% if not settings.DISABLE_CAPTCHA %}
-        <dl class="captcha-d">
-            <dt {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}>
-                <label for="recaptcha_response_field">{% trans "Captcha" %}</label>
-            </dt>
-            <dd>
-                
-                <div id="recaptcha_widget" style="display: none">
-                    <div id="recaptcha_image" onclick="Recaptcha.reload();" class="captcha-img" {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}></div>
-                    <p><input type="text" name="recaptcha_response_field" id="recaptcha_response_field" size="16" maxlength="32" class="captcha" {% if settings.DISABLE_CAPTCHA %}style="display: none"{% endif %}></p>
-                </div>
-                
-                {{form.captcha}}
-            </dd>
-        </dl>
-        {% endif %}
-        <dl class="password-d">
-            <dt><label for="password">{{form.password.label}}</label></dt>
-            <dd><input type="password" name="password" id="password" size="16" maxlength="32"></dd>
-        </dl>
-    </fieldset>
-</form>
-<div class="info">
-    <ul>
-        <li><a href="/bugs/">О багах писать сюда</a></li>
-        {% if section.description %}<li class="sectionDescription">{{section.description}}</li>{% endif %}
-    </ul>
+            <dl class="email-d">
+                <dt><label for="email">{{form.email.label}}</label></dt>
+                <dd><input type="email" name="email" id="email" size="16" maxlength="32"></dd>
+            </dl>
+
+            <dl class="topic-d">
+                <dt><label for="topic">{{form.topic.label}}</label></dt>
+                <dd>
+                    <input type="text" name="topic" id="topic" size="16" maxlength="48">
+                    <input type="submit" value="{% trans 'Submit' %}">
+                </dd>
+            </dl>
+
+            <dl class="message-d">
+                <dt><label for="message">{{form.message.label}}</label></dt>
+                <dd>
+                    <div class="bbcode">
+                        <a href="#" class="b" data-tag="**" title="Жирный">Ж</a>
+                        <a href="#" class="i" data-tag="*" title="Курсив">К</a>
+                        <a href="#" class="s" data-tag="--" title="Зачеркнутый">З</a>
+                        <a href="#" class="u" data-tag="__" title="Подчеркнутый">П</a>
+                        <a href="#" class="spoiler" data-tag="%%" title="Спойлер">С</a>
+                        <a href="#" class="quote" data-tag=">" data-tagEnd="" title="Цитата">Ц</a>
+                        <a href="#" class="code" data-tag="    " data-tagEnd="" title="Код">Код</a>
+                    </div>
+                    <textarea name="message" id="message" class="message" rows="8" cols="40" required></textarea>
+                    {% if thread %}<input name="thread" id="thread" value="{{thread.id}}" type="hidden">
+                    {% else %}
+                    <input name="section" id="section" value="{{section.id}}" type="hidden">{% endif %}
+                </dd>
+            </dl>
+            <dl class="file-d">
+                <dt><label for="file">{% trans "File" %}</label></dt>
+                <dd><input type="file" name="file" id="file"></dd>
+            </dl>
+            {% if not settings.DISABLE_CAPTCHA %}
+            <dl class="captcha-d">
+                <dt>
+                    <label for="recaptcha_response_field">{% trans "Captcha" %}</label>
+                </dt>
+                <dd>
+                    <div id="recaptcha_widget">
+                        <div id="recaptcha_image" onclick="Recaptcha.reload();" class="captcha-img"></div>
+                        <input type="text" name="recaptcha_response_field" id="recaptcha_response_field" size="16" maxlength="32" class="captcha">
+                    </div>
+                    {{form.captcha}}
+                </dd>
+            </dl>
+            {% endif %}
+            <dl class="password-d">
+                <dt><label for="password">{{form.password.label}}</label></dt>
+                <dd><input type="password" name="password" id="password" size="16" maxlength="32"></dd>
+            </dl>
+        </fieldset>
+    </form>
+    <div class="info">
+        <ul>
+            <li><a href="/bugs/">О багах писать сюда</a></li>
+            {% if section.description %}<li class="sectionDescription">{{section.description}}</li>{% endif %}
+        </ul>
+    </div>
 </div>

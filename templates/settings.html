@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% block title %}{% trans "Settings" %}{% endblock %}
-
+{% block role %}settings{% endblock %}
 {% block content %}
 <form>
     <fieldset class="settings">
@@ -117,16 +117,15 @@
                 <label for="dontLogVisits">{% trans "Don't log visited threads" %} (<a href="?clear" class="clearVisitedThreads">{% trans "clear" %}</a>)</label>
             </dt>
         </dl>
+        <div class="visitedThreads hidden">
+            <h4>{% trans "Visited threads" %}</h4>
+            <h5>{% trans "Sorted by the" %}
+                <select name="sortVisitedThreads" id="sortVisitedThreads" class="sortVisitedThreads" size="1">
+                    <option value="first_visit">{% trans "time of first visit" %}</option>
+                    <option value="-visits">{% trans "visits count" %}</option></select>
+            </h5>
+            <ul></ul>
+        </div>
     </fieldset>
 </form>
-
-<div class="visitedThreads hidden">
-    <h4>{% trans "Visited threads" %}</h4>
-    <h5>{% trans "Sorted by the" %}
-        <select name="sortVisitedThreads" id="sortVisitedThreads" class="sortVisitedThreads" size="1">
-            <option value="first_visit">{% trans "time of first visit" %}</option>
-            <option value="-visits">{% trans "visits count" %}</option></select>
-    </h5>
-    <ul></ul>
-</div>
 {% endblock %}

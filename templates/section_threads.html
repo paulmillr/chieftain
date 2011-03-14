@@ -1,10 +1,10 @@
 {% extends "section_base.html" %}
 {% load i18n %}
 {% block title %}{{section.name}}{% endblock %}
+{% block role %}threads{% endblock %}
 
 {% block section %}
-    {% include "form.html" %}
-    <section class="threads section">
+    <section class="threads">
         {% autoescape off %}
         {% for thread in threads %}
         <section class="thread" id="thread{{thread.id}}">

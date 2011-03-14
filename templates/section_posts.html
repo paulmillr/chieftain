@@ -2,23 +2,21 @@
 {% load haship %}
 {% load i18n %}
 {% block title %}{{section.name}}{% endblock %}
+{% block role %}posts{% endblock %}
 
 {% block section %}
-    {% if form %}
-    {% include "form.html" %}
-    {% endif %}
     <section class="threads section">
         {% autoescape off %}
         {% for post in posts.object_list %}
         <section class="thread">
             {{post.html}}
-            {% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}
+            {% if mod %}<span class="ip" id="ip{{post.id}}">{{post.ip|haship}}</span>{% endif %}
         </section>
         {% endfor %}
         {% endautoescape %}
     </section>
-    <div class="paginator">
-        <ul class="group">
+    <section class="actions">
+        <ul class="pagination">
         {% for p in posts.paginator.page_range %}
             {% if p != posts.number %}
                 <li><a href="posts{{p}}">{{p}}</a></li>
@@ -27,10 +25,10 @@
             {% endif %}
         {% endfor %}
         </ul>
-        <ul class="group">
+        <ul class="pagination">
             <li><a href=".">{% trans "Everything" %}</a></li>
             <li><a href="threads">{% trans "Threads" %}</a></li>
             <li><span>{% trans "Posts" %}</span></li>
         </ul>
-    </div>
+    </section>
 {% endblock %}

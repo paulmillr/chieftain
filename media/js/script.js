@@ -5,11 +5,6 @@
  * http://www.gnu.org/licenses/gpl.html
  */
 
-// workaround
-if (typeof Recaptcha !== 'undefined') {
-    Recaptcha.focus_response_field = function() {};
-}
-
 var api = {
     url: '/api',  // URL to klipped API
     defaultType: 'text/plain'  // Default MIME type of queries to API
@@ -18,8 +13,8 @@ var api = {
     answersMap = {},
     postButtons = {},
     votedPolls = new BoardStorage('polls'),
-    // pre-localize messages because of django bug
-    i18n = (function() {
+    workarounds = (function() {
+        // pre-localize messages because of django bug
         gettext('Reason');
         gettext('Reply');
         gettext('Message is too long.');
@@ -31,46 +26,52 @@ var api = {
         gettext('hide');
         gettext('Replies');
         gettext('New message in thread #');
+
+        // Recaptcha focus bug
+        if (typeof Recaptcha !== 'undefined') {
+            Recaptcha.focus_response_field = function() {};
+        }
+
+        if (!window.console) {
+            window.console = {log: function() {}};
+        }
     })(),
     // page detector
     curPage = (function() {
-    var loc = window.location.href.split('/').slice('3'),
-        re = /(\d+)(?:.+)?/,
-        data = {cache: {}};
+        var data = {
+            type: $('#main').attr('role'),
+            cache: {}
+        };
 
-    // main, settings or faq
-    if (loc[1] == null) {
-        l = loc[0];
-        pages = ['settings', 'faq'];
-        for (var i=0; i < pages.length; i++) {
-            var c = pages[i]
-            if (l.substr(0, c.length) === c) {
-                data.type = c;
-            }
+        switch (data.type) {
+            case 'thread':
+            case 'sectionPage':
+            case 'sectionPosts':
+            case 'sectionThreads':
+                data.section = window.location.href.split('/')[3];
+            case 'thread': 
+                data.type = 'thread';
+                data.cache.thread = $('.thread');
+                data.cache.first = $('.post:first');
+                data.thread = getThreadId(data.cache.thread);
+                data.first = getPostPid(data.cache.first);
+                break;
+            default:
+                break;
         }
-        data.type = data.type || 'main';
-    } else { // section or thread
-        data.section = loc[0];
-        l = loc[1];
-        if (l.match(/^\d+/)) {
-            data.type = 'thread';
-            data.cache.thread = $('.thread');
-            data.thread = getThreadId(data.cache.thread);
-            data.first = l.match(re)[1];
-            data.cache.first = $('#post' + data.first);
-        } else {
-            if (l.match('posts')) {
-                data.type = 'posts';
-            } else if (l.match('threads')) {
-                data.type = 'threads'
-            } else {
-                data.type = 'section';
-            }
-        }
-    }
 
-    return data;
+        return data;
 })();
+
+if(!Array.indexOf) {
+	Array.prototype.indexOf = function(obj) {
+		for(var i=0; i < this.length; i++) {
+			if(this[i] == obj) {
+				return i;
+			}
+		}
+	}
+}
 
 function isjQuery(object) {
     return object instanceof jQuery;
@@ -145,7 +146,7 @@ function getPostPid(post) {
 }
 
 function getPostLinkPid(postlink) {
-    return postlink.text.match(/>>(\/\w+\/)?(\d+)/)[2];
+    return postlink.text().match(/>>(\/\w+\/)?(\d+)/)[2];
 }
 
 /**
@@ -234,7 +235,7 @@ function PostContainer(span, post) {
     this.text_data = {
         'section': curPage.section,
         'first': getPostPid(this.first),
-        'pid': getPostPid(this.post),
+        'pid': getPostPid(this.post)
     };
 }
 
@@ -313,7 +314,7 @@ $.extend(ColorContainer.prototype, {
         }
 
         return [Math.floor(h * 360), Math.floor(s * 100), Math.floor(l * 100)];
-    },
+    }
 });
 
 function randomString(length) {
@@ -340,7 +341,7 @@ function getCurrentTimestamp() {
 
 function checkForSidebarScroll() {
     var bodyHeight = $(window).height(),
-        side = $('#sidebar aside'),
+        side = $('#sidebar'),
         sideHeight = side.height();
 
     if (sideHeight > bodyHeight) {
@@ -368,7 +369,7 @@ function manipulator(arr) {
         },
         before : function(from, to) {
             $(from).remove().insertBefore(to)
-        },
+        }
     };
 
     for (var i in arr) {
@@ -543,11 +544,6 @@ function init() {
         textArea.wrap(start, end, code);
     });
 
-    $('.thread').delegate('.postlink', 'clicka', function(event) {
-        event.preventDefault();
-        window.location.hash = '#' + $(this).attr('href');
-    });
-
     $('.threads').delegate('.post-icon', 'click', function(event) {
         event.preventDefault();
         var cont = new PostContainer(this),
@@ -675,7 +671,7 @@ function init() {
         $.ajax({
             'url': url,
             'dataType': 'json',
-            'type': 'DELETE',
+            'type': 'DELETE'
         })
         .error(function(response) {
             $.notification('error', $.parseJSON(response.responseText)['detail']);
@@ -713,7 +709,7 @@ function init() {
         });
     });
 
-    $('#main > .thread').delegate('.edit', 'click', function(event) {
+    $('.thread').delegate('.edit', 'click', function(event) {
         event.preventDefault();
         var c = new Canvas;
     });
@@ -722,7 +718,7 @@ function init() {
         if (curPage.type != 'section') {
             if (!$.settings('oldInsert')) {
                 var n = $('#post' + $(this).text());
-                $('.new-post').insertAfter(n);
+                $('.newpost form').insertAfter(n);
             }
             textArea.insert('>>' + e.target.innerHTML + ' ');
             return false
@@ -784,14 +780,14 @@ function initSettings() {
 
                 var styleInfo = {
                     after : [
-                        ['.new-post input[type="submit"]', '.captcha'],
+                        ['.newpost input[type="submit"]', '.file-d'],
                         ['.password-d', '.topic-d'],
-                        ['.file-d', '.password-d'],
-                    ],
+                        ['.file-d', '.message-d'],
+                    ]
                 };
 
                 labelsToPlaceholders(['username', 'email', 'topic', 'message', 'captcha']);
-                $('.new-post').addClass('new-style')
+                $('.newpost').addClass('new-style')
                 $('.empty').remove();
                 manipulator(styleInfo);
             },
@@ -799,7 +795,7 @@ function initSettings() {
             bottomForm: function(x) {
                 x = $.settings(x);
                 if (x && curPage.type === 'thread') {
-                    $('.new-post').insertAfter('.deleteMode');
+                    $('.newpost').insertAfter('.deleteMode');
                 }
             },
 
@@ -810,7 +806,7 @@ function initSettings() {
             miniForm: function(x) {
                 $('.username-d, .topic-d, .email-d, .password-d').toggle();
                 $('.new-style2')
-            },
+            }
         };
 
     if (!$.dNotification.checkSupport() || $.dNotification.check()) {
@@ -934,39 +930,39 @@ function initStyle() {
         }
         e.preventDefault();
         switch(e.which) {
-            case 1081: key='q'; break;
-            case 1094: key='w'; break;
-            case 1091: key='e'; break;
-            case 1082: key='r'; break;
-            case 1077: key='t'; break;
-            case 1085: key='y'; break;
-            case 1075: key='u'; break;
-            case 1096: key='i'; break;
-            case 1097: key='o'; break;
-            case 1079: key='p'; break;
-            case 1092: key='a'; break;
-            case 1099: key='s'; break;
-            case 1074: key='d'; break;
-            case 1072: key='f'; break;
-            case 1087: key='g'; break;
-            case 1088: key='h'; break;
-            case 1086: key='j'; break;
-            case 1083: key='k'; break;
-            case 1076: key='l'; break;
-            case 1103: key='z'; break;
-            case 1095: key='x'; break;
-            case 1089: key='c'; break;
-            case 1084: key='v'; break;
-            case 1080: key='b'; break;
-            case 1090: key='n'; break;
-            case 1100: key='m'; break;
+            case 1081: key = 'q'; break;
+            case 1094: key = 'w'; break;
+            case 1091: key = 'e'; break;
+            case 1082: key = 'r'; break;
+            case 1077: key = 't'; break;
+            case 1085: key = 'y'; break;
+            case 1075: key = 'u'; break;
+            case 1096: key = 'i'; break;
+            case 1097: key = 'o'; break;
+            case 1079: key = 'p'; break;
+            case 1092: key = 'a'; break;
+            case 1099: key = 's'; break;
+            case 1074: key = 'd'; break;
+            case 1072: key = 'f'; break;
+            case 1087: key = 'g'; break;
+            case 1088: key = 'h'; break;
+            case 1086: key = 'j'; break;
+            case 1083: key = 'k'; break;
+            case 1076: key = 'l'; break;
+            case 1103: key = 'z'; break;
+            case 1095: key = 'x'; break;
+            case 1089: key = 'c'; break;
+            case 1084: key = 'v'; break;
+            case 1080: key = 'b'; break;
+            case 1090: key = 'n'; break;
+            case 1100: key = 'm'; break;
             default: return true;
         }
         e.target.value = e.target.value + key;
     });
 
     // images resize
-    $('.threads').delegate('.post .files a', 'click', function(event) {
+    $('.threads').delegate('.post .file', 'click', function(event) {
         event.preventDefault();
         var t = $(this),
             children = t.children(),
@@ -1007,10 +1003,10 @@ function initStyle() {
     });
 
     // strip long posts at section page
-    $('.section .post .content').each(function() {
+    $('.post .message').each(function() {
         var t = $(this), parent, span, a;
         if (t.hasScrollBar()) {
-            t.addClass('overflow-hidden');
+            t.css('overflow', 'hidden');
             span = $('<span/>').addClass('skipped')
                 .text(gettext('Message is too long.'))
                 .appendTo(t.parent());
@@ -1019,7 +1015,7 @@ function initStyle() {
             .text(gettext('Full text'))
             .click(function(event) {
                 event.preventDefault();
-                t.removeClass('overflow-hidden');
+                t.css('overflow', 'auto');
                 $(this).parent().remove();
             })
             .appendTo(span);
@@ -1068,12 +1064,16 @@ function initPosts(selector) {
         map = {},
         cache = {};
 
+    //if ($.browser.msie && $.browser.version === '7.0') {
+    //    return true;
+    //}
+
     for (var i=0; i < posts.length; i++) {
         var p = posts[i],
             post = $(p),
             id = getPostId(post),
             pid = getPostPid(post),
-            links = post.find('.postlink');
+            links = post.find('.postlink').map(function() {return $(this);});
 
         // Initialize answers map.
         for (var j=0; j < links.length; j++) {
@@ -1097,6 +1097,7 @@ function initPosts(selector) {
         }
 
         // Initialize post buttons.
+        /*
         for (var className in buttons) {
             var button = buttons[className],
                 span = post.find('.' + className);
@@ -1109,6 +1110,7 @@ function initPosts(selector) {
                 button.onInit(new PostContainer(span, post));
             }
         }
+        */
     }
 
     // Build or rebuild page answers map.
@@ -1128,12 +1130,12 @@ function initPosts(selector) {
             div.html(div.html() + ',' + links.join(','));
         }
 
-        $('#post' + i + ' .post-wrapper').append(div);
+        $('#post' + i).append(div);
     }
 }
 
 function initVisited() {
-    if ($.settings('dontLogVisits')) {
+    if (!window.localStorage || $.settings('dontLogVisits')) {
         return true;
     }
 
@@ -1145,7 +1147,7 @@ function initVisited() {
         visitedList.slideToggle();
     });
 
-    if (curPage.type == 'thread') {
+    if (curPage.type === 'thread') {
         thread = curPage.thread;
         if (!(thread in storage.list())) {
             storage.set(thread, {
@@ -1195,8 +1197,8 @@ function initVisited() {
 }
 
 function initHotkeys() {
-    $('.new-post input, .new-post textarea').keydown('shift+return', function(event) {
-        $('.new-post').submit();
+    $('.newpost input, .newpost textarea').keydown('shift+return', function(event) {
+        $('.newpost').submit();
         return false;
     });
 }
@@ -1219,7 +1221,7 @@ function initAJAX() {
             initPosts(post);
         }
 
-        var newpost = $('.new-post');
+        var newpost = $('.newpost');
         if (newpost.parent().attr('id') !== 'main') {
             newpost.insertBefore('.threads');
         }
@@ -1244,16 +1246,21 @@ function initAJAX() {
             }
         });
     }
-    $('.new-post').ajaxForm({ 
-        target: 'body',
+    $('.newpost form').ajaxForm({
+        //target: 'body',
         success: function(response) {
+            //alert(response);
+            if (typeof response === 'string') {
+                response = $.parseJSON(response);
+            }
+
             return !response['field-errors'] && !response['detail'] ? 
                 successCallback(response) :
                 defaultErrorCallback(response);
         },
         error: defaultErrorCallback,
         url: window.api.url + '/post/?html=1&_accept=text/plain',
-        dataType: 'json',
+        dataType: 'json'
     });
 }
 
@@ -1300,21 +1307,28 @@ function initPubSub() {
                     text;
 
                 pubsub.cursor = posts[posts.length - 1].id;
-                //console.log(posts.length, 'new msgs', pubsub.cursor);
-
+                //console.log(posts.length, 'new msgs');
                 for (var i=0; i < posts.length; i++) {
-                    var post = $(posts[i]).hide()
+                    var post = $(posts[i]).filter(function() {
+                            // remove text nodes
+                            var t = document.createTextNode('').__proto__;
+                            //console.log('t', this.__proto__ != t)
+                            return this.__proto__ != t;
+                        })
+                        .hide()
                         .appendTo('.thread')
-                        .fadeIn(500);
+                        .fadeIn(500, function() {
+                        $(this).attr('style', '');
+                    });
+
                     post.find('.tripcode:contains("!")').addClass('staff');
                     initPosts(post);
                 }
-                
                 text = post.find('.message').text();
                 showNewPostNotification(text, curPage.section, curPage.first);
                 window.setTimeout(pubsub.poll, 0);
             });
-        },
+        }
     }
 
     pubsub.poll();

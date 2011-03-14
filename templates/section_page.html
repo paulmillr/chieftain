@@ -1,30 +1,47 @@
 {% extends "section_base.html" %}
 {% load i18n %}
 {% block title %}{{section.name}}{% endblock %}
+{% block role %}page{% endblock %}
 
 {% block section %}
-    {% include "form.html" %}
-    <section class="threads section">
+    <section class="threads">
         {% autoescape off %}
         {% for thread in threads.object_list %}
             {{thread.html}}
         {% endfor %}
         {% endautoescape %}
     </section>
-    <div class="paginator">
-        <ul class="group">
-        {% for p in threads.paginator.page_range %}
-            {% if p != threads.number %}
-                <li><a href="page{{p}}">{{p}}</a></li>
-            {% else %}
-                <li><span>{{p}}</span></li>
-            {% endif %}
-        {% endfor %}
+    <section class="actions">
+        <ul class="pagination">
+            {% for p in threads.paginator.page_range %}
+                {% if p != threads.number %}
+                    <li><a href="page{{p}}">{{p}}</a></li>
+                {% else %}
+                    <li><span>{{p}}</span></li>
+                {% endif %}
+            {% endfor %}
         </ul>
-        <ul class="group">
+        <ul class="pagination changeviews">
             <li><span>{% trans "Everything" %}</span></li>
             <li><a href="threads">{% trans "Threads" %}</a></li>
             <li><a href="posts">{% trans "Posts" %}</a></li>
         </ul>
-    </div>
+        <div class="remove">
+            <form method="POST" action="#">
+                <input type="submit" value="Удалить сообщения">
+            </form>
+            <div class="hidden">
+                <p><input type="checkbox" name="only_files" id="only_files">
+                <label for="only_files">Только файлы</label></p>
+
+                <div class="admin">
+                    <p><input type="checkbox" name="delete_all" id="delete_all">
+                    <label for="delete_all">Удалить все сообщения с айпи</label></p>
+
+                    <p><input type="checkbox" name="ban_ip" id="ban_ip">
+                    <label for="ban_ip">Забанить айпи</label></p>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
