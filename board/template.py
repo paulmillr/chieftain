@@ -20,6 +20,7 @@ __all__ = ['render_to_file', 'handle_file_cache', 'rebuild_cache']
 
 
 def render_to_file(template, filename, request, context):
+    """Renders template to filename."""
     with codecs.open(filename, 'w', 'utf-8') as f:
         f.write(render_to_string(template, context, RequestContext(request)))
 

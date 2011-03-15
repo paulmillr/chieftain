@@ -37,7 +37,6 @@ SECTION_TYPES = (
     (1, _('Default')),
 #    (2, _('Premodded')),
     (3, _('News')),
-# TODO
     (4, _('International')),
     (5, _('Software')),
 #    (5, _('Private')),
@@ -529,15 +528,21 @@ class Section(models.Model):
             '-is_pinned', '-bump', '-id')
 
     def op_posts(self):
+        """List of first posts in section."""
         return Post.objects.filter(is_op_post=True,
             thread__section=self.id).order_by('-date', '-pid')
 
     def posts(self):
+        """List of posts in section."""
         return Post.objects.filter(thread__section=self.id).order_by(
             '-date', '-pid')
 
     def posts_html(self):
         return self.posts().values('html')
+
+    def files(self):
+        """List of files in section."""
+        return File.objects.filter(post__thread__section=self.id)
 
     def allowed_filetypes(self):
         """List of allowed MIME types of section."""

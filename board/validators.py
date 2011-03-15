@@ -107,11 +107,9 @@ def post(request, no_captcha=True):
         raise NotAuthenticatedError(_('Authentication required to create '
             'threads in this section'))
     if post.email.lower() != 'sage':
-        if new_thread:
+        if new_thread or thread.posts().count() < thread.section.bumplimit:
             thread.bump = post.date
-        elif thread.posts().count() < thread.section.bumplimit:
-            thread.bump = post.date
-    if '!' in post.poster:
+    if '!' in post.poster:  # make user signature
         if ('!OP' in post.poster and not new_thread and
             post.password == thread.op_post.password):
             post.poster = ''
@@ -131,7 +129,7 @@ def post(request, no_captcha=True):
 
     if not post.poster or thread.section.anonymity:
         post.poster = thread.section.default_name
-    if post.email == 'mvtn'.encode('rot13'):
+    if post.email == 'mvtn'.encode('rot13'):  # easter egg o/
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10
         post.message = (s + u' ') * 50
