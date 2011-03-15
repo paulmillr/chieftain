@@ -85,7 +85,6 @@ def do_macro(parser, token):
     except IndexError:
         raise template.TemplateSyntaxError('"{0}" tag requires at least '
             'one argument (macro name)'.format(token.contents.split()[0]))
-    # TODO: check that 'args' are all simple strings ([a-zA-Z0-9_]+)
     r_valid_arg_name = re.compile(r'^[a-zA-Z0-9_]+$')
     for arg in args:
         if not r_valid_arg_name.match(arg):

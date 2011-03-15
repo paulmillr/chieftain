@@ -25,5 +25,8 @@ else:
 
 
 class JSONTextEmitter(JSONEmitter):
-    """Emitter which serializes to JSON, but has media_type of plain text."""
+    """Emitter which serializes to JSON, but has media_type of plain text.
+    
+       Used because Firefox and Opera don't support application/json.
+    """
     media_type = 'text/plain'
