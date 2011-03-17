@@ -34,10 +34,6 @@ def faq(request):
     return rtr('faq.html', request)
 
 
-def api(request):
-    return rtr('api.html', request)
-
-
 def search(request, section_slug, page):
     section = get_object_or_404(Section, slug=section_slug)
     is_op_post = request.GET.get('is_op_post') or False

@@ -738,106 +738,32 @@ function init() {
     }
 }
 
+function updateSetting(key, value, callback) {
+    callback = callback || function() {};
+    console.log(window.api.url + '/setting/' + key)
+    $.post(window.api.url + '/setting/' + key, {'data': value});
+    /*.success(function(response) {
+        callback(response['settings'][key])
+    });*/
+}
+
 function initSettings() {
     // those things depend on cookie settings
-    var s = parseQs(), 
-        settings = $('.settings').find('select, input[type="checkbox"]'),
+    var body = $('body'),
+        qs = parseQs(),
+        settings = $('.settings').find('input[type="checkbox"], select'),
+        style = $('html').attr('id'),
         dn = $('#enableDesktopNotifications').click(function() {
             $.dNotification.request();
-        }),
-        changes = { // description of all functions on settings pages
-            ustyle: function(x) {
-                if (x !== 'ustyle') {
-                    $('html').attr('id',  x);
-                }
-            },
-
-            toggleNsfw: function(x) {
-                if (x) {
-                    $('.post img').addClass('nsfw');
-                } else {
-                    $('.post img').removeClass('nsfw');
-                }
-            },
-
-            hideSidebar: function(x) {
-                $('#container-wrap').toggleClass('no-sidebar');
-                $('#sidebar').toggle(0, null);
-            },
-
-            hideNav: function(x) {
-                $('nav').toggle();
-            },
-
-            hideSectBanner: function(x) {
-                $('.section-banner').toggle();
-            },
-
-            newForm: function(x) {
-                if (!x) {
-                    return false;
-                }
-
-                var styleInfo = {
-                    after : [
-                        ['.newpost input[type="submit"]', '.file-d'],
-                        ['.password-d', '.topic-d'],
-                        ['.file-d', '.message-d'],
-                    ]
-                };
-
-                labelsToPlaceholders(['username', 'email', 'topic', 'message', 'captcha']);
-                $('.newpost').addClass('new-style')
-                $('.empty').remove();
-                manipulator(styleInfo);
-            },
-
-            bottomForm: function(x) {
-                x = $.settings(x);
-                if (x && curPage.type === 'thread') {
-                    $('.newpost').insertAfter('.deleteMode');
-                }
-            },
-
-            hideBBCodes: function(x) {
-                $('.bbcode').hide();
-            },
-
-            miniForm: function(x) {
-                $('.username-d, .topic-d, .email-d, .password-d').toggle();
-                $('.new-style2')
-            }
-        };
+        });
 
     if (!$.dNotification.checkSupport() || $.dNotification.check()) {
         dn.closest('dl').hide();
     }
 
-    if ('forced' in s) {
-        delete s['forced']
-        for (var x in s) {
-            $.settings(x, s[x]);
-        }
-    }
-
-
-    settings.each(function(x) {
-        var s = $.settings(this.id),
-            t = parseQs(this.id);
-        if (!!t && 'forced' in t) {
-            $.settings(this.id, t);
-            s = t;
-        }
-        if (s !== null) {
-            if (s === 'false') {
-                s = false;
-            }
-
-            if (this.checked == null) {
-                this.value = s;
-            } else {
-                this.checked = s;
-            }
+    settings.each(function() {
+        if (body.hasClass(this.id)) {
+            this.checked = true;
         }
     });
 
@@ -846,8 +772,8 @@ function initSettings() {
         if (this.checked !== undefined) {
             value = this.checked ? true : '';
         }
-        //console.log('Setting %s changed to "%s".', this.id, value);
-        $.settings(this.id, value);
+        console.log('Setting %s changed to "%s".', this.id, value);
+        updateSetting(this.id, value);
     });
 
     $('#sidebar .hide').click(function(event) {
@@ -858,7 +784,7 @@ function initSettings() {
         changes[k](h);
     });
 
-    $('#sidebar h4').click(function(e) {
+    $('#sidebar h3').click(function(e) {
         var num = this.id.split('group').pop(),
             key = 'hideSectGroup',
             set = $.settings(key),
@@ -879,23 +805,6 @@ function initSettings() {
     $('.threads').delegate('.nsfw', 'hover', function(event) {
         $(this).toggleClass('nsfw');
     });
-
-    $('.toggleNsfw').click(function(event) {
-        event.preventDefault();
-        var k = 'toggleNsfw',
-            c = $.settings(k),
-            v = c ? '' : 1;
-        $.settings(k, v);
-        changes.toggleNsfw(v);
-    });
-
-    for (var id in changes) {
-        var func = changes[id],
-            c = $.settings(id);
-        if (c) {
-            func(id);
-        }
-    }
 }
 
 function initStyle() {

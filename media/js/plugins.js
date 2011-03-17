@@ -491,6 +491,25 @@ $.extend({
     }
 });
 
+jQuery.each(["put", "delete"], function( i, method ) {
+	jQuery[ method ] = function( url, data, callback, type ) {
+		// shift arguments if data argument was omitted
+		if ( jQuery.isFunction( data ) ) {
+			type = type || callback;
+			callback = data;
+			data = undefined;
+		}
+
+		return jQuery.ajax({
+			type: method,
+			url: url,
+			data: data,
+			success: callback,
+			dataType: type
+		});
+	};
+});
+
 /*
  * jQuery Hotkeys Plugin
  * Copyright 2010, John Resig

@@ -9,8 +9,10 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from django.conf.urls.defaults import patterns
 from api.resources import *
 
-urlpatterns = patterns('board.views',
+urlpatterns = patterns('api.views',
     (r'^$', 'api'),
+    (r'^setting/$', 'settings_root'),
+    (r'^setting/(?P<key>[\w\d]+)$', 'settings'),
     (r'^poll/$', PollRootResource.as_view()),
     (r'^poll/(?P<id>\d+)$', PollResource.as_view()),
     (r'^choice/$', ChoiceRootResource.as_view()),

@@ -8,21 +8,13 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 
 import os
-import codecs
 import shutil
 from django.conf import settings
 from django.http import HttpResponse
-from django.template import RequestContext
-from django.template.loader import render_to_string
-from board.shortcuts import rtr
+from board.shortcuts import rtr, render_to_file
 
-__all__ = ['render_to_file', 'handle_file_cache', 'rebuild_cache']
+__all__ = ['handle_file_cache', 'rebuild_cache']
 
-
-def render_to_file(template, filename, request, context):
-    """Renders template to filename."""
-    with codecs.open(filename, 'w', 'utf-8') as f:
-        f.write(render_to_string(template, context, RequestContext(request)))
 
 
 def handle_file_cache(template, filename, request, context):

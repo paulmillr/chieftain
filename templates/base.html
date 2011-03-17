@@ -1,8 +1,8 @@
-{% load cache %}{% load i18n %}{% load macros %}
+{% load i18n %}{% load macros %}
 <!DOCTYPE html>  
-<!--[if lt IE 8 ]> <html lang="en" id="photon" class="ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html lang="en" id="photon" class="ie8"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--> <html lang="en" id="photon"> <!--<![endif]-->
+<!--[if lt IE 8 ]> <html lang="ru" id="{{style}}" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="ru" id="{{style}}" class="ie8"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> <html lang="ru" id="{{style}}"> <!--<![endif]-->
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <!--<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">-->
@@ -29,8 +29,7 @@
     <script src="{{settings.STATIC_URL}}js/preload.js?v=12"></script>
     <script src="{% url django.views.i18n.javascript_catalog %}"></script>
 </head>
-
-<body>
+<body class="{{session_classes}}">
     {% include "sidebar.html" %}
     <div id="container">
         <header id="site-header">
