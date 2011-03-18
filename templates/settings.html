@@ -6,9 +6,6 @@
 <form>
     <fieldset class="settings">
         <dl>
-            <dt><input type="submit" value="{% trans "Save preferences" %}"></dt>
-        </dl>
-        <dl>
             <dt>
                 <label for="style">{% trans "Board style" %}</label>
                 <select name="style" id="style" size="1">
@@ -58,8 +55,8 @@
         </dl>
         <dl>
             <dt>
-                <input type="checkbox" name="hideBBCodes" id="hideBBCodes">
-                <label for="hideBBCodes">{% trans "Hide markup panel" %}</label>
+                <input type="checkbox" name="showBBCodes" id="showBBCodes">
+                <label for="showBBCodes">{% trans "Show markup panel" %}</label>
             </dt>
         </dl>
         <dl>

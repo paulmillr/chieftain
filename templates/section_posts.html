@@ -4,31 +4,25 @@
 {% block title %}{{section.name}}{% endblock %}
 {% block role %}posts{% endblock %}
 
-{% block section %}
-    <section class="threads section">
-        {% autoescape off %}
-        {% for post in posts.object_list %}
-        <section class="thread">
-            {{post.html}}
-            {% if mod %}<span class="ip" id="ip{{post.id}}">{{post.ip|haship}}</span>{% endif %}
-        </section>
-        {% endfor %}
-        {% endautoescape %}
+{% block pages %}
+<ul class="pagination">
+    {% for p in posts.paginator.page_range %}
+        {% if p != posts.number %}
+            <li><a href="page{{p}}">{{p}}</a></li>
+        {% else %}
+            <li><span>{{p}}</span></li>
+        {% endif %}
+    {% endfor %}
+</ul>
+{% endblock %}
+
+{% block threads %}
+    {% autoescape off %}
+    {% for post in posts.object_list %}
+    <section class="thread">
+        {{post.html}}
+        {% if mod %}<span class="ip" id="ip{{post.id}}">{{post.ip|haship}}</span>{% endif %}
     </section>
-    <section class="actions">
-        <ul class="pagination">
-        {% for p in posts.paginator.page_range %}
-            {% if p != posts.number %}
-                <li><a href="posts{{p}}">{{p}}</a></li>
-            {% else %}
-                <li><span>{{p}}</span></li>
-            {% endif %}
-        {% endfor %}
-        </ul>
-        <ul class="pagination">
-            <li><a href=".">{% trans "Everything" %}</a></li>
-            <li><a href="threads">{% trans "Threads" %}</a></li>
-            <li><span>{% trans "Posts" %}</span></li>
-        </ul>
-    </section>
+    {% endfor %}
+    {% endautoescape %}
 {% endblock %}

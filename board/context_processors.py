@@ -15,7 +15,7 @@ def settings(request):
     return {'settings': _settings}
 
 
-def session_classes(request):
+def session(request):
     """Returns str of session settings keys.
 
        Example:
@@ -31,6 +31,7 @@ def session_classes(request):
     else:
         style = 'photon'
     return {
+        'session': dict(s.items()),
         'session_classes': ' '.join(s.keys()),
         'style': style
     }

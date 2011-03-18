@@ -5,11 +5,7 @@
  * http://www.gnu.org/licenses/gpl.html
  */
 
-var api = {
-    url: '/api',  // URL to klipped API
-    defaultType: 'text/plain'  // Default MIME type of queries to API
-},
-    queryString = parseQs(),
+var queryString = parseQs(),
     answersMap = {},
     postButtons = {},
     votedPolls = new BoardStorage('polls'),
@@ -25,7 +21,8 @@ var api = {
         gettext('bookmark');
         gettext('hide');
         gettext('Replies');
-        gettext('New message in thread #');
+        gettext('New message in thread ');
+        gettext('Post not found');
 
         // Recaptcha focus bug
         if (typeof Recaptcha !== 'undefined') {
@@ -39,17 +36,18 @@ var api = {
     // page detector
     curPage = (function() {
         var data = {
-            type: $('#main').attr('role'),
+            type: $('#container').attr('role'),
             cache: {}
         };
 
         switch (data.type) {
-            case 'thread':
-            case 'sectionPage':
-            case 'sectionPosts':
-            case 'sectionThreads':
+            case 'page':
+            case 'posts':
+            case 'threads':
                 data.section = window.location.href.split('/')[3];
+                break;
             case 'thread': 
+                data.section = window.location.href.split('/')[3];
                 data.type = 'thread';
                 data.cache.thread = $('.thread');
                 data.cache.first = $('.post:first');
@@ -147,6 +145,10 @@ function getPostPid(post) {
 
 function getPostLinkPid(postlink) {
     return postlink.text().match(/>>(\/\w+\/)?(\d+)/)[2];
+}
+
+function getPostNumberPid(postnumber) {
+    return postnumber.text();
 }
 
 /**
@@ -392,23 +394,6 @@ function parseQs() {
     return parsed;
 }
 
-/**
- * Searches for post on the page.
- *
- * If not found, makes request to API.
- */
-function searchPost(board, pid, callback) {
-    var p = $('#post' + pid);
-    if (p.length) {
-        return p;
-    }
-
-    $.get(window.api.url + '/post/' + board + '/' + pid + '?html=1')
-        .success(function(response) {
-            callback(response.html);
-        });
-}
-
 function slideRemove(elem) {
     if (typeof elem !== 'object') {
         elem = $(elem);
@@ -463,7 +448,7 @@ function init() {
                 onAdd : function(data) {
                     var first = false,
                         post,
-                        hideClass = $.settings('hardHide') ? 'hard hidden' : 'hidden';
+                        hideClass = 'hidden';
                     if (data.id === getPostId(data.first)) {
                         data.thread.addClass(hideClass);
                         post = data.first;
@@ -478,7 +463,7 @@ function init() {
                             ' #'+ getPostPid(post) +
                             //'('+ post.find('.message').text().split(0, 20) +')' +
                             ' ' + gettext('hidden') + '.'
-                        ).appendTo(post.find('.post-wrapper')),
+                        ).appendTo(post),
                         b = post.find('.bookmark, .hide').appendTo(s);
                 },
 
@@ -507,12 +492,8 @@ function init() {
 
     function removeIfPreview(element) {
         element = isjQuery(element) ? element : $(element);
-        var p = element.prev();
-        if (p.hasClass('post-preview')) {
-            removeIfPreview(p);
-            p.remove();
-        }
         element.remove();
+        //console.log(element, element.parent())
     }
 
     for (var className in buttons) {
@@ -571,47 +552,90 @@ function init() {
 
     function previewPosts() {
         $('.threads').delegate('.postlink', 'mouseover', function(event) {
-            event.preventDefault();
             var t = $(this),
                 m = t.attr('href').match(/(?:\/(\w+)\/)?(\d+)/),
-                globalLink = !!m[1],
-                board = globalLink ? m[1] : curPage.section,
+                globalLink = !!m[1] || !$('#post' + m[2]).length,
+                board = m[1] || curPage.section,
                 pid = m[2],
                 post = t.closest('.post'),
+                prevTree = post.hasClass('post-preview') ? post.parent() : false,
                 timestamp = getCurrentTimestamp(),
                 id = 'preview-' + pid + '-' + timestamp,
                 top = event.clientY + (document.documentElement.scrollTop || document.body.scrollTop)
                 left = event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft + 1;
-                function callback(html) {
-                    var div = $(html).clone(),
-                        outer = $('<article/>').addClass('post post-preview')
-                    .attr('id', id)
-                    .css({'top': top + 11 +'px', 'left': left + 'px'})
-                    .hover(function(ev) {}, function(ev) {
-                        if ($(ev.target).hasClass('post-preview')) {
-                            return false;
-                        }
-                        removeIfPreview(this);
+
+            if (globalLink) {
+                //console.log('Searching the post', board, pid);
+                var p = $('#post' + pid);
+                if (p.length) {
+                    return p;
+                }
+
+                $.get(window.api.url + '/post/' + board + '/' + pid + '?html=1')
+                    .success(function(response) {
+                        createPreview(response.html, board, pid, true, prevTree);
+                    })
+                    .error(function(xhr) {
+                        $.notification('error', gettext('Post not found'));
                     });
+            } else {
+                createPreview($('#post' + pid).html(), board, pid, false, prevTree);
+            }
 
-                    window.mouseOnPreview = true;
+            function createPreview(html, board, pid, globalLink, prevTree) {
+                var to,
+                    treeid = 'tree' + board + pid,
+                    previews = $('<div class="post-previews-tree"/>').attr('id', treeid),
+                    tree = $('#' + treeid),
+                    div = $(html).clone(),
+                    check = $(div.get(0)),
+                    outer = $('<article/>').addClass('post post-preview')
+                .attr('id', id)
+                .css({'top': top + 11 +'px', 'left': left + 'px'});
 
-                    // remove icons
-                    div.find('.bookmark, .hide, .is_closed, .is_pinned').remove();
-                    outer.append(div).insertAfter(post);
+                // remove icons
+                div.find('.bookmark, .hide, .is_closed, .is_pinned').remove();
+                // we've got post information through API, so
+                // remove not necessary elements
+                if (check.hasClass('post')) {
+                    //console.log('Global link', check);
+                    div = check.children();
                 }
+
                 if (globalLink) {
-                    searchPost(board, pid, callback);
-                } else {
-                    callback($('#post' + pid).html());
+                    div.find('.number a').attr('href', '/' + board + '/' + pid);
                 }
 
-                t.bind('mouseout', function(ev) {
-                    if (!$(ev.target).is('.post-preview')) {
-                        return false;
+                if (!$('#' + outer.attr('id')).length) {
+                    outer.append(div);
+                    if (prevTree) {
+                        outer.appendTo(prevTree);
+                    } else {
+                        previews.appendTo('.threads').append(outer);
                     }
-                    $('#' + id).remove();
+                }
+            }
+            
+            function bindRemovePreview(link, id) {
+                var timeout,
+                    prev = $('#' + id);
+                link = link.add(prev);
+                //console.log('Binded preview remove', prev);
+
+                link.mouseout(function() {
+                    timeout = window.setTimeout(function() {
+                        //prev.remove();
+                        removeIfPreview(prev);
+                    }, 300);
+                })
+                .mouseover(function() {
+                    window.clearTimeout(timeout);
                 });
+            }
+            
+            window.setTimeout(function() {
+                bindRemovePreview(t, id);
+            }, 200);
         });
     }
 
@@ -718,7 +742,7 @@ function init() {
         if (curPage.type != 'section') {
             if (!$.settings('oldInsert')) {
                 var n = $('#post' + $(this).text());
-                $('.newpost form').insertAfter(n);
+                $('.newpost').insertAfter(n);
             }
             textArea.insert('>>' + e.target.innerHTML + ' ');
             return false
@@ -736,15 +760,6 @@ function init() {
     for (var i = 0; i < set.length; i++) {
         $('#list-group' + set[i]).slideToggle(0);
     }
-}
-
-function updateSetting(key, value, callback) {
-    callback = callback || function() {};
-    console.log(window.api.url + '/setting/' + key)
-    $.post(window.api.url + '/setting/' + key, {'data': value});
-    /*.success(function(response) {
-        callback(response['settings'][key])
-    });*/
 }
 
 function initSettings() {
@@ -768,12 +783,12 @@ function initSettings() {
     });
 
     settings.change(function(event) {
-        var value = this.value;
+        var value = this.value,
+            id = this.id;
         if (this.checked !== undefined) {
             value = this.checked ? true : '';
         }
-        console.log('Setting %s changed to "%s".', this.id, value);
-        updateSetting(this.id, value);
+        $.settings(id, value);
     });
 
     $('#sidebar .hide').click(function(event) {
@@ -787,7 +802,7 @@ function initSettings() {
     $('#sidebar h3').click(function(e) {
         var num = this.id.split('group').pop(),
             key = 'hideSectGroup',
-            set = $.settings(key),
+            set = $.localSettings(key),
             ul = $('#list-group' + num),
             hidden = (ul.css('display') == 'none');
         set = set ? set.split(',') : [];
@@ -798,18 +813,23 @@ function initSettings() {
             set.push(num);
         }
 
-        $.settings(key, set);
+        $.localSettings(key, set);
         ul.slideToggle(500, checkForSidebarScroll);
     });
 
-    $('.threads').delegate('.nsfw', 'hover', function(event) {
+    $('.toggleNsfw').click(function(event) {
+        event.preventDefault();
+        var bool = $('body').hasClass('nsfw') ? '' : true;
+        $.settings('nsfw', bool);
+    });
+
+    $('.nsfw .threads').delegate('img', 'hover', function(event) {
         $(this).toggleClass('nsfw');
     });
 }
 
 function initStyle() {
-    var key = 'ustyle',
-        style = $.settings(key);
+    var style = $.settings('style');
 
     checkForSidebarScroll();
 
@@ -820,6 +840,21 @@ function initStyle() {
             val = typeof pxo === 'number' ? pxo : document.body.scrollLeft;
         $('.sidebar').css('left', '-' + val + 'px');
     });
+
+    if ($.settings('newForm')) {
+        var styleInfo = {
+                after : [
+                    ['.newpost input[type="submit"]', '.file-d'],
+                    ['.password-d', '.topic-d'],
+                    ['.file-d', '.message-d'],
+                ]
+            };
+
+            labelsToPlaceholders(['username', 'email', 'topic', 'message', 'captcha']);
+            $('.newpost').addClass('new-style')
+            $('.empty').remove();
+            manipulator(styleInfo);
+    }
 
     $('.section .post:first-child').each(function(x) {
         var post = $(this),
@@ -871,7 +906,7 @@ function initStyle() {
     });
 
     // images resize
-    $('.threads').delegate('.post .file', 'click', function(event) {
+    $('.threads').delegate('.file', 'click', function(event) {
         event.preventDefault();
         var t = $(this),
             children = t.children(),
@@ -991,7 +1026,7 @@ function initPosts(selector) {
                 target = $(targetSelector);
 
             if (href in map) {
-                if (map[href].indexOf(pid) === -1) {
+                if (map[href].indexOf(pid) !== 0) {
                     map[href].push(pid);
                 }
             } else {
@@ -1006,8 +1041,8 @@ function initPosts(selector) {
         }
 
         // Initialize post buttons.
-        /*
-        for (var className in buttons) {
+        
+        /*for (var className in buttons) {
             var button = buttons[className],
                 span = post.find('.' + className);
 
@@ -1018,8 +1053,7 @@ function initPosts(selector) {
             if (button.onInit) {
                 button.onInit(new PostContainer(span, post));
             }
-        }
-        */
+        }*/
     }
 
     // Build or rebuild page answers map.
@@ -1041,6 +1075,8 @@ function initPosts(selector) {
 
         $('#post' + i).append(div);
     }
+    
+    answersMap = map
 }
 
 function initVisited() {
@@ -1131,8 +1167,10 @@ function initAJAX() {
         }
 
         var newpost = $('.newpost');
-        if (newpost.parent().attr('id') !== 'main') {
-            newpost.insertBefore('.threads');
+        if (newpost.parent().hasClass('thread')) {
+            var b = $.settings('bottomForm') && curPage.type === 'thread' ? 
+                '.actions' : '#main';
+            newpost.insertBefore(b);
         }
         try {
             window.location.hash = '#post' + data.pid;
@@ -1193,7 +1231,7 @@ function initPubSub() {
                 args.cursor = pubsub.cursor;
             }
 
-            $.ajax('/api/stream/'+ curPage.thread, {
+            $.ajax(window.api.url + '/stream/'+ curPage.thread, {
                 'type': 'POST',
                 'dataType': 'json'
             })
@@ -1219,14 +1257,14 @@ function initPubSub() {
                 //console.log(posts.length, 'new msgs');
                 for (var i=0; i < posts.length; i++) {
                     var post = $(posts[i]).filter(function() {
-                            // remove text nodes
-                            var t = document.createTextNode('').__proto__;
-                            //console.log('t', this.__proto__ != t)
-                            return this.__proto__ != t;
-                        })
-                        .hide()
-                        .appendTo('.thread')
-                        .fadeIn(500, function() {
+                        // remove text nodes
+                        var t = document.createTextNode('').__proto__;
+                        //console.log('t', this.__proto__ != t)
+                        return this.__proto__ != t;
+                    })
+                    .hide()
+                    .appendTo('.thread')
+                    .fadeIn(500, function() {
                         $(this).attr('style', '');
                     });
 

@@ -5,6 +5,12 @@
     font-size: 15px;
 }
 
+/*
+body {
+    font-size: 15px;
+}
+*/
+
 header, nav, article, footer, address, section {
     display: block;
 }
@@ -153,6 +159,10 @@ ul.pagination li a {
     font-size: 34px;
 }
 
+.hideNav #site-header nav, .hideNav #site-footer nav {
+    display: none;
+}
+
 /* New Post */
 
 .newpost {
@@ -171,6 +181,14 @@ ul.pagination li a {
     color: #024;
 }
 
+.newpost .bbcodes {
+    display: none;
+}
+
+.showBBCodes .newpost .bbcodes {
+    display: block;
+}
+
 .newpost textarea {width: 450px;}
 
 .newpost dd {
@@ -182,11 +200,12 @@ ul.pagination li a {
 .new-style .file-d {float: left;}
 .new-style input[type="submit"] {float: right;}
 
+
 fieldset {border: 0;}
 .newpost fieldset {
     padding-top: 15px;
 }
-#main[role="settings"] fieldset {
+#container[role="settings"] fieldset {
     padding: 10px 0;
 }
 
@@ -237,6 +256,14 @@ a.file img {
     margin: 0 6px 6px 0;
 }
 
+.nsfw a.file img {
+    opacity: 0.1;
+}
+
+.nsfw a.file img:hover {
+    opacity: 1;
+}
+
 .skipped {
     display: block;
     color: #666;
@@ -263,6 +290,15 @@ a.file img {
     border-radius: 4px;
 }
 
+.post.hidden header, .post.hidden .filemeta, .post.hidden .file,
+.post.hidden .message, .post.hidden .answer-map {
+    display: none;
+}
+
+.hardHide .post.hidden {
+    display: none;
+}
+
 .post-preview {position: absolute;}
 
 /*
@@ -271,7 +307,7 @@ a.file img {
     overflow: auto;
 }*/
 
-.post:first-child {
+.thread .post:first-child {
     background-color: #eee;
     border: 0;
     overflow: visible;

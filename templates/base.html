@@ -14,7 +14,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{settings.STATIC_URL}}favicon.ico">
     <link rel="apple-touch-icon" href="{{settings.STATIC_URL}}icon.png">
-    <link rel="stylesheet" href="{{settings.STATIC_URL}}css/style.css?v=19">
+    <link rel="stylesheet" href="{{settings.STATIC_URL}}css/style.css?v=20">
     <script>
         document.createElement('header');
         document.createElement('nav');
@@ -26,19 +26,25 @@
     <!--
     <link rel="stylesheet" href="{{settings.STATIC_URL}}css/skins.css?v=16" class="ustyle">
     -->
-    <script src="{{settings.STATIC_URL}}js/preload.js?v=12"></script>
+    <script src="{{settings.STATIC_URL}}js/preload.js?v=13"></script>
     <script src="{% url django.views.i18n.javascript_catalog %}"></script>
 </head>
 <body class="{{session_classes}}">
     {% include "sidebar.html" %}
-    <div id="container">
+    <div id="container" role="{% block role %}{% endblock %}">
         <header id="site-header">
             {% include "navigation.html" %}
             {% block search %}{% endblock %}
             <h1><a href=".">{{settings.SITE_TITLE}}&nbsp;&mdash; {% usemacro title %}</a></h1>
         </header>
-        {% block newpost %}{% endblock %}
-        <section id="main" role="{% block role %}{% endblock %}">
+        {% if thread %}
+            <a href=".">{% trans "Go back" %}</a>
+        {% endif %}
+        {% if thread and not session.bottomForm or not thread %}
+            {% block newpost %}{% endblock %}
+        {% endif %}
+        
+        <section id="main">
             {% block content %}{% endblock %}
         </section>
         <footer id="site-footer">
@@ -51,8 +57,8 @@
         </footer>
     </div>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-    <script src="{{settings.STATIC_URL}}js/plugins.js?v=18"></script>
-    <script src="{{settings.STATIC_URL}}js/script.js?v=46"></script>
+    <script src="{{settings.STATIC_URL}}js/plugins.js?v=19"></script>
+    <script src="{{settings.STATIC_URL}}js/script.js?v=48"></script>
     <!--
     <script src="{{settings.STATIC_URL}}js/profiling/yahoo-profiling.min.js"></script>   
     <script src="{{settings.STATIC_URL}}js/profiling/config.js"></script>

@@ -4,20 +4,11 @@
 {% block role %}threads{% endblock %}
 
 {% block section %}
-    <section class="threads">
-        {% autoescape off %}
-        {% for thread in threads %}
-        <section class="thread" id="thread{{thread.id}}">
-            {{thread.html}}
-        </section>
-        {% endfor %}
-        {% endautoescape %}
+    {% autoescape off %}
+    {% for thread in threads %}
+    <section class="thread" id="thread{{thread.id}}">
+        {{thread.html}}
     </section>
-    <div class="paginator">
-        <ul class="group">
-            <li><a href=".">{% trans "Everything" %}</a></li>
-            <li><span>{% trans "Threads" %}</span></li>
-            <li><a href="posts">{% trans "Posts" %}</a></li>
-        </ul>
-    </div>
+    {% endfor %}
+    {% endautoescape %}
 {% endblock %}

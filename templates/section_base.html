@@ -4,7 +4,9 @@
 {% load macros %}
 
 {% block title %}{{section.name}}{% endblock %}
-{% block newpost %}{% include "form.html" %}{% endblock %}
+{% macro newpost %}
+    {% block newpost %}{% include "form.html" %}{% endblock %}
+{% endmacro %}
 {% block search %}
 <div class="searchbox">
     <form action="search" method="get" accept-charset="utf-8">
@@ -17,5 +19,36 @@
 {% endblock %}
 
 {% block content %}
-    {% block section %}{% endblock %}
+    <section class="threads">
+        {% block threads %}{% endblock %}
+    </section>
+    {% if thread and session.bottomForm %}
+        {% usemacro newpost %}
+    {% endif %}
+    <section class="actions">
+        <ul class="pagination">
+            <li><a href=".">{% trans "Everything" %}</a></li>
+            <li><a href="threads">{% trans "Threads" %}</a></li>
+            <li><a href="posts">{% trans "Posts" %}</a></li>
+        </ul>
+        {% block pages %}{% endblock %}
+
+        <div class="remove">
+            <form method="POST" action="#">
+                <input type="submit" value="Удалить сообщения">
+            </form>
+            <div class="hidden">
+                <p><input type="checkbox" name="only_files" id="only_files">
+                <label for="only_files">Только файлы</label></p>
+
+                <div class="admin">
+                    <p><input type="checkbox" name="delete_all" id="delete_all">
+                    <label for="delete_all">Удалить все сообщения с айпи</label></p>
+
+                    <p><input type="checkbox" name="ban_ip" id="ban_ip">
+                    <label for="ban_ip">Забанить айпи</label></p>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

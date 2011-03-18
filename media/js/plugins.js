@@ -74,16 +74,28 @@ $.extend({
         }
     },
 
-    settingsFactory: function(prefix) {
-        return function(name, value, options) {
-            name = prefix + name;
-            return $.cookie(name, value, options);
+    settings: function(name, value, is_not_boolean) {
+        var elem = $('body');
+        if (typeof name === 'undefiled') {
+            return elem.attr('class').split(' ');
+        } else if (typeof value === 'undefined') {
+            switch (name) {
+                case 'style': return $('html').attr('id'); break;
+                default: return elem.hasClass(name); break;
+            }
+        } else {
+            switch (name) {
+                case 'style': $('html').attr('id', value); break;
+                default: elem.toggleClass(name); break;
+            }
+            //console.log(value)
+            $.post(window.api.url + '/setting/' + name, {'data': value});
         }
     },
 
     // Little wrapper around $.cookie
-    settings: function(name, value, options) {
-        return this.settingsFactory('k_')(name, value, options);
+    localSettings: function(name, value) {
+        return $.cookie(name, value, options);
     },
 
     /**

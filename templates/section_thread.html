@@ -1,43 +1,36 @@
 {% extends "section_base.html" %}
 {% load haship %}
 {% load i18n %}
+{% load macros %}
 {% block title %}{% trans "Thread title" %} {{thread.op_post.pid}}{% endblock %}
 {% block role %}thread{% endblock %}
+
 {% block newpost %}
-    <a href=".">{% trans "Go back" %}</a>
     {% include "form.html" %}
 {% endblock %}
-{% block section %}
-    <section class="threads">
-        <section class="thread" id="thread{{thread.id}}">
-            {% if thread.poll_id %}
-                <div class="poll{% if thread.poll.vote_data %} voted{% endif %}">
-                    {{thread.poll.vote_data.id}}
-                    <div class="hbg-title">{{thread.poll.question}}</div>
-                    <dl id="poll{{thread.poll_id}}" title="{{thread.poll.question}}">
-                        {% for choice in thread.poll.choice_set.all %}
-                        <dt id="vote-info{{choice.id}}">
-                            <input type="radio" name="choice" value="{{choice.id}}">
-                            {{choice.name}}
-                        </dt>
-                        <dd id="vote-result{{choice.id}}"></dd>
-                        {% endfor %}
-                    </dl>
-                </div>
-            {% endif %}
-            {% autoescape off %}
-            {% for post in thread.posts_html %}
-                {{post.html}}
-                {% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}
-            {% endfor %}
-            {% endautoescape %}
-        </section>
-    </section>
-    <section class="actions">
-        <ul class="pagination">
-            <li><a href=".">{% trans "Everything" %}</a></li>
-            <li><a href="threads">{% trans "Threads" %}</a></li>
-            <li><a href="posts">{% trans "Posts" %}</a></li>
-        </ul>
+
+{% block threads %}
+    <section class="thread" id="thread{{thread.id}}">
+        {% if thread.poll_id %}
+            <div class="poll{% if thread.poll.vote_data %} voted{% endif %}">
+                {{thread.poll.vote_data.id}}
+                <div class="hbg-title">{{thread.poll.question}}</div>
+                <dl id="poll{{thread.poll_id}}" title="{{thread.poll.question}}">
+                    {% for choice in thread.poll.choice_set.all %}
+                    <dt id="vote-info{{choice.id}}">
+                        <input type="radio" name="choice" value="{{choice.id}}">
+                        {{choice.name}}
+                    </dt>
+                    <dd id="vote-result{{choice.id}}"></dd>
+                    {% endfor %}
+                </dl>
+            </div>
+        {% endif %}
+        {% autoescape off %}
+        {% for post in thread.posts_html %}
+            {{post.html}}
+            {% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}
+        {% endfor %}
+        {% endautoescape %}
     </section>
 {% endblock %}
