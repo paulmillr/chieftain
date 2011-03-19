@@ -53,7 +53,7 @@ msgstr "Интернациональный"
 
 #: board/models.py:41
 msgid "Software"
-msgstr ""
+msgstr "Багтрекер"
 
 #: board/models.py:146
 msgid "Question"
@@ -502,7 +502,7 @@ msgstr "КПК версия"
 
 #: templates/post.html:29
 msgid "Reply"
-msgstr ""
+msgstr "Ответить"
 
 #: templates/section_base.html:13
 msgid "Search"

@@ -776,6 +776,7 @@ function initSettings() {
         dn.closest('dl').hide();
     }
 
+    $('#style').val(style);
     settings.each(function() {
         if (body.hasClass(this.id)) {
             this.checked = true;
@@ -1061,7 +1062,9 @@ function initPosts(selector) {
         var c = cache[i].find('.answer-map'),
             cacheExists = !!c.length,
             div = cacheExists ? c : $('<div class="answer-map"/>'),
-            links = [];
+            links = [],
+            post = $('#post' + i),
+            skipped = post.find('.skipped');
         for (var j=0; j < map[i].length; j++) {
             var text = map[i][j];
             links.push('<a class="postlink" href="#post'+ text +'">&gt;&gt;'+ text +'</a>');
@@ -1072,8 +1075,15 @@ function initPosts(selector) {
         } else {
             div.html(div.html() + ',' + links.join(','));
         }
-
-        $('#post' + i).append(div);
+        
+        if (skipped.length) {
+            div.insertBefore(skipped);
+        } else {
+            post.append(div);
+        }
+        
+        div.insertBefore( + '.skipped')
+        $('#post' + i).append();
     }
     
     answersMap = map
