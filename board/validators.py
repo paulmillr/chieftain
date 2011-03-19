@@ -159,5 +159,4 @@ def post(request, no_captcha=True):
         tools.handle_uploaded_file(file, file_hash, ext, post)
     post.save()
     thread.save()
-    template.rebuild_cache(thread.section.slug, thread.op_post.pid)
     return post

@@ -370,7 +370,7 @@ function manipulator(arr) {
             $(from).remove().insertAfter(to)
         },
         before : function(from, to) {
-            $(from).remove().insertBefore(to)
+            $(from).remove().insertBefore(to);
         }
     };
 

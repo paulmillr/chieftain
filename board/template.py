@@ -16,7 +16,6 @@ from board.shortcuts import rtr, render_to_file
 __all__ = ['handle_file_cache', 'rebuild_cache']
 
 
-
 def handle_file_cache(template, filename, request, context):
     return rtr(template, request, context, True)
 

@@ -1,0 +1,56 @@
+* {margin:0; padding:0;}
+img {border:0;}
+body {background:#ffffff; font:13px "Trebuchet MS", Arial, Helvetica, sans-serif; color:#505050;}
+.center { width:909px; margin:0 auto;}
+.clear {clear:both; line-height:0px; height:0px; overflow:hidden; font-size:0px;}
+ul {list-style:none;}
+ul li a {text-transform: lowercase;}
+a { color:#ff6600; text-decoration:underline;}
+a:hover {text-decoration:none; color:#0086cf;}
+
+/*Head*/
+.head {height:115px; position:relative; z-index:2;}
+.logo {position:absolute; float:left; background: url(../images/logo.gif) no-repeat; padding:0 0 0 28px; top:52px; left:14px; font-size:24px; color:#f26722; height:28px; line-height:25px;text-decoration: none;}
+.wellcome {float:left; position:absolute; left:242px; top:36px; background:#f6f6f6; border:1px solid #eaeaea; border-radius:5px 5px 5px 5px; -moz-border-radius:5px 5px 5px 5px; -webkit-border-radius:5px 5px 5px 5px; -khtml-border-radius:5px 5px 5px 5px; padding:0 14px; line-height:56px; font-size:20px;}
+.wellcome p {line-height: normal; font-size:13px; color:#d0d0d0; position:absolute; right:-61px; top:-6px; background:url(../images/p2.gif) no-repeat right center; padding:0 14px 0 0; text-decoration:underline; cursor:pointer;}
+.settings {position:absolute; top:76px; right:0px;}
+.set-d {text-decoration:underline; background:url(../images/p1.gif) no-repeat right; height:22px; line-height:22px; color:#d0d0d0; padding:0 29px 0 0; cursor:pointer;}
+.set-box {background:#eaeaea; padding:5px; width:186px; border:1px solid #eaeaea; border-radius:4px 4px 4px 4px; -moz-border-radius:4px 4px 4px 4px; -webkit-border-radius:4px 4px 4px 4px; -khtml-border-radius:4px 4px 4px 4px; position:absolute; top:28px; right:0; display:none;}
+.set-box ul {border:1px solid #d7d7d7; background:#f6f6f6; width:184px;}
+.set-box ul li {line-height:22px; padding:0 0 0 9px; font-size:11px;}
+.set-box ul li a {border-bottom:1px dotted #ff6600; text-decoration:none;}
+.set-box ul li:hover a {border-bottom:none;}
+.set-box ul li:hover {background:#ffffff;}
+
+/*Nav*/
+.box1 {background:#f6f6f6; border:1px solid #eaeaea; border-radius:5px 5px 5px 5px; -moz-border-radius:5px 5px 5px 5px; -webkit-border-radius:5px 5px 5px 5px; -khtml-border-radius:5px 5px 5px 5px; margin-bottom:21px;}
+.nav {display:block; padding:13px 0 0 12px; min-height:1px;}
+.nl {float:left; width:462px; min-height:1px;}
+.nr {float:left; width:433px; min-height:1px;}
+.nav h3 { position:relative; background:#ffffff; border:1px solid #eaeaea; border-radius:4px 4px 4px 4px; -moz-border-radius:4px 4px 4px 4px; -webkit-border-radius:4px 4px 4px 4px; -khtml-border-radius:4px 4px 4px 4px; line-height:30px; height:30px; font-size:15px; padding:0 0 0 12px;}
+.nav ul li {line-height:19px; padding-bottom:3px;}
+.nl ul {float:left; width:204px; padding:0 0 0 13px;}
+.nl h3 {width:429px; margin-bottom:7px;}
+.nr2 {float:left; width:220px;}
+.nr3 {float:left; width:213px;}
+.nr ul {padding:0 0 16px 13px;}
+.nr h3 {width:187px; margin-bottom:7px;}
+.yo18 {position:absolute; left:86px; top:-9px;}
+
+/* Main */
+.main {min-height:1px;}
+.left {width:695px; float:left; min-height:1px;}
+.right {width:214px; float:left;}
+.pop {float:left; width:331px; padding:0 19px 27px 0;}
+.pop2 {float:left; width:326px; padding-bottom:27px;}
+.main h4 { line-height:30px; padding:0 0 0 13px; position:relative; background:#f6f6f6; border:1px solid #eaeaea; border-radius:5px 5px 5px 5px; -moz-border-radius:5px 5px 5px 5px; -webkit-border-radius:5px 5px 5px 5px; -khtml-border-radius:5px 5px 5px 5px; font-size:15px;}
+.main h4 span {background:url(../images/p3.gif); width:21px; height:21px; cursor:pointer; position:absolute; top:5px; right:5px;}
+.pop ul, .pop2 ul { padding:8px 0 0 15px;}
+.pop ul li, .pop2 ul li {line-height:19px; padding-bottom:3px;}
+.right h4 {margin-bottom:15px;}
+.banner {margin-bottom:15px; padding:8px 0; text-align:center; border:1px solid #eaeaea; background:#f6f6f6;}
+.txt-box {line-height:22px; background:#f6f6f6; border-radius:5px 5px 5px 5px; -moz-border-radius:5px 5px 5px 5px; -webkit-border-radius:5px 5px 5px 5px; -khtml-border-radius:5px 5px 5px 5px; padding:10px 15px; width:646px; margin:0 0 19px 0;}
+.txt-box2 {padding:10px 15px; line-height:22px; width:646px;}
+
+
+.foot {text-align:center; padding:50px 0;}

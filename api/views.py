@@ -26,7 +26,7 @@ def settings(request, key):
        * GET method gets settings key. If settings key is empty, it returns
        None.
        * POST method sets settings key to value.
-       * DELETE method resets settings key.       
+       * DELETE method resets settings key.
     """
     try:
         s = request.session['settings']
@@ -47,5 +47,3 @@ def settings(request, key):
     elif request.method == 'DELETE':
         s[key] = None
     return render_to_json({key: value})
-
-

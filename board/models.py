@@ -6,6 +6,7 @@ models.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+from collections import Counter
 from datetime import datetime
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -90,6 +91,39 @@ class PostManager(models.Manager):
         return super(PostManager, self).get_query_set().filter(
             is_deleted=False)
 
+    def popular(self, limit=10):
+        """Gets most popular board threads.
+
+           Popularity is calculated by thread post count.
+           Each section can have only two popular threads.
+        """
+        sql = '''SELECT board_post.thread_id, board_thread.section_id,
+        COUNT(*) as post_count FROM board_post
+        INNER JOIN board_thread ON board_post.thread_id = board_thread.id
+        GROUP BY board_post.thread_id
+        ORDER BY post_count DESC LIMIT {limit}'''.format(limit=limit * 10)
+        counter = Counter()
+        thread_ids = []
+
+        cursor = connection.cursor()
+        cursor.execute(sql)
+
+        # Select two threads from each section.
+        for i in cursor.fetchall():
+            if counter[i[1]] < 2:
+                thread_ids.append(i[0])
+                counter[i[1]] += 1
+
+        # Get post information.
+        posts = Post.objects.filter(thread__in=thread_ids[:limit],
+            is_op_post=True).values('thread__section__name',
+            'thread__section__slug', 'pid', 'topic', 'message'
+        )[:limit]
+
+        # Filter post information.
+        # Popular post message uses post topic, message or pid.
+        return reversed([tools.make_post_description(p) for p in list(posts)])
+
 
 class DeletedPostManager(models.Manager):
     def get_query_set(self):
@@ -101,6 +135,9 @@ class FileManager(models.Manager):
     def get_query_set(self):
         return super(FileManager, self).get_query_set().filter(
             is_deleted=False)
+
+    def random_images(self):
+        return self.filter(image_width__gt=200).order_by('?')
 
 
 class DeletedFileManager(models.Manager):

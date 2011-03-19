@@ -21,6 +21,7 @@ from datetime import datetime
 
 __all__ = [
     'handle_uploaded_file', 'tripcode', 'key', 'parse_user_agent',
+    'make_post_description',
     'take_first', 'from_timestamp'
 ]
 
@@ -77,6 +78,17 @@ def tripcode(text):
     salt = re.sub('/[^\.-z]/', '.', salt[1:3])
     salt = salt.translate(maketrans(':;<=>?@[\]^_`', 'ABCDEFGabcdef'))
     return crypt(trip, salt)[-10:]
+
+
+def make_post_description(post):
+    if post['topic']:
+        msg = post['topic']
+    elif post['message']:
+        msg = post['message']
+    else:
+        msg = '>>{0}'.format(post['pid'])
+    post['message'] = msg
+    return post
 
 
 def key(text):
