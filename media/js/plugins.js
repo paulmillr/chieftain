@@ -3,11 +3,19 @@
 window.log = function(){
     log.history = log.history || [];   // store logs to an array for reference
     log.history.push(arguments);
-    if(this.console) console.log( Array.prototype.slice.call(arguments) );
+    if (this.console) console.log( Array.prototype.slice.call(arguments) );
 };
+(function() {
+    if (!window.gettext) {
+        window.gettext = function(text) {
+            return text;
+        };
+    }
+    gettext('Settings error');
+})();
 
 // catch all document.write() calls
-(function(doc){
+(function(doc) {
     var write = doc.write;
     doc.write = function(q) {
         if (/docwriteregexwhitelist/.test(q)) {
@@ -74,7 +82,7 @@ $.extend({
         }
     },
 
-    settings: function(name, value, is_not_boolean) {
+    settings: function(name, value) {
         var elem = $('body');
         if (typeof name === 'undefiled') {
             return elem.attr('class').split(' ');
@@ -88,14 +96,19 @@ $.extend({
                 case 'style': $('html').attr('id', value); break;
                 default: elem.toggleClass(name); break;
             }
-            //console.log(value)
-            $.post(window.api.url + '/setting/' + name, {'data': value});
+            if (value === 'false' || value === false) {
+                value = '';
+            }
+            $.post(window.api.url + '/setting/' + name, {'data': value})
+            .error(function(xhr) {
+                $.notification('error', gettext('Settings error'));
+            });
         }
     },
 
     // Little wrapper around $.cookie
     localSettings: function(name, value) {
-        return $.cookie(name, value, options);
+        return $.cookie(name, value);
     },
 
     /**

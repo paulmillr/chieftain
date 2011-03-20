@@ -140,7 +140,12 @@ function getPostId(post) {
 }
 
 function getPostPid(post) {
-    return post.attr('id').replace('post', '');
+    if (isjQuery(post)) {
+        return post.attr('id').replace('post', '');
+    } else {
+        return post.id.replace('post', '')
+    }
+    
 }
 
 function getPostLinkPid(postlink) {
@@ -512,7 +517,7 @@ function init() {
         $('.threads').addClass('with' + sname);
     }
 
-    $('.bbcode a').click(function(e) {
+    $('.bbcodes a').click(function(e) {
         e.preventDefault();
         var t = $(this),
             start = $(this).data('tag'),
@@ -740,7 +745,7 @@ function init() {
 
     $('.threads').delegate('.number > a', 'click', function(e) {
         if (curPage.type != 'section') {
-            if (!$.settings('oldInsert')) {
+            if (!$.settings('disableFastReply')) {
                 var n = $('#post' + $(this).text());
                 $('.newpost').insertAfter(n);
             }
@@ -922,7 +927,31 @@ function initStyle() {
         }
         p.toggleClass('resized');
     });
-    
+
+    $('.button').click(function() {
+        $(this).toggleClass('active');
+    })
+
+    $('.expandImages').click(function(event) {
+        event.preventDefault();
+        $('.file').trigger('click');
+    });
+
+    $('.filterPosts .button').click(function() {
+        var map = window.answersMap,
+            posts = $('.post'),
+            val = $('#filterPosts').val(),
+            replies;
+
+        posts.filter(function() {
+            var pid = getPostPid(this);
+            if (!(pid in map) || map[pid].length < val) {
+                return true;
+            }
+            return false
+        }).toggle();
+    });
+
     $('.threads').delegate('.poll input[type="radio"]', 'click', function() {
         var radio = $(this);
         $.post(window.api.url + '/vote/', {'choice': this.value})
@@ -1086,7 +1115,7 @@ function initPosts(selector) {
         $('#post' + i).append();
     }
     
-    answersMap = map
+    window.answersMap = map;
 }
 
 function initVisited() {
@@ -1164,7 +1193,7 @@ function initAJAX() {
     }
 
     function successCallback(data) {
-        if (curPage.type === 'section') { // redirect
+        if (curPage.type !== 'thread') { // redirect
             window.location.href = './' + data.pid;
             return true;
         }

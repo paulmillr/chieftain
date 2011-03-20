@@ -1,7 +1,5 @@
 {% extends "section_base.html" %}
-{% load haship %}
-{% load i18n %}
-{% load macros %}
+{% load i18n haship macros %}
 {% block title %}{% trans "Thread title" %} {{thread.op_post.pid}}{% endblock %}
 {% block role %}thread{% endblock %}
 
@@ -10,26 +8,34 @@
 {% endblock %}
 
 {% block threads %}
+    <section class="tools">
+        <button class="button expandImages">{% trans "Expand images" %}</button>
+        <span class="filterPosts">
+            <button class="button">{% trans "Filter posts" %}</button>
+            <input type="text" name="filterPosts" value="1" id="filterPosts">
+            {% trans "replies" %}
+        </span>
+    </section>
+    {% if thread.poll_id %}
+        <section class="poll{% if thread.poll.vote_data %} voted{% endif %}">
+            {{thread.poll.vote_data.id}}
+            <div class="hbg-title">{{thread.poll.question}}</div>
+            <dl id="poll{{thread.poll_id}}" title="{{thread.poll.question}}">
+                {% for choice in thread.poll.choice_set.all %}
+                <dt id="vote-info{{choice.id}}">
+                    <input type="radio" name="choice" value="{{choice.id}}">
+                    {{choice.name}}
+                </dt>
+                <dd id="vote-result{{choice.id}}"></dd>
+                {% endfor %}
+            </dl>
+        </section>
+    {% endif %}
     <section class="thread" id="thread{{thread.id}}">
-        {% if thread.poll_id %}
-            <div class="poll{% if thread.poll.vote_data %} voted{% endif %}">
-                {{thread.poll.vote_data.id}}
-                <div class="hbg-title">{{thread.poll.question}}</div>
-                <dl id="poll{{thread.poll_id}}" title="{{thread.poll.question}}">
-                    {% for choice in thread.poll.choice_set.all %}
-                    <dt id="vote-info{{choice.id}}">
-                        <input type="radio" name="choice" value="{{choice.id}}">
-                        {{choice.name}}
-                    </dt>
-                    <dd id="vote-result{{choice.id}}"></dd>
-                    {% endfor %}
-                </dl>
-            </div>
-        {% endif %}
         {% autoescape off %}
         {% for post in thread.posts_html %}
             {{post.html}}
-            {% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}
+            <!--{% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}-->
         {% endfor %}
         {% endautoescape %}
     </section>

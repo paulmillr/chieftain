@@ -1,4 +1,4 @@
-{% load md2 %}{% load i18n %}{% load settings %}
+{% load i18n settings md2 %}
 <article class="post" id="post{{post.pid}}" data-id="{{post.id}}">
     <header>
         {% if post.data %}
@@ -26,7 +26,7 @@
         <span class="number"><a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">{{post.pid}}</a></span>
         {% if post.thread and post.is_op_post %}
             <span class="replylink">
-                <a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">{% trans "Reply" %}</a>
+                <a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">Ответ</a>
             </span>
         {% endif %}
     </header>

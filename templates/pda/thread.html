@@ -1,6 +1,5 @@
 {% extends "pda/base.html" %}
-{% load i18n %}
-{% load md2 %}
+{% load i18n md2 %}
 
 {% block title %}-
     {% trans "Thread" %} 
@@ -24,7 +23,7 @@
                 <div class="message">{% autoescape off %}{{ post.message|markdown2:"safe,videos,code-friendly,code-color" }}{% endautoescape %}</div>
             </li>
         {% endfor %}
-        <li><input type="text" name="message" placeholder="Ответить" id="message"></li>
+        <li><input type="text" name="message" placeholder="{% trans 'Reply' %}" id="message"></li>
     </ul>
 </div>
 {% endblock %}

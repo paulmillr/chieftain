@@ -339,9 +339,6 @@ class Thread(models.Model):
         if with_op_post:
             self.op_post.save(rebuild_cache=True)
 
-    def rebuild_template_cache(self):
-        template.rebuild_cache(self.section.slug, self.op_post.pid)
-
     def save(self, rebuild_cache=True):
         """Saves thread and rebuilds cache."""
         if rebuild_cache:
@@ -715,6 +712,7 @@ class PostFormNoCaptcha(ModelForm):
 
        Used for disabling double requests to api server.
     """
+    file = FileField(required=False)
     section = CharField(required=False)
 
     class Meta:
@@ -723,7 +721,6 @@ class PostFormNoCaptcha(ModelForm):
 
 class PostForm(PostFormNoCaptcha):
     """Simple post form."""
-    file = FileField(required=False)
     captcha = fields.ReCaptchaField(required=False)
     recaptcha_challenge_field = CharField(required=False)
     recaptcha_response_field = CharField(required=False)

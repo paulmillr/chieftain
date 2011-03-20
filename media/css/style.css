@@ -179,6 +179,7 @@ ul.pagination li a {
     width: 130px;
     font-weight: bold;
     color: #024;
+    font-size: 1.1em;
 }
 
 .newpost .bbcodes {
@@ -188,6 +189,14 @@ ul.pagination li a {
 .showBBCodes .newpost .bbcodes {
     display: block;
 }
+
+.bbcodes a {text-decoration: none;}
+.bbcodes .b {font-weight: bold;}
+.bbcodes .i {font-style: italic;}
+.bbcodes .s {text-decoration: line-through;}
+.bbcodes .u {text-decoration: underline;}
+.bbcodes .quote:before {content: '>';}
+.bbcodes .code {font-family: 'Menlo', 'Monaco', 'Consolas', 'Droid Sans Mono', Courier, monospace;}
 
 .newpost textarea {width: 450px;}
 
@@ -220,6 +229,13 @@ fieldset {border: 0;}
 }
 
 .newpost .info li {list-style: none;}
+
+.disableTools .tools {display: none;}
+.tools {margin-top: 5px;}
+.tools input#filterPosts {
+    width: 2em;
+    vertical-align: bottom;
+}
 
 .post .title, .post .number {
     font-weight: bold;
@@ -295,11 +311,40 @@ a.file img {
     display: none;
 }
 
+blockquote {
+    color: #789922;
+}
+
 .hardHide .post.hidden {
     display: none;
 }
 
 .post-preview {position: absolute;}
+
+.button {
+    -moz-border-radius: 3px;
+    -moz-box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
+    -webkit-border-radius: 3px;
+    -webkit-box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
+    background: #d6d6d6;
+    border: 1px solid rgba(0, 0, 0, .6);
+    border-radius: 3px;
+    box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
+    color: #000;
+    display: inline-block;
+    font-size: 12px;
+    line-height: 13px;
+    padding: 3px 6px;
+    text-decoration: none;
+    text-shadow: rgba(255, 255, 255, .4) 0 1px;
+}
+
+.button.active {
+    -moz-box-shadow: inset rgba(0, 0, 0, .4) 0 -5px 12px, inset rgba(0, 0, 0, 1) 0 1px 3px, rgba(255, 255, 255, .4) 0 1px;
+    -webkit-box-shadow: inset rgba(0, 0, 0, .4) 0 -5px 12px, inset rgba(0, 0, 0, 1) 0 1px 3px, rgba(255, 255, 255, .4) 0 1px;
+    background: #b5b5b5;
+    box-shadow: inset rgba(0, 0, 0, .4) 0 -5px 12px, inset rgba(0, 0, 0, 1) 0 1px 3px, rgba(255, 255, 255, .4) 0 1px;
+}
 
 /*
 .post .message {
@@ -479,7 +524,9 @@ pre {
   top:expression(eval(document.documentElement.scrollTop));
 }
 
-.ie7 .post .number {z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = "№" + this.innerHTML);}
+.ie7 .post .number {
+    z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = "№" + this.innerHTML);
+}
 
 .ie7 ul.pagination, .ie7 .replylink {
     z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = "[ " + this.innerHTML + " ]");

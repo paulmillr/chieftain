@@ -50,7 +50,7 @@ def search(request, section_slug, page):
         thread__section=section,
         message__contains=request.GET['q']).order_by('-date')
     if not posts.count():
-        return rtr('error.html', request, {'details': _('Nothing found')})
+        return rtr('client_error.html', request, {'details': _('Nothing found')})
     p = get_page_or_404(Paginator(posts, section.ONPAGE), page)
     return rtr('section_posts.html', request, {'posts': p,
             'section': section})

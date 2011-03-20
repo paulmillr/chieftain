@@ -27,6 +27,7 @@ __all__ = [
     'PostRootResource', 'PostResource',
     'SectionRootResource', 'SectionResource',
     'FileRootResource', 'FileResource',
+    'RandomImageRootResource',
     'FileTypeRootResource', 'FileTypeResource',
     'FileTypeGroupRootResource', 'FileTypeGroupResource',
     'SectionGroupRootResource', 'SectionGroupResource',
@@ -146,7 +147,7 @@ class ThreadResource(ModelResource):
 class PostRootResource(RootModelResource):
     """A create/list resource for Post."""
     allowed_methods = anon_allowed_methods = ('GET', 'POST')
-    form = PostForm
+    form = PostFormNoCaptcha
     model = Post
 
     def get(self, request, auth, *args, **kwargs):
@@ -246,6 +247,15 @@ class SectionGroupResource(ModelResource):
 class FileRootResource(RootModelResource):
     """A list resource for File."""
     model = File
+
+class RandomImageRootResource(RootModelResource):
+    model = File
+    fields = ('id', 'name', 'type', 'size',
+        'image_width', 'image_height', 'hash', 'file', 'thumb')
+
+    def get(self, request, auth, *args, **kwargs):
+        count = kwargs.get('count', 3)
+        return self.model.objects.random_images()[:count]
 
 
 class FileResource(ModelResource):

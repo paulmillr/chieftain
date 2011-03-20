@@ -6,23 +6,49 @@
 <title>{{settings.SITE_TITLE}} &mdash; {% trans "Main page" %}</title> 
 <link rel="stylesheet" href="{{settings.STATIC_URL}}css/index.css" media="all">
 <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+<script src="{{settings.STATIC_URL}}js/preload.js?v=13"></script>
+<script src="{{settings.STATIC_URL}}js/plugins.js?v=19"></script>
 <script>
-    $(document).ready(function(){
-        $('.wellcome p').click(function(){
+    var media_url = '{{settings.MEDIA_URL}}';
+    $(function() {
+        $('.mpHiderandom .random span').toggleClass('minimized');
+        $('.mpHidebookmarks .bookmarks span').toggleClass('minimized');
+        $('.mpHidepopular .popular span').toggleClass('minimized');
+        $('.wellcome p').click(function() {
             $('.wellcome').hide('fast');
         });
 
-        $('h4 span').click(function(){
-            $(this).parent().next('ul').slideToggle('fast');
+        $('h4 span').click(function() {
+            var span = $(this);
+            span.toggleClass('minimized');
+            span.parent().parent().find('ul, .banner')
+            .slideToggle('fast', function() {
+                $.settings('mpHide' + span.parent().attr('class'), span.hasClass('minimized'));
+            });
         });
 
-        $('.set-d').click(function(){
+        $('.set-d').click(function() {
             $('.set-box').slideToggle('fast');
+        });
+
+        $('.banner').click(function(event) {
+            event.preventDefault();
+            var banner = $(this);
+
+            $.get(window.api.url + '/file/random_image/1')
+            .success(function(data) {
+                data = data[0];
+                console.log(media_url + data.file)
+                banner.find('img').attr('src', media_url + data.file);
+                banner.find('a').attr('href', media_url + data.thumb);
+            });
+
+            banner.find('a')
         });
     });
 </script>
 </head> 
-<body> 
+<body class="{{session_classes}}"> 
 <div class="center"> 
   <header> 
     <div class="head"><a href="/" class="logo">{{settings.SITE_TITLE}}</a> 
@@ -85,7 +111,7 @@
   <div class="main"> 
     <div class="left">
       <div class="pop">
-          <h4>{% trans "Popular threads" %}<span></span></h4>
+          <h4 class="popular">{% trans "Popular threads" %}<span></span></h4>
           <ul>
           {% for p in popular %}
             <li><a href="/{{p.thread__section__slug}}/{{p.pid}}">/{{p.thread__section__name}}/</a>&nbsp;&mdash;
@@ -99,7 +125,7 @@
           </ul>
       </div>
       <div class="pop2">
-          <h4>{% trans "Bookmarked threads" %}<span></span></h4>
+          <h4 class="bookmarks">{% trans "Bookmarked threads" %}<span></span></h4>
           <ul>
           {% for p in bookmarks %}
             <li><a href="/{{p.thread__section__slug}}/{{p.pid}}">/{{p.thread__section__name}}/</a>&nbsp;&mdash;
@@ -118,10 +144,10 @@
 Теперь можно добавлять треды на главную страницу. Для этого надо иметь аккаунт в твиттере и просто нажать кнопку "t" рядом с тредом.</div> 
     </div> 
     <div class="right">
-      <h4>{% trans "Random image" %}</h4>
+      <h4 class="random">{% trans "Random image" %}<span></span></h4>
       {% for f in random_images %}
       <div class="banner">
-          <a href="{{f.file.url}}"><img src="{{f.thumb.url}}" id="file{{f.id}}" data-hash="{{f.hash}}" width="126" height="80"></a>
+          <a href="{{f.file.url}}"><img src="{{f.thumb.url}}" id="file{{f.id}}" width="126" height="80"></a>
       </div>
       {% endfor %}
     </div>

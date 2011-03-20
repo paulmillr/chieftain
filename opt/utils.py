@@ -28,6 +28,7 @@ def rebuild():
             print 'Rendered thread {0}'.format(c)
 
     for c, post in enumerate(posts):
+        # print 'Rendering post {0}'.format(post.id)
         post.save()
         if c % 250 == 0:
             print 'Rendered post {0}'.format(c)
