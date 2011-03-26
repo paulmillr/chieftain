@@ -16,4 +16,4 @@ class ModelsTest(unittest.TestCase):
         self.client = Client()
 
     def test_post_create(self):
-        
+        pass

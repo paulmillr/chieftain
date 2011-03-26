@@ -246,6 +246,7 @@ class FileRootResource(RootModelResource):
     """A list resource for File."""
     model = File
 
+
 class RandomImageRootResource(RootModelResource):
     model = File
     fields = ('id', 'name', 'type', 'size',

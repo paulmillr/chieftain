@@ -45,6 +45,7 @@ def wipe(posts=10, thread=False):
     start = datetime.now()
     uri = 'http://1chan.ru/{0}/createAjaxForm/'
     boards = ['d', 'b', 'a', 's', 'vg', 'pr', 'mu', 'tv']
+
     def rand():
         return str(int(random.random() * 100000) % 50000)
     #if thread_or_slug.isdigit():

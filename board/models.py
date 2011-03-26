@@ -97,7 +97,7 @@ class PostManager(models.Manager):
 
     def popular(self, limit=10):
         """Gets most popular board threads.
-        
+
         Popularity is calculated by thread post count.
         Each section can have only two popular threads.
         This method returns list of post dicts with 'description' value,

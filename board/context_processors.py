@@ -25,8 +25,10 @@ def session(request):
        {'session_classes': 'test test2'}
     """
     s = request.session.get('settings', {})
+
     def pop_from_session(key, default=''):
         return s.pop(key) if s.get(key) else default
+
     u = request.user
     if u.is_authenticated():
         s['is_mod'] = True
