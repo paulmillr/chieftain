@@ -396,12 +396,12 @@ class Post(models.Model):
     objects = PostManager()
     deleted_objects = DeletedPostManager()
 
-    allowed_fields = (
+    allowed_fields = [
         'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
         'date', 'message', 'email', 'data',
         ('thread', ('id', ('section', ('id', 'slug')))),
         'files',
-    )
+    ]
 
     def section(self):
         return self.thread.section

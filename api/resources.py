@@ -190,6 +190,7 @@ class PostRootResource(RootModelResource):
                     _('Server error'), _('can\'t refresh messages')
                 )
             })
+        self.model.allowed_fields.append('html')
         return Response(status.CREATED, instance)
 
 

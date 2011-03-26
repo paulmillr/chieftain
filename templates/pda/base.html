@@ -3,26 +3,26 @@
     <head>
         <meta charset="UTF-8" />
         <title>{{settings.SITE_TITLE}} {% block title %}{% endblock %}</title>
-        <style type="text/css" media="screen">@import "{{settings.STATIC_URL}}css/jqtouch.css";</style>
-        <style type="text/css" media="screen">@import "{{settings.STATIC_URL}}css/apple/theme.css";</style>
-        <link rel="shortcut icon" href="{{settings.STATIC_URL}}favicon.ico">
+        <style type="text/css" media="screen">@import "{{ STATIC_URL }}css/jqtouch.css";</style>
+        <style type="text/css" media="screen">@import "{{ STATIC_URL }}css/apple/theme.css";</style>
+        <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico">
         <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" charset="utf-8"></script>
-        <script src="{{settings.STATIC_URL}}js/jqtouch.js" charset="utf-8"></script>
+        <script src="{{ STATIC_URL }}js/jqtouch.js" charset="utf-8"></script>
         <script type="text/javascript" charset="utf-8">
             var jQT = new $.jQTouch({
-                icon: '{{settings.STATIC_URL}}icon.png',
-                icon4: '{{settings.STATIC_URL}}icon.png',
+                icon: '{{ STATIC_URL }}icon.png',
+                icon4: '{{ STATIC_URL }}icon.png',
                 addGlossToIcon: false,
                 //startupScreen: 'jqt_startup.png',
                 statusBar: 'blue',
                 preloadImages: [
-                    '{{settings.STATIC_URL}}css/apple/img/activeButton.png',
-                    '{{settings.STATIC_URL}}css/apple/img/backButton.png',
-                    '{{settings.STATIC_URL}}css/apple/img/grayButton.png',
-                    '{{settings.STATIC_URL}}css/apple/img/greenButton.png',
-                    '{{settings.STATIC_URL}}css/apple/img/redButton.png',
-                    '{{settings.STATIC_URL}}css/apple/img/whiteButton.png',
-                    '{{settings.STATIC_URL}}css/apple/img/loading.gif'
+                    '{{ STATIC_URL }}css/apple/img/activeButton.png',
+                    '{{ STATIC_URL }}css/apple/img/backButton.png',
+                    '{{ STATIC_URL }}css/apple/img/grayButton.png',
+                    '{{ STATIC_URL }}css/apple/img/greenButton.png',
+                    '{{ STATIC_URL }}css/apple/img/redButton.png',
+                    '{{ STATIC_URL }}css/apple/img/whiteButton.png',
+                    '{{ STATIC_URL }}css/apple/img/loading.gif'
                     ]
             });
         </script>

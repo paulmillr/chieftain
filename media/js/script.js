@@ -736,10 +736,15 @@ function init() {
     });
 
     $('.threads').delegate('.number > a', 'click', function(e) {
-        if (curPage.type != 'section') {
+        if (curPage.type === 'page' || curPage.type === 'thread') {
             if (!$.settings('disableFastReply')) {
                 var n = $('#post' + $(this).text());
                 $('.newpost').insertAfter(n);
+                if (curPage.type === 'page') {
+                    var thread_id = getThreadId(n.parent());
+                    $('.newpost form').append('<input type="hidden" value="' + thread_id + '" id="thread" name="thread" />');
+                    window.quickReplied = true;
+                }
             }
             textArea.insert('>>' + e.target.innerHTML + ' ');
             return false
@@ -1223,16 +1228,26 @@ function initAJAX() {
     }
 
     function successCallback(data) {
-        if (curPage.type !== 'thread') { // redirect
+        if (curPage.type !== 'thread' && !window.quickReplied) { // redirect
             window.location.href = './' + data.pid;
             return true;
         }
-        if ($.settings('disablePubSub')) {
-            var post = $(data.html).hide()
-                .appendTo('.thread')
+
+        if (window.quickReplied || $.settings('disablePubSub')) {
+            //console.log(data.html);
+            var html = $(data.html);
+                html = $([html[0], html[2]]),
+                post = html.hide()
+                .appendTo('#thread' + data.thread.id)
                 .fadeIn(500);
+            console.log(post);
             post.find('.tripcode:contains("!")').addClass('staff');
             initPosts(post);
+        }
+
+        if (window.quickReplied) {
+            $('input[name="thread"]').remove();
+            window.quickReplied = false;
         }
 
         var newpost = $('.newpost');

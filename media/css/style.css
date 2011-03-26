@@ -1,15 +1,12 @@
 * {
     margin: 0px;
     padding: 0px;
-    font-family: "Trebuchet MS", Trebuchet, tahoma, serif;
-    font-size: 15px;
 }
 
-/*
 body {
     font-size: 15px;
+    font-family: "Trebuchet MS", Trebuchet, tahoma, serif;
 }
-*/
 
 header, nav, article, footer, address, section {
     display: block;
@@ -179,7 +176,12 @@ ul.pagination li a {
     width: 130px;
     font-weight: bold;
     color: #024;
-    font-size: 1.1em;
+    font-size: 1.05em;
+}
+
+.newpost input[type="text"], .newpost input[type="email"], .newpost input[type="password"] {
+    width: 145px;
+    padding: 2px;
 }
 
 .newpost .bbcodes {
@@ -241,10 +243,17 @@ fieldset {border: 0;}
     margin: 5px 0 0 5px;
 }
 
+.post:first-child .file img {margin-right: 20px;}
+
+.post .title {font-size: 1.2em;}
+
+.post .poster, .post time {font-size: 1.06em;}
+
 .post .title, .post .number {
     font-weight: bold;
 }
 
+.post .number {font-size: 0.9em;}
 .post .number:before {content: "#";}
 
 #main .replylink {
@@ -439,7 +448,6 @@ blockquote {
 .stats {border: 1px dashed; padding: 0 5px;}
 #container + iframe {display: none;} /* Recaptcha bug */
 .post header {
-    font-size: 0.8em;
 }
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
