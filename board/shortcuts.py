@@ -16,8 +16,7 @@ from django.template.loader import render_to_string
 from django.utils import simplejson as json
 
 __all__ = [
-    'get_page_or_404', 'update_context', 'render_to_json',
-    'render_to_file', 'rtr'
+    'get_page_or_404', 'add_sidebar', 'render_to_json', 'render_to_file',
 ]
 
 
@@ -29,11 +28,10 @@ def get_page_or_404(paginator, page):
         raise Http404
 
 
-def update_context(context):
+def add_sidebar(context={}):
     """Updates context dictionary with sidebar."""
     from board.models import SectionGroup  # block recursive import
-    context.update({'navigation': SectionGroup.objects.sections()})
-    return context
+    return dict(context, navigation=SectionGroup.objects.sections())
 
 
 def render_to_json(data):
@@ -44,14 +42,3 @@ def render_to_file(template, filename, request, context):
     """Renders template to filename."""
     with codecs.open(filename, 'w', 'utf-8') as f:
         f.write(render_to_string(template, context, RequestContext(request)))
-
-
-def rtr(template, request, context={}, no_update=False):
-    """Wrapper around render_to_response.
-
-       Adds sidebar to all requests.
-    """
-    if not no_update:
-        context = update_context(context)
-    return render_to_response(template, context,
-        context_instance=RequestContext(request))

@@ -8,8 +8,9 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 
 from django.contrib.auth.decorators import login_required
+from django.shortcuts import render
 from board.models import Wordfilter, DeniedIP
-from board.shortcuts import rtr
+from board.shortcuts import add_sidebar
 
 
 def is_mod(request, section_slug):
@@ -21,16 +22,18 @@ def is_mod(request, section_slug):
 
 
 def index(request):
-    return rtr('modindex.html', request)
+    return render(request, 'modindex.html', add_sidebar())
 
 
 @login_required
 def wordfilter(request):
-    return rtr('wordfilter.html', request, {
-        'wordlist': Wordfilter.objects.all()})
+    return render(request, 'wordfilter.html', add_sidebar({
+        'wordlist': Wordfilter.objects.all()
+    }))
 
 
 @login_required
 def banlist(request):
-    return rtr('banlist.html', request, {
-        'banlist': DeniedIP.objects.all()})
+    return render(request, 'banlist.html', add_sidebar({
+        'banlist': DeniedIP.objects.all()
+    }))

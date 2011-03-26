@@ -7,11 +7,11 @@ Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.paginator import Paginator
-from django.http import Http404, HttpResponseRedirect,\
-    HttpResponsePermanentRedirect
-from django.shortcuts import get_object_or_404
+from django.http import (Http404, HttpResponseRedirect,
+    HttpResponsePermanentRedirect)
+from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from board import validators, template
+from board import validators
 from board.models import *
 from board.shortcuts import *
 from board.tools import make_post_description
@@ -28,19 +28,19 @@ def index(request):
         'bookmarks', []))
 
     #Thread.objects.filter
-    return rtr('index.html', request, {
+    return render(request, 'index.html', add_sidebar({
         'popular': Post.objects.popular(10),
         'bookmarks': (make_post_description(p) for p in bposts),
         'random_images': File.objects.random_images()[:3],
-    })
+    }))
 
 
 def settings(request):
-    return rtr('settings.html', request)
+    return render(request, 'settings.html', add_sidebar())
 
 
 def faq(request):
-    return rtr('faq.html', request)
+    return render(request, 'faq.html', add_sidebar())
 
 
 def search(request, section_slug, page):
@@ -50,11 +50,12 @@ def search(request, section_slug, page):
         thread__section=section,
         message__contains=request.GET['q']).order_by('-date')
     if not posts.count():
-        return rtr('client_error.html', request,
-            {'details': _('Nothing found')})
+        return render(request, 'client_error.html', add_sidebar({
+            'details': _('Nothing found')
+        }))
     p = get_page_or_404(Paginator(posts, section.ONPAGE), page)
-    return rtr('section_posts.html', request, {'posts': p,
-            'section': section})
+    return render(request, 'section_posts.html', add_sidebar({'posts': p,
+        'section': section}))
 
 
 def post_router(request, op_post=None):
@@ -62,9 +63,11 @@ def post_router(request, op_post=None):
     try:
         p = validators.post(request, no_captcha=False)
     except validators.ValidationError as e:
-        return rtr('error.html', request, {'details': e})
+        return render(request, 'error.html', {'details': e})
     if not p:  # display error page
-        return rtr('error.html', request, {'errors': PostForm(p).errors})
+        return render(request, 'error.html', add_sidebar({
+            'errors': PostForm(p).errors
+        }))
     # get op post and created post pids
     args = [op_post, p.pid] if op_post else [p.pid, p.pid]
     return HttpResponseRedirect('{0}#post{1}'.format(*args))
@@ -79,34 +82,34 @@ def section(request, section_slug, page):
         return post_router(request)
     s = get_object_or_404(Section, slug=section_slug)
     t = get_page_or_404(Paginator(s.threads(), s.ONPAGE), page)
-    return rtr('section_page.html', request, {
+    return render(request, 'section_page.html', add_sidebar({
         'threads': t,
         'section': s,
         'form': PostForm()
-    })
+    }))
 
 
 def threads(request, section_slug):
     """List of OP-posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
-    return rtr('section_threads.html', request, {
+    return render(request, 'section_threads.html', add_sidebar({
         'threads': section.op_posts(),
         'section': section,
         'form': PostForm(),
         'mod': is_mod(request, section_slug)
-    })
+    }))
 
 
 def posts(request, section_slug, page):
     """List of posts in section."""
     section = get_object_or_404(Section, slug=section_slug)
     p = get_page_or_404(Paginator(section.posts(), section.ONPAGE), page)
-    return rtr('section_posts.html', request, {
+    return render(request, 'section_posts.html', add_sidebar({
         'posts': p,
         'section': section,
         'form': PostForm(),
         'mod': is_mod(request, section_slug)
-    })
+    }))
 
 
 def images(request, section_slug, page):
@@ -131,8 +134,8 @@ def thread(request, section_slug, op_post):
     if not post.is_op_post:
         return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
-    return rtr('section_thread.html', request, {
+    return render(request, 'section_thread.html', add_sidebar({
         'thread': thread,
         'form': PostForm(),
         'mod': is_mod(request, section_slug),
-    })
+    }))

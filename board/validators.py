@@ -11,7 +11,7 @@ from django.contrib.gis.utils import GeoIP
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
 from hashlib import md5
-from board import tools, template
+from board import tools
 from board.models import *
 
 

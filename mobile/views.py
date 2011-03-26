@@ -8,20 +8,20 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponsePermanentRedirect
-from django.shortcuts import get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from board.models import *
 from board.shortcuts import *
 
 
 def index(request):
-    return rtr('mobile/index.html', request)
+    return render(request, 'mobile/index.html')
 
 
 def section(request, section_slug, page):
     s = get_object_or_404(Section, slug=section_slug)
     # TODO
     t = get_page_or_404(Paginator(s.threads(), s.ONPAGE), page)
-    return rtr('mobile/section.html', request, {'section': s})
+    return render(request, 'mobile/section.html', {'section': s})
 
 
 def thread(request, section_slug, op_post):
@@ -34,4 +34,4 @@ def thread(request, section_slug, op_post):
     if not post.is_op_post:
         return HttpResponsePermanentRedirect('../{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
-    return rtr('mobile/thread.html', request, {'thread': thread})
+    return render(request, 'mobile/thread.html', {'thread': thread})

@@ -21,7 +21,7 @@ from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
 from ipcalc import Network
-from board import fields, template, tools
+from board import fields, tools
 
 
 __all__ = [
@@ -111,20 +111,18 @@ class PostManager(models.Manager):
 
         # Select two threads from each section.
         for t in threads:
-            if len(thread_ids) > limit:
-                break
             if counter[t['section']] < 2:
                 thread_ids.append(t['id'])
-                counter[t['id']] += 1
+                counter[t['section']] += 1
 
         # Get post information.
-        posts = Post.objects.filter(thread__in=thread_ids,
+        posts = Post.objects.filter(thread__in=thread_ids[:limit],
             is_op_post=True).values('thread__section__name',
             'thread__section__slug', 'pid', 'topic', 'message'
         )[:limit]
 
         # Filter post information.
-        return (tools.make_post_description(p) for p in posts)
+        return (tools.make_post_description(p) for p in reversed(posts))
 
 
 class DeletedPostManager(models.Manager):
@@ -621,7 +619,6 @@ class Section(models.Model):
     def save(self):
         super(Section, self).save()
         cache.delete('sections')
-        template.rebuild_cache()
 
     def __unicode__(self):
         return self.slug
@@ -643,7 +640,6 @@ class SectionGroup(models.Model):
     def save(self):
         super(SectionGroup, self).save()
         cache.delete('sections')
-        template.rebuild_cache()
 
     def __unicode__(self):
         return unicode(self.name) + ', ' + unicode(self.order)

@@ -15,7 +15,7 @@ from django.core.files import File as DjangoFile
 from hashlib import sha1
 from string import maketrans
 from crypt import crypt
-from klipped import settings
+from django.conf import settings
 from datetime import datetime
 
 

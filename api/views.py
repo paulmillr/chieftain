@@ -8,11 +8,11 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.utils import simplejson as json
-from board.shortcuts import rtr, render_to_json
+from board.shortcuts import render_to_json
 
 
 def api(request):
-    return rtr('api.html', request)
+    return render(request, 'api.html')
 
 
 def settings_root(request):
