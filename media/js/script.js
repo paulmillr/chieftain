@@ -929,6 +929,20 @@ function initStyle() {
         $('.file').trigger('click');
     });
 
+    $('.filterPosts .button').click(function() {
+        var active = $(this).hasClass('active');
+        $('.post').show();
+        if (active) {
+            var c = $('.filterPosts #filterImages');
+            if (c.attr('checked')) {
+                c.trigger('change');
+            }
+            $('.filterPosts .slider').trigger('slidechange');
+        }
+        $('.filterParams, .sliderInfo').toggle();
+        $('.filterPosts .slider').toggle();
+    });
+
     $('.filterPosts .slider').slider({
         'max': 15
     })
@@ -939,9 +953,8 @@ function initStyle() {
             slider = $('.filterPosts .slider'),
             value = slider.slider('value'),
             replies;
-        console.log('Filtered posts with %s answers.', value);
+        //console.log('Filtered posts with %s answers.', value);
 
-        posts.show();
         posts.filter(function() {
             var pid = getPostPid(this);
             if (value === 0) {
@@ -952,13 +965,22 @@ function initStyle() {
             if (!(pid in map)) {
                 return true;
             }
+
+            // Hide posts with answers count less than value
             return map[pid].length < value;
         }).hide();
     });
-
-    $('.filterPosts .button').click(function() {
-        $('.post:hidden').show();
-        $('.filterPosts .slider').toggle();
+    
+    $('.filterPosts #filterImages').change(function() {
+        var posts = $('.post').filter(function() {
+            return !$(this).find('.file').length;
+        }),
+            checked = this.checked;
+        if (checked) {
+            posts.hide();
+        } else {
+            posts.show();
+        }
     });
 
     $('.threads').delegate('.poll input[type="radio"]', 'click', function() {

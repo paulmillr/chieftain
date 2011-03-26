@@ -372,6 +372,15 @@ blockquote {
     box-shadow: inset rgba(0, 0, 0, .4) 0 -5px 12px, inset rgba(0, 0, 0, 1) 0 1px 3px, rgba(255, 255, 255, .4) 0 1px;
 }
 
+.filterParams, .sliderInfo {
+    display: none;
+}
+
+.sliderInfo {
+    margin-top: -0.8em;
+    margin-left: 410px;
+}
+
 /*
 .post .message {
     max-height: 300px;
@@ -429,6 +438,9 @@ blockquote {
 .dashed {border: 1px dashed;}
 .stats {border: 1px dashed; padding: 0 5px;}
 #container + iframe {display: none;} /* Recaptcha bug */
+.post header {
+    font-size: 0.8em;
+}
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
 .post .tripcode.staff {color: #800080;}

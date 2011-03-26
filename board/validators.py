@@ -44,13 +44,15 @@ def attachment(file, section):
     lim = section.filesize_limit
     if lim != 0 and file.size > lim:
         raise InvalidFileError(_('Too big file'))
+    
     m = md5()
     for chunk in file.chunks():
         m.update(chunk)
     del chunk
     file_hash = m.hexdigest()
-    if File.objects.filter(hash=file_hash).count() > 0:
-        raise InvalidFileError(_('This file already exists'))
+    # Check if this file already exists
+    #if File.objects.filter(hash=file_hash).count() > 0:
+    #    raise InvalidFileError(_('This file already exists'))
     return (allowed[file.content_type], file_hash)  # extension, file hash
 
 

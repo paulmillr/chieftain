@@ -12,8 +12,12 @@
         <button class="button expandImages">{% trans "Expand images" %}</button>
         <span class="filterPosts">
             <button class="button">{% trans "Filter posts" %}</button>
-            
+            <span class="filterParams">
+                <input type="checkbox" name="filterImages" id="filterImages">
+                <label for="filterImages">{% trans "with images" %}</label>
+            </span>
             <div class="slider"></div>
+            <div class="sliderInfo"><span class="sliderVal"></span>{% trans "reply count" %}</div>
         </span>
     </section>
     {% if thread.poll_id %}
