@@ -14,7 +14,7 @@ from board.shortcuts import *
 
 
 def index(request):
-    return render(request, 'mobile/index.html')
+    return render(request, 'mobile/index.html', add_sidebar())
 
 
 def section(request, section_slug, page):

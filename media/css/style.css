@@ -349,20 +349,20 @@ blockquote {
 
 .button {
     -moz-border-radius: 3px;
-    -moz-box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
     -webkit-border-radius: 3px;
+    border-radius: 3px;
+    -moz-box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
     -webkit-box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
+    box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
     background: #d6d6d6;
     border: 1px solid rgba(0, 0, 0, .6);
-    border-radius: 3px;
-    box-shadow: rgba(255, 255, 255, .4) 0 1px, inset 0 20px 20px -10px #fff;
     color: #000;
     display: inline-block;
-    font-size: 12px;
+    font-size: 0.9em;
     line-height: 13px;
     padding: 3px 6px;
     text-decoration: none;
-    text-shadow: rgba(255, 255, 255, .4) 0 1px;
+    text-shadow: rgba(255, 255, 255, 0.4) 0 1px;
 }
 
 .button.active {

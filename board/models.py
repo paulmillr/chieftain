@@ -111,12 +111,14 @@ class PostManager(models.Manager):
 
         # Select two threads from each section.
         for t in threads:
+            if len(thread_ids) >= limit:
+                break
             if counter[t['section']] < 2:
                 thread_ids.append(t['id'])
                 counter[t['section']] += 1
 
         # Get post information.
-        posts = Post.objects.filter(thread__in=thread_ids[:limit],
+        posts = Post.objects.filter(thread__in=thread_ids,
             is_op_post=True).values('thread__section__name',
             'thread__section__slug', 'pid', 'topic', 'message'
         )[:limit]

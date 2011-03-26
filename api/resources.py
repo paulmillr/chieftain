@@ -182,7 +182,14 @@ class PostRootResource(RootModelResource):
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
         url = 'http://127.0.0.1:8888/api/streamp/{0}'
         data = urllib.urlencode({'html': instance.html.encode('utf-8')})
-        urllib2.urlopen(url.format(instance.thread.id), data)
+        try:
+            urllib2.urlopen(url.format(instance.thread.id), data)
+        except urllib2.URLError:
+            raise ResponseException(status.INTERNAL_SERVER_ERROR, {
+                'detail': u'{0}: {1}'.format(
+                    _('Server error'), _('can\'t refresh messages')
+                )
+            })
         return Response(status.CREATED, instance)
 
 
