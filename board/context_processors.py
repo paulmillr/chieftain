@@ -25,13 +25,16 @@ def session(request):
        {'session_classes': 'test test2'}
     """
     s = request.session.get('settings', {})
-    style = s.get('style')
-    if style:
-        s.pop('style')
-    else:
-        style = 'photon'
+    def pop_from_session(key, default=''):
+        return s.pop(key) if s.get(key) else default
+    u = request.user
+    if u.is_authenticated():
+        s['is_mod'] = True
+        if u.is_superuser:
+            s['is_admin'] = True
     return {
+        'style': pop_from_session('style', 'photon'),
+        'password': pop_from_session('password'),
         'session': dict(s.items()),
         'session_classes': ' '.join(s.keys()),
-        'style': style
     }

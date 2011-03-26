@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.db import models, connection
+from django.db.models.aggregates import Count
 from django.forms import ModelForm, CharField, FileField
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -79,6 +80,9 @@ class ThreadManager(models.Manager):
         return super(ThreadManager, self).get_query_set().filter(
             is_deleted=False)
 
+    def post_count(self):
+        return self.annotate(Count('post')).order_by('-post__count')
+
 
 class DeletedThreadManager(models.Manager):
     def get_query_set(self):
@@ -93,36 +97,34 @@ class PostManager(models.Manager):
 
     def popular(self, limit=10):
         """Gets most popular board threads.
-
-           Popularity is calculated by thread post count.
-           Each section can have only two popular threads.
+        
+        Popularity is calculated by thread post count.
+        Each section can have only two popular threads.
+        This method returns list of post dicts with 'description' value,
+        that contains post title / text / link.
         """
-        sql = '''SELECT board_post.thread_id, board_thread.section_id,
-        COUNT(*) as post_count FROM board_post
-        INNER JOIN board_thread ON board_post.thread_id = board_thread.id
-        GROUP BY board_post.thread_id
-        ORDER BY post_count DESC LIMIT {limit}'''.format(limit=limit * 10)
-        counter = Counter()
+        # Aggregate thread posts.
+        threads = Thread.objects.post_count().order_by('-post__count').values(
+            'id', 'section', 'post__count')[:limit * 10]
         thread_ids = []
-
-        cursor = connection.cursor()
-        cursor.execute(sql)
+        counter = Counter()
 
         # Select two threads from each section.
-        for i in cursor.fetchall():
-            if counter[i[1]] < 2:
-                thread_ids.append(i[0])
-                counter[i[1]] += 1
+        for t in threads:
+            if len(thread_ids) > limit:
+                break
+            if counter[t['section']] < 2:
+                thread_ids.append(t['id'])
+                counter[t['id']] += 1
 
         # Get post information.
-        posts = Post.objects.filter(thread__in=thread_ids[:limit],
+        posts = Post.objects.filter(thread__in=thread_ids,
             is_op_post=True).values('thread__section__name',
             'thread__section__slug', 'pid', 'topic', 'message'
         )[:limit]
 
         # Filter post information.
-        # Popular post message uses post topic, message or pid.
-        return reversed([tools.make_post_description(p) for p in list(posts)])
+        return (tools.make_post_description(p) for p in posts)
 
 
 class DeletedPostManager(models.Manager):
@@ -580,9 +582,8 @@ class Section(models.Model):
 
     def allowed_filetypes(self):
         """List of allowed MIME types of section."""
-        f = FileType.objects.filter(group__in=self.filetypes.all()
-            ).values_list('mime', 'extension')
-        return dict(f)
+        return dict(FileType.objects.filter(
+            group__in=self.filetypes.all()).values('mime', 'extension'))
 
     @property
     def key(self):

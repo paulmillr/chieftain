@@ -156,6 +156,10 @@ function getPostNumberPid(postnumber) {
     return postnumber.text();
 }
 
+function getFileId(file) {
+    return file.attr('id').replace('file', '');
+}
+
 /**
  * Key-value database, based on localStorage
  *
@@ -440,7 +444,7 @@ function defaultErrorCallback(response) {
 function init() {
     var textArea = new PostArea('#message'),
         set = $.settings('hideSectGroup'),
-        pass = $.settings('password'),
+        pass = $.localSettings('password'),
         buttons = {
             'bookmark': {storageName: 'Bookmarks'},
             'hide': {storageName: 'Hidden',
@@ -491,7 +495,8 @@ function init() {
         $('#password').val(pass);
     }
 
-    $('#main').delegate('#password', 'change', function(event) {
+    $('#container').delegate('#password', 'change', function(event) {
+        $.localSettings('password', this.value);
         $.settings('password', this.value);
     });
 
@@ -648,24 +653,11 @@ function init() {
         previewPosts();
     }
 
-    $('.deleteMode > input').click(function(event) {
-        var tmp = this.value,
-            t = $(this),
-            fn;
-        this.value = t.data('back');
-        t.data('back', tmp);
+    $('.actions .removePosts .button').click(function(event) {
+        event.preventDefault();
+        var t = $(this);
         t.next().toggle();
-        if (!$('.ip').length) {
-            $('.modPanel').remove();
-        }
-        if (t.attr('class') == 'toggled') {
-            t.removeClass('toggled');
-            t.addClass('toggle');
-            $('.deleted').removeClass('deleted');
-        } else {
-            t.removeClass('toggle');
-            t.addClass('toggled');
-        }
+        $('.threads').toggleClass('deletingPosts');
     });
 
     $('#ban_ip').click(function(event) {
@@ -680,61 +672,61 @@ function init() {
     });
 
     // Posts deletion
-    $('#main').delegate('.post', 'click', function(event) {
-        if ($('.deleteMode input').attr('class') !== 'toggled') {
-            return true;
-        }
+    $('.threads').delegate('.post', 'click', function(event) {
+        if (!$('.threads').hasClass('deletingPosts')) {
+            return true
+        };
         var t = $(this),
             only_files = !!$('#only_files').attr('checked'),
             ban_ip = !!$('#ban_ip').attr('checked'),
             delete_all = !!$('#delete_all').attr('checked'),
-            target = !only_files ? t : t.find('.files'),
+            target = !only_files ? t : t.find('.file, .filemeta'),
             url = !only_files ? 
                 window.api.url + '/post/' + target.data('id') : 
-                window.api.url + '/file/' + target.find('.file').attr('id').replace(/file/, ''),
-            password = $('#password').val();
-
+                window.api.url + '/file/' + getFileId(target.find('img')),
+        password = $('#password').val();
+        
         url += '?password=' + password;
-        url += '&' + $('.deleteMode').serialize();
+        url += '&' + $('.removePosts').serialize();
         target.addClass('deleted');
         $.ajax({
             'url': url,
             'dataType': 'json',
             'type': 'DELETE'
         })
-        .error(function(response) {
-            $.notification('error', $.parseJSON(response.responseText)['detail']);
+        .error(function(xhr) {
+            $.notification('error', $.parseJSON(xhr.responseText)['detail']);
             target.removeClass('deleted');
         })
         .success(function(data) {
             if (only_files) {
-                slideRemove(t.find('.files, .file-info'));
+                slideRemove(target);
                 return true;
             }
+
+            // Deleting all user posts.
             if (delete_all) {
                 var t = target.find('.ip').text(),
                     d = $('.ip').filter(function() {
-                        return $(this).text() === t;
+                    return $(this).text() === t;
                 }).each(function() {
                     var post = $(this).closest('.post');
                     post.addClass('deleted');
                     slideRemove(post);
                 });
             }
-            if (target.prev().length !== 0) {
-                // post is not first in thread
-                slideRemove(target);
-                return true;
-            }
 
-            // remove whole thread
-            if (curPage.type === 'thread') {
-                window.location.href = './';
-                return true;
+            // post is not first in thread
+            if (target.prev().length !== 0) {
+                slideRemove(target.add(target.find('img')));
+            } else {
+                if (curPage.type === 'thread') {
+                    window.location.href = './';
+                }
+                var thread = target.parent();
+                thread.children().addClass('deleted');
+                slideRemove(thread);
             }
-            var thread = target.parent();
-            thread.children().addClass('deleted');
-            slideRemove(thread);
         });
     });
 
@@ -937,19 +929,36 @@ function initStyle() {
         $('.file').trigger('click');
     });
 
-    $('.filterPosts .button').click(function() {
+    $('.filterPosts .slider').slider({
+        'max': 15
+    })
+    .hide()
+    .bind('slidechange', function() {
         var map = window.answersMap,
             posts = $('.post'),
-            val = $('#filterPosts').val(),
+            slider = $('.filterPosts .slider'),
+            value = slider.slider('value'),
             replies;
+        console.log('Filtered posts with %s answers.', value);
 
+        posts.show();
         posts.filter(function() {
             var pid = getPostPid(this);
-            if (!(pid in map) || map[pid].length < val) {
+            if (value === 0) {
+                return false;
+            }
+
+            // Hide posts, that don't have answers
+            if (!(pid in map)) {
                 return true;
             }
-            return false
-        }).toggle();
+            return map[pid].length < value;
+        }).hide();
+    });
+
+    $('.filterPosts .button').click(function() {
+        $('.post:hidden').show();
+        $('.filterPosts .slider').toggle();
     });
 
     $('.threads').delegate('.poll input[type="radio"]', 'click', function() {
@@ -1071,7 +1080,6 @@ function initPosts(selector) {
         }
 
         // Initialize post buttons.
-        
         /*for (var className in buttons) {
             var button = buttons[className],
                 span = post.find('.' + className);

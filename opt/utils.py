@@ -34,32 +34,29 @@ def rebuild():
             print 'Rendered post {0}'.format(c)
 
 
-def wipe(posts=10, thread_or_slug='', domain='http://b.2-ch.ru/'):
+def wipe(posts=10, thread=False):
     """Requires Python 3.2."""
     # >>> wipe(50000, 'b')
     # 50000 posts in 0:34:54.923063
-
-    if sys.version_info[0] < 3:
-        raise Exception('You need Python 3.2+ to use this function.')
     import urllib.request
     import random
     import concurrent.futures
     from datetime import datetime
     start = datetime.now()
-    uri = '{0}api/post/'.format(domain)
-
+    uri = 'http://1chan.ru/{0}/createAjaxForm/'
+    boards = ['d', 'b', 'a', 's', 'vg', 'pr', 'mu', 'tv']
     def rand():
         return str(int(random.random() * 100000) % 50000)
-
-    if thread_or_slug.isdigit():
-        data = 'thread={0}'.format(thread_or_slug)
-    else:
-        data = 'section={0}'.format(thread_or_slug)
-    data += '&poster=&email=&topic=&password=test&message=WIPE'
+    #if thread_or_slug.isdigit():
+    #    data = 'thread={0}'.format(thread_or_slug)
+    #else:
+    #    data = 'section={0}'.format(thread_or_slug)
+    data = 'text=1kunsosnool&password=1231&title=SOSNOOL'
     opener = urllib.request.URLopener()
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         for i in range(posts):
-            executor.submit(opener.open, uri, data + rand())
+            c = i % len(boards)
+            executor.submit(opener.open, uri.format(boards[c]), data + rand())
     print('{0} posts in {1}'.format(posts, datetime.now() - start))
 
 

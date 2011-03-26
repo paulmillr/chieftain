@@ -236,12 +236,16 @@ fieldset {border: 0;}
     width: 2em;
     vertical-align: bottom;
 }
+.tools .filterPosts .slider {
+    width: 400px;
+    margin: 5px 0 0 5px;
+}
 
 .post .title, .post .number {
     font-weight: bold;
 }
 
-.post .number:before {content: "№";}
+.post .number:before {content: "#";}
 
 #main .replylink {
     text-decoration: none;
@@ -311,6 +315,10 @@ a.file img {
     display: none;
 }
 
+.deleted {
+    background-color: #b00;
+}
+
 blockquote {
     color: #789922;
 }
@@ -320,6 +328,24 @@ blockquote {
 }
 
 .post-preview {position: absolute;}
+
+.rssButton, .twitterButton {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 2px;
+    background-image: url(../images/sprites.png);
+    vertical-align: bottom;
+}
+
+.twitterButton {
+    background-position: 0 -83px;
+}
+.rssButton {
+    width: 15px;
+    height: 14px;
+    background-position: -16px -84px;
+}
 
 .button {
     -moz-border-radius: 3px;
@@ -366,8 +392,16 @@ blockquote {
 .ie7 .post {float: left;}
 .ie7 .post:first-child {float: none;}
 
+.mod, .admin {display: none;}
+.is_mod .mod {display: block;}
+.is_admin .admin {display: block;}
+
 .actions .pagination {
     margin: 6px 0 6px 0;
+}
+
+.actions .removePosts .hidden {
+    display: none;
 }
 
 .copyright {
@@ -525,7 +559,7 @@ pre {
 }
 
 .ie7 .post .number {
-    z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = "№" + this.innerHTML);
+    z-index: expression(runtimeStyle.zIndex = 1, this.innerHTML = "#" + this.innerHTML);
 }
 
 .ie7 ul.pagination, .ie7 .replylink {

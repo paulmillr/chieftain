@@ -25,7 +25,7 @@ msgstr "Необходимо ввести причину блокировки"
 
 #: api/resources.py:221
 msgid "Error on deleting post #"
-msgstr "Ошибка при удалении сообщения №"
+msgstr "Ошибка при удалении сообщения #"
 
 #: api/resources.py:222 api/resources.py:278
 msgid "Password mismatch"
@@ -33,7 +33,7 @@ msgstr "Неправильный пароль"
 
 #: api/resources.py:277
 msgid "Error on deleting file #"
-msgstr "Ошибка при удалении файла №"
+msgstr "Ошибка при удалении файла #"
 
 #: board/fields.py:26
 msgid "Invalid captcha"

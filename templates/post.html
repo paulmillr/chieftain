@@ -24,10 +24,15 @@
             {{post.date|date:"d.m.Y H:i:s"}}
         </time>
         <span class="number"><a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">{{post.pid}}</a></span>
-        {% if post.thread and post.is_op_post %}
+        {% if thread and post.is_op_post %}
             <span class="replylink">
                 <a href="{{thread.op_post.pid|default:""}}#post{{post.pid}}">Ответ</a>
             </span>
+        {% endif %}
+        {% if post.is_op_post %}
+            {% url board.views.thread post.section_slug post.pid as thread_url %}
+            <a href="http://twitter.com/share?text={{post.message|urlencode}}&amp;url={% setting 'SITE_URL' %}{{thread_url|slice:'1:'|urlencode}}" title="Добавить в Twitter" target="_blank" class="twitterButton"></a>
+            <a href="{{thread_url}}/rss" title="RSS feed" class="rssButton"></a>
         {% endif %}
     </header>
 

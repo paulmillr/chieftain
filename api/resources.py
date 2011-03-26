@@ -57,7 +57,24 @@ class RootModelResource(RootModelResource, Resource):
     pass
 
 
-#def admin(request, mode):
+def mod_delete_post(request, post):
+    if request.GET.get('ban_ip'):
+        r = request.GET.get('ban_reason')
+        if not r:
+            raise ResponseException(status.BAD_REQUEST, {
+                'detail': _('You need to enter ban reason')})
+        d = DeniedIP(ip=post.ip, reason=r, by=request.user)
+        d.save()
+    if request.GET.get('delete_all'):
+        slug = post.section_slug()
+        posts = post.section().posts().filter(ip=post.ip)
+        # remove threads
+        op = posts.filter(is_op_post=True).values('pid', 'thread')
+        t = Thread.objects.filter(id__in=[i['thread'] for i in op])
+        t.update(is_deleted=True)
+        for p in posts:
+            p.remove()
+
 
 class PollRootResource(RootModelResource):
     """A list resource for Poll."""
@@ -192,29 +209,9 @@ class PostResource(ModelResource):
         key = tools.key(request.GET['password'])
         if post.password == key:
             post.remove()
-            return Response(status.NO_CONTENT)
         elif is_mod(request, post.section_slug()):
-            if request.GET.get('ban_ip'):
-                r = request.GET.get('ban_reason')
-                if not r:
-                    return Response(status.BAD_REQUEST, {
-                    'detail': _('You need to enter ban reason')})
-                d = DeniedIP(ip=post.ip, reason=r, by=request.user)
-                d.save()
-            if request.GET.get('delete_all'):
-                slug = post.section_slug()
-                posts = post.section().posts().filter(ip=post.ip)
-                # remove threads
-                op = posts.filter(is_op_post=True).values('pid', 'thread')
-                template.rebuild_cache(slug, [i['pid'] for i in op])
-                t = Thread.objects.filter(id__in=[i['thread'] for i in op])
-                t.update(is_deleted=True)
-                for p in posts:
-                    p.remove()
-            else:
-                post.remove()
-            post.thread.rebuild_template_cache()
-            return Response(status.NO_CONTENT)
+            mod_delete_post(request, post)
+            post.remove()
         else:
             return Response(status.FORBIDDEN, content={
                 'detail': u'{0}{1}. {2}'.format(
@@ -222,6 +219,7 @@ class PostResource(ModelResource):
                     _('Password mismatch')
                 )
             })
+        return Response(status.NO_CONTENT)
 
 
 class SectionRootResource(RootModelResource):
@@ -271,14 +269,18 @@ class FileResource(ModelResource):
             raise ResponseException(status.NOT_FOUND)
 
         key = tools.key(request.GET['password'])
-        if file.post.password != key:
+        if file.post.password == key:
+            file.remove()
+        elif is_mod(request, file.post.section_slug()):
+            mod_delete_post(request, file.post)
+            file.remove()
+        else:
             raise ResponseException(status.FORBIDDEN, content={
                 'detail': u'{0}{1}. {2}'.format(
-                    _('Error on deleting file #'), post.pid,
+                    _('Error on deleting file #'), file.post.pid,
                     _('Password mismatch')
                 )
             })
-        file.remove()
         return Response(status.NO_CONTENT)
 
 

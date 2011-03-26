@@ -1,6 +1,19 @@
-__test__ = {"doctest": """
-Another way to test that 1 + 1 is equal to 2.
+#!/usr/bin/env python
+# encoding: utf-8
+"""
+tests.py
 
->>> 1 + 1 == 2
-True
-"""}
+Created by Paul Bagwell on 2011-03-26.
+Copyright (c) 2011 Paul Bagwell. All rights reserved.
+"""
+from django.utils import unittest
+from django.test.client import Client
+
+
+class ModelsTest(unittest.TestCase):
+    def setUp(self):
+        # init test browser.
+        self.client = Client()
+
+    def test_post_create(self):
+        

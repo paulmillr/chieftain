@@ -81,13 +81,8 @@ def tripcode(text):
 
 
 def make_post_description(post):
-    if post['topic']:
-        msg = post['topic']
-    elif post['message']:
-        msg = post['message']
-    else:
-        msg = '>>{0}'.format(post['pid'])
-    post['message'] = msg
+    post['description'] = (post['topic'] or post['message'] or
+        '>>{0}'.format(post['pid']))
     return post
 
 

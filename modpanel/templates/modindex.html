@@ -4,7 +4,10 @@
 {% block title %}{% trans "Mod control panel" %}{% endblock %}
 
 {% block content %}
-<h3><a href="/admin/">Panel</a></h3>
-<h3><a href="banlist">Ban list</a></h3>
+
+<ul class="pagination">
+    <li><a href="/admin/">Panel</a></li>
+    <li><a href="banlist">Ban list</a></li>
+</ul>
 {% block modcontent %}{% endblock %}
 {% endblock %}

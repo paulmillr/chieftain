@@ -2,10 +2,9 @@
 {% load cache %}
 {% load i18n %}
 
-{% block title %}{% trans "Mod control panel" %}{% endblock %}
+{% block title %}{% trans "Mod control panel" %} - {% trans "Ban list" %}{% endblock %}
 
 {% block modcontent %}
-{% trans "Ban list"}
 {% for i in banlist %}
     {{i}}
 {% endfor %}

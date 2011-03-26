@@ -33,22 +33,20 @@
         </ul>
         {% block pages %}{% endblock %}
 
-        <div class="remove">
-            <form method="POST" action="#">
-                <input type="submit" value="Удалить сообщения">
-            </form>
+        <form method="POST" action="/api/posts/" class="removePosts">
+            <button class="button">{% trans 'Delete posts' %}</button>
             <div class="hidden">
                 <p><input type="checkbox" name="only_files" id="only_files">
-                <label for="only_files">Только файлы</label></p>
+                <label for="only_files">{% trans "Only files" %}</label></p>
 
-                <div class="admin">
+                <div class="mod">
                     <p><input type="checkbox" name="delete_all" id="delete_all">
-                    <label for="delete_all">Удалить все сообщения с айпи</label></p>
+                    <label for="delete_all">{% trans "Delete all messages from IP" %}</label></p>
 
                     <p><input type="checkbox" name="ban_ip" id="ban_ip">
-                    <label for="ban_ip">Забанить айпи</label></p>
+                    <label for="ban_ip">{% trans "Ban IP" %}</label></p>
                 </div>
             </div>
-        </div>
+        </form>
     </section>
 {% endblock %}
