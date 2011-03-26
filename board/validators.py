@@ -56,16 +56,34 @@ def attachment(file, section):
     return (allowed[file.content_type], file_hash)  # extension, file hash
 
 
-def post(request, no_captcha=True):
+def post(request):
     """Makes various changes on new post creation.
 
        If there is no POST['thread'] specified, it will create
        new thread.
     """
     #f = PostFormNoCaptcha if no_captcha else PostForm
-    form = PostFormNoCaptcha(request.POST, request.FILES)
+    c = request.session.get('valid_captchas', 0)
+    no_captcha = request.session.get('no_captcha', False)
+    print 'vc', c
+    if request.user.is_authenticated():
+        no_captcha = True
+    f = PostFormNoCaptcha if no_captcha else PostForm
+    form = f(request.POST, request.FILES)
     if not form.is_valid():
         raise ValidationError(form.errors)
+
+    if no_captcha:
+        c -= 1
+        if c == 0:
+            request.session['no_captcha'] = False
+    else:
+        c += 1
+        if c == 3:
+            request.session['no_captcha'] = True
+            c = 20
+    request.session['valid_captchas'] = c
+
     new_thread = not request.POST.get('thread')
     with_files = bool(request.FILES.get('file'))
     logged_in = bool(request.user.is_authenticated())

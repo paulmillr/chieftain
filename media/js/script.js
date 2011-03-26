@@ -1234,13 +1234,12 @@ function initAJAX() {
         }
 
         if (window.quickReplied || $.settings('disablePubSub')) {
-            //console.log(data.html);
+            //console.log('Received post html', data.html);
             var html = $(data.html);
                 html = $([html[0], html[2]]),
                 post = html.hide()
                 .appendTo('#thread' + data.thread.id)
                 .fadeIn(500);
-            console.log(post);
             post.find('.tripcode:contains("!")').addClass('staff');
             initPosts(post);
         }

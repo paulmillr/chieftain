@@ -713,6 +713,9 @@ class PostFormNoCaptcha(ModelForm):
     """
     file = FileField(required=False)
     section = CharField(required=False)
+    captcha = CharField(required=False)
+    recaptcha_challenge_field = CharField(required=False)
+    recaptcha_response_field = CharField(required=False)
 
     class Meta:
         model = Post
@@ -721,8 +724,6 @@ class PostFormNoCaptcha(ModelForm):
 class PostForm(PostFormNoCaptcha):
     """Simple post form."""
     captcha = fields.ReCaptchaField(required=False)
-    recaptcha_challenge_field = CharField(required=False)
-    recaptcha_response_field = CharField(required=False)
 
 
 class SectionFeed(Feed):

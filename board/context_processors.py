@@ -26,6 +26,9 @@ def session(request):
        {'session_classes': 'test test2'}
     """
     s = request.session.get('settings', {})
+    no_captcha = request.session.get('no_captcha')
+    if no_captcha:
+        s['no_captcha'] = True
 
     def pop_from_session(key, default=''):
         return s.pop(key) if s.get(key) else default

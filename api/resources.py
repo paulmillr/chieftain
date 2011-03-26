@@ -175,7 +175,7 @@ class PostRootResource(RootModelResource):
 
     def post(self, request, auth, content, *args, **kwargs):
         try:
-            instance = validators.post(request, auth)
+            instance = validators.post(request)
         except validators.ValidationError as e:
             return Response(status.BAD_REQUEST, {'detail': e})
         # django sends date with microseconds. We don't want it.

@@ -184,6 +184,8 @@ ul.pagination li a {
     padding: 2px;
 }
 
+.no_captcha .newpost .captcha-d, .is_mod .newpost .captcha-d {display: none;}
+
 .newpost .bbcodes {
     display: none;
 }
