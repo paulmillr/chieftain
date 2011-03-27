@@ -62,11 +62,13 @@ def post(request):
        If there is no POST['thread'] specified, it will create
        new thread.
     """
-    #f = PostFormNoCaptcha if no_captcha else PostForm
+    new_thread = not request.POST.get('thread')
+    with_files = bool(request.FILES.get('file'))
+    logged_in = bool(request.user.is_authenticated())
+
     c = request.session.get('valid_captchas', 0)
     no_captcha = request.session.get('no_captcha', False)
-    print 'vc', c
-    if request.user.is_authenticated():
+    if logged_in:
         no_captcha = True
     f = PostFormNoCaptcha if no_captcha else PostForm
     form = f(request.POST, request.FILES)
@@ -83,10 +85,6 @@ def post(request):
             request.session['no_captcha'] = True
             c = 20
     request.session['valid_captchas'] = c
-
-    new_thread = not request.POST.get('thread')
-    with_files = bool(request.FILES.get('file'))
-    logged_in = bool(request.user.is_authenticated())
 
     post = form.save(commit=False)
     post.date = datetime.now()
