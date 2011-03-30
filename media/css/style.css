@@ -4,8 +4,8 @@
 }
 
 body {
-    font-size: 15px;
-    font-family: "Trebuchet MS", Trebuchet, tahoma, serif;
+    font-size: 13px;
+    font-family: Verdana, sans-serif;
 }
 
 header, nav, article, footer, address, section {
@@ -108,7 +108,6 @@ a:hover {color:#06f;}
 
 ul.pagination li {
     display: inline;
-    font-weight: bold;
 }
 
 ul.pagination:before {
@@ -173,7 +172,7 @@ ul.pagination li a {
 
 .newpost label {
     float: left;
-    width: 130px;
+    width: 140px;
     font-weight: bold;
     color: #024;
     font-size: 1.05em;

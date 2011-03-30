@@ -1,6 +1,6 @@
 * {margin:0; padding:0;}
 img {border:0;}
-body {background:#ffffff; font:13px "Trebuchet MS", Arial, Helvetica, sans-serif; color:#505050;}
+body {background:#ffffff; font:13px Helvetica, serif; color:#505050;}
 .center { width:909px; margin:0 auto;}
 .clear {clear:both; line-height:0px; height:0px; overflow:hidden; font-size:0px;}
 ul {list-style:none;}

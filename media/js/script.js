@@ -413,10 +413,24 @@ function slideRemove(elem) {
 }
 
 function showNewPostNotification(text, section, thread) {
-    var nm = gettext('New message in thread '),
-        title = nm + '/' + section + '/' + thread;
+    var title_txt = $('title').text(),
+        n_title = gettext('New message in thread ') + '/' + section + '/' + thread;
+
+    window.newMsgCount = window.newMsgCount ? window.newMsgCount + 1 : 1;
+
+    if (window.newMsgCount > 1) {
+        title_txt = title_txt.split('] ').pop();
+    }
+
+    $('title').text('[' + window.newMsgCount + '] ' + title_txt);
+    $(document).mousemove(function(event) {
+        $('title').text(title_txt);
+        $(document).unbind('mousemove');
+        window.newMsgCount = 0;
+    });
+
     if ($.dNotification.check()) {
-        $.dNotification.show(text, 3000, title);
+        $.dNotification.show(text, 3000, n_title);
     }
 }
 
@@ -1339,12 +1353,8 @@ function initPubSub() {
                 pubsub.cursor = posts[posts.length - 1].id;
                 //console.log(posts.length, 'new msgs');
                 for (var i=0; i < posts.length; i++) {
-                    var post = $(posts[i]).filter(function() {
-                        // remove text nodes
-                        var t = document.createTextNode('').__proto__;
-                        //console.log('t', this.__proto__ != t)
-                        return this.__proto__ != t;
-                    })
+                    var p = $(posts[i]),
+                        post = $(p.get(0)).add(p.get(2))
                     .hide()
                     .appendTo('.thread')
                     .fadeIn(500, function() {

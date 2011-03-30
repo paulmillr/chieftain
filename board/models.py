@@ -49,10 +49,10 @@ SECTION_TYPES = (
 def get_file_path(base):
     """Builds path to stored static files. Used in File class."""
     def closure(instance, filename):
-        ip = instance.post
-        return '{base}/{slug}/{pid}.{ext}'.format(
-            base=base, slug=ip.section_slug(), thread=ip.thread,
-            pid=ip.pid, ext=instance.type.extension
+        post = instance.post
+        return '{base}/{slug}/{post_id}.{ext}'.format(
+            base=base, slug=post.section_slug(), thread=post.thread,
+            post_id=post.id, ext=instance.type.extension
         )
     return closure
 

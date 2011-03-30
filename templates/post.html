@@ -39,7 +39,7 @@
     {% if post.file_count > 0 %}
     {% for f in post.files %}
         <div class="filemeta">
-            <a target="_blank" href="{{f.file.url}}">{{post.pid}}.{{f.type.extension}}</a>
+            <a target="_blank" href="{{f.file.url}}">{{post.id}}.{{f.type.extension}}</a>
             (<em>{{f.size|filesizeformat}}{% if f.image_height %}, {{f.image_height}}x{{f.image_width}}{% endif %}</em>)
         </div>
         <a href="{{f.file.url}}" class="file">
