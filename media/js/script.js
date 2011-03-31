@@ -4,10 +4,16 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  */
+// TODO: split everything into modules.
 
 var queryString = parseQs(),
     answersMap = {},
     postButtons = {},
+    info = {  // stores various information
+        newMsgs: 0,
+        quickReplied: false,
+        validCaptchas: 0
+    },
     votedPolls = new BoardStorage('polls'),
     workarounds = (function() {
         // pre-localize messages because of django bug
@@ -413,10 +419,18 @@ function slideRemove(elem) {
 }
 
 function showNewPostNotification(text, section, thread) {
-    var nm = gettext('New message in thread '),
-        title = nm + '/' + section + '/' + thread;
+    var title_txt = $('title').text().split('] ').pop(),
+        n_title = gettext('New message in thread ') + '/' + section + '/' + thread;
+
+    $('title').text('[' + (++window.info.newMsgs) + '] ' + title_txt);
+    $(document).mousemove(function(event) {
+        $('title').text(title_txt);
+        $(document).unbind('mousemove');
+        window.info.newMsgs = 0;
+    });
+
     if ($.dNotification.check()) {
-        $.dNotification.show(text, 3000, title);
+        $.dNotification.show(text, 3000, n_title);
     }
 }
 
@@ -743,7 +757,7 @@ function init() {
                 if (curPage.type === 'page') {
                     var thread_id = getThreadId(n.parent());
                     $('.newpost form').append('<input type="hidden" value="' + thread_id + '" id="thread" name="thread" />');
-                    window.quickReplied = true;
+                    window.info.quickReplied = true;
                 }
             }
             textArea.insert('>>' + e.target.innerHTML + ' ');
@@ -1228,12 +1242,12 @@ function initAJAX() {
     }
 
     function successCallback(data) {
-        if (curPage.type !== 'thread' && !window.quickReplied) { // redirect
+        if (curPage.type !== 'thread' && !window.info.quickReplied) { // redirect
             window.location.href = './' + data.pid;
             return true;
         }
 
-        if (window.quickReplied || $.settings('disablePubSub')) {
+        if (window.info.quickReplied || $.settings('disablePubSub')) {
             //console.log('Received post html', data.html);
             var html = $(data.html);
                 html = $([html[0], html[2]]),
@@ -1244,9 +1258,13 @@ function initAJAX() {
             initPosts(post);
         }
 
-        if (window.quickReplied) {
+        if (window.info.quickReplied) {
             $('input[name="thread"]').remove();
-            window.quickReplied = false;
+            window.info.quickReplied = false;
+        }
+
+        if (++window.info.validCaptchas > 2) {
+            $('.captcha-d').remove();
         }
 
         var newpost = $('.newpost');
@@ -1339,12 +1357,8 @@ function initPubSub() {
                 pubsub.cursor = posts[posts.length - 1].id;
                 //console.log(posts.length, 'new msgs');
                 for (var i=0; i < posts.length; i++) {
-                    var post = $(posts[i]).filter(function() {
-                        // remove text nodes
-                        var t = document.createTextNode('').__proto__;
-                        //console.log('t', this.__proto__ != t)
-                        return this.__proto__ != t;
-                    })
+                    var p = $(posts[i]),
+                        post = $(p.get(0)).add(p.get(2))
                     .hide()
                     .appendTo('.thread')
                     .fadeIn(500, function() {
