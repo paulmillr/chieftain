@@ -1,0 +1,6 @@
+Django==1.3
+ipcalc
+Tornado
+py-memcached
+recaptcha-client
+PIL

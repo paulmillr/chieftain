@@ -7,7 +7,6 @@
 // TODO: split everything into modules.
 
 var queryString = parseQs(),
-    answersMap = {},
     postButtons = {},
     info = {  // stores various information
         newMsgs: 0,
@@ -967,8 +966,7 @@ function initStyle() {
     })
     .hide()
     .bind('slidechange', function() {
-        var map = window.answersMap,
-            posts = $('.post'),
+        var posts = $('.post'),
             slider = $('.filterPosts .slider'),
             value = slider.slider('value'),
             replies;
@@ -981,12 +979,12 @@ function initStyle() {
             }
 
             // Hide posts, that don't have answers
-            if (!(pid in map)) {
+            if (!(pid in posts.map)) {
                 return true;
             }
 
             // Hide posts with answers count less than value
-            return map[pid].length < value;
+            return posts.map[pid].length < value;
         }).hide();
     });
     
@@ -1081,167 +1079,144 @@ function initStyle() {
     return true;
 }
 
-function initPosts(selector) {
-    var posts = selector && typeof selector !== 'function' ? 
-            isjQuery(selector) ? selector : $(selector) : $('.post'),
-        buttons = window.postButtons,
-        map = {},
-        cache = {};
+posts = {
+    map: {},
+    data: {},
 
-    //if ($.browser.msie && $.browser.version === '7.0') {
-    //    return true;
-    //}
+    init: function() {
+        var posts = selector && typeof selector !== 'function' ? 
+                isjQuery(selector) ? selector : $(selector) : $('.post'),
+            buttons = window.postButtons,
+            cache = {};
 
-    for (var i=0; i < posts.length; i++) {
-        var p = posts[i],
-            post = $(p),
-            id = getPostId(post),
-            pid = getPostPid(post),
-            links = post.find('.postlink').map(function() {return $(this);});
+        //if ($.browser.msie && $.browser.version === '7.0') {
+        //    return true;
+        //}
 
-        // Initialize answers map.
-        for (var j=0; j < links.length; j++) {
-            var href = getPostLinkPid(links[j]),
-                targetSelector = '#post' + href,
-                target = $(targetSelector);
+        for (var i=0; i < posts.length; i++) {
+            var p = posts[i],
+                post = $(p),
+                id = getPostId(post),
+                pid = getPostPid(post),
+                links = post.find('.postlink').map(function() {return $(this);});
 
-            if (href in map) {
-                if (map[href].indexOf(pid) !== 0) {
-                    map[href].push(pid);
+            // Initialize answers map.
+            for (var j=0; j < links.length; j++) {
+                var href = getPostLinkPid(links[j]),
+                    targetSelector = '#post' + href,
+                    target = $(targetSelector);
+
+                if (href in this.map) {
+                    if (this.map[href].indexOf(pid) !== 0) {
+                        this.map[href].push(pid);
+                    }
+                } else {
+                    this.map[href] = [pid];
                 }
+
+                cache[href] = target
+
+                if (curPage.type === 'thread' && target.length !== 0) {
+                    target.attr('href', targetSelector);
+                }
+            }
+
+            // Initialize post buttons.
+            /*for (var className in buttons) {
+                var button = buttons[className],
+                    span = post.find('.' + className);
+
+                if (id in button.list) {
+                    span.removeClass('add').addClass('remove');
+                }
+
+                if (button.onInit) {
+                    button.onInit(new PostContainer(span, post));
+                }
+            }*/
+        }
+
+        // Build or rebuild page answers map.
+        for (var i in this.map) {
+            var c = cache[i].find('.answer-map'),
+                cacheExists = !!c.length,
+                div = cacheExists ? c : $('<div class="answer-map"/>'),
+                links = [],
+                post = $('#post' + i),
+                skipped = post.find('.skipped');
+            for (var j=0; j < this.map[i].length; j++) {
+                var text = this.map[i][j];
+                links.push('<a class="postlink" href="#post'+ text +'">&gt;&gt;'+ text +'</a>');
+            }
+
+            if (!cacheExists) {
+                div.html(gettext('Replies') + ':' + links.join(','));
             } else {
-                map[href] = [pid];
+                div.html(div.html() + ',' + links.join(','));
             }
 
-            cache[href] = target
-
-            if (curPage.type === 'thread' && target.length !== 0) {
-                target.attr('href', targetSelector);
+            if (skipped.length) {
+                div.insertBefore(skipped);
+            } else {
+                post.append(div);
             }
+
+            div.insertBefore( + '.skipped')
+            $('#post' + i).append();
         }
-
-        // Initialize post buttons.
-        /*for (var className in buttons) {
-            var button = buttons[className],
-                span = post.find('.' + className);
-
-            if (id in button.list) {
-                span.removeClass('add').addClass('remove');
-            }
-
-            if (button.onInit) {
-                button.onInit(new PostContainer(span, post));
-            }
-        }*/
     }
-
-    // Build or rebuild page answers map.
-    for (var i in map) {
-        var c = cache[i].find('.answer-map'),
-            cacheExists = !!c.length,
-            div = cacheExists ? c : $('<div class="answer-map"/>'),
-            links = [],
-            post = $('#post' + i),
-            skipped = post.find('.skipped');
-        for (var j=0; j < map[i].length; j++) {
-            var text = map[i][j];
-            links.push('<a class="postlink" href="#post'+ text +'">&gt;&gt;'+ text +'</a>');
-        }
-
-        if (!cacheExists) {
-            div.html(gettext('Replies') + ':' + links.join(','));
-        } else {
-            div.html(div.html() + ',' + links.join(','));
-        }
-        
-        if (skipped.length) {
-            div.insertBefore(skipped);
-        } else {
-            post.append(div);
-        }
-        
-        div.insertBefore( + '.skipped')
-        $('#post' + i).append();
-    }
-    
-    window.answersMap = map;
 }
 
-function initVisited() {
-    if (!window.localStorage || $.settings('dontLogVisits')) {
-        return true;
-    }
-
-    // Thread visits counter
-    var storage = new BoardStorage('visitedThreads', true),
-        visitedList = $('.' + storage.storageName);
-
-    $('#dontLogVisits').click(function(event) {
-        visitedList.slideToggle();
-    });
-
-    if (curPage.type === 'thread') {
-        thread = curPage.thread;
-        if (!(thread in storage.list())) {
-            storage.set(thread, {
-                'first': curPage.first, 
-                'section': curPage.section,
-                'visits': 1,
-                'first_visit': (new Date()).getTime(),
-                'title': $('.post:first-child .title').text(),
-                'description': (function() {
-                    var text = $('.post:first-child .message').text();
-                    if (text.length > 100) {
-                        text = text.substring(0, 100) + '...';
-                    } 
-                    return $.trim(text);
-                })()
-            })
-        } else {
-            storage.incr(thread, 'visits');
+visited = {
+    init: function() {
+        if (!window.localStorage || $.settings('dontLogVisits')) {
+            return true;
         }
-    } else if (curPage.type == 'settings') {
-        ul = visitedList.find('ul');
-        visitedList.show();
-        function makeList(list) {
-            for (var i=0; i < list.length; ++i) {
-                var a = $('<a/>'),
-                    item = list[i],
-                    elem = $('<li/>'),
-                    tpl = '/' + item.section + '/' + item.first;
-                a.attr('href', tpl);
-                a.text(tpl + ': ' + item.description);
-                ul.append(elem.append(a));
-            }
-        }
-        makeList(storage.sort('visits'));
-        $('.sortVisitedThreads').change(function(event) {
-            ul.find('li').remove();
-            makeList(storage.sort(this.value));
-        });
-        $('.clearVisitedThreads').click(function(event) {
-            event.preventDefault();
-            storage.flush();
-            ul.children('li').slideUp('normal', function() {
-                $(this).remove();
-            });
+        
+        // Thread visits counter
+        var storage = new BoardStorage('visitedThreads', true),
+            visitedList = $('.' + storage.storageName);
+
+        $('#dontLogVisits').click(function(event) {
+            visitedList.slideToggle();
         });
     }
 }
 
-function initHotkeys() {
-    $('.newpost input, .newpost textarea').keydown('shift+return', function(event) {
-        $('.newpost').submit();
-        return false;
-    });
+hotkeys = {
+    init: function() {
+        $('.newpost input, .newpost textarea').keydown('shift+return', function(event) {
+            $('.newpost').submit();
+            return false;
+        });
+    }
 }
 
-function initAJAX() {
-    if (!$('#password').val()) {
-        $('#password').val(randomString(8));
-    }
+ajax = {
+    init: function() {
+        if (!$('#password').val()) {
+            $('#password').val(randomString(8));
+        }
+        
+        $('.newpost form').ajaxForm({
+            //target: 'body',
+            success: function(response) {
+                //alert(response);
+                if (typeof response === 'string') {
+                    response = $.parseJSON(response);
+                }
 
-    function successCallback(data) {
+                return !response['field-errors'] && !response['detail'] ? 
+                    this.success(response) :
+                    defaultErrorCallback(response);
+            },
+            error: defaultErrorCallback,
+            url: window.api.url + '/post/?html=1&_accept=text/plain',
+            dataType: 'json'
+        });
+    },
+
+    success: function(data) {
         if (curPage.type !== 'thread' && !window.info.quickReplied) { // redirect
             window.location.href = './' + data.pid;
             return true;
@@ -1294,22 +1269,6 @@ function initAJAX() {
             }
         });
     }
-    $('.newpost form').ajaxForm({
-        //target: 'body',
-        success: function(response) {
-            //alert(response);
-            if (typeof response === 'string') {
-                response = $.parseJSON(response);
-            }
-
-            return !response['field-errors'] && !response['detail'] ? 
-                successCallback(response) :
-                defaultErrorCallback(response);
-        },
-        error: defaultErrorCallback,
-        url: window.api.url + '/post/?html=1&_accept=text/plain',
-        dataType: 'json'
-    });
 }
 
 /**
@@ -1317,74 +1276,77 @@ function initAJAX() {
  * 
  * Uses long polling to check for new posts.
  */
-function initPubSub() {
-    if (curPage.type !== 'thread' || $.settings('disablePubSub')) {
-        return false;
-    }
-    var pubsub = {
-        sleepTime: 500,
-        maxSleepTime: 1000 * 60 * 15,
-        cursor: null,
+pubsub = {
+    init: function() {
+        if (curPage.type !== 'thread' || $.settings('disablePubSub')) {
+            return false;
+        }
+        
+        this.poll();
+    },
 
-        poll: function() {
-            var args = {};
-            if (pubsub.cursor) {
-                args.cursor = pubsub.cursor;
+    sleepTime: 500,
+    maxSleepTime: 1000 * 60 * 15,
+    cursor: null,
+
+    poll: function() {
+        var args = {};
+        if (pubsub.cursor) {
+            args.cursor = pubsub.cursor;
+        }
+
+        $.ajax(window.api.url + '/stream/'+ curPage.thread, {
+            'type': 'POST',
+            'dataType': 'json'
+        })
+        .error(function() {
+            if (pubsub.sleepTime < pubsub.maxSleepTime) {
+                pubsub.sleepTime *= 2;
+            } else {
+                pubsub.sleepTime = pubsub.maxSleepTime;
             }
 
-            $.ajax(window.api.url + '/stream/'+ curPage.thread, {
-                'type': 'POST',
-                'dataType': 'json'
-            })
-            .error(function() {
-                if (pubsub.sleepTime < pubsub.maxSleepTime) {
-                    pubsub.sleepTime *= 2;
-                } else {
-                    pubsub.sleepTime = pubsub.maxSleepTime;
-                }
+            //console.log('Poll error; sleeping for', pubsub.sleepTime, 'ms');
+            window.setTimeout(pubsub.poll, pubsub.sleepTime);
+        })
+        .success(function(response) {
+            if (!response.posts) {
+                return false;
+            }
+            pubsub.cursor = response.cursor;
+            var posts = response.posts,
+                text;
 
-                //console.log('Poll error; sleeping for', pubsub.sleepTime, 'ms');
-                window.setTimeout(pubsub.poll, pubsub.sleepTime);
-            })
-            .success(function(response) {
-                if (!response.posts) {
-                    return false;
-                }
-                pubsub.cursor = response.cursor;
-                var posts = response.posts,
-                    text;
+            pubsub.cursor = posts[posts.length - 1].id;
+            //console.log(posts.length, 'new msgs');
+            for (var i=0; i < posts.length; i++) {
+                var p = $(posts[i]),
+                    post = $(p.get(0)).add(p.get(2))
+                .hide()
+                .appendTo('.thread')
+                .fadeIn(500, function() {
+                    $(this).attr('style', '');
+                });
 
-                pubsub.cursor = posts[posts.length - 1].id;
-                //console.log(posts.length, 'new msgs');
-                for (var i=0; i < posts.length; i++) {
-                    var p = $(posts[i]),
-                        post = $(p.get(0)).add(p.get(2))
-                    .hide()
-                    .appendTo('.thread')
-                    .fadeIn(500, function() {
-                        $(this).attr('style', '');
-                    });
+                post.find('.tripcode:contains("!")').addClass('staff');
+                initPosts(post);
+            }
+            text = post.find('.message').text();
+            showNewPostNotification(text, curPage.section, curPage.first);
+            window.setTimeout(pubsub.poll, 0);
+        });
+    },
 
-                    post.find('.tripcode:contains("!")').addClass('staff');
-                    initPosts(post);
-                }
-                text = post.find('.message').text();
-                showNewPostNotification(text, curPage.section, curPage.first);
-                window.setTimeout(pubsub.poll, 0);
-            });
-        }
-    }
-
-    pubsub.poll();
+    
 }
 
 $(function() {
-    init();
-    initSettings();
-    initStyle();
-    initPosts();
-    initVisited();
-    initHotkeys();
-    initAJAX();
-    initPubSub();
+    board.init();
+    settings.init();
+    style.init()
+    posts.init();
+    visited.init();
+    hotkeys.init();
+    ajax.init();
+    pubsub.init();
 });

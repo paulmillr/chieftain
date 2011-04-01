@@ -76,11 +76,11 @@ def post(request):
         raise ValidationError(form.errors)
 
     if no_captcha:
-        c -= 1
+        c -= 1  # decrease allowed no-captcha posts
         if c == 0:
             request.session['no_captcha'] = False
     else:
-        c += 1
+        c += 1  # increase valid captchas counter
         if c == 3:
             request.session['no_captcha'] = True
             c = 20
