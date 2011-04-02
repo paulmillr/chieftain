@@ -360,8 +360,7 @@ $.extend({
         show: function(text, timeout, title, icon) {
             if (!timeout) timeout = 3000;
             if (!title) {
-                $.trim($('title').text()).split(' ');
-                title = currentPage.title;
+                title = $.trim($('title').text());
             }
             if (!icon) {
                 icon = $('link[rel="apple-touch-icon"]').attr('href');
