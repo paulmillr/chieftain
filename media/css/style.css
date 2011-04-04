@@ -312,18 +312,25 @@ a.file img {
     border: 1px solid #ccc;
     overflow: hidden;
     display: table;
+    display: inline-block;
     _zoom: 1;
     margin: 5px 0 5px 0;
     padding: 6px;
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
+    max-height: 600px;
 }
+.post.resized {max-height: none;}
+.thread.resized {overflow-x: scroll;}
 
 .post.hidden header, .post.hidden .filemeta, .post.hidden .file,
-.post.hidden .message, .post.hidden .answer-map {
+.post.hidden .message, .post.hidden .answer-map, .post.hidden .skipped {
     display: none;
 }
+
+.thread.hidden .post {display: none;}
+.thread.hidden .post:first-child {display: inherit;}
 
 .deleted {
     background-color: #b00;
@@ -462,12 +469,15 @@ blockquote {
     background-repeat: no-repeat;
 }
 
+.bookmark, .hide {display: inline-block; vertical-align: bottom;}
+
 .is_closed {background-position: -16px 0;}
 .is_pinned {background-position: -48px 0;}
 .bookmark {background-position: 0 0;}
-.add {opacity: 0.3;filter:alpha(opacity=30);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";}
+.add {opacity: 0.3; filter:alpha(opacity=30);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";}
+.add:hover {opacity: 0.7; filter:alpha(opacity=70);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";}
 .rss {background-position: -20px -50px;}
-.hide {background-position: -32px 0;}
+.hide {background-position: -32px 1px;}
 .useragent {vertical-align: bottom;}
 
 .underlined {border-bottom: 1px dashed;}

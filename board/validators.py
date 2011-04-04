@@ -44,7 +44,7 @@ def attachment(file, section):
     lim = section.filesize_limit
     if lim != 0 and file.size > lim:
         raise InvalidFileError(_('Too big file'))
-    
+
     m = md5()
     for chunk in file.chunks():
         m.update(chunk)
@@ -64,7 +64,7 @@ def post(request):
     """
     new_thread = not request.POST.get('thread')
     with_files = bool(request.FILES.get('file'))
-    logged_in = bool(request.user.is_authenticated())
+    logged_in = request.user.is_authenticated()
 
     c = request.session.get('valid_captchas', 0)
     no_captcha = request.session.get('no_captcha', False)

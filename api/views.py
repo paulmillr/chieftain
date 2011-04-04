@@ -6,21 +6,35 @@ views.py
 Created by Paul Bagwell on 2011-03-15.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from django.http import HttpResponse, HttpResponseBadRequest
-from django.utils import simplejson as json
-from board.shortcuts import render_to_json
+from django.shortcuts import render
+from djangorestframework import status
+from djangorestframework.response import Response, ResponseException
 
 
 def api(request):
     return render(request, 'api.html')
 
 
-def settings_root(request):
-    d = request.session.get('settings') or {}
-    return render_to_json(dict(d))
+def setting_root(request):
+    settings = request.session.setdefault('settings', {})
+    if request.method == 'GET':
+        return Response(status.OK, settings)
+    elif request.method == 'POST':
+        try:
+            key = request.POST['key']
+            value = request.POST['value']
+        except KeyError:
+            raise ResponseException(status.BAD_REQUEST)
+        settings[key] = value
+        request.session.modified = True
+        return Response(status.CREATED, settings)
+    elif request.method == 'DELETE':
+        settings = {}
+        request.session.modified = True
+        return Response(status.NO_CONTENT)
 
 
-def settings(request, key):
+def setting(request, key=None):
     """This is used to work with user settings.
 
        * GET method gets settings key. If settings key is empty, it returns
@@ -28,22 +42,18 @@ def settings(request, key):
        * POST method sets settings key to value.
        * DELETE method resets settings key.
     """
-    try:
-        s = request.session['settings']
-    except KeyError:
-        s = request.session['settings'] = {}
+    settings = request.session.setdefault('settings', {})
     if request.method == 'GET':
-        value = s.get(key)
-    elif request.method == 'POST':
-        try:
-            value = request.POST['data']
-            if value:
-                s[key] = value
-            elif key in s:
-                del s[key]
-            request.session.modified = True
-        except (KeyError, ValueError):
-            return HttpResponseBadRequest('')
+        value = settings.get(key)
     elif request.method == 'DELETE':
-        s[key] = None
-    return render_to_json({key: value})
+        value = settings[key] = None
+    return Response(status.OK, {key: value})
+
+
+def bookmark(request, key):
+    b = request.session.setdefault('bookmarks')
+    if not key:
+        return Response(status.OK, s)
+    
+
+def hidden(request, key):

@@ -34,6 +34,8 @@
             <a href="http://twitter.com/share?text={{post.message|urlencode}}&amp;url={% setting 'SITE_URL' %}{{thread_url|slice:'1:'|urlencode}}" title="Добавить в Twitter" target="_blank" class="twitterButton"></a>
             <a href="{{thread_url}}/rss" title="RSS feed" class="rssButton"></a>
         {% endif %}
+        <span class="post-icon hide add" title="{% trans 'Hide' %}"></span>
+        <span class="post-icon bookmark add" title="{% trans 'Add to bookmarks' %}"></span>
     </header>
 
     {% if post.file_count > 0 %}

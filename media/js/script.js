@@ -172,7 +172,7 @@ $.extend(BoardStorage.prototype, {
     // gets all keys
     list: function() {
         var s = $.storage(this.storageName);
-        return (typeof s !== 'undefined' && typeof s !== 'string' && s !== null) ? s : {};
+        return (typeof s !== 'undefined' && typeof s !== 'string' && s !== null && s !== false) ? s : {};
     },
 
     get: function(key) {
@@ -439,7 +439,7 @@ board = {
             set = $.settings('hideSectGroup'),
             pass = $.localSettings('password'),
             buttons = {
-                'bookmark': {storageName: 'Bookmarks'},
+                'bookmark': {storageName: 'Bookmarks', storeText: true},
                 'hide': {storageName: 'Hidden',
                     onInit : function(data) {
                         if (data.span.hasClass('remove')) {
@@ -460,7 +460,7 @@ board = {
                         }
                         post.addClass(hideClass);
                         var t = first ? gettext('Thread') : gettext('Post'),
-                            s = $('<span/>').addClass('skipped')
+                            s = $('<span/>').addClass('hide-msg')
                             .text(t +
                                 ' #'+ getPostPid(post) +
                                 //'('+ post.find('.message').text().split(0, 20) +')' +
@@ -478,7 +478,7 @@ board = {
                             post = data.post;
                         }
                         post.find('.bookmark, .hide').appendTo(post.find('header'));
-                        post.find('.skipped').remove();
+                        post.find('.hide-msg').remove();
                         post.removeClass('hidden');
                     }
                 }
@@ -501,7 +501,7 @@ board = {
 
         for (var className in buttons) {
             var button = buttons[className],
-                sname = button.storageName
+                sname = button.storageName;
 
             // Check if current button set is not blocked by user.
             if ($.settings('disable' + className)) {
@@ -530,7 +530,8 @@ board = {
 
         $('.threads').delegate('.post-icon', 'click', function(event) {
             event.preventDefault();
-            var cont = new PostContainer(this),
+            var span = $(this),
+                cont = new PostContainer(span.closest('.post')),
                 span = cont.span,
                 post = cont.post,
                 postId = cont.id,
@@ -755,7 +756,7 @@ board = {
         for (var i = 0; i < set.length; i++) {
             $('#list-group' + set[i]).slideToggle(0);
         }
-    },
+    }
 }
 
 settings = {
@@ -921,6 +922,7 @@ style = {
                 children.attr('src', children.data('thumb'));
             }
             p.toggleClass('resized');
+            p.parent().toggleClass('resized');
         });
 
         $('.button').click(function() {
@@ -1108,7 +1110,7 @@ posts = {
             }
 
             // Initialize post buttons.
-            /*for (var className in buttons) {
+            for (var className in buttons) {
                 var button = buttons[className],
                     span = post.find('.' + className);
 
@@ -1119,7 +1121,7 @@ posts = {
                 if (button.onInit) {
                     button.onInit(new PostContainer(span, post));
                 }
-            }*/
+            }
         }
 
         this.buildAnswersMap(map, true);

@@ -99,7 +99,7 @@ $.extend({
             if (value === 'false' || value === false) {
                 value = '';
             }
-            $.post(window.api.url + '/setting/' + name, {'data': value})
+            $.post(window.api.url + '/settings/' + name, {'data': value})
             .error(function(xhr) {
                 $.notification('error', gettext('Settings error'));
             });
@@ -125,6 +125,7 @@ $.extend({
         if (!st) {
             return false;
         }
+
         name = 'k_' + name;
         if (mode === 'flush') {
             st.setItem(name, '');

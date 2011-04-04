@@ -23,6 +23,7 @@ FileType.objects.count() == 35
 USERNAME = 'paul'
 PASSWORD = 'paulpaul'
 
+
 class ModelsTest(unittest.TestCase):
     def setUp(self):
         pass
@@ -99,7 +100,8 @@ class ViewsTest(unittest.TestCase):
     def test_login_logout(self):
         c = Client()
         self.assertNotEqual(c.get('/modpanel/').status_code, 200)
-        response = c.post('/admin/', {'username': USERNAME, 'password': PASSWORD})
+        response = c.post('/admin/', {'username': USERNAME,
+            'password': PASSWORD})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(c.get('/modpanel/').status_code, 200)
 
@@ -135,6 +137,6 @@ class APITest(unittest.TestCase):
         self.assertTrue(p.is_deleted)
         self.assertEqual(p.thread.section.pid, 101)
 
-        # Test 
+        # Test
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)

@@ -11,8 +11,9 @@ from api.resources import *
 
 urlpatterns = patterns('api.views',
     (r'^$', 'api'),
-    (r'^setting/$', 'settings_root'),
-    (r'^setting/(?P<key>[\w\d]+)$', 'settings'),
+    (r'^setting/(?P<key>[\w\d]+)?$', 'setting'),
+    (r'^bookmark/(?P<key>[\w\d]+)?$', 'bookmark'),
+    (r'^hidden/(?P<key>[\w\d]+)?$', 'hidden'),
     (r'^poll/$', PollRootResource.as_view()),
     (r'^poll/(?P<id>\d+)$', PollResource.as_view()),
     (r'^choice/$', ChoiceRootResource.as_view()),
