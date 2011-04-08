@@ -9,11 +9,16 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from django.conf.urls.defaults import patterns
 from api.resources import *
 
+
 urlpatterns = patterns('api.views',
     (r'^$', 'api'),
-    (r'^setting/(?P<key>[\w\d]+)?$', 'setting'),
-    (r'^bookmark/(?P<key>[\w\d]+)?$', 'bookmark'),
-    (r'^hidden/(?P<key>[\w\d]+)?$', 'hidden'),
+    # user settings
+    (r'^setting/(?P<key>[\w\d]+)?$', 'storage',
+        {'storage_name': 'settings', 'is_dict': True}),
+    (r'^bookmark/(?P<key>[\w\d]+)?$', 'storage',
+        {'storage_name': 'bookmarks'}),
+    (r'^hidden/(?P<key>[\w\d]+)?$', 'storage', {'storage_name': 'hidden'}),
+    # polls
     (r'^poll/$', PollRootResource.as_view()),
     (r'^poll/(?P<id>\d+)$', PollResource.as_view()),
     (r'^choice/$', ChoiceRootResource.as_view()),
