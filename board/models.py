@@ -316,36 +316,15 @@ class Thread(models.Model):
             post_set = Post.deleted_objects.filter(thread=self)
         return post_set.filter(is_op_post=True).get()
 
-    def un_lp(self, offset, limit):
-        fields = ('thread_id', 'html')
-        sql = '''
-            (SELECT board_post.thread_id, board_post.html
-            FROM board_post
-            WHERE board_post.thread_id = {thread_id}
-            AND board_post.is_op_post = 1
-            AND board_post.is_deleted = 0)
-            UNION ALL
-            (SELECT board_post.thread_id, board_post.html
-            FROM board_post
-            WHERE board_post.thread_id = {thread_id}
-            AND board_post.is_deleted = 0
-            ORDER BY board_post.id ASC
-            LIMIT {offset}, {limit})
-        '''.format(thread_id=self.id, offset=offset, limit=limit)
-        cursor = connection.cursor()
-        cursor.execute(sql)
-
-        return (dict(zip(fields, i)) for i in cursor.fetchall())
-
     def last_posts(self):
         c = self.count()
         s = self.posts()
-        all = s.all()
+        posts = s.all()
         if not c['skipped']:
-            return all
+            return posts
         else:  # select first one and last 5 posts
             start, stop = c['start'], c['stop']
-            return [all[0]] + list(all[start:stop])
+            return [posts[0]] + list(posts[start:stop])
 
     def remove(self):
         """Deletes thread."""
