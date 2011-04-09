@@ -6,7 +6,7 @@ validators.py
 Created by Paul Bagwell on 2011-02-07.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-
+from django import forms
 from django.contrib.gis.utils import GeoIP
 from django.utils.translation import ugettext_lazy as _
 from datetime import datetime
@@ -19,21 +19,6 @@ __all__ = [
     'ValidationError', 'InvalidFileError', 'NotAuthenticatedError',
     'attachment', 'post',
 ]
-
-
-class ValidationError(Exception):
-    """Base class for all validation errors."""
-    pass
-
-
-class InvalidFileError(ValidationError):
-    """Raised when user uploads file with bad type."""
-    pass
-
-
-class NotAuthenticatedError(ValidationError):
-    """Raised when user posts in section, that requires auth."""
-    pass
 
 
 def attachment(file, section):
@@ -56,16 +41,10 @@ def attachment(file, section):
     return (allowed[file.content_type], file_hash)  # extension, file hash
 
 
-def post(request):
-    """Makes various changes on new post creation.
-
-       If there is no POST['thread'] specified, it will create
-       new thread.
-    """
-    new_thread = not request.POST.get('thread')
-    with_files = bool(request.FILES.get('file'))
+def new_post(request):
     logged_in = request.user.is_authenticated()
 
+    # adaptive captcha check
     c = request.session.get('valid_captchas', 0)
     no_captcha = request.session.get('no_captcha', False)
     if logged_in:
@@ -73,7 +52,10 @@ def post(request):
     f = PostFormNoCaptcha if no_captcha else PostForm
     form = f(request.POST, request.FILES)
     if not form.is_valid():
-        raise ValidationError(form.errors)
+        raise forms.ValidationError(form.errors)
+    post = form.save(commit=False)
+    post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
+    thread = post.thread
 
     if no_captcha:
         c -= 1  # decrease allowed no-captcha posts
@@ -86,12 +68,47 @@ def post(request):
             c = 20
     request.session['valid_captchas'] = c
 
-    post = form.save(commit=False)
-    post.date = datetime.now()
-    post.file_count = len(request.FILES)
-    post.is_op_post = new_thread
-    post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
-    post.password = tools.key(post.password)
+    if thread.section.type == 3:  # feed
+        if post.is_op_post and not logged_in:
+            raise forms.ValidationError(_('Authentication required to create '
+                'threads in this section'))
+    elif thread.section.type == 4:  # international
+        post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
+    elif thread.section.type == 5:  # show useragent
+        ua = request.META['HTTP_USER_AGENT']
+        parsed = tools.parse_user_agent(ua)
+        v = ''
+        b = parsed.get('browser') or {'name': 'Unknown', 'version': ''}
+        os = parsed.get('os') or {'name': 'Unknown'}
+        if parsed.get('flavor'):
+            v = parsed['flavor'].get('version')
+        post.data = {'useragent': {
+            'name': b['name'],
+            'version': b['version'],
+            'os_name': os,
+            'os_version': v,
+            'raw': ua,
+        }}
+    if new_thread:
+        thread.save(rebuild_cache=False)
+        post.thread = thread
+    post.pid = thread.section.pid_incr()
+    if with_files:
+        post.save(rebuild_cache=False)
+        tools.handle_uploaded_file(file, file_hash, ext, post)
+    post.save()
+    thread.save()
+    return post
+    
+
+
+def post(request):
+    """Makes various changes on new post creation.
+
+       If there is no POST['thread'] specified, it will create
+       new thread.
+    """
+
     if new_thread:
         kw = {'bump': post.date}
         if request.POST['section'].isdigit():

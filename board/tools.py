@@ -88,7 +88,7 @@ def make_post_description(post):
 
 def key(text):
     """Generates key for passwords etc."""
-    return sha1(text).hexdigest()
+    raise Exception('Not implemented')
 
 
 def parse_user_agent(user_agent):

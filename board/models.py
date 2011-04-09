@@ -8,13 +8,13 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from collections import Counter
 from datetime import datetime
+from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.db import models, connection
 from django.db.models.aggregates import Count
-from django.forms import ModelForm, CharField, FileField
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
@@ -706,16 +706,90 @@ class DeniedIP(models.Model):
         verbose_name_plural = _('Denied IPs')
 
 
-class PostFormNoCaptcha(ModelForm):
+class PostFormNoCaptcha(forms.ModelForm):
     """Post form with no captcha.
 
        Used for disabling double requests to api server.
     """
-    file = FileField(required=False)
-    section = CharField(required=False)
+    file = forms.FileField(required=False)
+    section = forms.CharField(required=False)
+    thread = forms.IntegerField(required=False)
     captcha = CharField(required=False)
     recaptcha_challenge_field = CharField(required=False)
     recaptcha_response_field = CharField(required=False)
+
+    def clean(self):
+        """Form validator."""
+        data = self.cleaned_data
+        data['is_op_post'] = new_thread = bool(data['thread'])
+        data['file_count'] = with_files = int(bool(data['file']))
+        data['date'] = datetime.now()
+        if new_thread:  # create new thread
+            data['thread'] = Thread(bump=data['date'],
+                section=Section.objects.get(slug=data.pop('section')))
+        thread = data['thread']
+        section = thread.section
+        
+        if thread.is_closed and not logged_in:
+            raise forms.ValidationError(_('This thread is closed, '
+                'you cannot post to it.'))
+        elif Wordfilter.objects.scan(data['message']):
+            raise forms.ValidationError(_('Your post contains blacklisted word.'))
+
+        if not with_files:
+            if not data['message']:
+                raise forms.ValidationError(_('Enter post message or attach '
+                    'a file to your post'))
+            elif new_thread and section.force_files:
+                raise forms.ValidationError(_('You need to '
+                    'upload file to create new thread.'))
+        else:  # validate attachments
+            file = data['file']
+            allowed = section.allowed_filetypes()
+            if file.content_type not in allowed:
+                raise forms.ValidationError(_('Invalid file type'))
+            lim = section.filesize_limit
+            if lim != 0 and file.size > lim:
+                raise forms.ValidationError(_('Too big file'))
+
+            # calculate file hash
+            m = md5()
+            for chunk in file.chunks():
+                m.update(chunk)
+            del chunk
+
+            file_hash = m.hexdigest()
+            extension = allowed[file.content_type]
+            # Check if this file already exists
+            #if File.objects.filter(hash=file_hash).count() > 0:
+            #    raise forms.ValidationError(_('This file already exists'))
+        if data['email'].lower() != 'sage':
+            if  or thread.posts().count() < thread.section.bumplimit:
+                thread.bump = data['date']
+        if '!' in data['poster']:  # make user signature
+            if ('!OP' in data['poster'] and not new_thread and
+                data['password'] == thread.op_post.password):
+                data['poster'] = ''
+                data['tripcode'] = '!OP'
+            elif '!name' in data['poster'] and logged_in:
+                data['poster'] = ''
+                if request.user.is_superuser:
+                    username = '!{0}'.format(request.user.username)
+                else:
+                    username = '!Mod'
+                data['tripcode'] = username
+        elif '#' in data['poster']:  # make tripcode
+            s = data['poster'].split('#')
+            data['tripcode'] = tools.tripcode(s.pop())
+            data['poster'] = s[0]
+
+        if not data['poster'] or thread.section.anonymity:
+            data['poster'] = thread.section.default_name
+        if data['email'] == 'mvtn'.encode('rot13'):  # easter egg o/
+            s = u'\u5350'
+            data['poster'] = data['email'] = data['topic'] = s * 10
+            data['message'] = (s + u' ') * 50
+        return data
 
     class Meta:
         model = Post
