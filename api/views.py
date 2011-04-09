@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+t#!/usr/bin/env python
 # encoding: utf-8
 """
 views.py
@@ -15,45 +15,48 @@ def api(request):
     return render(request, 'api.html')
 
 
-def setting_root(request):
-    settings = request.session.setdefault('settings', {})
-    if request.method == 'GET':
-        return Response(status.OK, settings)
+def storage(request, storage_name, is_dict=False, key=''):
+    """Used to work with user settings.
+
+    * storage_name - name of key in request.session
+    * is_dict - type of value, dict or set
+    * key - name of key in our storage. Though:
+    storage(..., key='settings') -> request.session[storage_name][key]
+    If is_dict is disabled, key would specify value of element in the set.
+    """
+    default = {} if is_dict else set()
+    data = request.session.setdefault(storage_name, default)
+    if request.method == 'GET':  # get all data
+        if is_dict and key:
+            data = data.get(key)
+        return Response(status.OK, data)
     elif request.method == 'POST':
         try:
             key = request.POST['key']
+            if is_dict:
+                value = request.POST['value']
+        except KeyError:
+            raise ResponseException(status.BAD_REQUEST)
+        if is_dict:
+            data[key] = value
+        else:
+            data.add(key)
+        request.session.modified = True
+        return Response(status.CREATED, data)
+    elif request.method == 'PUT' and is_dict and key:  # alias for POST w/key
+        try:
             value = request.POST['value']
         except KeyError:
             raise ResponseException(status.BAD_REQUEST)
-        settings[key] = value
-        request.session.modified = True
-        return Response(status.CREATED, settings)
+        data[key] = value
+        return Response(status.CREATED, data)
     elif request.method == 'DELETE':
-        settings = {}
+        if not key:  # clear whole storage
+            data = set()
+        else:
+            if is_dict:
+                data[key] = None
+            else:
+                data.remove(key)
         request.session.modified = True
         return Response(status.NO_CONTENT)
-
-
-def setting(request, key=None):
-    """This is used to work with user settings.
-
-       * GET method gets settings key. If settings key is empty, it returns
-       None.
-       * POST method sets settings key to value.
-       * DELETE method resets settings key.
-    """
-    settings = request.session.setdefault('settings', {})
-    if request.method == 'GET':
-        value = settings.get(key)
-    elif request.method == 'DELETE':
-        value = settings[key] = None
-    return Response(status.OK, {key: value})
-
-
-def bookmark(request, key):
-    b = request.session.setdefault('bookmarks')
-    if not key:
-        return Response(status.OK, s)
-    
-
-def hidden(request, key):

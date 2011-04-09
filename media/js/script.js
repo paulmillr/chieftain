@@ -169,6 +169,22 @@ function BoardStorage(storageName) {
 $.extend(BoardStorage.prototype, {
     storageName: '',
 
+    sync: function(callback) {
+        $.get(window.api.url + '/' + this.storageName)
+        .success(function(data) {
+            var l = this.list();
+            for (var i in data) {
+                if (i in list) {
+                    continue;
+                }
+                l[i] = {};
+            }
+            if (callback) {
+                callback(data);
+            }
+        });
+    },
+
     // gets all keys
     list: function() {
         var s = $.storage(this.storageName);
@@ -361,7 +377,7 @@ function checkForSidebarScroll() {
 function labelsToPlaceholders(list) {
     for (var i=0; i < list.length; i++) {
         var x = list[i],
-            t = $('label[for="'+x+'"]').text(),
+            t = $('label[for="' + x + '"]').text(),
             dt = $('.' + x + '-d').find('dt').hide(),
             dd = $('#' + x);
         dd.attr('placeholder', t);
@@ -372,10 +388,10 @@ function labelsToPlaceholders(list) {
 // Manipulates elements. Used for user styles.
 function manipulator(arr) {
     var cases = {
-        after : function(from, to) {
+        after: function(from, to) {
             $(from).remove().insertAfter(to)
         },
-        before : function(from, to) {
+        before: function(from, to) {
             $(from).remove().insertBefore(to);
         }
     };
@@ -439,8 +455,8 @@ board = {
             set = $.settings('hideSectGroup'),
             pass = $.localSettings('password'),
             buttons = {
-                'bookmark': {storageName: 'Bookmarks', storeText: true},
-                'hide': {storageName: 'Hidden',
+                'bookmark': {storageName: 'bookmark', storeText: true},
+                'hide': {storageName: 'hidden',
                     onInit : function(data) {
                         if (data.span.hasClass('remove')) {
                             this.onAdd(data);
