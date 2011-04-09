@@ -52,7 +52,7 @@ def wipe(posts=10, thread=False):
     #    data = 'thread={0}'.format(thread_or_slug)
     #else:
     #    data = 'section={0}'.format(thread_or_slug)
-    data = 'text=1kunsosnool&password=1231&title=SOSNOOL'
+    data = 'text=Testing&password=1231&title=Test'
     opener = urllib.request.URLopener()
     with concurrent.futures.ThreadPoolExecutor(max_workers=10) as executor:
         for i in range(posts):
