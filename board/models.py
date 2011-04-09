@@ -187,6 +187,13 @@ class Poll(models.Model):
 
     allowed_fields = ('id', 'question', ('choices', ('name', 'vote_count')))
 
+    class Meta:
+        verbose_name = _('Poll')
+        verbose_name_plural = _('Polls')
+
+    def __unicode__(self):
+        return self.question
+
     def choices(self):
         return self.choice_set.all()
 
@@ -195,13 +202,6 @@ class Poll(models.Model):
         if not f:
             return False
         return f.get()
-
-    def __unicode__(self):
-        return self.question
-
-    class Meta:
-        verbose_name = _('Poll')
-        verbose_name_plural = _('Polls')
 
 
 class Choice(models.Model):
@@ -213,12 +213,12 @@ class Choice(models.Model):
 
     allowed_fields = ('id', 'name', 'vote_count', ('poll', ('question',)))
 
-    def __unicode__(self):
-        return u'{0} - {1}'.format(self.poll, self.name)
-
     class Meta:
         verbose_name = _('Poll choice')
         verbose_name_plural = _('Poll choices')
+
+    def __unicode__(self):
+        return u'{0} - {1}'.format(self.poll, self.name)
 
 
 class Vote(models.Model):
@@ -230,12 +230,12 @@ class Vote(models.Model):
 
     allowed_fields = ('id', 'choice')
 
-    def __unicode__(self):
-        return u'{0}, {1}'.format(self.choice, self.ip)
-
     class Meta:
         verbose_name = _('Poll vote')
         verbose_name_plural = _('Poll votes')
+
+    def __unicode__(self):
+        return u'{0}, {1}'.format(self.choice, self.ip)
 
 
 class Thread(models.Model):
@@ -259,6 +259,26 @@ class Thread(models.Model):
         'id', 'section_id', 'bump', 'is_pinned',
         'is_closed', 'html',
     )
+
+    class Meta:
+        verbose_name = _('Thread')
+        verbose_name_plural = _('Threads')
+        get_latest_by = 'bump'
+        ordering = ['-bump']
+
+    def __unicode__(self):
+        return unicode(self.op_post)
+
+    def save(self, rebuild_cache=True):
+        """Saves thread and rebuilds cache."""
+        if rebuild_cache:
+            super(Thread, self).save()
+            self.rebuild_cache()
+        super(Thread, self).save()
+        # remove first thread in section
+        ts = self.section.thread_set.filter(is_pinned=False)
+        if ts.count() > self.section.threadlimit:
+            ts.order_by('bump')[0].delete()
 
     def posts(self):
         """Returns thread posts."""
@@ -341,26 +361,6 @@ class Thread(models.Model):
         if with_op_post:
             self.op_post.save(rebuild_cache=True)
 
-    def save(self, rebuild_cache=True):
-        """Saves thread and rebuilds cache."""
-        if rebuild_cache:
-            super(Thread, self).save()
-            self.rebuild_cache()
-        super(Thread, self).save()
-        # remove first thread in section
-        ts = self.section.thread_set.filter(is_pinned=False)
-        if ts.count() > self.section.threadlimit:
-            ts.order_by('bump')[0].delete()
-
-    def __unicode__(self):
-        return unicode(self.op_post)
-
-    class Meta:
-        verbose_name = _('Thread')
-        verbose_name_plural = _('Threads')
-        get_latest_by = 'bump'
-        ordering = ['-bump']
-
 
 class Post(models.Model):
     """Represents post."""
@@ -403,6 +403,28 @@ class Post(models.Model):
         'files',
     ]
 
+    class Meta:
+        verbose_name = _('Post')
+        verbose_name_plural = _('Posts')
+        get_latest_by = 'pid'
+        ordering = ['pid']
+
+    def __unicode__(self):
+        return '{0}/{1}'.format(self.thread.section.slug, self.pid)
+
+    def save(self, rebuild_cache=True):
+        if rebuild_cache:
+            if not self.id:
+                super(Post, self).save()
+            self.rebuild_cache()
+        super(Post, self).save()
+
+    def delete(self):
+        super(Post, self).delete()
+        if self.is_op_post:
+            self.thread.delete()
+        self.file_set.delete()
+
     def section(self):
         return self.thread.section
 
@@ -425,28 +447,6 @@ class Post(models.Model):
     def rebuild_cache(self):
         """Regenerates html cache of post."""
         self.html = render_to_string('post.html', {'post': self})
-
-    def save(self, rebuild_cache=True):
-        if rebuild_cache:
-            if not self.id:
-                super(Post, self).save()
-            self.rebuild_cache()
-        super(Post, self).save()
-
-    def delete(self):
-        super(Post, self).delete()
-        if self.is_op_post:
-            self.thread.delete()
-        self.file_set.delete()
-
-    def __unicode__(self):
-        return '{0}/{1}'.format(self.thread.section.slug, self.pid)
-
-    class Meta:
-        verbose_name = _('Post')
-        verbose_name_plural = _('Posts')
-        get_latest_by = 'pid'
-        ordering = ['pid']
 
 
 class File(models.Model):
@@ -474,19 +474,19 @@ class File(models.Model):
     allowed_fields = ('id', 'post', 'name', 'type', 'size',
         'image_width', 'image_height', 'hash', 'file', 'thumb')
 
+    class Meta:
+        verbose_name = _('File')
+        verbose_name_plural = _('Files')
+
+    def __unicode__(self):
+        return '{0}/{1}'.format(self.post.section_slug(), self.post.pid)
+
     def remove(self):
         """Visually deletes file."""
         self.is_deleted = True
         self.save()
         self.post.save()
         self.post.thread.save()
-
-    def __unicode__(self):
-        return '{0}/{1}'.format(self.post.section_slug(), self.post.pid)
-
-    class Meta:
-        verbose_name = _('File')
-        verbose_name_plural = _('Files')
 
 
 class FileType(models.Model):
@@ -500,12 +500,12 @@ class FileType(models.Model):
 
     allowed_fields = ('id', 'category_id', 'type', 'extension')
 
-    def __unicode__(self):
-        return self.extension
-
     class Meta:
         verbose_name = _('File type')
         verbose_name_plural = _('File types')
+
+    def __unicode__(self):
+        return self.extension
 
 
 class FileTypeGroup(models.Model):
@@ -516,12 +516,12 @@ class FileTypeGroup(models.Model):
 
     allowed_fields = ('id', 'name')
 
-    def __unicode__(self):
-        return self.name
-
     class Meta:
         verbose_name = _('File type group')
         verbose_name_plural = _('File type group')
+
+    def __unicode__(self):
+        return self.name
 
 
 class Section(models.Model):
@@ -558,6 +558,17 @@ class Section(models.Model):
         'filesize_limit', 'default_name', 'anonymity', 'threadlimit',
         'group_id', 'type', 'slug', 'name'
     )
+
+    class Meta:
+        verbose_name = _('Section')
+        verbose_name_plural = _('Sections')
+
+    def __unicode__(self):
+        return self.slug
+
+    def save(self):
+        super(Section, self).save()
+        cache.delete('sections')
 
     def threads(self):
         return Thread.objects.filter(section=self.id).order_by(
@@ -618,17 +629,6 @@ class Section(models.Model):
         self.pid = pid
         return pid
 
-    def save(self):
-        super(Section, self).save()
-        cache.delete('sections')
-
-    def __unicode__(self):
-        return self.slug
-
-    class Meta:
-        verbose_name = _('Section')
-        verbose_name_plural = _('Sections')
-
 
 class SectionGroup(models.Model):
     """Group of board sections. Example: [b / d / s] [a / aa]."""
@@ -639,16 +639,16 @@ class SectionGroup(models.Model):
     objects = SectionGroupManager()
     allowed_fields = ('id', 'name', 'order', 'is_hidden')
 
-    def save(self):
-        super(SectionGroup, self).save()
-        cache.delete('sections')
-
-    def __unicode__(self):
-        return unicode(self.name) + ', ' + unicode(self.order)
-
     class Meta:
         verbose_name = _('Section group')
         verbose_name_plural = _('Section groups')
+
+    def __unicode__(self):
+        return u'{0}, {1}'.format(self.name, self.order)
+
+    def save(self):
+        super(SectionGroup, self).save()
+        cache.delete('sections')
 
 
 class UserProfile(models.Model):
@@ -656,6 +656,13 @@ class UserProfile(models.Model):
     user = models.ForeignKey(User)
     sections = models.ManyToManyField('Section', blank=False,
         verbose_name=_('User owned sections'))
+
+    class Meta:
+        verbose_name = _('User profile')
+        verbose_name_plural = _('User profiles')
+
+    def __unicode__(self):
+        return '{0}'.format(self.user)
 
     def modded(self):
         """List of modded section slugs."""
@@ -665,13 +672,6 @@ class UserProfile(models.Model):
         """Boolean value of user moderation rights of section_slug."""
         return self.user.is_superuser or section_slug in self.modded()
 
-    def __unicode__(self):
-        return '{0}'.format(self.user)
-
-    class Meta:
-        verbose_name = _('User profile')
-        verbose_name_plural = _('User profiles')
-
 
 class Wordfilter(models.Model):
     """Black list word, phrase."""
@@ -679,12 +679,12 @@ class Wordfilter(models.Model):
         verbose_name=_('Word'))
     objects = WordfilterManager()
 
-    def __unicode__(self):
-        return self.word
-
     class Meta:
         verbose_name = _('Wordfilter')
         verbose_name_plural = _('Wordfilters')
+
+    def __unicode__(self):
+        return self.word
 
 
 class DeniedIP(models.Model):
@@ -695,15 +695,15 @@ class DeniedIP(models.Model):
     by = models.ForeignKey(User)
     date = models.DateTimeField(default=datetime.now)
 
-    def network(self):
-        return Network(self.ip)
+    class Meta:
+        verbose_name = _('Denied IP')
+        verbose_name_plural = _('Denied IPs')
 
     def __unicode__(self):
         return '{0} @ {1}'.format(self.ip, self.date)
 
-    class Meta:
-        verbose_name = _('Denied IP')
-        verbose_name_plural = _('Denied IPs')
+    def network(self):
+        return Network(self.ip)
 
 
 class PostFormNoCaptcha(ModelForm):
