@@ -152,12 +152,10 @@ class ThreadResource(ModelResource):
                 instance = op_post.thread
         except (Post.DoesNotExist, self.model.DoesNotExist):
             raise ResponseException(status.NOT_FOUND)
-        res = {}
-        for f in self.fields:
-            res[f] = instance.__getattribute__(f)
-        pf = [f for f in list(PostResource.fields)
+        res = dict((f, getattr(instance, f)) for f in self.fields)
+        fields = [f for f in list(PostResource.fields)
             if isinstance(f, str) and f != 'files']
-        res['posts'] = instance.posts().values(*pf)
+        res['posts'] = instance.posts().values(*fields)
         return res
 
 
