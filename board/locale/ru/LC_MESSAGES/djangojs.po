@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-20 19:44+0200\n"
+"POT-Creation-Date: 2011-04-10 23:53+0300\n"
 "PO-Revision-Date: 2011-02-26 17:38+0200\n"
 "Last-Translator: Paul Bagwell <pbagwl@gmail.com>\n"
 "Language-Team: LANGUAGE <pbagwl@gmail.com>\n"
@@ -23,50 +23,50 @@ msgstr ""
 msgid "Settings error"
 msgstr "Ошибка при сохранении настроек"
 
-#: media/js/script.js:14 media/js/script.js.py:665
+#: media/js/script.js:20 media/js/script.js.py:664
 msgid "Reason"
 msgstr "Причина"
 
-#: media/js/script.js:15 media/js/script.js.py:857
+#: media/js/script.js:21 media/js/script.js.py:865
 msgid "Reply"
 msgstr "Ответ"
 
-#: media/js/script.js:16
+#: media/js/script.js:22 media/js/script.js.py:1015
 msgid "Message is too long."
 msgstr "Комментарий слишком слишком длинный."
 
-#: media/js/script.js:17
+#: media/js/script.js:23 media/js/script.js.py:1019
 msgid "Full text"
 msgstr "Полный текст"
 
-#: media/js/script.js:18
+#: media/js/script.js:24
 msgid "Thread"
 msgstr "Тред"
 
-#: media/js/script.js:19
+#: media/js/script.js:25
 msgid "Post"
 msgstr "Пост"
 
-#: media/js/script.js:20 media/js/script.js.py:463
+#: media/js/script.js:26 media/js/script.js.py:476
 msgid "hidden"
 msgstr "скрыт"
 
-#: media/js/script.js:21
+#: media/js/script.js:27
 msgid "bookmark"
 msgstr "Добавить в закладки"
 
-#: media/js/script.js:22
+#: media/js/script.js:28
 msgid "hide"
 msgstr "Скрыть"
 
-#: media/js/script.js:23
+#: media/js/script.js:29
 msgid "Replies"
 msgstr "Ответы"
 
-#: media/js/script.js:24
+#: media/js/script.js:30 media/js/script.js.py:1272
 msgid "New message in thread "
 msgstr "Новое сообщение в теме"
 
-#: media/js/script.js:25 media/js/script.js.py:576
+#: media/js/script.js:31 media/js/script.js.py:588
 msgid "Post not found"
 msgstr "Сообщение не найдено"

@@ -58,19 +58,14 @@ def search(request, section_slug, page):
         'section': section}))
 
 
-def post_router(request, op_post=None):
-    """Routes post creation requests."""
-    try:
-        p = validators.post(request, no_captcha=False)
-    except validators.ValidationError as e:
-        return render(request, 'error.html', {'details': e})
-    if not p:  # display error page
-        return render(request, 'error.html', add_sidebar({
-            'errors': PostForm(p).errors
-        }))
-    # get op post and created post pids
-    args = [op_post, p.pid] if op_post else [p.pid, p.pid]
-    return HttpResponseRedirect('{0}#post{1}'.format(*args))
+def storage(request):
+    section = request.GET.get('section')
+    if section:
+        posts = request.session.get(section, {})
+        return render(request, 'storage_tab.html', {
+            'posts': Post.objects.filter(id__in=posts)
+        })
+    return render(request, 'storage.html', add_sidebar())
 
 
 def section(request, section_slug, page):
