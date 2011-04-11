@@ -1,0 +1,15 @@
+{% load i18n %}
+<div class="info">
+    <input type="checkbox" class="global">
+    <button class="button" class="delete">{% trans "Delete" %}</button>
+    <button class="button" class="disable">{% trans "Disable" %}</button>
+</div>
+<table class="storageTable">
+    {% for p in posts %}
+        <tr>
+            <td><input type="checkbox" name="checkedPosts"></td>
+            <td class="location"><a href="{{ p.link }}">{{ p.link }}</a></td>
+            <td class="info">{{ p.text }}</td>
+        </tr>
+    {% endfor %}
+</table>

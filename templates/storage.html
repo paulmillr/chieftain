@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% load i18n %}
+{% block title %}{% trans "Storage" %}{% endblock %}
+{% block role %}storage{% endblock %}
+{% block content %}
+<section class="storageTabs kTabs">
+    <ul>
+        <li>
+            <a href="?section=bookmarks">{% trans "Bookmarks" %}</a>
+        </li>
+        <li>
+            <a href="?section=visited-threads">{% trans "Visited threads" %}</a>
+        </li>
+        <li>
+            <a href="?section=hidden-posts">{% trans "Hidden posts" %}</a>
+        </li>
+    </ul>
+</section>
+{% endblock %}
