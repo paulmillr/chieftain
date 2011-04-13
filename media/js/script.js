@@ -5,7 +5,7 @@
  * http://www.gnu.org/licenses/gpl.html
  */
 
-if(!Array.indexOf) {
+if (!Array.indexOf) {
 	Array.prototype.indexOf = function(obj) {
 		for(var i=0; i < this.length; i++) {
 			if(this[i] == obj) {
