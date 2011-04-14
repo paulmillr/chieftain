@@ -73,8 +73,6 @@ def section(request, section_slug, page):
     Gets 20 threads from current section with
     OP post and last 5 posts in each thread.
     """
-    if request.method == 'POST':
-        return post_router(request)
     s = get_object_or_404(Section, slug=section_slug)
     t = get_page_or_404(Paginator(s.threads(), s.ONPAGE), page)
     return render(request, 'section_page.html', add_sidebar({
@@ -116,8 +114,6 @@ def images(request, section_slug, page):
 
 def thread(request, section_slug, op_post):
     """Thread and its posts."""
-    if request.method == 'POST':
-        return post_router(request, op_post)
     post = get_object_or_404(Post, thread__section__slug=section_slug,
         pid=op_post)
     thread = post.thread

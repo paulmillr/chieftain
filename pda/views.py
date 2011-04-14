@@ -22,8 +22,6 @@ def section(request, section_slug, page):
     Gets 20 threads from current section with
     OP post and last 5 posts in each thread.
     """
-    if request.method == 'POST':
-        return post_router(request)
     s = get_object_or_404(Section, slug=section_slug)
     p = get_page_or_404(Paginator(s.op_posts(), s.ONPAGE), page)
     return render(request, 'pda/section.html', {'section': s,
