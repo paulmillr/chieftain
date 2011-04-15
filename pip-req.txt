@@ -4,6 +4,7 @@ Tornado
 python-memcached
 recaptcha-client
 PIL
-lxml
 -e git+http://github.com/pbagwl/markdown2.git#egg=markdown2
+-e git+http://github.com/pbagwl/djangorestframework.git#egg=djangorestframework
 http://geolite.maxmind.com/download/geoip/api/python/GeoIP-Python-1.2.4.tar.gz
+MySQL-python
