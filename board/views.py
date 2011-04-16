@@ -48,7 +48,8 @@ def search(request, section_slug, page):
     is_op_post = request.GET.get('is_op_post') or False
     posts = Post.objects.filter(is_op_post=is_op_post,
         thread__section=section,
-        message__contains=request.GET['q']).order_by('-date')
+        message__contains=request.GET['q']
+    ).order_by('-date')
     if not posts.count():
         return render(request, 'client_error.html', add_sidebar({
             'details': _('Nothing found')
