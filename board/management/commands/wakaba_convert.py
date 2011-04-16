@@ -1,16 +1,16 @@
-#!/usr/bin/env python'
+#!/usr/bin/env python
 # encoding: utf-8
 """
-wakaba_conv.py
+wakaba_convert.py
 
-Created by Paul Bagwell on 2011-04-09.
+Created by Paul Bagwell on 2011-04-16.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-
-import sys
 import os
-import unittest
 from django.db import connection
+from django.core.cache import cache
+from django.core.management.base import BaseCommand
+from board.models import Section, Post, Thread, File
 
 
 class ConvertError(Exception):
@@ -46,6 +46,7 @@ class WakabaConverter(object):
         new_thread = bool(wpost['parent'])
         has_file = bool(wpost['image'])
         post = Post()
+        post.id = wpost['num']
         post.message = wpost['message'].striphtml()  # use django strip
         post.poster, post.tripcode = wpost['name'], wpost['trip']
         post.email = wpost['email']
@@ -66,16 +67,14 @@ class WakabaConverter(object):
         return (dict(zip(self.fields, c)) for c in res.fetchall())
 
     def convert(self):
-        for t in self.tables:
-            for post in get_table_data(t):
-                p = self.convert_post(post, t)
+        for table in self.tables:
+            for post in self.get_table_data(table):
+                p = self.convert_post(post, table)
                 p.save()
 
 
-class WakabaConverterTests(unittest.TestCase):
-    def setUp(self):
-        pass
-
-
-if __name__ == '__main__':
-    unittest.main()
+class Command(BaseCommand):
+    def handle(self, *args, **options):
+        prefix = args[0] if len(args) > 0 else 'comments_'
+        w = WakabaConverter(connection, prefix)
+        w.convert()
