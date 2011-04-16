@@ -1269,7 +1269,7 @@ pubsub = {
             //console.log(posts.length, 'new msgs');
             for (var i=0; i < posts.length; i++) {
                 var p = $(posts[i]),
-                    post = $(p.get(0))
+                    post = $(p.get(0))  // p[1] is text node
                         .add(p.get(2))
                         .hide()
                         .appendTo('.thread')
