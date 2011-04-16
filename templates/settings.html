@@ -3,8 +3,13 @@
 {% block title %}{% trans "Settings" %}{% endblock %}
 {% block role %}settings{% endblock %}
 {% block content %}
-<form>
-    <fieldset class="settings">
+<section class="settingsTabs kTabs">
+    <ul>
+        <li><a href="#styles">{% trans "Style" %}</a></li>
+        <li><a href="#features">{% trans "Features" %}</a></li>
+        <li><a href="#various">{% trans "Various" %}</a></li>
+    </ul>
+    <div id="styles">
         <dl>
             <dt>
                 <label for="style">{% trans "Board style" %}</label>
@@ -16,7 +21,8 @@
                 </select>
             </dt>
         </dl>
-        <h3>{% trans "Features" %}</h3>
+    </div>
+    <div id="features">
         <dl>
             <dt>
                 <input type="checkbox" name="newForm" id="newForm">
@@ -53,7 +59,8 @@
                 <label for="enableDesktopNotifications">{% trans "Enable desktop notifications" %}</label>
             </dt>
         </dl>
-        <h3>{% trans "Various" %}</h3>
+    </div>
+    <div id="various">
         <dl>
             <dt>
                 <input type="checkbox" name="disableFastReply" id="disableFastReply">
@@ -80,12 +87,6 @@
         </dl>
         <dl>
             <dt>
-                <input type="checkbox" name="disableHidden" id="disableHidden">
-                <label for="disableHidden">{% trans "Disable posts hide" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
                 <input type="checkbox" name="disablePubSub" id="disablePubSub">
                 <label for="disablePubSub">{% trans "Disable post autoload" %}</label>
             </dt>
@@ -102,28 +103,6 @@
                 <label for="disableAnswersMap">{% trans "Disable answers map" %}</label>
             </dt>
         </dl>
-        <h3>{% trans "Storage" %}</h3>
-        <dl>
-            <dt>
-                <input type="checkbox" name="disableBookmarks" id="disableBookmarks">
-                <label for="disableBookmarks">{% trans "Disable bookmarks" %} (<a href="?clear" class="clearBookmarks">{% trans "clear" %}</a>)</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="dontLogVisits" id="dontLogVisits">
-                <label for="dontLogVisits">{% trans "Don't log visited threads" %} (<a href="?clear" class="clearVisitedThreads">{% trans "clear" %}</a>)</label>
-            </dt>
-        </dl>
-        <div class="visitedThreads hidden">
-            <h4>{% trans "Visited threads" %}</h4>
-            <h5>{% trans "Sorted by the" %}
-                <select name="sortVisitedThreads" id="sortVisitedThreads" class="sortVisitedThreads" size="1">
-                    <option value="first_visit">{% trans "time of first visit" %}</option>
-                    <option value="-visits">{% trans "visits count" %}</option></select>
-            </h5>
-            <ul></ul>
-        </div>
-    </fieldset>
-</form>
+    </div>
+</section>
 {% endblock %}

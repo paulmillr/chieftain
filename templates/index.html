@@ -2,51 +2,51 @@
 <!DOCTYPE html> 
 <html> 
 <head> 
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-<title>{{settings.SITE_TITLE}} &mdash; {% trans "Main page" %}</title> 
-<link rel="stylesheet" href="{{ STATIC_URL }}css/index.css" media="all">
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-<script src="{{ STATIC_URL }}js/preload.js?v=13"></script>
-<script src="{{ STATIC_URL }}js/plugins.js?v=19"></script>
-<script>
-    var media_url = '{{settings.MEDIA_URL}}';
-    $(function() {
-        $('.mpHiderandom .random span').toggleClass('minimized');
-        $('.mpHidebookmarks .bookmarks span').toggleClass('minimized');
-        $('.mpHidepopular .popular span').toggleClass('minimized');
-        $('.wellcome p').click(function() {
-            $('.wellcome').hide('fast');
-        });
-
-        $('h4 span').click(function() {
-            var span = $(this);
-            span.toggleClass('minimized');
-            span.parent().parent().find('ul, .banner')
-            .slideToggle('fast', function() {
-                $.settings('mpHide' + span.parent().attr('class'), span.hasClass('minimized'));
-            });
-        });
-
-        $('.set-d').click(function() {
-            $('.set-box').slideToggle('fast');
-        });
-
-        $('.banner').click(function(event) {
-            event.preventDefault();
-            var banner = $(this);
-
-            $.get(window.api.url + '/file/random_image/1')
-            .success(function(data) {
-                data = data[0];
-                console.log(media_url + data.file)
-                banner.find('img').attr('src', media_url + data.file);
-                banner.find('a').attr('href', media_url + data.thumb);
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+    <title>{{settings.SITE_TITLE}} &mdash; {% trans "Main page" %}</title> 
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/index.css" media="all">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
+    <script src="{{ STATIC_URL }}js/preload.js?v=13"></script>
+    <script src="{{ STATIC_URL }}js/plugins.js?v=19"></script>
+    <script>
+        var media_url = '{{settings.MEDIA_URL}}';
+        $(function() {
+            $('.mpHiderandom .random span').toggleClass('minimized');
+            $('.mpHidebookmarks .bookmarks span').toggleClass('minimized');
+            $('.mpHidepopular .popular span').toggleClass('minimized');
+            $('.wellcome p').click(function() {
+                $('.wellcome').hide('fast');
             });
 
-            banner.find('a')
+            $('h4 span').click(function() {
+                var span = $(this);
+                span.toggleClass('minimized');
+                span.parent().parent().find('ul, .banner')
+                .slideToggle('fast', function() {
+                    $.settings('mpHide' + span.parent().attr('class'), span.hasClass('minimized'));
+                });
+            });
+
+            $('.set-d').click(function() {
+                $('.set-box').slideToggle('fast');
+            });
+
+            $('.banner').click(function(event) {
+                event.preventDefault();
+                var banner = $(this);
+
+                $.get(window.api.url + '/file/random_image/1')
+                .success(function(data) {
+                    data = data[0];
+                    console.log(media_url + data.file)
+                    banner.find('img').attr('src', media_url + data.file);
+                    banner.find('a').attr('href', media_url + data.thumb);
+                });
+
+                banner.find('a')
+            });
         });
-    });
-</script>
+    </script>
 </head> 
 <body class="{{session_classes}}"> 
 <div class="center"> 
@@ -154,25 +154,31 @@
     <br class="clear"> 
   </div> 
   <footer> 
-    <div class="foot">[<a href="/">главная</a>] [<a href="/faq.html">FAQ</a>] [<a href="/contacts.html">контакты</a>] [<a href="http://2ch.userecho.com/">идеи и предложения</a>] [<a href="http://www.so-slow.com/">so slow</a>] [<a href="http://twitter.com/2ch_ru">twitter</a>] [<a href="http://www.formspring.me/2chabu">formsping</a>] [<a href="/index2.html">версия с фреймом</a>]</div> 
-
-<script type='text/javascript'> 
-var _ues = {
-host:'2ch.userecho.com',
-forum:'1773',
-lang:'ru',
-tab_show:false,
-};
- 
-(function() {
-    var _ue = document.createElement('script'); _ue.type = 'text/javascript'; _ue.async = true;
-    _ue.src = ('https:' == document.location.protocol ? 'https://s3.amazonaws.com/' : 'http://') + 'cdn.userecho.com/js/widget-1.4.gz.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(_ue, s);
-  })();
- 
-</script> 
- 
+    <div class="foot">
+        [<a href="/">главная</a>]
+        [<a href="/faq.html">FAQ</a>]
+        [<a href="/contacts.html">контакты</a>]
+        [<a href="http://2ch.userecho.com/">идеи и предложения</a>]
+        [<a href="http://www.so-slow.com/">so slow</a>]
+        [<a href="http://twitter.com/2ch_ru">twitter</a>]
+        [<a href="http://www.formspring.me/2chabu">formsping</a>]
+        [<a href="/index2.html">версия с фреймом</a>]
+        <div class="copyright">
+            Бегает на <a href="http://klipped.pbagwl.com/">klipped</a>
+        </div>
+    </div>
 </footer> 
-</div> 
-</body> 
+</div>
+<script type='text/javascript'> 
+var _ues = {host: '2ch.userecho.com', forum: '1773', lang: 'ru', tab_show: false};
+(function() {
+    var _ue = document.createElement('script');
+    _ue.type = 'text/javascript';
+    _ue.async = true;
+    _ue.src = ('https:' == document.location.protocol ? 'https://s3.amazonaws.com/' : 'http://') + 'cdn.userecho.com/js/widget-1.4.gz.js';
+    var s = document.getElementsByTagName('script')[0];
+    s.parentNode.insertBefore(_ue, s);
+})();
+</script>
+</body>
 </html>

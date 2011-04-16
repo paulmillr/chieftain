@@ -89,6 +89,10 @@ a:hover {color:#06f;}
     border-bottom: 1px solid #AAA;
 }
 
+#container[role="settings"] #site-header, #container[role="storage"] #site-header {
+    border-bottom: 0;
+}
+
 #site-header nav {
     overflow: hidden;
     _zoom: 1;
@@ -220,6 +224,11 @@ fieldset {border: 0;}
 #container[role="settings"] fieldset {
     padding: 10px 0;
 }
+
+.storageNav {width: 200px; float: left;}
+.storage .info {padding-left: 2px}
+.storageTable tr th:first-child, tr td:first-child {padding-right: 5px}
+.storageTable .location {width: 100px;}
 
 .newpost fieldset dl {
     margin-bottom: 5px;

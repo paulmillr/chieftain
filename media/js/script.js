@@ -8,11 +8,12 @@
 if (!Array.indexOf) {
 	Array.prototype.indexOf = function(obj) {
 		for(var i=0; i < this.length; i++) {
-			if(this[i] == obj) {
+			if (this[i] == obj) {
 				return i;
 			}
 		}
-	}
+		return null;
+	};
 }
 
 (function() {
@@ -42,30 +43,30 @@ if (!Array.indexOf) {
 
 var curPage = (function() {
     // page detector
-        var data = {
-            type: $('#container').attr('role'),
-            cache: {}
-        };
+    var data = {
+        type: $('#container').attr('role'),
+        cache: {}
+    };
 
-        switch (data.type) {
-            case 'page':
-            case 'posts':
-            case 'threads':
-                data.section = window.location.href.split('/')[3];
-                break;
-            case 'thread': 
-                data.section = window.location.href.split('/')[3];
-                data.type = 'thread';
-                data.cache.thread = $('.thread');
-                data.cache.first = $('.post:first');
-                data.thread = getThreadId(data.cache.thread);
-                data.first = getPostPid(data.cache.first);
-                break;
-            default:
-                break;
-        }
+    switch (data.type) {
+        case 'page':
+        case 'posts':
+        case 'threads':
+            data.section = window.location.href.split('/')[3];
+            break;
+        case 'thread': 
+            data.section = window.location.href.split('/')[3];
+            data.type = 'thread';
+            data.cache.thread = $('.thread');
+            data.cache.first = $('.post:first');
+            data.thread = getThreadId(data.cache.thread);
+            data.first = getPostPid(data.cache.first);
+            break;
+        default:
+            break;
+    }
 
-        return data;
+    return data;
 })();
 
 function isjQuery(object) {
@@ -115,13 +116,13 @@ $.extend(PostArea.prototype, {
                 end = textarea.value.substr(textarea.selectionEnd);
             textarea.selectionEnd = textarea.selectionEnd + size; 
             if (eachLine) {
-                selection = selection.split('\n')
+                selection = selection.split('\n');
                 selection = $.map(selection, function(x) {
                     return tagStart + x;
-                }).join('\n')
-                textarea.value = begin+selection+end;
+                }).join('\n');
+                textarea.value = begin + selection + end;
             } else {
-                textarea.value = begin+tagStart+selection+tagEnd+end;
+                textarea.value = begin + tagStart + selection + tagEnd + end;
             }
         }
         textarea.focus();
@@ -140,7 +141,7 @@ function getPostPid(post) {
     if (isjQuery(post)) {
         return post.attr('id').replace('post', '');
     } else {
-        return post.id.replace('post', '')
+        return post.id.replace('post', '');
     }
     
 }
@@ -156,89 +157,6 @@ function getPostNumberPid(postnumber) {
 function getFileId(file) {
     return file.attr('id').replace('file', '');
 }
-
-/**
- * Key-value database, based on localStorage
- *
- * Used for storing bookmarks, hidden posts and visited threads.
- */
-function BoardStorage(storageName) {
-    this.storageName = storageName;
-}
-
-$.extend(BoardStorage.prototype, {
-    storageName: '',
-
-    sync: function(callback) {
-        $.get(window.api.url + '/' + this.storageName)
-        .success(function(data) {
-            var l = this.list();
-            for (var i in data) {
-                if (i in list) {
-                    continue;
-                }
-                l[i] = {};
-            }
-            if (callback) {
-                callback(data);
-            }
-        });
-    },
-
-    // gets all keys
-    list: function() {
-        var s = $.storage(this.storageName);
-        return (typeof s !== 'undefined' && typeof s !== 'string' && s !== null && s !== false) ? s : {};
-    },
-
-    get: function(key) {
-        return this.list()[key]
-    },
-
-    set: function(key, value) {
-        var l = this.list();
-        l[key] = value;
-        return $.storage(this.storageName, l);
-    },
-
-    incr: function(key, item) {
-        var dict = this.get(key);
-        if (typeof dict === 'object' && item in dict) {
-            ++dict[item];
-            this.set(key, dict);
-            return dict[item];
-        }
-    },
-
-    remove: function(key) {
-        var s = this.list();
-        delete s[key];
-        return $.storage(this.storageName, s);
-    },
-
-    // Clears container.
-    flush: function() {
-        $.storage(this.storageName, '', 'flush');
-    },
-
-    sort: function(key) {
-        var items = [],
-            l = this.list();
-        for (var i in l) {
-            l[i]['id'] = i;
-            items.push(l[i]);
-        }
-        items.sort(function(a, b) {
-            if (key[0] == '-') {
-                key = key.slice(1);
-                return a[key] < b[key];
-            } else {
-                return a[key] > b[key];
-            }
-        });
-        return items;
-    }
-});
 
 /**
  * Post container class.
@@ -269,23 +187,31 @@ function PostContainer(span, post) {
  * Used for storage of canvas data.
  */
 function ColorContainer(red, green, blue, alpha) {
-    if (!red) red = 0;
-    if (!green) green = 0;
-    if (!blue) blue = 0;
-    if (!alpha) alpha = 1;
+    red = red || 0;
+    green = green || 0;
+    blue = blue || 0;
+    alpha = alpha || 1;
     this.data = [red, green, blue, alpha];
 }
 
 $.extend(ColorContainer.prototype, {
     data : [0, 0, 0, 1],
-    red: function(v) {if (!v) return this.data[0]; else this.data[0] = v;},
-    green: function(v) {if (!v) return this.data[1]; else this.data[1] = v;},
-    blue: function(v) {if (!v) return this.data[2]; else this.data[2] = v;},
-    alpha: function(v) {if (!v) return this.data[3]; else this.data[3] = v;},
+
+    // getters & setters
+    getset: function(index, value) {
+        if (value) {
+            this.data[index] = value;
+        }
+        return this.data[index];
+    },
+    red: function(v) {return getset(0, v);},
+    green: function(v) {return getset(1, v);},
+    blue: function(v) {return getset(2, v);},
+    alpha: function(v) {return getset(3, v);},
     rgb: function() {return this.torgb(this.data);},
-    rgba: function() {return this.torgba(this.data)},
-    hex: function() {return this.tohex(this.data.slice(0,3))},
-    hsl: function() {return this.tohsl(this.data.slice(0,3))},
+    rgba: function() {return this.torgba(this.data);},
+    hex: function() {return this.tohex(this.data.slice(0,3));},
+    hsl: function() {return this.tohsl(this.data.slice(0,3));},
 
     torgba: function(arr) {
         return 'rgba(' + arr.join(',') + ')';
@@ -300,39 +226,44 @@ $.extend(ColorContainer.prototype, {
             if (number instanceof Array) {
                 var tmp = '';
                 for (var i=0; i < number.length; i++) {
-                    tmp += hex(number[i])
+                    tmp += hex(number[i]);
                 }
                 return tmp;
             }
-            var char = '0123456789abcdef';
-            if (number == null) {
+            var chars = '0123456789abcdef';
+            if (number === null) {
                 return '00';
             }
-            number = parseInt(number);
-            if (number == 0 || isNaN(number)) {
-                return '00'
+            number = parseInt(number, 10);
+            if (number === 0 || isNaN(number)) {
+                return '00';
             }
             number = Math.round(Math.min(Math.max(0, number), 255));
-            return char.charAt((number - number % 16) / 16) + char.charAt(number % 16);
+            return chars.charAt((number - number % 16) / 16) + chars.charAt(number % 16);
         }
-        return '#'+hex(arr);
+        return '#' + hex(arr);
     },
 
     tohsl: function(arr) {
-        var r = arr[0], g = arr[1], b = arr[2];
-        r /= 255, g /= 255, b /= 255;
-        var max = Math.max(r, g, b), min = Math.min(r, g, b);
-        var h, s, l = (max + min) / 2;
+        var r = arr[0] / 255,
+            g = arr[1] / 255,
+            b = arr[2] / 255,
+            max = Math.max(r, g, b),
+            min = Math.min(r, g, b),
+            h,
+            s,
+            l = (max + min) / 2;
 
-        if(max == min){
-            h = s = 0; // achromatic
-        }else{
+        if (max === min) {
+            h = s = 0;  // achromatic
+        } else {
             var d = max - min;
             s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
-            switch(max){
+            switch (max) {
                 case r: h = (g - b) / d + (g < b ? 6 : 0); break;
                 case g: h = (b - r) / d + 2; break;
                 case b: h = (r - g) / d + 4; break;
+                default: break;
             }
             h /= 6;
         }
@@ -347,9 +278,9 @@ function randomString(length) {
         if (n < 10) {
             return n; //1-10
         } else if (n < 36) {
-            return String.fromCharCode(n + 55); // A-Z
+            return String.fromCharCode(n + 55);  // A-Z
         } else {
-            return String.fromCharCode(n + 61); // a-z
+            return String.fromCharCode(n + 61);  // a-z
         }
     }
     var s = '';
@@ -369,7 +300,7 @@ function checkForSidebarScroll() {
         sideHeight = side.height();
 
     if (sideHeight > bodyHeight) {
-        side.height(parseInt(bodyHeight)).css('overflow-y', 'scroll');
+        side.height(parseInt(bodyHeight, 10)).css('overflow-y', 'scroll');
     }
 }
 
@@ -409,7 +340,7 @@ function parseQs() {
         parsed = {}, tmp;
 
     for (var i=0; i < d.length; i++) {
-        var tmp = d[i].split('='); 
+        tmp = d[i].split('='); 
         parsed[tmp[0]] = tmp[1];
     }
 
@@ -477,11 +408,11 @@ board = {
                         post.addClass(hideClass);
                         var t = first ? gettext('Thread') : gettext('Post'),
                             s = $('<span/>').addClass('hide-msg')
-                            .text(t +
-                                ' #'+ getPostPid(post) +
-                                //'('+ post.find('.message').text().split(0, 20) +')' +
-                                ' ' + gettext('hidden') + '.'
-                            ).appendTo(post),
+                                .text(t +
+                                    ' #'+ getPostPid(post) +
+                                    //'('+ post.find('.message').text().split(0, 20) +')' +
+                                    ' ' + gettext('hidden') + '.'
+                                ).appendTo(post),
                             b = post.find('.bookmark, .hide').appendTo(s);
                     },
 
@@ -524,9 +455,6 @@ board = {
                 continue;
             }
 
-            button.storage = new BoardStorage(sname);
-            button.list = button.storage.list();
-
             board.postButtons[className] = button;
             $('.threads').addClass('with' + sname);
         }
@@ -546,8 +474,7 @@ board = {
 
         $('.threads').delegate('.post-icon', 'click', function(event) {
             event.preventDefault();
-            var span = $(this),
-                cont = new PostContainer(span.closest('.post')),
+            var cont = new PostContainer($(this).closest('.post')),
                 span = cont.span,
                 post = cont.post,
                 postId = cont.id,
@@ -610,8 +537,8 @@ board = {
                         div = $(html).clone(),
                         check = $(div.get(0)),
                         outer = $('<article/>').addClass('post post-preview')
-                    .attr('id', id)
-                    .css({'top': top + 11 +'px', 'left': left + 'px'});
+                            .attr('id', id)
+                            .css({'top': top + 11 +'px', 'left': left + 'px'});
 
                     // remove icons
                     div.find('.bookmark, .hide, .is_closed, .is_pinned').remove();
@@ -643,14 +570,14 @@ board = {
                     //console.log('Binded preview remove', prev);
 
                     link.mouseout(function() {
-                        timeout = window.setTimeout(function() {
-                            //prev.remove();
-                            removeIfPreview(prev);
-                        }, 300);
-                    })
-                    .mouseover(function() {
-                        window.clearTimeout(timeout);
-                    });
+                            timeout = window.setTimeout(function() {
+                                //prev.remove();
+                                removeIfPreview(prev);
+                            }, 300);
+                        })
+                        .mouseover(function() {
+                            window.clearTimeout(timeout);
+                        });
                 }
 
                 window.setTimeout(function() {
@@ -846,7 +773,7 @@ settings = {
 
 
 style = {
-    votedPolls: new BoardStorage('polls'),
+    //votedPolls: new BoardStorage('polls'),
 
     init: function() {
         var style = $.settings('style');
@@ -1003,7 +930,7 @@ style = {
             }
         });
 
-        $('.threads').delegate('.poll input[type="radio"]', 'click', function() {
+        /*$('.threads').delegate('.poll input[type="radio"]', 'click', function() {
             var radio = $(this);
             $.post(window.api.url + '/vote/', {'choice': this.value})
             .error(defaultErrorCallback)
@@ -1025,7 +952,7 @@ style = {
                 style.votedPolls.set(pollId, radio.attr('value'));
                 poll.horizontalBarGraph({interval: 0.1});
             });
-        });
+        });*/
 
         // strip long posts at section page
         $('.post .message').each(function() {
@@ -1078,8 +1005,8 @@ style = {
                 return false;
             });
         }
-
-        return true;
+        
+        $('.kTabs').tabs();
     }
 }
 
@@ -1178,22 +1105,6 @@ posts = {
                 this.map[attr] = map[attr];
             }
         }
-    }
-}
-
-visited = {
-    init: function() {
-        if (!window.localStorage || $.settings('dontLogVisits')) {
-            return true;
-        }
-        
-        // Thread visits counter
-        var storage = new BoardStorage('visitedThreads', true),
-            visitedList = $('.' + storage.storageName);
-
-        $('#dontLogVisits').click(function(event) {
-            visitedList.slideToggle();
-        });
     }
 }
 
@@ -1333,8 +1244,8 @@ pubsub = {
         }
 
         $.ajax(window.api.url + '/stream/'+ curPage.thread, {
-            'type': 'POST',
-            'dataType': 'json'
+            type: 'POST',
+            dataType: 'json'
         })
         .error(function() {
             if (pubsub.sleepTime < pubsub.maxSleepTime) {
@@ -1358,12 +1269,13 @@ pubsub = {
             //console.log(posts.length, 'new msgs');
             for (var i=0; i < posts.length; i++) {
                 var p = $(posts[i]),
-                    post = $(p.get(0)).add(p.get(2))
-                .hide()
-                .appendTo('.thread')
-                .fadeIn(500, function() {
-                    $(this).attr('style', '');
-                });
+                    post = $(p.get(0))  // p[1] is text node
+                        .add(p.get(2))
+                        .hide()
+                        .appendTo('.thread')
+                        .fadeIn(500, function() {
+                            $(this).attr('style', '');
+                        });
 
                 post.find('.tripcode:contains("!")').addClass('staff');
                 window.posts.init(post);
@@ -1380,7 +1292,6 @@ $(function() {
     settings.init();
     style.init()
     posts.init();
-    visited.init();
     hotkeys.init();
     ajax.init();
     pubsub.init();
