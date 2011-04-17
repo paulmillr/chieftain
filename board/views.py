@@ -11,7 +11,6 @@ from django.http import (Http404, HttpResponseRedirect,
     HttpResponsePermanentRedirect)
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from board import validators
 from board.models import *
 from board.shortcuts import *
 from board.tools import make_post_description

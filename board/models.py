@@ -149,9 +149,7 @@ class DeletedFileManager(models.Manager):
 
 
 class SectionManager(models.Manager):
-    @cached(DAY)
-    def sections(self):
-        return self.order_by('slug')
+    pass
 
 
 class SectionGroupManager(models.Manager):
@@ -305,7 +303,7 @@ class Thread(models.Model):
                 'stop': stop,
                 'skipped': start - 1,
                 'skipped_files': ps.filter(id__in=skipped_ids,
-                    file_count__gt=0).count()
+                    file=True).count()
             }
 
     @property
@@ -353,13 +351,9 @@ class Post(models.Model):
         verbose_name=_('Bump date'))
     is_deleted = models.BooleanField(default=False,
         verbose_name=_('Is deleted'))
-    file_count = models.SmallIntegerField(default=0,
-        verbose_name=_('File count'), blank=True)
     ip = models.IPAddressField(verbose_name=_('IP'), blank=True)
     data = fields.JSONField(max_length=1024, blank=True, null=True,
         verbose_name=_('Data'))
-    #country = models.CharField(max_length=5, blank=True,
-    #    verbose_name=_('Country code'))  # used for /int/-like sections
     poster = models.CharField(max_length=32, blank=True, null=True,
         verbose_name=_('Poster'))
     tripcode = models.CharField(max_length=32, blank=True,
@@ -368,6 +362,8 @@ class Post(models.Model):
         verbose_name=_('Email'))
     topic = models.CharField(max_length=48, blank=True,
         verbose_name=_('Topic'))
+    file = models.ForeignKey('File', blank=True,
+        verbose_name=_('File'))
     password = models.CharField(max_length=64, blank=False,
         verbose_name=_('Password'))
     message = models.TextField(blank=True, verbose_name=_('Message'))
@@ -377,9 +373,8 @@ class Post(models.Model):
 
     allowed_fields = [
         'id', 'pid', 'poster', 'tripcode', 'topic', 'is_op_post',
-        'date', 'message', 'email', 'data',
+        'date', 'message', 'email', 'data', 'file',
         ('thread', ('id', ('section', ('id', 'slug')))),
-        'files',
     ]
 
     class Meta:
@@ -402,17 +397,12 @@ class Post(models.Model):
         super(Post, self).delete()
         if self.is_op_post:
             self.thread.delete()
-        self.file_set.delete()
 
     def section(self):
         return self.thread.section
 
     def section_slug(self):
         return self.thread.section.slug
-
-    def files(self):
-        """Workaround for REST api."""
-        return self.file_set.filter(is_deleted=False)
 
     def remove(self):
         """Visually deletes post."""
@@ -430,7 +420,6 @@ class Post(models.Model):
 
 class File(models.Model):
     """Represents files at the board."""
-    post = models.ForeignKey('Post', verbose_name=_('Post'))
     name = models.CharField(max_length=64,
         verbose_name=_('Original name'))
     type = models.ForeignKey('FileType', verbose_name=_('Type'))
@@ -690,30 +679,27 @@ class PostFormNoCaptcha(forms.ModelForm):
 
        Used for disabling double requests to api server.
     """
-    file = forms.FileField(required=False)
     section = forms.CharField(required=False)
     thread = forms.IntegerField(required=False)
-    captcha = CharField(required=False)
-    recaptcha_challenge_field = CharField(required=False)
-    recaptcha_response_field = CharField(required=False)
+    captcha = forms.CharField(required=False)
+    recaptcha_challenge_field = forms.CharField(required=False)
+    recaptcha_response_field = forms.CharField(required=False)
 
     def clean(self):
         """Form validator."""
         data = self.cleaned_data
         data['is_op_post'] = new_thread = bool(data['thread'])
-        data['file_count'] = with_files = int(bool(data['file']))
+        with_files = bool(data['file'])
         data['date'] = datetime.now()
         if new_thread:  # create new thread
             data['thread'] = Thread(bump=data['date'],
                 section=Section.objects.get(slug=data.pop('section')))
         thread = data['thread']
         section = thread.section
-        
-        if thread.is_closed and not logged_in:
-            raise forms.ValidationError(_('This thread is closed, '
-                'you cannot post to it.'))
-        elif Wordfilter.objects.scan(data['message']):
-            raise forms.ValidationError(_('Your post contains blacklisted word.'))
+
+        if Wordfilter.objects.scan(data['message']):
+            raise forms.ValidationError(_('Your post contains '
+                'blacklisted word.'))
 
         if not with_files:
             if not data['message']:
@@ -737,27 +723,12 @@ class PostFormNoCaptcha(forms.ModelForm):
                 m.update(chunk)
             del chunk
 
-            file_hash = m.hexdigest()
+            file.hash = m.hexdigest()
             extension = allowed[file.content_type]
-            # Check if this file already exists
-            #if File.objects.filter(hash=file_hash).count() > 0:
-            #    raise forms.ValidationError(_('This file already exists'))
         if data['email'].lower() != 'sage':
-            if  or thread.posts().count() < thread.section.bumplimit:
+            if new_thread or thread.posts().count() < thread.section.bumplimit:
                 thread.bump = data['date']
-        if '!' in data['poster']:  # make user signature
-            if ('!OP' in data['poster'] and not new_thread and
-                data['password'] == thread.op_post.password):
-                data['poster'] = ''
-                data['tripcode'] = '!OP'
-            elif '!name' in data['poster'] and logged_in:
-                data['poster'] = ''
-                if request.user.is_superuser:
-                    username = '!{0}'.format(request.user.username)
-                else:
-                    username = '!Mod'
-                data['tripcode'] = username
-        elif '#' in data['poster']:  # make tripcode
+        if '#' in data['poster']:  # make tripcode
             s = data['poster'].split('#')
             data['tripcode'] = tools.tripcode(s.pop())
             data['poster'] = s[0]

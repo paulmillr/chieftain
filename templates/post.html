@@ -38,8 +38,8 @@
         {% endif %}
     </header>
 
-    {% if post.file_count > 0 %}
-    {% for f in post.files %}
+    {% if post.file %}
+    {% with f=post.file %}
         <div class="filemeta">
             <a target="_blank" href="{{f.file.url}}">{{post.id}}.{{f.type.extension}}</a>
             (<em>{{f.size|filesizeformat}}{% if f.image_height %}, {{f.image_height}}x{{f.image_width}}{% endif %}</em>)
@@ -57,7 +57,7 @@
                 {% endif %}
             {% endif %}
         </a>
-    {% endfor %}
+    {% endwith %}
     {% endif %}
 
     <div class="message">{% autoescape off %}

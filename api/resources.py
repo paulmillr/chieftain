@@ -8,12 +8,14 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import urllib
 import urllib2
+from django import forms
+from django.contrib.gis.utils import GeoIP
 from django.utils.translation import ugettext as _
 from djangorestframework import status
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, ResponseException
-from board import tools, validators
+from board import tools
 from api import emitters
 from board.models import *
 from modpanel.views import is_mod
@@ -55,6 +57,81 @@ class ModelResource(ModelResource, Resource):
 
 class RootModelResource(RootModelResource, Resource):
     pass
+
+
+def validate_post(request):
+    logged_in = request.user.is_authenticated()
+
+    # adaptive captcha check
+    c = request.session.get('valid_captchas', 0)
+    no_captcha = request.session.get('no_captcha', False)
+    if logged_in:
+        no_captcha = True
+    f = PostFormNoCaptcha if no_captcha else PostForm
+    form = f(request.POST, request.FILES)
+    if not form.is_valid():
+        raise forms.ValidationError(form.errors)
+    post = form.save(commit=False)
+    post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
+    thread = post.thread
+
+    if no_captcha:
+        c -= 1  # decrease allowed no-captcha posts
+        if c == 0:
+            request.session['no_captcha'] = False
+    else:
+        c += 1  # increase valid captchas counter
+        if c == 3:
+            request.session['no_captcha'] = True
+            c = 20
+    request.session['valid_captchas'] = c
+
+    if thread.is_closed and not logged_in:
+        raise forms.ValidationError(_('This thread is closed, '
+            'you cannot post to it.'))
+    if thread.section.type == 3:  # feed
+        if post.is_op_post and not logged_in:
+            raise forms.ValidationError(_('Authentication required to create '
+                'threads in this section'))
+    elif thread.section.type == 4:  # international
+        post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
+    elif thread.section.type == 5:  # show useragent
+        ua = request.META['HTTP_USER_AGENT']
+        parsed = tools.parse_user_agent(ua)
+        v = ''
+        b = parsed.get('browser') or {'name': 'Unknown', 'version': ''}
+        os = parsed.get('os') or {'name': 'Unknown'}
+        if parsed.get('flavor'):
+            v = parsed['flavor'].get('version')
+        post.data = {'useragent': {
+            'name': b['name'],
+            'version': b['version'],
+            'os_name': os,
+            'os_version': v,
+            'raw': ua,
+        }}
+    if '!' in post.poster:  # make user signature
+        if ('!OP' in post.poster and not new_thread and
+            post.password == thread.op_post.password):
+            post.poster = ''
+            post.tripcode = '!OP'
+        elif '!name' in post.poster and logged_in:
+            post.poster = ''
+            if request.user.is_superuser:
+                username = '!{0}'.format(request.user.username)
+            else:
+                username = '!Mod'
+            post.tripcode = username
+    if new_thread:
+        thread.save(rebuild_cache=False)
+        post.thread = thread
+    post.pid = thread.section.pid_incr()
+    if with_files:
+        post.save(rebuild_cache=False)
+        tools.handle_uploaded_file(file, ext)
+    post.save()
+    thread.save()
+    return post
 
 
 def mod_delete_post(request, post):
@@ -174,8 +251,8 @@ class PostRootResource(RootModelResource):
 
     def post(self, request, auth, content, *args, **kwargs):
         try:
-            instance = validators.post(request)
-        except validators.ValidationError as e:
+            instance = validate_post(request)
+        except forms.ValidationError as e:
             return Response(status.BAD_REQUEST, {'detail': e})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
