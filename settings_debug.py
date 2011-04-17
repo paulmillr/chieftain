@@ -1,5 +1,5 @@
 # encoding: utf-8
-from settings_default import *
+from settings import *
 import os
 
 DEBUG = True

@@ -1,5 +1,6 @@
 # encoding: utf-8
 from settings_local import *
+from redis import Redis
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -7,6 +8,8 @@ TEMPLATE_DEBUG = DEBUG
 MANAGERS = ADMINS = (
     ('paul', 'pbagwl@gmail.com'),
 )
+
+REDIS = Redis(**REDIS_INFO)
 
 #APPEND_SLASH = False
 TIME_ZONE = 'Europe/Kiev'
@@ -68,6 +71,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
+    'klipped.redjiska',
     'klipped.board',
     'klipped.api',
     'klipped.modpanel',

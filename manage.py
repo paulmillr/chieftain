@@ -8,7 +8,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.management import execute_manager
 try:
-    import settings_default as settings  # Assumed to be in the same directory.
+    import settings  # Assumed to be in the same directory.
 except ImportError:
     import sys
     sys.stderr.write("Error: Can't find the file 'settings.py' in the \

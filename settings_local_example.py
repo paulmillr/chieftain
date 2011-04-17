@@ -22,6 +22,12 @@ CACHES = {
     }
 }
 
+REDIS_INFO = {
+    'host': '127.0.0.1',
+    'port': 6379,
+    'db': 0,
+}
+
 GEOIP_PATH = '/var/geoip/'
 DISABLE_CAPTCHA = False
 RECAPTCHA_PUBLIC_KEY = ''
