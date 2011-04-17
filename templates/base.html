@@ -27,6 +27,12 @@
     </script>
     <script src="{{ STATIC_URL }}js/preload.js?v=13"></script>
     <script src="{% url django.views.i18n.javascript_catalog %}"></script>
+    <script>
+    var session = {
+        hidden: {{ hidden }},
+        bookmarks: {{ bookmarks }},
+    };
+    </script>
 </head>
 <body class="{{session_classes}}">
     {% include "sidebar.html" %}

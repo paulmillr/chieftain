@@ -38,9 +38,13 @@ def session(request):
         s['is_mod'] = True
         if u.is_superuser:
             s['is_admin'] = True
+    s.setdefault('hidden', set())
+    s.setdefault('bookmarks', set())
     return {
         'style': pop_from_session('style', 'photon'),
         'password': pop_from_session('password'),
         'session': dict(s.items()),
         'session_classes': ' '.join(s.keys()),
+        'hidden': list(s['hidden']),
+        'bookmarks': list(s['bookmarks']),
     }

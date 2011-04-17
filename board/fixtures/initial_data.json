@@ -769,7 +769,8 @@
         "name" : "Фэндом",
         "slug" : "fd",
         "threadlimit" : 200,
-        "type" : 1
+        "type" : 1,
+        "force_files": false
       },
     "model" : "board.section",
     "pk" : 37

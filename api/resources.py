@@ -20,7 +20,7 @@ from api import emitters
 from board.models import *
 from modpanel.views import is_mod
 
-__all__ = [
+__all__ = (
     'Resource', 'ModelResource', 'RootModelResource',
     'PollRootResource', 'PollResource',
     'ChoiceRootResource', 'ChoiceResource',
@@ -33,7 +33,8 @@ __all__ = [
     'FileTypeRootResource', 'FileTypeResource',
     'FileTypeGroupRootResource', 'FileTypeGroupResource',
     'SectionGroupRootResource', 'SectionGroupResource',
-]
+    'StorageResource',
+)
 
 
 class Resource(Resource):
@@ -74,6 +75,7 @@ def validate_post(request):
     post = form.save(commit=False)
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     thread = post.thread
+    new_thread = post.is_op_post
 
     if no_captcha:
         c -= 1  # decrease allowed no-captcha posts
@@ -126,7 +128,7 @@ def validate_post(request):
         thread.save(rebuild_cache=False)
         post.thread = thread
     post.pid = thread.section.pid_incr()
-    if with_files:
+    if post.file:
         post.save(rebuild_cache=False)
         tools.handle_uploaded_file(file, ext)
     post.save()
@@ -387,3 +389,83 @@ class FileTypeGroupRootResource(RootModelResource):
 class FileTypeGroupResource(ModelResource):
     """A read resource for FileTypeGroup."""
     model = FileTypeGroup
+
+
+
+
+class StorageResource(Resource):
+    allowed_methods = anon_allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
+
+class StorageSetResource(Resource):
+    storage_name = ''
+    default = set()
+
+    def setdefault(self, request):
+        return request.session.setdefault(self.storage_name, self.default)
+
+    def get(self, request, auth, key=''):
+        return Response(status.OK, data)
+
+    def post(self, request, auth):
+        key = request.POST['key']
+        data.add(key)
+        request.session.modified = True
+        return Response(status.CREATED, data)
+
+    def delete(self, request, auth):
+        data = setdefault(request.session)
+        if not key:  # clear whole storage
+            data = set()
+        elif key in data:
+            data.remove(key)
+        request.session.modified = True
+        return Response(status.NO_CONTENT)
+
+
+class StorageDictResource(Resource):
+    default = {}
+
+    def get(self, request, auth):
+        data = data.get(key)
+        return data
+
+    def post(self, request, auth):
+        data = setdefault(request.session)
+        try:
+            key = request.POST['key']
+            value = request.POST['value']
+        except KeyError:
+            raise ResponseException(status.BAD_REQUEST)
+        data[key] = value
+        request.session.modified = True
+        return Response(status.CREATED, data)
+
+    def put(self, request, auth):
+        data = setdefault(request.session, storage_name)
+        try:
+            value = request.POST['value']
+        except KeyError:
+            raise ResponseException(status.BAD_REQUEST)
+        data[key] = value
+        return Response(status.CREATED, data)
+
+    def delete(self, request, auth, key):
+        data = setdefault(request.session)
+        if not key:  # clear whole storage
+            data = set()
+        elif key in data:
+            data[key] = None
+        request.session.modified = True
+        return Response(status.NO_CONTENT)
+
+
+class SettingResource(StorageDictResource):
+    storage_name = 'settings'
+
+
+class BookmarkResource(StorageSetResource):
+    storage_name = 'bookmarks'
+
+
+class HideResource(StorageSetResource):
+    storage_name = 'hidden'

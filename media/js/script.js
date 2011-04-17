@@ -362,7 +362,7 @@ function defaultErrorCallback(response) {
         errors,
         errorText,
         t = [], l;
-    if (response['field-errors']) {
+    if (response['field-errors'] || typeof rt['detail'] === 'object') {
         errors = response['field-errors'];
         for (var i in errors) {
             // Get label text of current field
@@ -386,7 +386,7 @@ board = {
             set = $.settings('hideSectGroup'),
             pass = $.localSettings('password'),
             buttons = {
-                'bookmark': {storageName: 'bookmark', storeText: true},
+                'bookmark': {storageName: 'bookmarks', storeText: true},
                 'hide': {storageName: 'hidden',
                     onInit : function(data) {
                         if (data.span.hasClass('remove')) {
@@ -480,17 +480,18 @@ board = {
                 postId = cont.id,
                 className = this.className.split(' ')[1],
                 current = board.postButtons[className],
-                storage = current.storage;
+                apiLink = window.api.url + '/' + className  + '/';
 
+            console.log(apiLink)
             if (span.hasClass('add')) {  // add
                 span.removeClass('add').addClass('remove');
-                storage.set(postId, cont.text_data);
+                $.post(apiLink, {value: postId});
                 if (current.onAdd) {
                     current.onAdd(cont);
                 }
             } else {  // remove
                 span.removeClass('remove').addClass('add');
-                storage.remove(postId);
+                $.delete(apiLink + postId);
                 if (current.onRemove) {
                     current.onRemove(cont);
                 }
@@ -1057,7 +1058,7 @@ posts = {
                 var button = buttons[className],
                     span = post.find('.' + className);
 
-                if (id in button.list) {
+                if (window.session[button.storageName].indexOf(id) > 0 ) {
                     span.removeClass('add').addClass('remove');
                 }
 

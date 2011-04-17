@@ -31,7 +31,7 @@ def get_page_or_404(paginator, page):
 def add_sidebar(context={}):
     """Updates context dictionary with sidebar."""
     from board.models import SectionGroup  # block recursive import
-    return dict(context, navigation=SectionGroup.objects.sections())
+    return dict(context, navigation=SectionGroup.objects.tree())
 
 
 def render_to_json(data):

@@ -13,11 +13,12 @@ from api.resources import *
 urlpatterns = patterns('api.views',
     (r'^$', 'api'),
     # user settings
-    (r'^setting/(?P<key>[\w\d]+)?$', 'storage',
-        {'storage_name': 'settings', 'is_dict': True}),
-    (r'^bookmark/(?P<key>[\w\d]+)?$', 'storage',
-        {'storage_name': 'bookmarks'}),
-    (r'^hidden/(?P<key>[\w\d]+)?$', 'storage', {'storage_name': 'hidden'}),
+    (r'^setting/$', SettingRootResource.as_view()),
+    (r'^setting/(?P<key>[\w\d]+)$', SettingResource.as_view()),
+    (r'^bookmark/$', BookmarkRootResource.as_view()),
+    (r'^bookmark/(?P<key>[\w\d]+)$', BookmarkResource.as_view()),
+    (r'^hide/$', HideRootResource.as_view()),
+    (r'^hide/(?P<key>[\w\d]+)?$', HideResource.as_view()),
     # polls
     (r'^poll/$', PollRootResource.as_view()),
     (r'^poll/(?P<id>\d+)$', PollResource.as_view()),

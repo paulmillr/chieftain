@@ -41,7 +41,7 @@
     {% if post.file %}
     {% with f=post.file %}
         <div class="filemeta">
-            <a target="_blank" href="{{f.file.url}}">{{post.id}}.{{f.type.extension}}</a>
+            <a target="_blank" href="{{f.file.url}}">{{f.id}}.{{f.type.extension}}</a>
             (<em>{{f.size|filesizeformat}}{% if f.image_height %}, {{f.image_height}}x{{f.image_width}}{% endif %}</em>)
         </div>
         <a href="{{f.file.url}}" class="file">
@@ -61,7 +61,7 @@
     {% endif %}
 
     <div class="message">{% autoescape off %}
-        {{ post.message|markdown2:"safe,videos,code-friendly,code-color" }}
+        {{ post.message_html }}
     {% endautoescape %}</div>
     {% if post.is_op_post and thread.count.skipped > 0 %}
         <span class="skipped">Пропущено ответов: {{thread.count.skipped}}, из них с файлами: {{thread.count.skipped_files}}.</span>

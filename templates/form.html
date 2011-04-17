@@ -37,13 +37,15 @@
                     <textarea name="message" id="message" class="message" rows="8" cols="40" required></textarea>
                     {% if thread %}<input name="thread" id="thread" value="{{thread.id}}" type="hidden">
                     {% else %}
-                    <input name="section" id="section" value="{{section.id}}" type="hidden">{% endif %}
+                    <input name="section" id="section" value="{{section.slug}}" type="hidden">{% endif %}
                 </dd>
             </dl>
-            <dl class="file-d">
-                <dt><label for="file">{% trans "File" %}</label></dt>
-                <dd><input type="file" name="file" id="file"></dd>
-            </dl>
+            {% if section.force_files %}
+                <dl class="file-d">
+                    <dt><label for="file">{% trans "File" %}</label></dt>
+                    <dd><input type="file" name="file" id="file"></dd>
+                </dl>
+            {% endif %}
             {% if not settings.DISABLE_CAPTCHA %}
             <dl class="captcha-d">
                 <dt>

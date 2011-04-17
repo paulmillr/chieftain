@@ -6,6 +6,7 @@ models.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+import markdown2
 from collections import Counter
 from datetime import datetime
 from django import forms
@@ -22,7 +23,7 @@ from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
 from ipcalc import Network
 from board import fields, tools
-
+from redjiska import redis
 
 __all__ = [
     'DAY', 'cached',
@@ -49,10 +50,9 @@ SECTION_TYPES = (
 def get_file_path(base):
     """Builds path to stored static files. Used in File class."""
     def closure(instance, filename):
-        post = instance.post
-        return '{base}/{slug}/{post_id}.{ext}'.format(
-            base=base, slug=post.section_slug(), thread=post.thread,
-            post_id=post.id, ext=instance.type.extension
+        return '{base}/{slug}/{id}.{ext}'.format(
+            base=base, slug=instance.post.section_slug(),
+            id=instance.id, ext=instance.type.extension
         )
     return closure
 
@@ -155,7 +155,7 @@ class SectionManager(models.Manager):
 class SectionGroupManager(models.Manager):
     """Manager for SectionGroup."""
     @cached(DAY, 'sections')
-    def sections(self):
+    def tree(self):
         """
            Gets list of board sections.
            We're not using QuerySet because they cannot be cached.
@@ -285,26 +285,22 @@ class Thread(models.Model):
     def posts_html(self):
         return self.posts().values('html', 'ip')
 
-    #@cached(1)
     def count(self):
         """Returns dict, that contains info about thread files and posts."""
-        lp = 5
+        limit = 5
         ps = self.posts()
-        stop = ps.count()
-        if stop <= lp:  # if we got thread with less posts than lp
-            return {'total': stop, 'skipped': 0, 'skipped_files': 0}
-        else:
-            start = stop - lp
-            skipped_ids = tools.take_first(ps[:stop - lp].values_list('id'))
-            skipped_ids.pop(0)  # remove first post
-            return {
-                'total': stop,
-                'start': start,
-                'stop': stop,
-                'skipped': start - 1,
-                'skipped_files': ps.filter(id__in=skipped_ids,
-                    file=True).count()
-            }
+        total = ps.count()
+        if total <= limit:
+            return {'total': total, 'skipped': 0, 'skipped_files': 0}
+        start = total - limit
+        skipped_ids = tools.take_first(ps[1:start].values_list('id'))
+        return {
+            'total': total,
+            'start': start,
+            'stop': total,
+            'skipped': start - 1,
+            'skipped_files': ps.filter(id__in=skipped_ids, file=True).count()
+        }
 
     @property
     def op_post(self):
@@ -320,9 +316,9 @@ class Thread(models.Model):
         posts = s.all()
         if not c['skipped']:
             return posts
-        else:  # select first one and last 5 posts
-            start, stop = c['start'], c['stop']
-            return [posts[0]] + list(posts[start:stop])
+        # select first and last 5 posts
+        start, stop = c['start'], c['stop']
+        return [posts[0]] + list(posts[start:stop])
 
     def remove(self):
         """Deletes thread."""
@@ -362,11 +358,12 @@ class Post(models.Model):
         verbose_name=_('Email'))
     topic = models.CharField(max_length=48, blank=True,
         verbose_name=_('Topic'))
-    file = models.ForeignKey('File', blank=True,
+    file = models.ForeignKey('File', blank=True, null=True,
         verbose_name=_('File'))
     password = models.CharField(max_length=64, blank=False,
         verbose_name=_('Password'))
     message = models.TextField(blank=True, verbose_name=_('Message'))
+    message_html = models.TextField(blank=True)
     html = models.TextField(blank=True, verbose_name=_('HTML cache'))
     objects = PostManager()
     deleted_objects = DeletedPostManager()
@@ -448,6 +445,10 @@ class File(models.Model):
 
     def __unicode__(self):
         return '{0}/{1}'.format(self.post.section_slug(), self.post.pid)
+
+    @property
+    def post(self):
+        return self.post_set.get()
 
     def remove(self):
         """Visually deletes file."""
@@ -688,12 +689,14 @@ class PostFormNoCaptcha(forms.ModelForm):
     def clean(self):
         """Form validator."""
         data = self.cleaned_data
-        data['is_op_post'] = new_thread = bool(data['thread'])
+        data['is_op_post'] = new_thread = not bool(data['thread'])
         with_files = bool(data['file'])
         data['date'] = datetime.now()
         if new_thread:  # create new thread
-            data['thread'] = Thread(bump=data['date'],
-                section=Section.objects.get(slug=data.pop('section')))
+            s = Section.objects.get(slug=data.pop('section'))
+            data['thread'] = Thread(bump=data['date'], section=s)
+        else:
+            data['thread'] = Thread.objects.get(id=data['thread'])
         thread = data['thread']
         section = thread.section
 
@@ -739,6 +742,8 @@ class PostFormNoCaptcha(forms.ModelForm):
             s = u'\u5350'
             data['poster'] = data['email'] = data['topic'] = s * 10
             data['message'] = (s + u' ') * 50
+        data['message_html'] = markdown2.markdown(data['message'], ['safe',
+            'videos', 'code-friendly','code-color'])
         return data
 
     class Meta:
