@@ -1,7 +1,7 @@
 Django==1.3
 ipcalc
 Tornado
-python-memcached
+redis
 recaptcha-client
 PIL
 -e git+http://github.com/pbagwl/markdown2.git#egg=markdown2

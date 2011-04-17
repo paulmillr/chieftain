@@ -4,26 +4,29 @@ klipped - new generation imageboard.
 
 ## What?
 
-klipped is a new generation imageboard. It is fastest chan.
-It has plenty of modern features and modular design. klipped is built with
-HTML5, Python programming language, Django web framework, Tornado scalable
-non-blocking web server with use of jQuery javascript library and Memcached
-memory caching system.
+klipped is a new generation imageboard (anonymous forum). It is the fastest chan.
+It has plenty of modern features and modular design.
+klipped is built with HTML5, Python programming language, Django web framework,
+Tornado scalable non-blocking web server with use of jQuery javascript library and
+Redis key-value storage.
 
 ## Features
 
 * Lightweight architecture
-* Realtime publish and subscribe system (posts autoload)
+* Realtime publish and subscribe system (post autoload)
 * REST API with XML, YAML and JSON serializers
 * Advanched post validation tools including tripcodes
 * Markdown support with code highlighting
-* Full-text search
+* Post search
 * AJAX
 * Answer maps & previews
+* Bookmarks
 * Customizable styles
 * Advanced moderation and administration tools
 * Internationalization (5 languages are supported currently)
-* HTML5
+* Mobile and smartphone versions
+* Wakaba database converter
+
 
 ### Planned for first release
 
@@ -32,21 +35,11 @@ memory caching system.
 
 ## Dependencies
 
-* You need Python 2.6 or 2.7 to run klipped.
-* [django](http://www.djangoproject.com/download/)
-* [Tornado](http://www.tornadoweb.org/)
-* [memcached](http://memcached.org/)
-* [py-memcached](http://pypi.python.org/pypi/python-memcached/)
-* [py-markdown2](https://github.com/pbagwl/markdown2)
-* [ipcalc](http://pypi.python.org/pypi/ipcalc)
-* [django-rest-framework](http://django-rest-framework.org/)
-* [recaptcha-client](http://pypi.python.org/pypi/recaptcha-client)
-* [PIL](http://www.pythonware.com/products/pil/)
+* You need Python 2.7 to run klipped.
+* [Redis](http://redis.io/)
 * [GeoIP C API](http://www.maxmind.com/app/c)
-* [GeoIP Python API](http://www.maxmind.com/app/python)
 * [GeoIP datasets](http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/)
-* Any supported by django SQL database binding (MySQLdb, postgresql, sqlite3,
-Oracle)
+* All python dependencies are listed in the file pip-req.txt
 
 ## Licensing
 

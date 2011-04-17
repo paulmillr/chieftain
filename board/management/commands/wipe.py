@@ -16,4 +16,3 @@ from board.models import Section, Thread, Post, File
 def generate(section='au', threads=100, posts=200):
     """Generates content for imageboard."""
     sect = Section.objects.get(slug=section)
-    
