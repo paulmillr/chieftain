@@ -33,7 +33,12 @@ __all__ = (
     'FileTypeRootResource', 'FileTypeResource',
     'FileTypeGroupRootResource', 'FileTypeGroupResource',
     'SectionGroupRootResource', 'SectionGroupResource',
-    'StorageResource',
+    'StorageRootResource', 'StorageResource',
+    'StorageDictRootResource', 'StorageDictResource',
+    'StorageSetRootResource', 'StorageSetResource',
+    'SettingRootResource', 'SettingResource',
+    'BookmarkRootResource', 'BookmarkResource',
+    'HideRootResource', 'HideResource',
 )
 
 
@@ -391,42 +396,68 @@ class FileTypeGroupResource(ModelResource):
     model = FileTypeGroup
 
 
-
-
-class StorageResource(Resource):
-    allowed_methods = anon_allowed_methods = ('GET', 'POST', 'PUT', 'DELETE')
-
-class StorageSetResource(Resource):
+class StorageRootResource(Resource):
+    """Base storage create/list/flush resource."""
+    allowed_methods = anon_allowed_methods = ('GET', 'POST', 'DELETE')
     storage_name = ''
-    default = set()
+    default = {}
 
     def setdefault(self, request):
         return request.session.setdefault(self.storage_name, self.default)
 
-    def get(self, request, auth, key=''):
+    def get(self, request, auth):
+        data = setdefault(request.session)
         return Response(status.OK, data)
 
+    def delete(self, request, auth):
+        """Clears whole storage."""
+        request.session = self.default
+        return Response(status.NO_CONTENT)
+
+
+class StorageResource(StorageRootResource):
+    """Base storage read/delete resource."""
+     allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
+
+     def get(self, request, auth, key):
+         raise ResponseException(status.NOT_IMPLEMENTED)
+
+
+class StorageSetRootResource(StorageRootResource):
+    """Storage create/list/flush resource, that uses set to store data."""
+    default = set()
+
     def post(self, request, auth):
+        data = setdefault(request.session)
         key = request.POST['key']
         data.add(key)
         request.session.modified = True
         return Response(status.CREATED, data)
 
-    def delete(self, request, auth):
+
+class StorageSetResource(StorageResource):
+    """Storage read/delete resource, that uses set to store data."""
+    default = set()
+
+    def get(self, request, auth, key):
         data = setdefault(request.session)
-        if not key:  # clear whole storage
-            data = set()
-        elif key in data:
+        return Response(status.OK, data)
+
+    def delete(self, request, auth, key):
+        data = setdefault(request.session)
+        if key in data:
             data.remove(key)
         request.session.modified = True
         return Response(status.NO_CONTENT)
 
 
-class StorageDictResource(Resource):
+class StorageDictRootResource(StorageResource):
+    """Storage create/list/flush resource, that uses dict to store data."""
+    allowed_methods = anon_allowed_methods = ('GET', 'POST', 'DELETE')
     default = {}
 
     def get(self, request, auth):
-        data = data.get(key)
+        data = setdefault(request.session)
         return data
 
     def post(self, request, auth):
@@ -440,31 +471,42 @@ class StorageDictResource(Resource):
         request.session.modified = True
         return Response(status.CREATED, data)
 
-    def put(self, request, auth):
-        data = setdefault(request.session, storage_name)
-        try:
-            value = request.POST['value']
-        except KeyError:
-            raise ResponseException(status.BAD_REQUEST)
-        data[key] = value
-        return Response(status.CREATED, data)
+
+class StorageDictResource(StorageResource):
+    """Storage read/delete resource, that uses dict to store data."""
+    allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
+    default = {}
+
+    def get(self, request, auth, key):
+        data = setdefault(request.session)
+        data = data.get(key)
+        return data
 
     def delete(self, request, auth, key):
-        data = setdefault(request.session)
-        if not key:  # clear whole storage
-            data = set()
-        elif key in data:
+        if key in data:
             data[key] = None
         request.session.modified = True
         return Response(status.NO_CONTENT)
+
+
+class SettingRootResource(StorageDictRootResource):
+    storage_name = 'settings'
 
 
 class SettingResource(StorageDictResource):
     storage_name = 'settings'
 
 
+class BookmarkRootResource(StorageSetRootResource):
+    storage_name = 'bookmarks'
+
+
 class BookmarkResource(StorageSetResource):
     storage_name = 'bookmarks'
+
+
+class HideRootResource(StorageRootResource):
+    storage_name = 'hidden'
 
 
 class HideResource(StorageSetResource):
