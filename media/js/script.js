@@ -474,7 +474,8 @@ board = {
 
         $('.threads').delegate('.post-icon', 'click', function(event) {
             event.preventDefault();
-            var cont = new PostContainer($(this).closest('.post')),
+            var t = $(this), 
+                cont = new PostContainer(t, t.closest('.post')),
                 span = cont.span,
                 post = cont.post,
                 postId = cont.id,
@@ -482,16 +483,15 @@ board = {
                 current = board.postButtons[className],
                 apiLink = window.api.url + '/' + className  + '/';
 
-            console.log(apiLink)
             if (span.hasClass('add')) {  // add
                 span.removeClass('add').addClass('remove');
-                $.post(apiLink, {value: postId});
+                $.post(apiLink, {value: postId}).error(defaultErrorCallback);
                 if (current.onAdd) {
                     current.onAdd(cont);
                 }
             } else {  // remove
                 span.removeClass('remove').addClass('add');
-                $.delete(apiLink + postId);
+                $.delete(apiLink + postId).error(defaultErrorCallback);
                 if (current.onRemove) {
                     current.onRemove(cont);
                 }
@@ -1056,9 +1056,10 @@ posts = {
             // Initialize post buttons.
             for (var className in buttons) {
                 var button = buttons[className],
-                    span = post.find('.' + className);
+                    span = post.find('.' + className),
+                    idInStorage = window.session[button.storageName].indexOf(id);
 
-                if (window.session[button.storageName].indexOf(id) > 0 ) {
+                if (idInStorage !== null && idInStorage >= 0) {
                     span.removeClass('add').addClass('remove');
                 }
 

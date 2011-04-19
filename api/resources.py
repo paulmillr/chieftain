@@ -430,8 +430,11 @@ class StorageSetRootResource(StorageRootResource):
 
     def post(self, request, auth, content):
         data = self.setdefault(request.session)
-        key = int(content['key'])
-        data.add(key)
+        try:
+            value = int(content['value'])
+        except (KeyError, TypeError):
+            raise ResponseException(status.BAD_REQUEST)
+        data.add(value)
         request.session.modified = True
         return Response(status.CREATED, data)
 
@@ -498,7 +501,7 @@ class BookmarkResource(StorageSetResource):
     storage_name = 'bookmarks'
 
 
-class HideRootResource(StorageRootResource):
+class HideRootResource(StorageSetRootResource):
     storage_name = 'hidden'
 
 
