@@ -743,7 +743,7 @@ class PostFormNoCaptcha(forms.ModelForm):
             data['poster'] = data['email'] = data['topic'] = s * 10
             data['message'] = (s + u' ') * 50
         data['message_html'] = markdown2.markdown(data['message'], ['safe',
-            'videos', 'code-friendly','code-color'])
+            'videos', 'code-friendly', 'code-color'])
         return data
 
     class Meta:

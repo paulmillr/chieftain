@@ -25,6 +25,7 @@ def session(request):
        s['test_2'] = 120
        {'session_classes': 'test test2'}
     """
+    session = request.session
     s = request.session.get('settings', {})
     no_captcha = request.session.get('no_captcha')
     if no_captcha:
@@ -38,13 +39,13 @@ def session(request):
         s['is_mod'] = True
         if u.is_superuser:
             s['is_admin'] = True
-    s.setdefault('hidden', set())
-    s.setdefault('bookmarks', set())
+    session.setdefault('hidden', set())
+    session.setdefault('bookmarks', set())
     return {
         'style': pop_from_session('style', 'photon'),
         'password': pop_from_session('password'),
         'session': dict(s.items()),
         'session_classes': ' '.join(s.keys()),
-        'hidden': list(s['hidden']),
-        'bookmarks': list(s['bookmarks']),
+        'hidden': list(session['hidden']),
+        'bookmarks': list(session['bookmarks']),
     }

@@ -402,34 +402,35 @@ class StorageRootResource(Resource):
     storage_name = ''
     default = {}
 
-    def setdefault(self, request):
-        return request.session.setdefault(self.storage_name, self.default)
+    def setdefault(self, session):
+        return session.setdefault(self.storage_name, self.default)
 
     def get(self, request, auth):
-        data = setdefault(request.session)
+        data = self.setdefault(request.session)
         return Response(status.OK, data)
 
     def delete(self, request, auth):
         """Clears whole storage."""
-        request.session = self.default
+        data = self.setdefault(request.session)
+        request.session[self.storage_name] = self.default
         return Response(status.NO_CONTENT)
 
 
 class StorageResource(StorageRootResource):
     """Base storage read/delete resource."""
-     allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
+    allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
 
-     def get(self, request, auth, key):
-         raise ResponseException(status.NOT_IMPLEMENTED)
+    def get(self, request, auth, key):
+        raise ResponseException(status.NOT_IMPLEMENTED)
 
 
 class StorageSetRootResource(StorageRootResource):
     """Storage create/list/flush resource, that uses set to store data."""
     default = set()
 
-    def post(self, request, auth):
-        data = setdefault(request.session)
-        key = request.POST['key']
+    def post(self, request, auth, content):
+        data = self.setdefault(request.session)
+        key = int(content['key'])
         data.add(key)
         request.session.modified = True
         return Response(status.CREATED, data)
@@ -439,15 +440,12 @@ class StorageSetResource(StorageResource):
     """Storage read/delete resource, that uses set to store data."""
     default = set()
 
-    def get(self, request, auth, key):
-        data = setdefault(request.session)
-        return Response(status.OK, data)
-
     def delete(self, request, auth, key):
-        data = setdefault(request.session)
+        data = self.setdefault(request.session)
+        key = int(key)
         if key in data:
             data.remove(key)
-        request.session.modified = True
+            request.session.modified = True
         return Response(status.NO_CONTENT)
 
 
@@ -456,15 +454,11 @@ class StorageDictRootResource(StorageResource):
     allowed_methods = anon_allowed_methods = ('GET', 'POST', 'DELETE')
     default = {}
 
-    def get(self, request, auth):
-        data = setdefault(request.session)
-        return data
-
-    def post(self, request, auth):
+    def post(self, request, auth, content):
         data = setdefault(request.session)
         try:
-            key = request.POST['key']
-            value = request.POST['value']
+            key = int(content['key'])
+            value = content['value']
         except KeyError:
             raise ResponseException(status.BAD_REQUEST)
         data[key] = value
@@ -479,8 +473,7 @@ class StorageDictResource(StorageResource):
 
     def get(self, request, auth, key):
         data = setdefault(request.session)
-        data = data.get(key)
-        return data
+        return Response(status.OK, data.get(key))
 
     def delete(self, request, auth, key):
         if key in data:

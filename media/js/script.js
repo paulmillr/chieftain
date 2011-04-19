@@ -675,7 +675,7 @@ board = {
 
         $('.threads').delegate('.number > a', 'click', function(e) {
             if (curPage.type === 'page' || curPage.type === 'thread') {
-                if (!$.settings('disableFastReply')) {
+                if (!$.settings('disableQuickReply')) {
                     var n = $('#post' + $(this).text());
                     $('.newpost').insertAfter(n);
                     if (curPage.type === 'page') {
