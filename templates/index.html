@@ -128,7 +128,7 @@
           <h4 class="bookmarks">{% trans "Bookmarked threads" %}<span></span></h4>
           <ul>
           {% for p in bookmarks %}
-            <li><a href="/{{p.thread__section__slug}}/{{p.pid}}">/{{p.thread__section__name}}/</a>&nbsp;&mdash;
+            <li><a href="{{ p.link }}">/{{p.thread__section__name}}/</a>&nbsp;&mdash;
             {% if p.message|length > 100 %}
                 {{p.message|slice:":100"}}...
             {% else %}

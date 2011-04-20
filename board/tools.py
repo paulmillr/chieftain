@@ -86,6 +86,8 @@ def make_post_descriptions(posts):
         'pid', 'topic', 'message'
     )
     for post in posts:
+        post['link'] = '/{slug}/{pid}'.format(
+            slug=post['thread__section__slug'], pid=post['pid'])
         post['description'] = (post['topic'] or post['message'] or
             '>>{0}'.format(post['pid']))
         yield post
