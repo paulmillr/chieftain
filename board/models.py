@@ -119,12 +119,10 @@ class PostManager(models.Manager):
 
         # Get post information.
         posts = Post.objects.filter(thread__in=thread_ids,
-            is_op_post=True).values('thread__section__name',
-            'thread__section__slug', 'pid', 'topic', 'message'
-        )[:limit]
+            is_op_post=True)[:limit]
 
         # Filter post information.
-        return (tools.make_post_description(p) for p in reversed(posts))
+        return tools.make_post_descriptions(posts.reverse())
 
 
 class DeletedPostManager(models.Manager):

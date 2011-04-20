@@ -21,7 +21,7 @@ from datetime import datetime
 
 __all__ = [
     'handle_uploaded_file', 'tripcode', 'key', 'parse_user_agent',
-    'make_post_description',
+    'make_post_descriptions',
     'take_first', 'from_timestamp'
 ]
 
@@ -80,10 +80,15 @@ def tripcode(text):
     return crypt(trip, salt)[-10:]
 
 
-def make_post_description(post):
-    post['description'] = (post['topic'] or post['message'] or
-        '>>{0}'.format(post['pid']))
-    return post
+def make_post_descriptions(posts):
+    """Takes Post QuerySet and generates description to all posts."""
+    posts = posts.values('thread__section__name', 'thread__section__slug',
+        'pid', 'topic', 'message'
+    )
+    for post in posts:
+        post['description'] = (post['topic'] or post['message'] or
+            '>>{0}'.format(post['pid']))
+        yield post
 
 
 def key(text):

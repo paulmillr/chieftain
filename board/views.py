@@ -13,7 +13,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from board.models import *
 from board.shortcuts import *
-from board.tools import make_post_description
+from board.tools import make_post_descriptions
 from modpanel.views import is_mod
 
 __all__ = [
@@ -29,7 +29,7 @@ def index(request):
     #Thread.objects.filter
     return render(request, 'index.html', add_sidebar({
         'popular': Post.objects.popular(10),
-        'bookmarks': (make_post_description(p) for p in bposts),
+        'bookmarks': make_post_descriptions(bposts),
         'random_images': File.objects.random_images()[:3],
     }))
 
@@ -61,9 +61,10 @@ def search(request, section_slug, page):
 def storage(request):
     section = request.GET.get('section')
     if section:
-        posts = request.session.get(section, {})
+        session_posts = request.session.get(section, {})
+        posts = Post.objects.filter(id__in=session_posts)
         return render(request, 'storage_tab.html', {
-            'posts': Post.objects.filter(id__in=posts)
+            'posts': make_post_descriptions(posts)
         })
     return render(request, 'storage.html', add_sidebar())
 

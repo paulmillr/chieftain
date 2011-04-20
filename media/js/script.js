@@ -498,6 +498,10 @@ board = {
             }
         });
 
+        $('.storage-clear-icon').click(function(event) {
+            $.delete(window.api.url + '/' + $(this).attr('data-storagename'));
+        });
+
         function previewPosts() {
             $('.threads').delegate('.postlink', 'mouseover', function(event) {
                 var t = $(this),
