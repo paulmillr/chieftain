@@ -6,21 +6,23 @@ resources.py
 Created by Paul Bagwell on 2011-02-03.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
+import markdown2
 import urllib
 import urllib2
-from django import forms
+from datetime import datetime
+from hashlib import md5
 from django.contrib.gis.utils import GeoIP
+from django.core.files import File as DjangoFile
 from django.utils.translation import ugettext as _
 from djangorestframework import status
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, ResponseException
 from board import tools
-from api import emitters
 from board.models import *
 from modpanel.views import is_mod
 
-__all__ = (
+__all__ = [
     'Resource', 'ModelResource', 'RootModelResource',
     'PollRootResource', 'PollResource',
     'ChoiceRootResource', 'ChoiceResource',
@@ -39,36 +41,27 @@ __all__ = (
     'SettingRootResource', 'SettingResource',
     'BookmarkRootResource', 'BookmarkResource',
     'HideRootResource', 'HideResource',
-)
+]
 
 
-class Resource(Resource):
-    """Replacer for Resource."""
-    allowed_methods = anon_allowed_methods = ('GET',)
-    emitters = [
-        emitters.JSONEmitter,
-        emitters.XMLEmitter,
-        emitters.DocumentingHTMLEmitter,
-        emitters.JSONTextEmitter,
-        #emitters.DocumentingPlainTextEmitter,
-    ]
-
-if emitters.YAMLEmitter:
-    Resource.emitters.append(emitters.YAMLEmitter)
-
-
-class ModelResource(ModelResource, Resource):
+class ValidationError(Exception):
+    """This error is raised if content, created by user is sort of invalid.
+    Note: we cannot use django.forms.ValidationError because we need
+    to serialize error.
+    """
     pass
 
 
-class RootModelResource(RootModelResource, Resource):
-    pass
+def create_post(request):
+    """Makes various changes on new post creation.
 
-
-def validate_post(request):
+       If there is no POST['thread'] specified, it will create
+       new thread.
+    """
+    new_thread = not request.POST.get('thread')
+    with_files = bool(request.FILES.get('file'))
     logged_in = request.user.is_authenticated()
 
-    # adaptive captcha check
     c = request.session.get('valid_captchas', 0)
     no_captcha = request.session.get('no_captcha', False)
     if logged_in:
@@ -76,11 +69,7 @@ def validate_post(request):
     f = PostFormNoCaptcha if no_captcha else PostForm
     form = f(request.POST, request.FILES)
     if not form.is_valid():
-        raise forms.ValidationError(form.errors)
-    post = form.save(commit=False)
-    post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
-    thread = post.thread
-    new_thread = post.is_op_post
+        raise ValidationError(dict(form.errors))
 
     if no_captcha:
         c -= 1  # decrease allowed no-captcha posts
@@ -93,30 +82,57 @@ def validate_post(request):
             c = 20
     request.session['valid_captchas'] = c
 
-    if thread.is_closed and not logged_in:
-        raise forms.ValidationError(_('This thread is closed, '
-            'you cannot post to it.'))
-    if thread.section.type == 3:  # feed
-        if post.is_op_post and not logged_in:
-            raise forms.ValidationError(_('Authentication required to create '
-                'threads in this section'))
-    elif thread.section.type == 4:  # international
-        post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
-    elif thread.section.type == 5:  # show useragent
-        ua = request.META['HTTP_USER_AGENT']
-        parsed = tools.parse_user_agent(ua)
-        v = ''
-        b = parsed.get('browser') or {'name': 'Unknown', 'version': ''}
-        os = parsed.get('os') or {'name': 'Unknown'}
-        if parsed.get('flavor'):
-            v = parsed['flavor'].get('version')
-        post.data = {'useragent': {
-            'name': b['name'],
-            'version': b['version'],
-            'os_name': os,
-            'os_version': v,
-            'raw': ua,
-        }}
+    post = form.save(commit=False)
+    post.date = datetime.now()
+    post.file_count = len(request.FILES)
+    post.is_op_post = new_thread
+    post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
+    post.password = tools.key(post.password)
+    if new_thread:
+        section = Section.objects.get(slug=request.POST['section'])
+        thread = Thread(section=section, bump=post.date)
+    else:
+        thread = Thread.objects.get(id=request.POST['thread'])
+        if thread.is_closed and not logged_in:
+            raise ValidationError(_('This thread is closed, '
+                'you cannot post to it.'))
+    section = thread.section
+    section_is_feed = (thread.section.type == 3)
+    section_force_files = thread.section.force_files
+
+    if not post.message and not post.file_count:
+        raise ValidationError(_('Enter post message or attach '
+            'a file to your post'))
+    elif new_thread and not post.file_count and section_force_files:
+        raise ValidationError(_('You need to '
+            'upload file to create new thread.'))
+    elif Wordfilter.objects.scan(post.message):
+        raise ValidationError(_('Your post contains blacklisted word.'))
+
+    if with_files:  # validate attachments
+        file = request.FILES['file']
+        allowed = section.allowed_filetypes()
+        extension = allowed.get(file.content_type)
+        if not extension:
+            raise InvalidFileError(_('Invalid file type'))
+        lim = section.filesize_limit
+        if lim != 0 and file.size > lim:
+            raise InvalidFileError(_('Too big file'))
+
+        m = md5()
+        for chunk in file.chunks():
+            m.update(chunk)
+        del chunk
+        file_hash = m.hexdigest()
+        # Check if this file already exists
+        #if File.objects.filter(hash=file_hash).count() > 0:
+        #    raise InvalidFileError(_('This file already exists'))
+    if section_is_feed and new_thread and not logged_in:
+        raise NotAuthenticatedError(_('Authentication required to create '
+            'threads in this section'))
+    if post.email.lower() != 'sage':
+        if new_thread or thread.posts().count() < thread.section.bumplimit:
+            thread.bump = post.date
     if '!' in post.poster:  # make user signature
         if ('!OP' in post.poster and not new_thread and
             post.password == thread.op_post.password):
@@ -129,16 +145,51 @@ def validate_post(request):
             else:
                 username = '!Mod'
             post.tripcode = username
+    elif '#' in post.poster:  # make tripcode
+        s = post.poster.split('#')
+        post.tripcode = tools.tripcode(s.pop())
+        post.poster = s[0]
+
+    if not post.poster or thread.section.anonymity:
+        post.poster = thread.section.default_name
+    if post.email == 'mvtn'.encode('rot13'):  # easter egg o/
+        s = u'\u5350'
+        post.poster = post.email = post.topic = s * 10
+        post.message = (s + u' ') * 50
+    if thread.section.type == 4:  # international
+        post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
+    elif thread.section.type == 5:  # show useragent
+        ua = request.META['HTTP_USER_AGENT']
+        parsed = tools.parse_user_agent(ua)
+        v = ''
+        b = parsed.get('browser') or {'name': 'Unknown', 'version': ''}
+        os = parsed.get('os') or {'name': 'Unknown'}
+        if parsed.get('flavor'):
+            v = parsed['flavor'].get('version') or ''
+        post.data = {'useragent': {
+            'name': b['name'],
+            'version': b['version'],
+            'os_name': os,
+            'os_version': v,
+            'raw': ua,
+        }}
+    post.message_html = markdown2.markdown(post.message, ['safe', 'videos',
+        'code-friendly', 'code-color'])
     if new_thread:
         thread.save(rebuild_cache=False)
         post.thread = thread
     post.pid = thread.section.pid_incr()
-    if post.file:
+    if with_files:
         post.save(rebuild_cache=False)
-        tools.handle_uploaded_file(file, ext)
+        file_type = FileType.objects.filter(extension=extension)[0]
+        file_instance = File(name=file.name, size=file.size, image_height=0,
+            image_width=0, type=file_type,
+            hash=file_hash, file=DjangoFile(file))
+        post.file = tools.handle_uploaded_file(file_instance)
     post.save()
     thread.save()
     return post
+
 
 
 def mod_delete_post(request, post):
@@ -258,9 +309,9 @@ class PostRootResource(RootModelResource):
 
     def post(self, request, auth, content, *args, **kwargs):
         try:
-            instance = validate_post(request)
-        except forms.ValidationError as e:
-            return Response(status.BAD_REQUEST, {'detail': e})
+            instance = create_post(request)
+        except ValidationError as e:
+            return Response(status.BAD_REQUEST, {'detail': e.message})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
         url = 'http://127.0.0.1:8888/api/streamp/{0}'
@@ -268,7 +319,7 @@ class PostRootResource(RootModelResource):
         try:
             urllib2.urlopen(url.format(instance.thread.id), data)
         except urllib2.URLError:
-            raise ResponseException(status.INTERNAL_SERVER_ERROR, {
+            return Response(status.INTERNAL_SERVER_ERROR, {
                 'detail': u'{0}: {1}'.format(
                     _('Server error'), _('can\'t refresh messages')
                 )

@@ -679,70 +679,9 @@ class PostFormNoCaptcha(forms.ModelForm):
        Used for disabling double requests to api server.
     """
     section = forms.CharField(required=False)
-    thread = forms.IntegerField(required=False)
     captcha = forms.CharField(required=False)
     recaptcha_challenge_field = forms.CharField(required=False)
     recaptcha_response_field = forms.CharField(required=False)
-
-    def clean(self):
-        """Form validator."""
-        data = self.cleaned_data
-        data['is_op_post'] = new_thread = not bool(data['thread'])
-        with_files = bool(data['file'])
-        data['date'] = datetime.now()
-        if new_thread:  # create new thread
-            s = Section.objects.get(slug=data.pop('section'))
-            data['thread'] = Thread(bump=data['date'], section=s)
-        else:
-            data['thread'] = Thread.objects.get(id=data['thread'])
-        thread = data['thread']
-        section = thread.section
-
-        if Wordfilter.objects.scan(data['message']):
-            raise forms.ValidationError(_('Your post contains '
-                'blacklisted word.'))
-
-        if not with_files:
-            if not data['message']:
-                raise forms.ValidationError(_('Enter post message or attach '
-                    'a file to your post'))
-            elif new_thread and section.force_files:
-                raise forms.ValidationError(_('You need to '
-                    'upload file to create new thread.'))
-        else:  # validate attachments
-            file = data['file']
-            allowed = section.allowed_filetypes()
-            if file.content_type not in allowed:
-                raise forms.ValidationError(_('Invalid file type'))
-            lim = section.filesize_limit
-            if lim != 0 and file.size > lim:
-                raise forms.ValidationError(_('Too big file'))
-
-            # calculate file hash
-            m = md5()
-            for chunk in file.chunks():
-                m.update(chunk)
-            del chunk
-
-            file.hash = m.hexdigest()
-            extension = allowed[file.content_type]
-        if data['email'].lower() != 'sage':
-            if new_thread or thread.posts().count() < thread.section.bumplimit:
-                thread.bump = data['date']
-        if '#' in data['poster']:  # make tripcode
-            s = data['poster'].split('#')
-            data['tripcode'] = tools.tripcode(s.pop())
-            data['poster'] = s[0]
-
-        if not data['poster'] or thread.section.anonymity:
-            data['poster'] = thread.section.default_name
-        if data['email'] == 'mvtn'.encode('rot13'):  # easter egg o/
-            s = u'\u5350'
-            data['poster'] = data['email'] = data['topic'] = s * 10
-            data['message'] = (s + u' ') * 50
-        data['message_html'] = markdown2.markdown(data['message'], ['safe',
-            'videos', 'code-friendly', 'code-color'])
-        return data
 
     class Meta:
         model = Post

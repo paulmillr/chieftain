@@ -358,22 +358,28 @@ function slideRemove(elem) {
 
 function defaultErrorCallback(response) {
     //document.write(data.responseText); // for debugging
-    var rt = response,
-        errors,
-        errorText,
-        t = [], l;
-    if (response['field-errors'] || typeof rt['detail'] === 'object') {
-        errors = response['field-errors'];
-        for (var i in errors) {
-            // Get label text of current field
-            l = $('label[for="'+i+'"]').text();
-            t.push(l + ': ' + errors[i].join(', '));
-        }
-        errorText = t.join('<br/>')
+    var errors = response['field-errors'] || response['detail'],
+        errorText = '',
+        tmp = [],
+        text, label;
+    console.log(response);
+    console.log(errors);
+    if (typeof errors === 'string') {
+        errorText = errors;
     } else {
-        errorText = rt['detail'];
+        console.log('not string')
+        for (var i in errors) {
+            text = '';
+            label = $('label[for="' + i + '"]');
+            if (label.length) {
+                text += label.text() + ': ';
+            }
+            text += errors[i].join(', ');
+            tmp.push(text)
+        }
+        errorText = tmp.join('<br/>');
     }
-
+    
     $.notification('error', errorText);
 }
 
@@ -1139,18 +1145,21 @@ ajax = {
                 if (typeof response === 'string') {
                     response = $.parseJSON(response);
                 }
-
-                return !response['field-errors'] && !response['detail'] ? 
-                    ajax.success(response) :
+                
+                if (response['field-errors'] || response['errors'] || response['detail']) {
                     defaultErrorCallback(response);
+                } else {
+                    ajax.success(response)
+                }
             },
             error: defaultErrorCallback,
-            url: window.api.url + '/post/?html=1&_accept=text/plain',
+            url: window.api.url + '/post/?html=1',
             dataType: 'json'
         });
     },
 
     success: function(data) {
+        console.log(data);
         if (curPage.type !== 'thread' && !ajax.quickReplied) { // redirect
             window.location.href = './' + data.pid;
             return true;

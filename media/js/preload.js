@@ -5,5 +5,4 @@ var RecaptchaOptions = {
 },
     api = {
         url: '/api',  // URL to klipped API
-        defaultType: 'text/plain'  // Default MIME type of queries to API
     };

@@ -40,7 +40,7 @@
                     <input name="section" id="section" value="{{section.slug}}" type="hidden">{% endif %}
                 </dd>
             </dl>
-            {% if section.force_files %}
+            {% if section.force_files or thread.section.force_files %}
                 <dl class="file-d">
                     <dt><label for="file">{% trans "File" %}</label></dt>
                     <dd><input type="file" name="file" id="file"></dd>

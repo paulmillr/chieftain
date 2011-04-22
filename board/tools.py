@@ -26,27 +26,14 @@ __all__ = [
 ]
 
 
-def handle_uploaded_file(file, file_hash, extension, post):
+def handle_uploaded_file(file_instance):
     """Moves uploaded file to files directory and makes thumb."""
-    from board.models import File, FileType
-
+    f = file_instance
     def make_path(dir):
-        args = settings.MEDIA_ROOT, dir, post.section_slug()
-        return os.path.join(*args)
+        return os.path.join(settings.MEDIA_ROOT, dir)
     directory = make_path('section')
     if not os.path.isdir(directory):
         os.makedirs(directory)
-    file_data = {
-        'post': post,
-        'name': file.name,
-        'type': FileType.objects.filter(extension=extension)[0],
-        'size': file.size,
-        'image_height': 0,
-        'image_width': 0,
-        'file': DjangoFile(file),
-        'hash': file_hash,
-    }
-    f = File(**file_data)
     f.save()
     try:  # make thumb
         img = Image.open(f.file.file)
@@ -59,7 +46,7 @@ def handle_uploaded_file(file, file_hash, extension, post):
         if not os.path.isdir(thumb_dir):
             os.makedirs(thumb_dir)
         with tempfile.NamedTemporaryFile(
-            suffix='.{0}'.format(extension)) as tmp:
+            suffix='.{0}'.format(f.type.extension)) as tmp:
             img.thumbnail((MAX, MAX), Image.ANTIALIAS)
             img.save(tmp)
             f.thumb = DjangoFile(tmp)
@@ -95,7 +82,7 @@ def make_post_descriptions(posts):
 
 def key(text):
     """Generates key for passwords etc."""
-    raise Exception('Not implemented')
+    return sha1(text).hexdigest()
 
 
 def parse_user_agent(user_agent):
