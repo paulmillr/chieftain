@@ -1,4 +1,4 @@
-{% load i18n settings md2 %}
+{% load i18n settings md2 split %}
 <article class="post" id="post{{post.pid}}" data-id="{{post.id}}">
     <header>
         {% if post.data %}
@@ -41,7 +41,7 @@
     {% if post.file %}
     {% with f=post.file %}
         <div class="filemeta">
-            <a target="_blank" href="{{f.file.url}}">{{f.id}}.{{f.type.extension}}</a>
+            <a target="_blank" href="{{f.file.url}}">{{ f.file.name|split:"/"|last }}</a>
             (<em>{{f.size|filesizeformat}}{% if f.image_height %}, {{f.image_height}}x{{f.image_width}}{% endif %}</em>)
         </div>
         <a href="{{f.file.url}}" class="file">

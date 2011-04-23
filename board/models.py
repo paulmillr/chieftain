@@ -50,9 +50,9 @@ SECTION_TYPES = (
 def get_file_path(base):
     """Builds path to stored static files. Used in File class."""
     def closure(instance, filename):
-        return '{base}/{slug}/{id}.{ext}'.format(
-            base=base, slug=instance.post.section_slug(),
-            id=instance.id, ext=instance.type.extension
+        return '{base}/{timestamp}.{ext}'.format(
+            base=base, timestamp=tools.timestamp_now(),
+            ext=instance.type.extension
         )
     return closure
 

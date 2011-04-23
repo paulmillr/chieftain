@@ -138,7 +138,9 @@ function getPostId(post) {
 }
 
 function getPostPid(post) {
+    window.postz = post;
     if (isjQuery(post)) {
+        var post_id = post.attr('id');
         return post.attr('id').replace('post', '');
     } else {
         return post.id.replace('post', '');
@@ -171,8 +173,13 @@ function PostContainer(span, post) {
 
     this.span = span;
     this.post = post ? (!isjQuery(post) ? post : $(post)) : span.closest('.post');
-    this.thread = (curPage.type === 'thread') ? curPage.cache.thread : this.span.closest('.thread');
-    this.first = (curPage.type === 'thread') ? curPage.cache.first : this.thread.find('.post:first-child');
+    if (curPage.type === 'thread') {
+        this.thread = curPage.cache.thread;
+        this.first = curPage.cache.first;
+    } else {
+        this.thread = this.span.closest('.thread');
+        this.first = this.thread.find('.post:first-child');;
+    }
     this.id = getPostId(this.post);
     this.text_data = {
         'section': curPage.section,
@@ -362,12 +369,10 @@ function defaultErrorCallback(response) {
         errorText = '',
         tmp = [],
         text, label;
-    console.log(response);
-    console.log(errors);
+    //console.log('Response', response, ', errors', errors);
     if (typeof errors === 'string') {
         errorText = errors;
     } else {
-        console.log('not string')
         for (var i in errors) {
             text = '';
             label = $('label[for="' + i + '"]');
@@ -1029,14 +1034,12 @@ posts = {
     init: function(selector) {
         var posts = selector && typeof selector !== 'function' ? 
                 isjQuery(selector) ? selector : $(selector) : $('.post'),
-            buttons = board.postButtons,
             map = {};
         this.cache = {};
 
         for (var i=0; i < posts.length; i++) {
             var p = posts[i],
                 post = $(p),
-                id = getPostId(post),
                 pid = getPostPid(post),
                 links = post.find('.postlink').map(function() {
                     return $(this);
@@ -1062,13 +1065,24 @@ posts = {
                     target.attr('href', targetSelector);
                 }
             }
+        }
+        
+        this.initButtons();
+        this.buildAnswersMap(map, true);
+    },
+    
+    initButtons: function() {
+        var posts = $('.thread .post:first-child'),
+            buttons = board.postButtons;
 
-            // Initialize post buttons.
+        posts.each(function() {
+            var post = $(this),
+                id = getPostId(post);
+
             for (var className in buttons) {
                 var button = buttons[className],
                     span = post.find('.' + className),
                     idInStorage = window.session[button.storageName].indexOf(id);
-
                 if (idInStorage !== null && idInStorage >= 0) {
                     span.removeClass('add').addClass('remove');
                 }
@@ -1077,9 +1091,7 @@ posts = {
                     button.onInit(new PostContainer(span, post));
                 }
             }
-        }
-
-        this.buildAnswersMap(map, true);
+        });
     },
 
     buildAnswersMap: function(map, concat) {
@@ -1159,7 +1171,7 @@ ajax = {
     },
 
     success: function(data) {
-        console.log(data);
+        //console.log(data);
         if (curPage.type !== 'thread' && !ajax.quickReplied) { // redirect
             window.location.href = './' + data.pid;
             return true;

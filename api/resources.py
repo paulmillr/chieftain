@@ -180,7 +180,6 @@ def create_post(request):
         post.thread = thread
     post.pid = thread.section.pid_incr()
     if with_files:
-        post.save(rebuild_cache=False)
         file_type = FileType.objects.filter(extension=extension)[0]
         file_instance = File(name=file.name, size=file.size, image_height=0,
             image_width=0, type=file_type,
@@ -189,7 +188,6 @@ def create_post(request):
     post.save()
     thread.save()
     return post
-
 
 
 def mod_delete_post(request, post):

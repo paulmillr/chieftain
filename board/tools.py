@@ -10,6 +10,7 @@ import os
 import re
 import httpagentparser
 import tempfile
+import time
 from PIL import Image
 from django.core.files import File as DjangoFile
 from hashlib import sha1
@@ -28,9 +29,9 @@ __all__ = [
 
 def handle_uploaded_file(file_instance):
     """Moves uploaded file to files directory and makes thumb."""
-    f = file_instance
     def make_path(dir):
         return os.path.join(settings.MEDIA_ROOT, dir)
+    f = file_instance
     directory = make_path('section')
     if not os.path.isdir(directory):
         os.makedirs(directory)
@@ -97,3 +98,7 @@ def take_first(list):
 def from_timestamp(timestamp):
     """Convert timestamp to datetime object."""
     return str(datetime.fromtimestamp(int(timestamp)))
+
+
+def timestamp_now():
+    return int(time.time() * 100)
