@@ -7,8 +7,7 @@ Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.paginator import Paginator
-from django.http import (Http404, HttpResponseRedirect,
-    HttpResponsePermanentRedirect)
+from django.http import (Http404, HttpResponsePermanentRedirect)
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
 from board.models import *
@@ -107,8 +106,7 @@ def posts(request, section_slug, page):
 
 
 def images(request, section_slug, page):
-    """List of images in section."""
-    # TODO
+    """TODO: List of images in section."""
     section = get_object_or_404(Section, slug=section_slug)
     images_page = Paginator(section.images(), 100)
 

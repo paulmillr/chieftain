@@ -6,7 +6,6 @@ wakaba_convert.py
 Created by Paul Bagwell on 2011-04-16.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-import os
 from django.db import connection
 from django.core.cache import cache
 from django.core.management.base import BaseCommand
@@ -63,7 +62,7 @@ class WakabaConverter(object):
 
     def get_table_data(self, table):
         sql = 'SELECT * FROM {0}{1}'.format(self.prefix, table)
-        res = cursor.execute(sql)
+        res = self.cursor.execute(sql)
         return (dict(zip(self.fields, c)) for c in res.fetchall())
 
     def convert(self):

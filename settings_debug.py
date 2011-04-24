@@ -1,6 +1,5 @@
 # encoding: utf-8
 from settings import *
-import os
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG

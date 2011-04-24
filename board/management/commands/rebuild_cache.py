@@ -8,8 +8,6 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import os
 import shutil
-from django.db import connection
-from django.core.cache import cache
 from django.core.management.base import BaseCommand
 from board.models import Thread, Post
 
@@ -28,3 +26,4 @@ class Command(BaseCommand):
             post.save()
             if c % 250 == 0:
                 print 'Rendered post {0}'.format(c)
+        cache.clear()

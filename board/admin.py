@@ -6,12 +6,12 @@ admin.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from board.models import *
+from board import models
 from django.contrib import admin
 
 
 class ChoiceInline(admin.TabularInline):
-    model = Choice
+    model = models.Choice
     extra = 3
     exclude = ('vote_count',)
 
@@ -34,16 +34,16 @@ class PostAdmin(admin.ModelAdmin):
 class DeniedIPAdmin(admin.ModelAdmin):
     search_fields = ('ip',)
 
-admin.site.register(Poll, PollAdmin)
-admin.site.register(Choice)
-admin.site.register(Vote)
-admin.site.register(Thread, ThreadAdmin)
-admin.site.register(Post, PostAdmin)
-admin.site.register(File)
-admin.site.register(FileTypeGroup)
-admin.site.register(FileType)
-admin.site.register(Section)
-admin.site.register(SectionGroup)
-admin.site.register(UserProfile)
-admin.site.register(Wordfilter)
-admin.site.register(DeniedIP, DeniedIPAdmin)
+admin.site.register(models.Poll, PollAdmin)
+admin.site.register(models.Choice)
+admin.site.register(models.Vote)
+admin.site.register(models.Thread, ThreadAdmin)
+admin.site.register(models.Post, PostAdmin)
+admin.site.register(models.File)
+admin.site.register(models.FileTypeGroup)
+admin.site.register(models.FileType)
+admin.site.register(models.Section)
+admin.site.register(models.SectionGroup)
+admin.site.register(models.UserProfile)
+admin.site.register(models.Wordfilter)
+admin.site.register(models.DeniedIP, DeniedIPAdmin)

@@ -8,7 +8,6 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 import os
 import shutil
-from django.db import connection
 from django.conf import settings
 from django.core.cache import cache
 from django.core.management.base import BaseCommand

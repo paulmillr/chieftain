@@ -6,7 +6,6 @@ models.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-import markdown2
 from collections import Counter
 from datetime import datetime
 from django import forms
@@ -14,7 +13,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from django.core.cache import cache
-from django.db import models, connection
+from django.db import models
 from django.db.models.aggregates import Count
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -23,7 +22,6 @@ from django.utils.translation import ugettext_lazy as _
 from hashlib import sha1
 from ipcalc import Network
 from board import fields, tools
-from redjiska import redis
 
 __all__ = [
     'DAY', 'cached',

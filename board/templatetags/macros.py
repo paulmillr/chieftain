@@ -48,7 +48,7 @@ through {% extends ... %} tags.
 
 import re
 from django import template
-from django.template import resolve_variable, FilterExpression
+from django.template import FilterExpression
 from django.template.loader import get_template
 
 register = template.Library()

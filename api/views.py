@@ -55,7 +55,41 @@ class ValidationError(Exception):
 
 
 def api(request):
+    """Page, that contains some API examples."""
     return render(request, 'api.html')
+
+
+def adapt_captcha(request):
+    """Disables captcha, depending on some conditions.
+
+    Captcha is disabled if:
+    - User entered three valid captchas.
+    - User is logged in.
+
+    Returns post form. That form has or has not captcha field.
+    """
+    c = request.session.get('valid_captchas', 0)
+    no_captcha = request.session.get('no_captcha', False)
+
+    model = PostFormNoCaptcha if no_captcha else PostForm
+    form = model(request.POST, request.FILES)
+    if not form.is_valid():
+        raise ValidationError(dict(form.errors))
+
+    if request.user.is_authenticated():
+        no_captcha = True
+    else:
+        if no_captcha:
+            c -= 1  # decrease allowed no-captcha posts
+            if c == 0:
+                request.session['no_captcha'] = False
+        else:
+            c += 1  # increase valid captchas counter
+            if c == 3:
+                request.session['no_captcha'] = True
+                c = 20
+        request.session['valid_captchas'] = c
+    return form
 
 
 def create_post(request):
@@ -67,30 +101,9 @@ def create_post(request):
     new_thread = not request.POST.get('thread')
     with_files = bool(request.FILES.get('file'))
     logged_in = request.user.is_authenticated()
-
-    c = request.session.get('valid_captchas', 0)
-    no_captcha = request.session.get('no_captcha', False)
-    if logged_in:
-        no_captcha = True
-    f = PostFormNoCaptcha if no_captcha else PostForm
-    form = f(request.POST, request.FILES)
-    if not form.is_valid():
-        raise ValidationError(dict(form.errors))
-
-    if no_captcha:
-        c -= 1  # decrease allowed no-captcha posts
-        if c == 0:
-            request.session['no_captcha'] = False
-    else:
-        c += 1  # increase valid captchas counter
-        if c == 3:
-            request.session['no_captcha'] = True
-            c = 20
-    request.session['valid_captchas'] = c
-
+    form = adapt_captcha(request)
     post = form.save(commit=False)
     post.date = datetime.now()
-    post.file_count = len(request.FILES)
     post.is_op_post = new_thread
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = tools.key(post.password)
@@ -104,17 +117,9 @@ def create_post(request):
                 'you cannot post to it.'))
     section = thread.section
     section_is_feed = (thread.section.type == 3)
-    section_force_files = thread.section.force_files
 
-    if not post.message and not post.file_count:
-        raise ValidationError(_('Enter post message or attach '
-            'a file to your post'))
-    elif new_thread and not post.file_count and section_force_files:
-        raise ValidationError(_('You need to '
-            'upload file to create new thread.'))
-    elif Wordfilter.objects.scan(post.message):
+    if Wordfilter.objects.scan(post.message):
         raise ValidationError(_('Your post contains blacklisted word.'))
-
     if with_files:  # validate attachments
         file = request.FILES['file']
         allowed = section.allowed_filetypes()
@@ -133,12 +138,20 @@ def create_post(request):
         # Check if this file already exists
         #if File.objects.filter(hash=file_hash).count() > 0:
         #    raise InvalidFileError(_('This file already exists'))
-    if section_is_feed and new_thread and not logged_in:
-        raise NotAuthenticatedError(_('Authentication required to create '
-            'threads in this section'))
-    if post.email.lower() != 'sage':
-        if new_thread or thread.posts().count() < thread.section.bumplimit:
-            thread.bump = post.date
+    else:
+        if not post.message:
+            raise ValidationError(_('Enter post message or attach '
+                'a file to your post'))
+        elif new_thread:
+            if section.force_files:
+                raise ValidationError(_('You need to '
+                    'upload file to create new thread.'))
+            elif section_is_feed and not logged_in:
+                raise NotAuthenticatedError(_('Authentication required to '
+                    'create threads in this section'))
+    if (post.email.lower() != 'sage' and (new_thread or
+        thread.posts().count() < section.bumplimit)):
+        thread.bump = post.date
     if '!' in post.poster:  # make user signature
         if ('!OP' in post.poster and not new_thread and
             post.password == thread.op_post.password):
@@ -156,15 +169,15 @@ def create_post(request):
         post.tripcode = tools.tripcode(s.pop())
         post.poster = s[0]
 
-    if not post.poster or thread.section.anonymity:
-        post.poster = thread.section.default_name
+    if not post.poster or section.anonymity:
+        post.poster = section.default_name
     if post.email == 'mvtn'.encode('rot13'):  # easter egg o/
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10
         post.message = (s + u' ') * 50
-    if thread.section.type == 4:  # international
+    if section.type == 4:  # international
         post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
-    elif thread.section.type == 5:  # show useragent
+    elif section.type == 5:  # show useragent
         ua = request.META['HTTP_USER_AGENT']
         parsed = tools.parse_user_agent(ua)
         v = ''
@@ -184,12 +197,13 @@ def create_post(request):
     if new_thread:
         thread.save(rebuild_cache=False)
         post.thread = thread
-    post.pid = thread.section.pid_incr()
+    post.pid = section.pid_incr()
     if with_files:
         file_type = FileType.objects.filter(extension=extension)[0]
-        file_instance = File(name=file.name, size=file.size, image_height=0,
-            image_width=0, type=file_type,
-            hash=file_hash, file=DjangoFile(file))
+        file_instance = File(
+            name=file.name, size=file.size, type=file_type, hash=file_hash,
+            file=DjangoFile(file), image_height=0, image_width=0
+        )
         post.file = tools.handle_uploaded_file(file_instance)
     post.save()
     thread.save()
@@ -306,16 +320,21 @@ class PostRootResource(RootModelResource):
     model = Post
 
     def get(self, request, auth, *args, **kwargs):
-        qs = self.model.objects.filter(**kwargs).reverse()
+        """Returns list of posts. If ?html option is specified, method
+        will return only posts html without any other fields.
+        TODO: implement pagination.
+        """
+        qs = self.model.objects.filter(**kwargs).reverse()[:20]
         if request.GET.get('html'):
-            return qs.values('html')[:20]
-        return qs[:20]
+            return qs.values('html')
+        return qs
 
     def post(self, request, auth, content, *args, **kwargs):
+        """Checks post for errors and returns new post instance."""
         try:
             instance = create_post(request)
         except ValidationError as e:
-            return Response(status.BAD_REQUEST, {'detail': e.message})
+            raise ResponseException(status.BAD_REQUEST, {'detail': e.message})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
         url = 'http://127.0.0.1:8888/api/streamp/{0}'
@@ -323,7 +342,7 @@ class PostRootResource(RootModelResource):
         try:
             urlopen(url.format(instance.thread.id), data)
         except URLError:
-            return Response(status.INTERNAL_SERVER_ERROR, {
+            raise ResponseException(status.INTERNAL_SERVER_ERROR, {
                 'detail': u'{0}: {1}'.format(
                     _('Server error'), _('can\'t refresh messages')
                 )
@@ -338,6 +357,9 @@ class PostResource(ModelResource):
     model = Post
 
     def get(self, request, auth, *args, **kwargs):
+        """Gets post data. If ?html option is specified, method will return
+        only post html without any other fields.
+        """
         try:
             post = self.model.objects.get(**kwargs)
             if request.GET.get('html'):
@@ -394,6 +416,7 @@ class FileRootResource(RootModelResource):
 
 
 class RandomImageRootResource(RootModelResource):
+    """A list resource for random images."""
     model = File
     fields = ('id', 'name', 'type', 'size',
         'image_width', 'image_height', 'hash', 'file', 'thumb')
@@ -452,7 +475,9 @@ class FileTypeGroupResource(ModelResource):
 
 
 class StorageRootResource(Resource):
-    """Base storage create/list/flush resource."""
+    """Base storage create/list/flush resource. Storage is a dict or set,
+    located in the django session database.
+    """
     allowed_methods = anon_allowed_methods = ('GET', 'POST', 'DELETE')
     storage_name = ''
     default = {}
