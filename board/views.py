@@ -7,13 +7,11 @@ Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.paginator import Paginator
-from django.http import (Http404, HttpResponsePermanentRedirect)
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
 from board.models import Post, File, Section, PostForm
 from board.shortcuts import get_page_or_404, add_sidebar
 from board.tools import make_post_descriptions
-from modpanel.views import is_mod
 
 __all__ = [
     'index', 'settings', 'faq', 'search',
@@ -53,7 +51,7 @@ def search(request, section_slug, page):
             'details': _('Nothing found')
         }))
     p = get_page_or_404(Paginator(posts, section.ONPAGE), page)
-    return render(request, 'section_posts.html', add_sidebar({'posts': p,
+    return render(request, 'search_results.html', add_sidebar({'posts': p,
         'section': section}))
 
 
@@ -88,20 +86,7 @@ def threads(request, section_slug):
     return render(request, 'section_threads.html', add_sidebar({
         'threads': section.op_posts(),
         'section': section,
-        'form': PostForm(),
-        'mod': is_mod(request, section_slug)
-    }))
-
-
-def posts(request, section_slug, page):
-    """List of posts in section."""
-    section = get_object_or_404(Section, slug=section_slug)
-    p = get_page_or_404(Paginator(section.posts(), section.ONPAGE), page)
-    return render(request, 'section_posts.html', add_sidebar({
-        'posts': p,
-        'section': section,
-        'form': PostForm(),
-        'mod': is_mod(request, section_slug)
+        'form': PostForm()
     }))
 
 
@@ -118,18 +103,15 @@ def images(request, section_slug, page):
 def thread(request, section_slug, op_post):
     """Thread and its posts."""
     post = get_object_or_404(Post, thread__section__slug=section_slug,
-        pid=op_post)
+        pid=op_post, is_deleted=False)
     thread = post.thread
     if thread.poll_id:
         ip = request.META['REMOTE_ADDR']
         thread.poll.vote_data = thread.poll.get_vote_data(ip)
-    if thread.is_deleted:
-        raise Http404
     if not post.is_op_post:
-        return HttpResponsePermanentRedirect('/{0}/{1}#post{2}'.format(
+        return redirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))
     return render(request, 'section_thread.html', add_sidebar({
         'thread': thread,
         'form': PostForm(),
-        'mod': is_mod(request, section_slug),
     }))

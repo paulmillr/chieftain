@@ -1,13 +1,13 @@
 {% extends "section_base.html" %}
 {% load i18n %}
-{% block title %}{{section.name}}{% endblock %}
+{% block title %}{{ section.name }}{% endblock %}
 {% block role %}threads{% endblock %}
 
 {% block section %}
     {% autoescape off %}
     {% for thread in threads %}
-    <section class="thread" id="thread{{thread.id}}">
-        {{thread.html}}
+    <section class="thread" id="thread{{ thread.id }}">
+        {{ thread.html }}
     </section>
     {% endfor %}
     {% endautoescape %}

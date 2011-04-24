@@ -2,18 +2,18 @@
 {% load i18n %}
 {% load md2 %}
 
-{% block title %}- {{section.name}}{% endblock %}
+{% block title %}- {{ section.name }}{% endblock %}
 
 {% block content %}
 <div id="posts">
     <div class="toolbar">
         <a href=".." class="home">{% trans "Back" %}</a>
-        <h1>{{settings.SITE_TITLE}} - {{section.name}}</h1>
+        <h1>{{ settings.SITE_TITLE }} - {{ section.name }}</h1>
     </div>
     {% for post in section.op_posts %}
         <div class="post">
-            <strong class="number"><a href="{{post.pid}}">#{{post.pid}}</a></strong>
-            <div class="message">{% autoescape off %}{{ post.message|markdown2:"safe,videos,code-friendly,code-color" }}{% endautoescape %}</div>
+            <strong class="number"><a href="{{ post.pid }}">#{{ post.pid }}</a></strong>
+            <div class="message">{% autoescape off %}{{ post.message_html }}{% endautoescape %}</div>
         </div>
     {% endfor %}
 </div>

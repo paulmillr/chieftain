@@ -1,6 +1,6 @@
 {% extends "section_base.html" %}
 {% load i18n haship macros %}
-{% block title %}{% trans "Thread title" %} {{thread.op_post.pid}}{% endblock %}
+{% block title %}{% trans "Thread title" %} {{ thread.op_post.pid }}{% endblock %}
 {% block role %}thread{% endblock %}
 
 {% block newpost %}
@@ -22,11 +22,11 @@
     </section>
     {% if thread.poll_id %}
         <section class="poll{% if thread.poll.vote_data %} voted{% endif %}">
-            {{thread.poll.vote_data.id}}
-            <div class="hbg-title">{{thread.poll.question}}</div>
-            <dl id="poll{{thread.poll_id}}" title="{{thread.poll.question}}">
+            {{ thread.poll.vote_data.id }}
+            <div class="hbg-title">{{ thread.poll.question }}</div>
+            <dl id="poll{{ thread.poll_id }}" title="{{ thread.poll.question }}">
                 {% for choice in thread.poll.choice_set.all %}
-                <dt id="vote-info{{choice.id}}">
+                <dt id="vote-info{{ choice.id }}">
                     <input type="radio" name="choice" value="{{choice.id}}">
                     {{choice.name}}
                 </dt>
@@ -39,7 +39,6 @@
         {% autoescape off %}
         {% for post in thread.posts_html %}
             {{post.html}}
-            <!--{% if mod %}<span class="ip">{{post.ip|haship}}</span>{% endif %}-->
         {% endfor %}
         {% endautoescape %}
     </section>
