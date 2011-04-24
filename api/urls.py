@@ -7,7 +7,7 @@ Created by Paul Bagwell on 2011-01-28.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.conf.urls.defaults import patterns
-from api.resources import *
+from api.views import *
 
 
 urlpatterns = patterns('api.views',
