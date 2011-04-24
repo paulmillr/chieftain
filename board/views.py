@@ -10,8 +10,8 @@ from django.core.paginator import Paginator
 from django.http import (Http404, HttpResponsePermanentRedirect)
 from django.shortcuts import render, get_object_or_404
 from django.utils.translation import ugettext_lazy as _
-from board.models import *
-from board.shortcuts import *
+from board.models import Post, File, Section, PostForm
+from board.shortcuts import get_page_or_404, add_sidebar
 from board.tools import make_post_descriptions
 from modpanel.views import is_mod
 
@@ -109,6 +109,10 @@ def images(request, section_slug, page):
     """TODO: List of images in section."""
     section = get_object_or_404(Section, slug=section_slug)
     images_page = Paginator(section.images(), 100)
+    return render(request, 'section_images.html', add_sidebar({
+        'images_page': images_page,
+        'section': section,
+    }))
 
 
 def thread(request, section_slug, op_post):

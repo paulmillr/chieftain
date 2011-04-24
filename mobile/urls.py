@@ -6,7 +6,7 @@ urls.py
 Created by Paul Bagwell on 2011-03-02.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('mobile.views',
     (r'^$', 'index'),

@@ -40,7 +40,6 @@ class MessageMixin(object):
     cache_size = 200
 
     def wait_for_messages(self, callback, cursor=None):
-        cls = MessageMixin
         t = self.thread_id
         if not self.cache.get(t):
             self.cache[t] = []
@@ -62,7 +61,6 @@ class MessageMixin(object):
         waiters.append(callback)
 
     def new_messages(self, posts):
-        cls = MessageMixin
         t = self.thread_id
         if not self.cache.get(t):
             self.cache[t] = []

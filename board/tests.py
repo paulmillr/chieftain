@@ -8,7 +8,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.utils import unittest
 from django.test.client import Client
-from board import models
+from board.models import Post
 
 """
 We load some fixtures and start with this information:
@@ -42,7 +42,7 @@ class APITest(unittest.TestCase):
         })
         self.assertEqual(response.status_code, 201)  # HTTP_CREATED
         self.assertEqual(response.content, '{"id": 1}')  # response body
-        posts = models.Post.objects.all()
+        posts = Post.objects.all()
         self.assertEqual(posts.count(), 1)
         post = posts.get()
         self.assertEqual(post.values(), 'json')

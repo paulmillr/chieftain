@@ -166,7 +166,7 @@ def create_post(request):
             post.tripcode = username
     elif '#' in post.poster:  # make tripcode
         s = post.poster.split('#')
-        post.tripcode = tools.tripcode(s.pop())
+        post.tripcode = tools.make_tripcode(s.pop())
         post.poster = s[0]
 
     if not post.poster or section.anonymity:
@@ -219,7 +219,6 @@ def mod_delete_post(request, post):
         d = DeniedIP(ip=post.ip, reason=r, by=request.user)
         d.save()
     if request.GET.get('delete_all'):
-        slug = post.section_slug()
         posts = post.section().posts().filter(ip=post.ip)
         # remove threads
         op = posts.filter(is_op_post=True).values('pid', 'thread')
@@ -491,7 +490,7 @@ class StorageRootResource(Resource):
 
     def delete(self, request, auth):
         """Clears whole storage."""
-        data = self.setdefault(request.session)
+        self.setdefault(request.session)
         request.session[self.storage_name] = self.default
         return Response(status.NO_CONTENT)
 

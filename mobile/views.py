@@ -9,8 +9,8 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from django.core.paginator import Paginator
 from django.http import Http404, HttpResponsePermanentRedirect
 from django.shortcuts import render, get_object_or_404
-from board.models import *
-from board.shortcuts import *
+from board.models import Post, Section
+from board.shortcuts import get_page_or_404, add_sidebar
 
 
 def index(request):
@@ -19,9 +19,9 @@ def index(request):
 
 def section(request, section_slug, page):
     s = get_object_or_404(Section, slug=section_slug)
-    # TODO
     t = get_page_or_404(Paginator(s.threads(), s.ONPAGE), page)
-    return render(request, 'mobile/section.html', {'section': s})
+    return render(request, 'mobile/section.html', {'section': s,
+        'threads': t})
 
 
 def thread(request, section_slug, op_post):

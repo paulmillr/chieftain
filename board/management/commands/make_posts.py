@@ -6,8 +6,7 @@ make_posts.py
 Created by Paul Bagwell on 2011-04-16.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-import random
-from board.models import Post, Thread
+#from board.models import Post, Thread
 from datetime import datetime
 from random import random
 from django.core.management.base import BaseCommand

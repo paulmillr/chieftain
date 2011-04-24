@@ -6,7 +6,7 @@ urls.py
 Created by Paul Bagwell on 2011-03-01.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('pda.views',
     (r'^$', 'index'),

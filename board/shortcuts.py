@@ -6,13 +6,11 @@ shortcuts.py
 Created by Paul Bagwell on 2011-02-22.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-
 import codecs
 from django.core.paginator import InvalidPage, EmptyPage
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from django.utils import simplejson as json
 
 __all__ = [
     'get_page_or_404', 'add_sidebar', 'render_to_json', 'render_to_file',
@@ -31,10 +29,6 @@ def add_sidebar(context={}):
     """Updates context dictionary with sidebar."""
     from board.models import SectionGroup  # block recursive import
     return dict(context, navigation=SectionGroup.objects.tree())
-
-
-def render_to_json(data):
-    return HttpResponse(json.dumps(data))
 
 
 def render_to_file(template, filename, request, context):

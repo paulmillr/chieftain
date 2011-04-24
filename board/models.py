@@ -572,7 +572,7 @@ class Section(models.Model):
         return cache.get(self.key) or self.rebuild_cache()
 
     @pid.setter
-    def pid(self, value):
+    def pid_set(self, value):
         """Sets section last post PID cache to value."""
         cache.set(self.key, value)
         return value

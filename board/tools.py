@@ -21,7 +21,7 @@ from datetime import datetime
 
 
 __all__ = [
-    'handle_uploaded_file', 'tripcode', 'key', 'parse_user_agent',
+    'handle_uploaded_file', 'make_tripcode', 'key', 'parse_user_agent',
     'make_post_descriptions',
     'take_first', 'from_timestamp'
 ]
@@ -57,7 +57,7 @@ def handle_uploaded_file(file_instance):
     return f
 
 
-def tripcode(text):
+def make_tripcode(text):
     """Makes tripcode from text."""
     text = text.replace('\\', '')
     trip = text.replace('#', '') if '##' in text else text

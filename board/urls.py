@@ -6,7 +6,7 @@ urls.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from django.conf.urls.defaults import *
+from django.conf.urls.defaults import patterns
 from board.models import SectionFeed, ThreadFeed
 
 urlpatterns = patterns('board.views',
