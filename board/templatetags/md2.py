@@ -4,7 +4,7 @@ https://github.com/pbagwl/markdown2
 
 This code is based on django's markup contrib.
 """
-
+import markdown2
 from django import template
 from django.conf import settings
 from django.utils.encoding import force_unicode
@@ -30,16 +30,6 @@ def markdown2(value, arg=''):
     they will be silently ignored.
 
     """
-    try:
-        import markdown2
-    except ImportError:
-        if settings.DEBUG:
-            raise template.TemplateSyntaxError(""
-                "Error in {% markdown %} filter: "
-                "The python-markdown2 library isn't installed."
-            )
-        return force_unicode(value)
-
     def parse_extra(extra):
         if ':' not in extra:
             return (extra, {})

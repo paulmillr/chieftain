@@ -11,6 +11,7 @@ from django.core.paginator import InvalidPage, EmptyPage
 from django.http import Http404
 from django.template import RequestContext
 from django.template.loader import render_to_string
+from board.models import SectionGroup  # block recursive import
 
 __all__ = [
     'get_page_or_404', 'add_sidebar', 'render_to_json', 'render_to_file',
@@ -27,7 +28,6 @@ def get_page_or_404(paginator, page):
 
 def add_sidebar(context={}):
     """Updates context dictionary with sidebar."""
-    from board.models import SectionGroup  # block recursive import
     return dict(context, navigation=SectionGroup.objects.tree())
 
 
