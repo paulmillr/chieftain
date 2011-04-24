@@ -2,7 +2,7 @@
     <form novalidate method="post" enctype="multipart/form-data">
         <fieldset>
             <dl class="username-d">
-                <dt><label for="username">{{form.poster.label}}</label></dt>
+                <dt><label for="username">{{ form.poster.label }}</label></dt>
                 <dd>
                     <input type="text" name="poster" id="username" size="16" maxlength="32">
                     <span class="empty">{% trans "Left this field empty" %}</span>
@@ -10,12 +10,12 @@
             </dl>
 
             <dl class="email-d">
-                <dt><label for="email">{{form.email.label}}</label></dt>
+                <dt><label for="email">{{ form.email.label }}</label></dt>
                 <dd><input type="email" name="email" id="email" size="16" maxlength="32"></dd>
             </dl>
 
             <dl class="topic-d">
-                <dt><label for="topic">{{form.topic.label}}</label></dt>
+                <dt><label for="topic">{{ form.topic.label }}</label></dt>
                 <dd>
                     <input type="text" name="topic" id="topic" size="16" maxlength="48">
                     <input type="submit" value="{% trans 'Submit' %}">
@@ -23,7 +23,7 @@
             </dl>
 
             <dl class="message-d">
-                <dt><label for="message">{{form.message.label}}</label></dt>
+                <dt><label for="message">{{ form.message.label }}</label></dt>
                 <dd>
                     <div class="bbcodes">
                         <a href="#" class="b" data-tag="**" title="Жирный">Ж</a>
@@ -35,9 +35,9 @@
                         <a href="#" class="code" data-tag="    " data-tagEnd="" title="Код">Код</a>
                     </div>
                     <textarea name="message" id="message" class="message" rows="8" cols="40" required></textarea>
-                    {% if thread %}<input name="thread" id="thread" value="{{thread.id}}" type="hidden">
+                    {% if thread %}<input name="thread" id="thread" value="{{ thread.id }}" type="hidden">
                     {% else %}
-                    <input name="section" id="section" value="{{section.slug}}" type="hidden">{% endif %}
+                    <input name="section" id="section" value="{{ section.slug }}" type="hidden">{% endif %}
                 </dd>
             </dl>
             {% if section.force_files or thread.section.force_files %}
@@ -56,12 +56,12 @@
                         <div id="recaptcha_image" onclick="Recaptcha.reload();" class="captcha-img"></div>
                         <input type="text" name="recaptcha_response_field" id="recaptcha_response_field" size="16" maxlength="32" class="captcha">
                     </div>
-                    {{form.captcha}}
+                    {{ form.captcha }}
                 </dd>
             </dl>
             {% endif %}
             <dl class="password-d">
-                <dt><label for="password">{{form.password.label}}</label></dt>
+                <dt><label for="password">{{ form.password.label }}</label></dt>
                 <dd><input type="password" name="password" id="password" size="16" maxlength="32"></dd>
             </dl>
         </fieldset>
@@ -69,7 +69,7 @@
     <div class="info">
         <ul>
             <li><a href="/bugs/">О багах писать сюда</a></li>
-            {% if section.description %}<li class="sectionDescription">{{section.description}}</li>{% endif %}
+            {% if section.description %}<li class="sectionDescription">{{ section.description }}</li>{% endif %}
         </ul>
     </div>
 </div>

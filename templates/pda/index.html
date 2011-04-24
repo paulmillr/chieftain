@@ -2,12 +2,12 @@
 
 {% load i18n %}
 
-{% block title %}{{section.name}}{% endblock %}
+{% block title %}{{ section.name }}{% endblock %}
 
 {% block content %}
 <div id="jqt">
 <div id="about" class="selectable">
-        <p>{{settings.SITE_TITLE}} - {% trans "anonymous imageboard" %}.</p>
+        <p>{{ settings.SITE_TITLE }} - {% trans "anonymous imageboard" %}.</p>
         
         <p>{% trans "Runs on" %} 
             <a target="_blank" href="http://klipped.pbagwl.com/">klipped</a> &copy; 
@@ -22,10 +22,10 @@
     </div>
     {% for group in navigation %}
     {% if not group.is_hidden %}
-    <ul id="list-group{{group.id}}" class="group">
-        <li>{{group.name}}</li>
+    <ul id="list-group{{ group.id }}" class="group">
+        <li>{{ group.name }}</li>
         {% for section in group.sections %}
-            <li><a href="./{{section.slug}}/" target="_webapp">{{section.name}}</a></li>
+            <li><a href="./{{ section.slug }}/" target="_webapp">{{ section.name }}</a></li>
         {% endfor %}
     </ul>
     {% endif %}
@@ -165,7 +165,7 @@
 </div>
 <div id="home" class="current">
     <div class="toolbar">
-        <h1>{{settings.SITE_TITLE}}</h1>
+        <h1>{{ settings.SITE_TITLE }}</h1>
         <a class="button slideup" id="infoButton" href="#about">{% trans "Information" %}</a>
     </div>
     <ul class="rounded">

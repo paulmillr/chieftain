@@ -8,7 +8,7 @@
     {% for page in threads.paginator.page_range %}
         <li>
         {% if page != threads.number %}
-            <a href="page{{page}}">{{ p }}</a>
+            <a href="page{{ page }}">{{ p }}</a>
         {% else %}
             <span>{{ page }}</span>
         {% endif %}

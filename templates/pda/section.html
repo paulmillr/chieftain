@@ -14,7 +14,7 @@
         <li><input type="text" name="message" placeholder="Создать новую тему" id="message"></li>
         {% for post in section.op_posts %}
             <li id="{{ post.pid }}" data-id="{{ post.id }}" class="post">
-                <div class="number">{{post.pid}}</div>
+                <div class="number">{{ post.pid }}</div>
                 {% for file in post.files %}
                     <a href="{{ post.pid }}" target="_webapp" class="file"><img src="{{ MEDIA_URL }}{{ file.thumb }}" alt="{{ file.hash }}"></a>
                 {% endfor %}

@@ -3,13 +3,13 @@
 <html> 
 <head> 
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
-    <title>{{settings.SITE_TITLE}} &mdash; {% trans "Main page" %}</title> 
+    <title>{{ settings.SITE_TITLE }} &mdash; {% trans "Main page" %}</title> 
     <link rel="stylesheet" href="{{ STATIC_URL }}css/index.css" media="all">
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
     <script src="{{ STATIC_URL }}js/preload.js?v=13"></script>
     <script src="{{ STATIC_URL }}js/plugins.js?v=19"></script>
     <script>
-        var media_url = '{{settings.MEDIA_URL}}';
+        var media_url = '{{ settings.MEDIA_URL }}';
         $(function() {
             $('.mpHiderandom .random span').toggleClass('minimized');
             $('.mpHidebookmarks .bookmarks span').toggleClass('minimized');
@@ -48,10 +48,10 @@
         });
     </script>
 </head> 
-<body class="{{session_classes}}"> 
+<body class="{{ session_classes }}"> 
 <div class="center"> 
   <header> 
-    <div class="head"><a href="/" class="logo">{{settings.SITE_TITLE}}</a> 
+    <div class="head"><a href="/" class="logo">{{ settings.SITE_TITLE }}</a> 
       <div class="wellcome">
         {% trans "Welcome back" %} </div> 
     </div> 
@@ -60,45 +60,45 @@
     <nav> 
       <div class="nav"> 
         <div class="nl">
-            <h3>{{navigation.0.name}}</h3> 
+            <h3>{{ navigation.0.name }}</h3> 
             <ul>
             {% for section in navigation.0.sections|slice:":13" %}
-              <li><a href="/{{section.slug}}/">{{section.name}}</a></li>
+              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
             {% endfor %}
             </ul> 
             <ul>
             {% for section in navigation.0.sections|slice:"13:" %}
-                <li><a href="/{{section.slug}}/">{{section.name}}</a></li>
+                <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
             {% endfor %}
             </ul>
             <br class="clear">
         </div> 
         <div class="nr"> 
           <div class="nr2"> 
-            <h3>{{navigation.1.name}}</h3> 
+            <h3>{{ navigation.1.name }}</h3> 
             <ul>
             {% for section in navigation.1.sections %}
-              <li><a href="/{{section.slug}}/">{{section.name}}</a></li>
+              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
             {% endfor %}
             </ul>
-            <h3>{{navigation.2.name}}</h3> 
+            <h3>{{ navigation.2.name }}</h3> 
             <ul>
             {% for section in navigation.2.sections %}
-              <li><a href="/{{section.slug}}/">{{section.name}}</a></li>
+              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
             {% endfor %}
             </ul>
           </div> 
           <div class="nr3"> 
-            <h3>{{navigation.3.name}}<img src="{{ STATIC_URL }}images/18.gif" width="30" height="22" class="yo18"></h3>
+            <h3>{{ navigation.3.name }}<img src="{{ STATIC_URL }}images/18.gif" width="30" height="22" class="yo18"></h3>
             <ul>
             {% for section in navigation.3.sections %}
-              <li><a href="/{{section.slug}}/">{{section.name}}</a></li>
+              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
             {% endfor %}
             </ul>
-            <h3>{{navigation.4.name}}</h3> 
+            <h3>{{ navigation.4.name }}</h3> 
             <ul> 
             {% for section in navigation.4.sections %}
-              <li><a href="/{{section.slug}}/">{{section.name}}</a></li>
+              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
             {% endfor %}
             </ul> 
           </div> 
@@ -114,11 +114,11 @@
           <h4 class="popular">{% trans "Popular threads" %}<span></span></h4>
           <ul>
           {% for p in popular %}
-            <li><a href="/{{p.thread__section__slug}}/{{p.pid}}">/{{p.thread__section__name}}/</a>&nbsp;&mdash;
+            <li><a href="/{{ p.thread__section__slug }}/{{ p.pid }}">/{{ p.thread__section__name }}/</a>&nbsp;&mdash;
             {% if p.message|length > 100 %}
                 {{p.message|slice:":100"}}...
             {% else %}
-                {{p.message}}
+                {{ p.message }}
             {% endif %}
             </li>
           {% endfor %}
@@ -128,11 +128,11 @@
           <h4 class="bookmarks">{% trans "Bookmarked threads" %}<span></span></h4>
           <ul>
           {% for p in bookmarks %}
-            <li><a href="{{ p.link }}">/{{p.thread__section__name}}/</a>&nbsp;&mdash;
+            <li><a href="{{ p.link }}">/{{ p.thread__section__name }}/</a>&nbsp;&mdash;
             {% if p.message|length > 100 %}
                 {{p.message|slice:":100"}}...
             {% else %}
-                {{p.message}}
+                {{ p.message }}
             {% endif %}
             </li>
           {% endfor %}
@@ -147,7 +147,7 @@
       <h4 class="random">{% trans "Random image" %}<span></span></h4>
       {% for f in random_images %}
       <div class="banner">
-          <a href="{{f.file.url}}"><img src="{{f.thumb.url}}" id="file{{f.id}}" width="126" height="80"></a>
+          <a href="{{ f.file.url }}"><img src="{{ f.thumb.url }}" id="file{{ f.id }}" width="126" height="80"></a>
       </div>
       {% endfor %}
     </div>

@@ -1,16 +1,16 @@
 {% load i18n %}{% load macros %}
 <!DOCTYPE html>  
-<!--[if lt IE 8 ]> <html lang="ru" id="{{style}}" class="ie7"> <![endif]-->
-<!--[if IE 8 ]>    <html lang="ru" id="{{style}}" class="ie8"> <![endif]-->
-<!--[if (gte IE 9)|!(IE)]><!--> <html lang="ru" id="{{style}}"> <!--<![endif]-->
+<!--[if lt IE 8 ]> <html lang="ru" id="{{ style }}" class="ie7"> <![endif]-->
+<!--[if IE 8 ]>    <html lang="ru" id="{{ style }}" class="ie8"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> <html lang="ru" id="{{ style }}"> <!--<![endif]-->
 <head>
     <meta http-equiv="content-type" content="text/html;charset=utf-8">
     <!--<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">-->
     {% macro title %}
         {% block title %}{% endblock %}
     {% endmacro %}
-    <title>{{settings.SITE_TITLE}}. {% usemacro title %}</title>
-    <meta name="description" content="{{settings.SITE_TITLE}} - {{settings.SITE_DESCRIPTION}}.">
+    <title>{{ settings.SITE_TITLE }}. {% usemacro title %}</title>
+    <meta name="description" content="{{ settings.SITE_TITLE }} - {{ settings.SITE_DESCRIPTION }}.">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico">
     <link rel="apple-touch-icon" href="{{ STATIC_URL }}icon.png">
@@ -34,13 +34,13 @@
     };
     </script>
 </head>
-<body class="{{session_classes}}">
+<body class="{{ session_classes }}">
     {% include "sidebar.html" %}
     <div id="container" role="{% block role %}{% endblock %}">
         <header id="site-header">
             {% include "navigation.html" %}
             {% block search %}{% endblock %}
-            <h1><a href=".">{{settings.SITE_TITLE}}&nbsp;&mdash; {% usemacro title %}</a></h1>
+            <h1><a href=".">{{ settings.SITE_TITLE }}&nbsp;&mdash; {% usemacro title %}</a></h1>
         </header>
         {% if thread %}
             <a href=".">{% trans "Go back" %}</a>

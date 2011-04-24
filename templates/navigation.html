@@ -12,9 +12,9 @@
     </ul>
     {% for group in navigation %}
     {% if not group.is_hidden %}
-    <ul data-id="{{group.id}}" class="pagination">
+    <ul data-id="{{ group.id }}" class="pagination">
         {% for section in group.sections %}
-        <li><a href="/{{section.slug}}/" title="{{section.name}}">{{section.slug}}</a></li>{% endfor %}
+        <li><a href="/{{ section.slug }}/" title="{{ section.name }}">{{ section.slug }}</a></li>{% endfor %}
     </ul>
     {% endif %}
     {% endfor %}
