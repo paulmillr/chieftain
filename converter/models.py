@@ -14,7 +14,6 @@ import sys
 from datetime import datetime
 from struct import pack, unpack
 from django.db import models, connections
-from django.core.cache import cache
 from django.utils.html import strip_tags
 from board.tools import get_key
 
@@ -60,7 +59,7 @@ class WakabaConverter(object):
         ('trip', 'tripcode', lambda f: f.strip('!')),
         ('email', 'email'),
         ('subject', 'topic'),
-        ('password', 'password', lambda f: f),  # get_key(f)
+        ('password', 'password', lambda f: get_key(f)),
         ('comment', 'message', lambda f: strip_tags(f)),
         ('image', 'image'),
         ('size', 'image_size'),

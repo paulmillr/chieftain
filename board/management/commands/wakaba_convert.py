@@ -7,10 +7,10 @@ Created by Paul Bagwell on 2011-04-16.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.management.base import BaseCommand
+from converter.models import WakabaConverter
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        prefix = args[0] if len(args) > 0 else 'comments_'
-        w = WakabaConverter(connection, prefix)
+        w = WakabaConverter()
         w.convert()
