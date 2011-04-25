@@ -373,14 +373,14 @@ class PostResource(ModelResource):
             post = self.model.objects.get(id=kwargs['id'])
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
-        key = tools.key(request.GET['password'])
+        key = tools.get_key(request.GET['password'])
         if post.password == key:
             post.remove()
         elif is_mod(request, post.section_slug()):
             mod_delete_post(request, post)
             post.remove()
         else:
-            return Response(status.FORBIDDEN, content={
+            raise ResponseException(status.FORBIDDEN, content={
                 'detail': u'{0}{1}. {2}'.format(
                     _('Error on deleting post #'), post.pid,
                     _('Password mismatch')
@@ -437,7 +437,7 @@ class FileResource(ModelResource):
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
 
-        key = tools.key(request.GET['password'])
+        key = tools.get_key(request.GET['password'])
         if file.post.password == key:
             file.remove()
         elif is_mod(request, file.post.section_slug()):

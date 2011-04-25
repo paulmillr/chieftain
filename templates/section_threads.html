@@ -3,7 +3,7 @@
 {% block title %}{{ section.name }}{% endblock %}
 {% block role %}threads{% endblock %}
 
-{% block section %}
+{% block threads %}
     {% autoescape off %}
     {% for thread in threads %}
     <section class="thread" id="thread{{ thread.id }}">

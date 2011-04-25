@@ -71,9 +71,11 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.admin',
-    'klipped.redjiska',
+    'djangorestframework',
+    'django_nose',
     'klipped.board',
+    'klipped.converter',
     'klipped.api',
-    'klipped.modpanel',
-    #'klipped.mobile',
 )
+
+TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

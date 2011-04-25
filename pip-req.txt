@@ -8,3 +8,5 @@ PIL
 -e git+http://github.com/pbagwl/djangorestframework.git#egg=djangorestframework
 http://geolite.maxmind.com/download/geoip/api/python/GeoIP-Python-1.2.4.tar.gz
 MySQL-python
+nose
+django-nose

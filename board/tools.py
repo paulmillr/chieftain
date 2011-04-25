@@ -9,6 +9,8 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 import os
 import re
 import httpagentparser
+import random
+import string
 import tempfile
 import time
 from PIL import Image
@@ -21,8 +23,8 @@ from datetime import datetime
 
 
 __all__ = [
-    'handle_uploaded_file', 'make_tripcode', 'key', 'parse_user_agent',
-    'make_post_descriptions',
+    'handle_uploaded_file', 'make_tripcode', 'random_text',
+    'get_key', 'parse_user_agent', 'make_post_descriptions',
     'take_first', 'from_timestamp'
 ]
 
@@ -81,9 +83,19 @@ def make_post_descriptions(posts):
         yield post
 
 
-def key(text):
+def random_text(length=10):
+    return ''.join(
+        random.choice(string.ascii_uppercase + string.digits)
+        for x in range(length)
+    )
+
+
+def get_key(text):
     """Generates key for passwords etc."""
-    return sha1(text).hexdigest()
+    try:
+        return sha1(text).hexdigest()
+    except (UnicodeEncodeError, TypeError):
+        return sha1(random_text()).hexdigest()
 
 
 def parse_user_agent(user_agent):

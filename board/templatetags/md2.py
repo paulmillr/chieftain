@@ -4,9 +4,8 @@ https://github.com/pbagwl/markdown2
 
 This code is based on django's markup contrib.
 """
-import markdown2
+from markdown2 import markdown
 from django import template
-from django.conf import settings
 from django.utils.encoding import force_unicode
 from django.utils.safestring import mark_safe
 
@@ -46,8 +45,8 @@ def markdown2(value, arg=''):
     else:
         safe_mode = False
 
-    return mark_safe(markdown2.markdown(force_unicode(value),
-        extras=extras, safe_mode=safe_mode))
+    return mark_safe(markdown(force_unicode(value), extras=extras,
+        safe_mode=safe_mode))
 
 markdown2.is_safe = True
 register.filter(markdown2)

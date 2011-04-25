@@ -13,9 +13,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from board.models import SectionGroup  # block recursive import
 
-__all__ = [
-    'get_page_or_404', 'add_sidebar', 'render_to_json', 'render_to_file',
-]
+__all__ = ['get_page_or_404', 'add_sidebar', 'render_to_file']
 
 
 def get_page_or_404(paginator, page):

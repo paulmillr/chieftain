@@ -15,7 +15,7 @@ from board.tools import make_post_descriptions
 
 __all__ = [
     'index', 'settings', 'faq', 'search',
-    'section', 'threads', 'posts', 'thread',
+    'section', 'threads', 'thread',
 ]
 
 
