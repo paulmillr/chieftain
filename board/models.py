@@ -34,15 +34,6 @@ __all__ = [
 
 DAY = 86400  # seconds in day
 MEGABYTE = 2 ** 20
-SECTION_TYPES = (
-    (1, _('Default')),
-#    (2, _('Premodded')),
-    (3, _('News')),
-    (4, _('International')),
-    (5, _('Software')),
-#    (5, _('Private')),
-#    (6, _('Chat')),
-)
 
 
 def get_file_path(base):
@@ -176,8 +167,8 @@ class WordfilterManager(models.Manager):
 
 class Poll(models.Model):
     """Thread polls."""
-    question = models.CharField(max_length=200, verbose_name=_('Question'))
-    expires = models.DateTimeField(verbose_name=_('Expire date'))
+    question = models.CharField(_('Question'), max_length=200)
+    expires = models.DateTimeField(_('Expire date'))
 
     allowed_fields = ('id', 'question', ('choices', ('name', 'vote_count')))
 
@@ -200,10 +191,9 @@ class Poll(models.Model):
 
 class Choice(models.Model):
     """Thread poll answers."""
-    name = models.CharField(max_length=100, verbose_name=_('Choice name'))
+    name = models.CharField(_('Choice name'), max_length=100)
     poll = models.ForeignKey('Poll', verbose_name=_('Poll'))
-    vote_count = models.PositiveIntegerField(default=0,
-        verbose_name=_('Vote count'))
+    vote_count = models.PositiveIntegerField(_('Vote count'), default=0)
 
     allowed_fields = ('id', 'name', 'vote_count', ('poll', ('question',)))
 
@@ -217,10 +207,10 @@ class Choice(models.Model):
 
 class Vote(models.Model):
     """Thread poll votes."""
-    poll = models.ForeignKey('Poll', blank=True, null=True,
-        verbose_name=_('Poll'))
+    poll = models.ForeignKey('Poll', verbose_name=_('Poll'), blank=True,
+        null=True)
     choice = models.ForeignKey('Choice', verbose_name=_('Choice'))
-    ip = models.IPAddressField(blank=True, verbose_name=_('IP'))
+    ip = models.IPAddressField(_('IP'), blank=True)
 
     allowed_fields = ('id', 'choice')
 
@@ -235,17 +225,13 @@ class Vote(models.Model):
 class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
-    bump = models.DateTimeField(blank=True, db_index=True,
-        verbose_name=_('Bump date'))
-    is_deleted = models.BooleanField(default=False,
-        verbose_name=_('Is deleted'))
-    is_pinned = models.BooleanField(default=False,
-        verbose_name=_('Is pinned'))
-    is_closed = models.BooleanField(default=False,
-        verbose_name=_('Is closed'))
-    poll = models.ForeignKey('Poll', blank=True, null=True,
-        verbose_name=_('Poll'))
-    html = models.TextField(blank=True, verbose_name=_('HTML cache'))
+    bump = models.DateTimeField(_('Bump date'), blank=True, db_index=True)
+    is_deleted = models.BooleanField(_('Is deleted'), default=False)
+    is_pinned = models.BooleanField(_('Is pinned'), default=False)
+    is_closed = models.BooleanField(_('Is closed'), default=False)
+    poll = models.ForeignKey('Poll', verbose_name=_('Poll'), blank=True,
+        null=True)
+    html = models.TextField(_('HTML cache'), blank=True)
     objects = ThreadManager()
     deleted_objects = DeletedThreadManager()
 
@@ -333,34 +319,26 @@ class Thread(models.Model):
 
 class Post(models.Model):
     """Represents post."""
-    pid = models.PositiveIntegerField(blank=True, db_index=True,
-        verbose_name=_('PID'))
-    thread = models.ForeignKey('Thread', blank=True, null=True,
-        verbose_name=_('Thread'))
-    is_op_post = models.BooleanField(default=False,
-        verbose_name=_('First post in thread'))
-    date = models.DateTimeField(default=datetime.now, blank=True,
-        verbose_name=_('Bump date'))
-    is_deleted = models.BooleanField(default=False,
-        verbose_name=_('Is deleted'))
-    ip = models.IPAddressField(verbose_name=_('IP'), blank=True)
-    data = fields.JSONField(max_length=1024, blank=True, null=True,
-        verbose_name=_('Data'))
-    poster = models.CharField(max_length=32, blank=True, null=True,
-        verbose_name=_('Poster'))
-    tripcode = models.CharField(max_length=32, blank=True,
-        verbose_name=_('Tripcode'))
-    email = models.CharField(max_length=32, blank=True,
-        verbose_name=_('Email'))
-    topic = models.CharField(max_length=48, blank=True,
-        verbose_name=_('Topic'))
-    file = models.ForeignKey('File', blank=True, null=True,
-        verbose_name=_('File'))
-    password = models.CharField(max_length=64, blank=False,
-        verbose_name=_('Password'))
-    message = models.TextField(blank=True, verbose_name=_('Message'))
+    pid = models.PositiveIntegerField(_('PID'), blank=True, db_index=True)
+    thread = models.ForeignKey('Thread', verbose_name=_('Thread'), blank=True,
+        null=True)
+    is_op_post = models.BooleanField(_('First post in thread'), default=False)
+    date = models.DateTimeField(_('Bump date'), default=datetime.now,
+        blank=True)
+    is_deleted = models.BooleanField(_('Is deleted'), default=False)
+    ip = models.IPAddressField(_('IP'), blank=True)
+    data = fields.JSONField(_('Data'), max_length=1024, blank=True, null=True)
+    poster = models.CharField(_('Poster'), max_length=32, blank=True,
+        null=True)
+    tripcode = models.CharField(_('Tripcode'), max_length=32, blank=True)
+    email = models.CharField(_('Email'), max_length=32, blank=True)
+    topic = models.CharField(_('Topic'), max_length=48, blank=True)
+    file = models.OneToOneField('File', verbose_name=_('File'), blank=True,
+        null=True)
+    password = models.CharField(_('Password'), max_length=64, blank=True)
+    message = models.TextField(_('Message'), blank=True)
     message_html = models.TextField(blank=True)
-    html = models.TextField(blank=True, verbose_name=_('HTML cache'))
+    html = models.TextField(_('HTML cache'), blank=True)
     objects = PostManager()
     deleted_objects = DeletedPostManager()
 
@@ -413,22 +391,18 @@ class Post(models.Model):
 
 class File(models.Model):
     """Represents files at the board."""
-    name = models.CharField(max_length=64,
-        verbose_name=_('Original name'))
+    name = models.CharField(_('Original name'), max_length=64)
     type = models.ForeignKey('FileType', verbose_name=_('Type'))
-    size = models.PositiveIntegerField(verbose_name=_('Size'))
-    is_deleted = models.BooleanField(default=False,
-        verbose_name=_('Is deleted'))
-    image_width = models.PositiveSmallIntegerField(blank=True,
-        verbose_name=_('Image width'))
-    image_height = models.PositiveSmallIntegerField(blank=True,
-        verbose_name=_('Image height'))
-    hash = models.CharField(max_length=32, blank=True,
-        verbose_name=_('Hash'))
-    file = models.FileField(upload_to=get_file_path('section'),
-        verbose_name=_('Location'))
-    thumb = models.ImageField(upload_to=get_file_path('thumbs'),
-        verbose_name=_('Thumbnail'))
+    size = models.PositiveIntegerField(_('Size'))
+    is_deleted = models.BooleanField(_('Is deleted'), default=False)
+    image_width = models.PositiveSmallIntegerField(_('Image width'),
+        blank=True)
+    image_height = models.PositiveSmallIntegerField(_('Image height'),
+        blank=True)
+    hash = models.CharField(_('Hash'), max_length=32, blank=True)
+    file = models.FileField(_('Location'), upload_to=get_file_path('section'))
+    thumb = models.ImageField(_('Thumbnail'),
+        upload_to=get_file_path('thumbs'))
     objects = FileManager()
     deleted_objects = DeletedFileManager()
 
@@ -456,12 +430,9 @@ class File(models.Model):
 
 class FileType(models.Model):
     """File type"""
-    extension = models.CharField(max_length=10,
-        verbose_name=_('Extension'))
-    mime = models.CharField(max_length=250, blank=False,
-        verbose_name=_('MIME'))
-    group = models.ForeignKey('FileTypeGroup',
-        verbose_name=_('Group'))
+    extension = models.CharField(_('Extension'), max_length=10)
+    mime = models.CharField(_('MIME'), max_length=250)
+    group = models.ForeignKey('FileTypeGroup', verbose_name=_('Group'))
 
     allowed_fields = ('id', 'category_id', 'type', 'extension')
 
@@ -475,8 +446,7 @@ class FileType(models.Model):
 
 class FileTypeGroup(models.Model):
     """Category of files"""
-    name = models.CharField(max_length=32,
-        verbose_name=_('Name'))
+    name = models.CharField(_('Name'), max_length=32)
     default_image = models.ImageField(upload_to='default/')
 
     allowed_fields = ('id', 'name')
@@ -491,30 +461,34 @@ class FileTypeGroup(models.Model):
 
 class Section(models.Model):
     """Board section."""
-    slug = models.SlugField(max_length=5, unique=True,
-        verbose_name=_('Slug'))
-    name = models.CharField(max_length=64,
-        verbose_name=_('Name'))
-    description = models.TextField(blank=True,
-        verbose_name=_('Description'))
-    type = models.PositiveSmallIntegerField(default=1, choices=SECTION_TYPES,
-        verbose_name=_('Type'))
-    group = models.ForeignKey('SectionGroup',
-        verbose_name=_('Group'))
-    force_files = models.BooleanField(default=True,
-        verbose_name=_('Force to post file on thread creation'))
-    filesize_limit = models.PositiveIntegerField(default=MEGABYTE * 5,
-        verbose_name=_('Filesize limit'))
-    anonymity = models.BooleanField(default=False,
-        verbose_name=_('Force anonymity'))
-    default_name = models.CharField(max_length=64, default=_('Anonymous'),
-        verbose_name=_('Default poster name'))
-    filetypes = models.ManyToManyField('FileTypeGroup', blank=True,
-        verbose_name=_('File types'))
-    bumplimit = models.PositiveSmallIntegerField(default=500,
-        verbose_name=_('Max posts in thread'))
-    threadlimit = models.PositiveSmallIntegerField(default=200,
-        verbose_name=_('Max threads'))
+    SECTION_TYPES = (
+        (1, _('Default')),
+        (2, _('Premodded')),
+        (3, _('News')),
+        (4, _('International')),
+        (5, _('Software')),
+        (6, _('Chat')),
+    )
+
+    slug = models.SlugField(_('Slug'), max_length=5, unique=True)
+    name = models.CharField(_('Name'), max_length=64)
+    description = models.TextField(_('Description'), blank=True)
+    type = models.PositiveSmallIntegerField(_('Type'), default=1,
+        choices=SECTION_TYPES)
+    group = models.ForeignKey('SectionGroup', verbose_name=_('Group'))
+    force_files = models.BooleanField(
+        _('Force to post file on thread creation'), default=True)
+    filesize_limit = models.PositiveIntegerField(_('Filesize limit'),
+        default=MEGABYTE * 5)
+    anonymity = models.BooleanField(_('Force anonymity'), default=False)
+    default_name = models.CharField(_('Default poster name'), max_length=64,
+        default=_('Anonymous'))
+    filetypes = models.ManyToManyField('FileTypeGroup',
+        verbose_name=_('File types'), blank=True)
+    bumplimit = models.PositiveSmallIntegerField(_('Max posts in thread'),
+        default=500)
+    threadlimit = models.PositiveSmallIntegerField(_('Max threads'),
+        default=200)
     objects = SectionManager()
 
     ONPAGE = 20
@@ -597,10 +571,9 @@ class Section(models.Model):
 
 class SectionGroup(models.Model):
     """Group of board sections. Example: [b / d / s] [a / aa]."""
-    name = models.CharField(max_length=64, blank=False,
-        verbose_name=_('Name'))
-    order = models.SmallIntegerField(verbose_name=_('Order'))
-    is_hidden = models.BooleanField(default=False, verbose_name=_('Is hidden'))
+    name = models.CharField(_('Name'), max_length=64)
+    order = models.SmallIntegerField(_('Order'))
+    is_hidden = models.BooleanField(_('Is hidden'), default=False)
     objects = SectionGroupManager()
     allowed_fields = ('id', 'name', 'order', 'is_hidden')
 
@@ -619,7 +592,7 @@ class SectionGroup(models.Model):
 class UserProfile(models.Model):
     """User (moderator etc.)."""
     user = models.ForeignKey(User)
-    sections = models.ManyToManyField('Section', blank=False,
+    sections = models.ManyToManyField('Section',
         verbose_name=_('User owned sections'))
 
     class Meta:
@@ -640,8 +613,7 @@ class UserProfile(models.Model):
 
 class Wordfilter(models.Model):
     """Black list word, phrase."""
-    word = models.CharField(max_length=100, unique=True,
-        verbose_name=_('Word'))
+    word = models.CharField(_('Word'), max_length=100, unique=True)
     objects = WordfilterManager()
 
     class Meta:
