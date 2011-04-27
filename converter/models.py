@@ -18,6 +18,10 @@ from django.utils.html import strip_tags
 from board.tools import get_key
 
 
+class ConvertError(Exception):
+    pass
+
+
 def convert_ip(ip):
     """By default, Wakaba packs ip to the integer with perl's pack()
     function.
@@ -26,9 +30,14 @@ def convert_ip(ip):
     return '.'.join(str(i) for i in adr)
 
 
+def print_flush(text):
+    sys.stdout.write('\r' + text)
+    sys.stdout.flush()
+
+
 class WakabaPost(models.Model):
     pid = models.IntegerField()
-    section = models.CharField(max_length=10)
+    section_slug = models.CharField(max_length=10)
     parent = models.IntegerField(null=True)
     date = models.DateTimeField(null=True)
     ip = models.CharField(null=True, max_length=50)
@@ -43,11 +52,11 @@ class WakabaPost(models.Model):
     image_md5 = models.TextField(null=True)
     image_width = models.IntegerField(null=True)
     image_height = models.IntegerField(null=True)
-    thumbnail = models.TextField(null=True)
+    thumb = models.TextField(null=True)
+        
 
-
-class WakabaConverter(object):
-    """Converts wakaba database to klipped."""
+class WakabaInitializer(object):
+    """Copies posts from all wakaba databases to one big temporary db."""
     fields = (
         ('num', 'pid'),
         ('parent', 'parent'),
@@ -72,6 +81,7 @@ class WakabaConverter(object):
     )
 
     def __init__(self, prefix='comments_'):
+        super(WakabaConverter, self).__init__()
         self.prefix = prefix
         self.cursor = connections['wakaba'].cursor()
         self.threads_map = {}
@@ -96,7 +106,7 @@ class WakabaConverter(object):
         fields = [i[0] for i in self.fields]
         for i in self.cursor.fetchall():
             p = dict(zip(fields, i))
-            p['section'] = table
+            p['section_slug'] = table
             yield p
 
     def convert_post(self, raw_post):
@@ -120,10 +130,58 @@ class WakabaConverter(object):
     def convert(self):
         """Converts all wakaba post tables to one klipped WakabaPost table."""
         pid = 0
-        for t in self.tables:
-            posts = self.get_table_posts(t)
-            for post in posts:
-                pid += 1
-                sys.stdout.write('\rConverted post {0}'.format(pid))
-                sys.stdout.flush()
+        for table in self.tables:
+            for post in self.get_table_posts(table):
                 self.convert_post(post)
+                pid += 1
+                print_flush('Converted post {0}'.format(pid))
+
+
+class WakabaConverter(object):
+    """Converts wakaba database to klipped."""
+    fields = (
+        'pid', 'date', 'ip', 'poster', 'tripcode', 'email', 'topic',
+        'password', 'message'
+    )
+
+    def __init__(self, arg):
+        super(WakabaConverter, self).__init__()
+        self.arg = arg
+        self.section_map = dict(Section.objects.values_list('slug', 'id'))
+        self.thread_map = {}
+
+    def convert_post(self, wpost, first_post=False):
+        post = Post()
+        for f in self.fields:
+            setattr(post, f, getattr(wpost, f))
+        if not first_post:
+            thread = Thread()
+            try:
+                thread.section_id = self.section_map[post.section_slug]
+            except KeyError:
+                raise ConvertError('Board section {0} does not exist')
+            thread.save()
+            self.thread_map[wpost.parent] = thread.id
+            post.thread = thread
+        else:
+            post.thread_id = self.thread_map.get(parent)
+        if post.image:
+            f = File()
+            f.size = post.image_size
+            f.hash = post.image_md5
+            f.image_width, f.image_height = post.image_width, post.image_height
+            if post.thumbnail:
+                f.thumb = post.thumbnail
+            f.save()
+            post.file = f
+        post.save()
+
+    def convert(self):
+        first_posts = Post.objects.filter(parent=0)
+        posts = Post.objects.filter(parent__gt=0)
+        for i, p in enumerate(first_posts):
+            print_flush('Converted first post {0}'.format(i))
+            self.convert_post(p, True)
+        for i, p in enumerate(posts):
+            print_flush('Converted post {0}'.format(i))
+            self.convert_post(p)
