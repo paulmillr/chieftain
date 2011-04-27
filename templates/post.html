@@ -42,7 +42,7 @@
     {% with f=post.file %}
         <div class="filemeta">
             <a target="_blank" href="{{ f.file.url }}">{{ f.file.name|split:"/"|last }}</a>
-            (<em>{{f.size|filesizeformat}}{% if f.image_height %}, {{ f.image_height }}x{{ f.image_width }}{% endif %}</em>)
+            (<em>{{ f.file.size|filesizeformat }}{% if f.image_height %}, {{ f.image_height }}x{{ f.image_width }}{% endif %}</em>)
         </div>
         <a href="{{ f.file.url }}" class="file">
             {% if f.thumb %}

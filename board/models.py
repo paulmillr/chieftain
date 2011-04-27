@@ -393,7 +393,6 @@ class File(models.Model):
     """Represents files at the board."""
     name = models.CharField(_('Original name'), max_length=64)
     type = models.ForeignKey('FileType', verbose_name=_('Type'))
-    size = models.PositiveIntegerField(_('Size'))
     is_deleted = models.BooleanField(_('Is deleted'), default=False)
     image_width = models.PositiveSmallIntegerField(_('Image width'),
         blank=True)

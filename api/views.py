@@ -19,7 +19,8 @@ from djangorestframework import status
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, ResponseException
-from board import tools
+from board.tools import (get_key, make_tripcode, parse_user_agent,
+    handle_uploaded_file)
 from board.models import *
 from modpanel.views import is_mod
 
@@ -106,7 +107,7 @@ def create_post(request):
     post.date = datetime.now()
     post.is_op_post = new_thread
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
-    post.password = tools.key(post.password)
+    post.password = get_key(post.password)
     if new_thread:
         section = Section.objects.get(slug=request.POST['section'])
         thread = Thread(section=section, bump=post.date)
@@ -166,7 +167,7 @@ def create_post(request):
             post.tripcode = username
     elif '#' in post.poster:  # make tripcode
         s = post.poster.split('#')
-        post.tripcode = tools.make_tripcode(s.pop())
+        post.tripcode = make_tripcode(s.pop())
         post.poster = s[0]
 
     if not post.poster or section.anonymity:
@@ -179,7 +180,7 @@ def create_post(request):
         post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
     elif section.type == 5:  # show useragent
         ua = request.META['HTTP_USER_AGENT']
-        parsed = tools.parse_user_agent(ua)
+        parsed = parse_user_agent(ua)
         v = ''
         b = parsed.get('browser') or {'name': 'Unknown', 'version': ''}
         os = parsed.get('os') or {'name': 'Unknown'}
@@ -201,10 +202,10 @@ def create_post(request):
     if with_files:
         file_type = FileType.objects.filter(extension=extension)[0]
         file_instance = File(
-            name=file.name, size=file.size, type=file_type, hash=file_hash,
+            name=file.name, type=file_type, hash=file_hash,
             file=DjangoFile(file), image_height=0, image_width=0
         )
-        post.file = tools.handle_uploaded_file(file_instance)
+        post.file = handle_uploaded_file(file_instance)
     post.save()
     thread.save()
     return post
@@ -373,7 +374,7 @@ class PostResource(ModelResource):
             post = self.model.objects.get(id=kwargs['id'])
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
-        key = tools.get_key(request.GET['password'])
+        key = get_key(request.GET['password'])
         if post.password == key:
             post.remove()
         elif is_mod(request, post.section_slug()):
@@ -437,7 +438,7 @@ class FileResource(ModelResource):
         except self.model.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
 
-        key = tools.get_key(request.GET['password'])
+        key = get_key(request.GET['password'])
         if file.post.password == key:
             file.remove()
         elif is_mod(request, file.post.section_slug()):
