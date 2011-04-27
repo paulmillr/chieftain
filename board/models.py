@@ -231,7 +231,7 @@ class Thread(models.Model):
     is_closed = models.BooleanField(_('Is closed'), default=False)
     poll = models.ForeignKey('Poll', verbose_name=_('Poll'), blank=True,
         null=True)
-    html = models.TextField(_('HTML cache'), blank=True)
+    html = models.TextField(blank=True)
     objects = ThreadManager()
     deleted_objects = DeletedThreadManager()
 
@@ -338,7 +338,7 @@ class Post(models.Model):
     password = models.CharField(_('Password'), max_length=64, blank=True)
     message = models.TextField(_('Message'), blank=True)
     message_html = models.TextField(blank=True)
-    html = models.TextField(_('HTML cache'), blank=True)
+    html = models.TextField(blank=True)
     objects = PostManager()
     deleted_objects = DeletedPostManager()
 
