@@ -394,14 +394,14 @@ class File(models.Model):
     name = models.CharField(_('Original name'), max_length=64)
     type = models.ForeignKey('FileType', verbose_name=_('Type'))
     is_deleted = models.BooleanField(_('Is deleted'), default=False)
-    image_width = models.PositiveSmallIntegerField(_('Image width'),
-        blank=True)
-    image_height = models.PositiveSmallIntegerField(_('Image height'),
-        blank=True)
     hash = models.CharField(_('Hash'), max_length=32, blank=True)
     file = models.FileField(_('Location'), upload_to=get_file_path('section'))
     thumb = models.ImageField(_('Thumbnail'),
         upload_to=get_file_path('thumbs'))
+    image_width = models.PositiveSmallIntegerField(_('Image width'),
+        blank=True)
+    image_height = models.PositiveSmallIntegerField(_('Image height'),
+        blank=True)
     objects = FileManager()
     deleted_objects = DeletedFileManager()
 
