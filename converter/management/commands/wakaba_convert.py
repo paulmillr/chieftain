@@ -7,10 +7,13 @@ Created by Paul Bagwell on 2011-04-16.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.management.base import BaseCommand
-from converter.models import WakabaConverter
+from converter.models import WakabaInitializer, WakabaConverter, WakabaPost
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
+        if not WakabaPost.objects.count():
+            i = WakabaInitializer()
+            i.convert()
         w = WakabaConverter()
         w.convert()

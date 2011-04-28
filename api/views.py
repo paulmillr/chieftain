@@ -92,6 +92,8 @@ def adapt_captcha(request):
         request.session['valid_captchas'] = c
     return form
 
+def validate_post(request):
+    pass
 
 def create_post(request):
     """Makes various changes on new post creation.
@@ -99,6 +101,9 @@ def create_post(request):
        If there is no POST['thread'] specified, it will create
        new thread.
     """
+    # TODO: divide this function into two smaller.
+    # create_post doesn't need to be depended on request because we want
+    # to reuse it in the wakaba converter
     new_thread = not request.POST.get('thread')
     with_files = bool(request.FILES.get('file'))
     logged_in = request.user.is_authenticated()

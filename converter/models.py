@@ -15,6 +15,7 @@ from datetime import datetime
 from struct import pack, unpack
 from django.db import models, connections
 from django.utils.html import strip_tags
+from board.models import Thread, Post, File, Section
 from board.tools import get_key
 
 
@@ -23,10 +24,13 @@ class ConvertError(Exception):
 
 
 def convert_ip(ip):
-    """By default, Wakaba packs ip to the integer with perl's pack()
-    function.
+    """Converts IP from wakaba format to its normal string representation.
+    Wakaba packs ip to the long integer with perl's pack() function.
     """
-    adr = unpack('4B', pack('>L', int(ip)))  # 4-tuple
+    try:
+        adr = unpack('4B', pack('>L', int(ip)))  # 4-tuple
+    except Exception as e:
+        raise ValueError(e)
     return '.'.join(str(i) for i in adr)
 
 
@@ -36,6 +40,12 @@ def print_flush(text):
 
 
 class WakabaPost(models.Model):
+    """Used as temporary storage of wakaba posts on database convertation.
+    This model represents wakaba post with some additions, like:
+    - section slug (wakaba doesn't have sections)
+    - some fields renamed (num -> pid, trip -> tripcode) to match klipped style
+    - some fields removed (last_visit, thumb_size etc.)
+    """
     pid = models.IntegerField()
     section_slug = models.CharField(max_length=10)
     parent = models.IntegerField(null=True)
@@ -48,7 +58,6 @@ class WakabaPost(models.Model):
     password = models.TextField(null=True)
     message = models.TextField(null=True)
     image = models.TextField(null=True)
-    image_size = models.IntegerField(null=True)
     image_md5 = models.TextField(null=True)
     image_width = models.IntegerField(null=True)
     image_height = models.IntegerField(null=True)
@@ -71,7 +80,7 @@ class WakabaInitializer(object):
         ('password', 'password', lambda f: get_key(f)),
         ('comment', 'message', lambda f: strip_tags(f)),
         ('image', 'image'),
-        ('size', 'image_size'),
+        ('size', None),
         ('md5', 'image_md5'),
         ('width', 'image_width'),
         ('height', 'image_height'),
@@ -81,10 +90,9 @@ class WakabaInitializer(object):
     )
 
     def __init__(self, prefix='comments_'):
-        super(WakabaConverter, self).__init__()
+        super(WakabaInitializer, self).__init__()
         self.prefix = prefix
         self.cursor = connections['wakaba'].cursor()
-        self.threads_map = {}
         self.tables = self.get_tables_list()
 
     def get_tables_list(self):
@@ -109,18 +117,23 @@ class WakabaInitializer(object):
             p['section_slug'] = table
             yield p
 
+    def get_posts(self):
+        for table in self.tables:
+            for post in self.get_table_posts(table):
+                yield post
+
     def convert_post(self, raw_post):
         """Converts wakaba's post dict to the klipped WakabaPost object."""
         post = WakabaPost()
-        post.section = raw_post['section']
+        post.section_slug = raw_post['section_slug']
         for t in self.fields:
-            convertable = (len(t) == 3)
-            if convertable:
+            is_convertable = (len(t) == 3)
+            if is_convertable:
                 wfield, field, convert_fn = t
             else:
                 wfield, field = t
             data = raw_post[wfield]
-            if convertable:
+            if is_convertable:
                 data = convert_fn(data)
             elif field is None:
                 continue
@@ -129,12 +142,9 @@ class WakabaInitializer(object):
 
     def convert(self):
         """Converts all wakaba post tables to one klipped WakabaPost table."""
-        pid = 0
-        for table in self.tables:
-            for post in self.get_table_posts(table):
-                self.convert_post(post)
-                pid += 1
-                print_flush('Converted post {0}'.format(pid))
+        for i, p in enumerate(self.get_posts()):
+            self.convert_post(p)
+            print_flush('Converted post {0}'.format(i))
 
 
 class WakabaConverter(object):
@@ -144,9 +154,8 @@ class WakabaConverter(object):
         'password', 'message'
     )
 
-    def __init__(self, arg):
+    def __init__(self):
         super(WakabaConverter, self).__init__()
-        self.arg = arg
         self.section_map = dict(Section.objects.values_list('slug', 'id'))
         self.thread_map = {}
 
@@ -154,31 +163,40 @@ class WakabaConverter(object):
         post = Post()
         for f in self.fields:
             setattr(post, f, getattr(wpost, f))
-        if not first_post:
+        if first_post:
             thread = Thread()
             try:
-                thread.section_id = self.section_map[post.section_slug]
+                s = wpost.section_slug
+                section = self.section_map[s]
             except KeyError:
-                raise ConvertError('Board section {0} does not exist')
-            thread.save()
-            self.thread_map[wpost.parent] = thread.id
-            post.thread = thread
+                raise ConvertError('Board section "{0}" does not exist'.format(
+                    s))
+            thread.section_id = section
         else:
-            post.thread_id = self.thread_map.get(parent)
-        if post.image:
+            tid = self.thread_map.get(parent)
+            thread = Thread.objects.get(id=tid)
+
+        thread.bump = wpost.date
+        thread.save()
+        if first_post:
+            self.thread_map[wpost.parent] = thread.id
+        post.thread = thread
+
+        if wpost.image and False:  # TODO
             f = File()
-            f.size = post.image_size
-            f.hash = post.image_md5
-            f.image_width, f.image_height = post.image_width, post.image_height
-            if post.thumbnail:
-                f.thumb = post.thumbnail
+            f.size = wpost.image_size
+            f.hash = wpost.image_md5
+            f.image_width = wpost.image_width
+            f.image_height = wpost.image_height
+            #if post.thumbnail:
+            #    f.thumb = post.thumbnail
             f.save()
             post.file = f
         post.save()
 
     def convert(self):
-        first_posts = Post.objects.filter(parent=0)
-        posts = Post.objects.filter(parent__gt=0)
+        first_posts = WakabaPost.objects.filter(parent=0)
+        posts = WakabaPost.objects.filter(parent__gt=0)
         for i, p in enumerate(first_posts):
             print_flush('Converted first post {0}'.format(i))
             self.convert_post(p, True)
