@@ -92,8 +92,10 @@ def adapt_captcha(request):
         request.session['valid_captchas'] = c
     return form
 
+
 def validate_post(request):
     pass
+
 
 def create_post(request):
     """Makes various changes on new post creation.

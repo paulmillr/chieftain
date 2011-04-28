@@ -12,8 +12,7 @@ from board.tools import make_post_descriptions, make_tripcode
 
 
 def post_description_test():
-    p = Post.objects.all()
-    pd = make_post_descriptions(p)
+    pass
 
 
 def tripcode_test():

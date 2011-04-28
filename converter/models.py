@@ -62,7 +62,7 @@ class WakabaPost(models.Model):
     image_width = models.IntegerField(null=True)
     image_height = models.IntegerField(null=True)
     thumb = models.TextField(null=True)
-        
+
 
 class WakabaInitializer(object):
     """Copies posts from all wakaba databases to one big temporary db."""
@@ -173,7 +173,7 @@ class WakabaConverter(object):
                     s))
             thread.section_id = section
         else:
-            tid = self.thread_map.get(parent)
+            tid = self.thread_map.get(wpost.parent)
             thread = Thread.objects.get(id=tid)
 
         thread.bump = wpost.date
