@@ -65,20 +65,28 @@ class WakabaPost(models.Model):
 
 
 class WakabaInitializer(object):
-    """Copies posts from all wakaba databases to one big temporary db."""
+    """Copies posts from all wakaba databases to one big temporary db.
+
+    Initializer contains 'fields' field (2 or 3-tuple), that determines
+    convertable fields in format:
+    * wakaba field name
+    * klipped field name in the temporary model
+    * convert function (optional)
+    Also if klipped field name is None, it won't be converted.
+    """
     fields = (
         ('num', 'pid'),
         ('parent', 'parent'),
         ('timestamp', 'date', lambda f: datetime.fromtimestamp(float(f))),
         ('lasthit', None),
-        ('ip', 'ip', lambda f: convert_ip(f)),
+        ('ip', 'ip', convert_ip),
         ('date', None),
         ('name', 'poster'),
         ('trip', 'tripcode', lambda f: f.strip('!')),
         ('email', 'email'),
         ('subject', 'topic'),
-        ('password', 'password', lambda f: get_key(f)),
-        ('comment', 'message', lambda f: strip_tags(f)),
+        ('password', 'password', get_key),
+        ('comment', 'message', strip_tags),
         ('image', 'image'),
         ('size', None),
         ('md5', 'image_md5'),
@@ -160,6 +168,7 @@ class WakabaConverter(object):
         self.thread_map = {}
 
     def convert_post(self, wpost, first_post=False):
+        """Converts single post."""
         post = Post()
         for f in self.fields:
             setattr(post, f, getattr(wpost, f))
@@ -188,8 +197,8 @@ class WakabaConverter(object):
             f.hash = wpost.image_md5
             f.image_width = wpost.image_width
             f.image_height = wpost.image_height
-            #if post.thumbnail:
-            #    f.thumb = post.thumbnail
+            #if post.thumb:
+            #    f.thumb = post.thumb
             f.save()
             post.file = f
         post.save()
