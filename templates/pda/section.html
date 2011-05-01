@@ -11,7 +11,7 @@
     </div>
     
     <ul id="threads" class="rounded">
-        <li><input type="text" name="message" placeholder="Создать новую тему" id="message"></li>
+        <!--<li><input type="text" name="message" placeholder="Создать новую тему" id="message"></li>-->
         {% for post in section.op_posts %}
             <li id="{{ post.pid }}" data-id="{{ post.id }}" class="post">
                 <div class="number">{{ post.pid }}</div>
