@@ -399,13 +399,13 @@ board = {
             buttons = {
                 'bookmark': {storageName: 'bookmarks', storeText: true},
                 'hide': {storageName: 'hidden',
-                    onInit : function(data) {
+                    onInit: function(data) {
                         if (data.span.hasClass('remove')) {
                             this.onAdd(data);
                         }
                     },
 
-                    onAdd : function(data) {
+                    onAdd: function(data) {
                         var first = false,
                             post,
                             hideClass = 'hidden';
@@ -915,23 +915,25 @@ style = {
             var posts = $('.post'),
                 slider = $('.filterPosts .slider'),
                 value = slider.slider('value'),
-                replies;
-            //console.log('Filtered posts with %s answers.', value);
+                replies,
+                filtered = posts.filter(function() {
+                    var pid = getPostPid(this);
+                    if (value === 0) {
+                        posts.show();
+                        return false;
+                    }
+                    // Hide posts, that don't have answers
+                    if (!(pid in window.posts.map)) {
+                        return true;
+                    }
 
-            posts.filter(function() {
-                var pid = getPostPid(this);
-                if (value === 0) {
-                    return false;
-                }
-
-                // Hide posts, that don't have answers
-                if (!(pid in posts.map)) {
-                    return true;
-                }
-
-                // Hide posts with answers count less than value
-                return posts.map[pid].length < value;
-            }).hide();
+                    // Hide posts with answers count less than value
+                    return window.posts.map[pid].length < value;
+            });
+            console.log(window.posts.map);
+            console.log('Filtered posts with %s answers.', value);
+            console.log(filtered);
+            filtered.hide();
         });
 
         $('.filterPosts #filterImages').change(function() {
