@@ -42,6 +42,7 @@ __all__ = [
     'StorageSetRootResource', 'StorageSetResource',
     'SettingRootResource', 'SettingResource',
     'BookmarkRootResource', 'BookmarkResource',
+    'UserThreadRootResource', 'UserThreadResource',
     'HideRootResource', 'HideResource',
 ]
 
@@ -210,6 +211,10 @@ def create_post(request):
         post.file = handle_uploaded_file(file_instance)
     post.save()
     thread.save()
+    # add thread to user's feed
+    if new_thread:
+        request.session.setdefault('user_threads', set())
+        request.session['user_threads'].add(post.id)
     return post
 
 
@@ -580,6 +585,14 @@ class BookmarkRootResource(StorageSetRootResource):
 
 
 class BookmarkResource(StorageSetResource):
+    storage_name = 'user_threads'
+
+
+class UserThreadRootResource(StorageSetRootResource):
+    storage_name = 'user_threads'
+
+
+class UserThreadResource(StorageSetResource):
     storage_name = 'bookmarks'
 
 

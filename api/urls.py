@@ -17,6 +17,8 @@ urlpatterns = patterns('api.views',
     (r'^setting/(?P<key>[\w\d]+)$', SettingResource.as_view()),
     (r'^bookmark/$', BookmarkRootResource.as_view()),
     (r'^bookmark/(?P<key>[\d]+)$', BookmarkResource.as_view()),
+    (r'^user_thread/$', UserThreadRootResource.as_view()),
+    (r'^user_thread/(?P<key>[\d]+)$', UserThreadResource.as_view()),
     (r'^hide/$', HideRootResource.as_view()),
     (r'^hide/(?P<key>[\d]+)?$', HideResource.as_view()),
     # polls
