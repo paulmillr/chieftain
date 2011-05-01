@@ -122,6 +122,10 @@ class WakabaInitializer(object):
         fields = [i[0] for i in self.fields]
         for i in self.cursor.fetchall():
             p = dict(zip(fields, i))
+            if p['subject'] is None:
+                p['subject'] = ''
+            if p['email'] is None:
+                p['email'] = ''
             p['section_slug'] = table
             yield p
 
@@ -140,11 +144,11 @@ class WakabaInitializer(object):
                 wfield, field, convert_fn = t
             else:
                 wfield, field = t
+            if field is None:
+                continue
             data = raw_post[wfield]
             if is_convertable:
                 data = convert_fn(data)
-            elif field is None:
-                continue
             setattr(post, field, data)
         post.save()
 
@@ -153,6 +157,7 @@ class WakabaInitializer(object):
         for i, p in enumerate(self.get_posts()):
             self.convert_post(p)
             print_flush('Converted post {0}'.format(i))
+        print 'Initialized {0} posts. Trying to convert them...'.format(i)
 
 
 class WakabaConverter(object):
@@ -165,33 +170,48 @@ class WakabaConverter(object):
     def __init__(self):
         super(WakabaConverter, self).__init__()
         self.section_map = dict(Section.objects.values_list('slug', 'id'))
+        ss = WakabaPost.objects.distinct().values_list('section_slug')
+        sections = [i[0] for i in ss]
+        self.bad_sections = {
+            s for s in sections if not self.section_map.get(s)
+        }
         self.thread_map = {}
+        #self.thread_map = self.build_thread_map()
+
+    def build_thread_map(self):
+        thread_ids = (i[0] for i in Thread.objects.values_list('id'))
+        wpost_ids = (i[0] for i in
+            WakabaPost.objects.filter(parent=0).values_list('id'))
+        return dict(zip(thread_ids, wpost_ids))
 
     def convert_post(self, wpost, first_post=False):
         """Converts single post."""
+        if wpost.section_slug in self.bad_sections:
+            return False
         post = Post()
+        post.data = ''
         for f in self.fields:
             setattr(post, f, getattr(wpost, f))
         if first_post:
+            post.is_op_post = True
             thread = Thread()
-            try:
-                s = wpost.section_slug
-                section = self.section_map[s]
-            except KeyError:
-                raise ConvertError('Board section "{0}" does not exist'.format(
-                    s))
-            thread.section_id = section
+            thread.section_id = self.section_map[wpost.section_slug]
         else:
-            tid = self.thread_map.get(wpost.parent)
-            thread = Thread.objects.get(id=tid)
-
+            key = '{0}_{1}'.format(wpost.section_slug, wpost.parent)
+            tid = self.thread_map.get(key)
+            try:
+                thread = Thread.objects.get(id=tid)
+            except Thread.DoesNotExist:
+                print '\nFailed to convert post {0}'.format(wpost.id)
+                return False
         thread.bump = wpost.date
-        thread.save()
+        thread.save(rebuild_cache=False)
         if first_post:
-            self.thread_map[wpost.parent] = thread.id
+            key = '{0}_{1}'.format(wpost.section_slug, wpost.pid)
+            self.thread_map[key] = thread.id
         post.thread = thread
 
-        if wpost.image and False:  # TODO
+        if False and wpost.image:  # TODO
             f = File()
             f.size = wpost.image_size
             f.hash = wpost.image_md5
@@ -202,13 +222,22 @@ class WakabaConverter(object):
             f.save()
             post.file = f
         post.save()
+        thread.save()
 
-    def convert(self):
-        first_posts = WakabaPost.objects.filter(parent=0)
-        posts = WakabaPost.objects.filter(parent__gt=0)
+    def convert_threads(self):
+        first_posts = WakabaPost.objects.filter(parent=0).order_by('id')
         for i, p in enumerate(first_posts):
             print_flush('Converted first post {0}'.format(i))
             self.convert_post(p, True)
+        print
+
+    def convert_posts(self):
+        posts = WakabaPost.objects.filter(parent__gt=0).order_by('id')
         for i, p in enumerate(posts):
             print_flush('Converted post {0}'.format(i))
             self.convert_post(p)
+        print
+
+    def convert(self):
+        self.convert_threads()
+        self.convert_posts()
