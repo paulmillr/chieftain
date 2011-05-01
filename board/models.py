@@ -8,6 +8,9 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from collections import Counter
 from datetime import datetime
+from hashlib import sha1
+from ipcalc import Network
+from markdown2 import markdown
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -19,8 +22,6 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
-from hashlib import sha1
-from ipcalc import Network
 from board import fields, tools
 
 __all__ = [
@@ -229,7 +230,7 @@ class Thread(models.Model):
     is_deleted = models.BooleanField(_('Is deleted'), default=False)
     is_pinned = models.BooleanField(_('Is pinned'), default=False)
     is_closed = models.BooleanField(_('Is closed'), default=False)
-    poll = models.ForeignKey('Poll', verbose_name=_('Poll'), blank=True,
+    poll = models.OneToOneField('Poll', verbose_name=_('Poll'), blank=True,
         null=True)
     html = models.TextField(blank=True)
     objects = ThreadManager()
@@ -386,6 +387,8 @@ class Post(models.Model):
 
     def rebuild_cache(self):
         """Regenerates html cache of post."""
+        self.message_html = markdown(self.message, extras=['safe', 'videos',
+            'code-friendly', 'code-color']).encode('utf-8')
         self.html = render_to_string('post.html', {'post': self})
 
 
@@ -590,7 +593,7 @@ class SectionGroup(models.Model):
 
 class UserProfile(models.Model):
     """User (moderator etc.)."""
-    user = models.ForeignKey(User)
+    user = models.OneToOneField(User)
     sections = models.ManyToManyField('Section',
         verbose_name=_('User owned sections'))
 

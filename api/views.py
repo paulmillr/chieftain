@@ -8,7 +8,6 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from datetime import datetime
 from hashlib import md5
-from markdown2 import markdown
 from urllib import urlencode
 from urllib2 import urlopen, URLError
 from django.shortcuts import render
@@ -93,10 +92,6 @@ def adapt_captcha(request):
     return form
 
 
-def validate_post(request):
-    pass
-
-
 def create_post(request):
     """Makes various changes on new post creation.
 
@@ -109,7 +104,9 @@ def create_post(request):
     new_thread = not request.POST.get('thread')
     with_files = bool(request.FILES.get('file'))
     logged_in = request.user.is_authenticated()
+    # generate form, based on captcha settings
     form = adapt_captcha(request)
+    # init Post model
     post = form.save(commit=False)
     post.date = datetime.now()
     post.is_op_post = new_thread
@@ -200,8 +197,6 @@ def create_post(request):
             'os_version': v,
             'raw': ua,
         }}
-    post.message_html = markdown(post.message, ['safe', 'videos',
-        'code-friendly', 'code-color'])
     if new_thread:
         thread.save(rebuild_cache=False)
         post.thread = thread

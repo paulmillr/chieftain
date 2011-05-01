@@ -6,8 +6,8 @@ admin.py
 Created by Paul Bagwell on 2011-01-13.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from board import models
 from django.contrib import admin
+from board import models
 
 
 class ChoiceInline(admin.TabularInline):
