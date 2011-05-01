@@ -13,6 +13,7 @@ w.convert()
 import sys
 from datetime import datetime
 from struct import pack, unpack
+from django.core.files import File as DjangoFile
 from django.db import models, connections
 from django.utils.html import strip_tags
 from board.models import Thread, Post, File, Section
@@ -212,15 +213,14 @@ class WakabaConverter(object):
         post.thread = thread
 
         if False and wpost.image:  # TODO
-            f = File()
-            f.size = wpost.image_size
-            f.hash = wpost.image_md5
-            f.image_width = wpost.image_width
-            f.image_height = wpost.image_height
-            #if post.thumb:
-            #    f.thumb = post.thumb
-            f.save()
-            post.file = f
+            file = File(
+                file=DjangoFile(wpost.image), hash=wpost.image_md5,
+                image_width=wpost.image_width, image_height=wpost.image_height
+            )
+            if wpost.thumb:
+                file.thumb = DjangoFile(wpost.thumb)
+            file.save()
+            post.file = file
         post.save()
         thread.save()
 
