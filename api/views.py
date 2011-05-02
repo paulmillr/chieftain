@@ -41,8 +41,7 @@ __all__ = [
     'StorageDictRootResource', 'StorageDictResource',
     'StorageSetRootResource', 'StorageSetResource',
     'SettingRootResource', 'SettingResource',
-    'BookmarkRootResource', 'BookmarkResource',
-    'UserThreadRootResource', 'UserThreadResource',
+    'FeedRootResource', 'FeedResource',
     'HideRootResource', 'HideResource',
 ]
 
@@ -212,9 +211,10 @@ def create_post(request):
     post.save()
     thread.save()
     # add thread to user's feed
-    if new_thread:
-        request.session.setdefault('user_threads', set())
-        request.session['user_threads'].add(post.id)
+    feed_post_id = post.id if new_thread else thread.op_post.id
+    print feed_post_id
+    request.session['feed'].add(int(feed_post_id))
+    print request.session['feed']
     return post
 
 
@@ -489,17 +489,18 @@ class StorageRootResource(Resource):
     storage_name = ''
     default = {}
 
-    def setdefault(self, session):
-        return session.setdefault(self.storage_name, self.default)
+    def get_data(self, request):
+        return request.session[self.storage_name]
+
+    def set_data(self, request, value):
+        request.session[self.storage_name] = value
 
     def get(self, request, auth):
-        data = self.setdefault(request.session)
-        return Response(status.OK, data)
+        return Response(status.OK, self.get_data(request))
 
     def delete(self, request, auth):
         """Clears whole storage."""
-        self.setdefault(request.session)
-        request.session[self.storage_name] = self.default
+        self.set_data(request, self.default)
         return Response(status.NO_CONTENT)
 
 
@@ -516,7 +517,7 @@ class StorageSetRootResource(StorageRootResource):
     default = set()
 
     def post(self, request, auth, content):
-        data = self.setdefault(request.session)
+        data = self.get_data(request)
         try:
             value = int(content['value'])
         except (KeyError, TypeError):
@@ -531,7 +532,7 @@ class StorageSetResource(StorageResource):
     default = set()
 
     def delete(self, request, auth, key):
-        data = self.setdefault(request.session)
+        data = self.get_data(request)
         key = int(key)
         if key in data:
             data.remove(key)
@@ -539,13 +540,13 @@ class StorageSetResource(StorageResource):
         return Response(status.NO_CONTENT)
 
 
-class StorageDictRootResource(StorageResource):
+class StorageDictRootResource(StorageRootResource):
     """Storage create/list/flush resource, that uses dict to store data."""
     allowed_methods = anon_allowed_methods = ('GET', 'POST', 'DELETE')
     default = {}
 
     def post(self, request, auth, content):
-        data = setdefault(request.session)
+        data = self.get_data(request)
         try:
             key = int(content['key'])
             value = content['value']
@@ -562,12 +563,12 @@ class StorageDictResource(StorageResource):
     default = {}
 
     def get(self, request, auth, key):
-        data = setdefault(request.session)
+        data = self.get_data(request)
         return Response(status.OK, data.get(key))
 
     def delete(self, request, auth, key):
-        if key in data:
-            data[key] = None
+        data = self.get_data(request)
+        data.setdefault(key, None)
         request.session.modified = True
         return Response(status.NO_CONTENT)
 
@@ -580,20 +581,12 @@ class SettingResource(StorageDictResource):
     storage_name = 'settings'
 
 
-class BookmarkRootResource(StorageSetRootResource):
-    storage_name = 'bookmarks'
+class FeedRootResource(StorageSetRootResource):
+    storage_name = 'feed'
 
 
-class BookmarkResource(StorageSetResource):
-    storage_name = 'user_threads'
-
-
-class UserThreadRootResource(StorageSetRootResource):
-    storage_name = 'user_threads'
-
-
-class UserThreadResource(StorageSetResource):
-    storage_name = 'bookmarks'
+class FeedResource(StorageSetResource):
+    storage_name = 'feed'
 
 
 class HideRootResource(StorageSetRootResource):

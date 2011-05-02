@@ -6,7 +6,6 @@ context_processors.py
 Created by Paul Bagwell on 2011-02-07.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-
 from django.conf import settings as _settings
 
 
@@ -26,26 +25,25 @@ def session(request):
        {'session_classes': 'test test2'}
     """
     session = request.session
-    s = request.session.get('settings', {})
-    no_captcha = request.session.get('no_captcha')
-    if no_captcha:
-        s['no_captcha'] = True
+    user = request.user
+    settings = session['settings']
 
     def pop_from_session(key, default=''):
-        return s.pop(key) if s.get(key) else default
+        return settings.pop(key) if settings.get(key) else default
 
-    u = request.user
-    if u.is_authenticated():
-        s['is_mod'] = True
-        if u.is_superuser:
-            s['is_admin'] = True
-    session.setdefault('hidden', set())
-    session.setdefault('bookmarks', set())
+    if session.get('no_captcha'):
+        settings['no_captcha'] = True
+
+    if user.is_authenticated():
+        settings['is_mod'] = True
+        if user.is_superuser:
+            settings['is_admin'] = True
+    print session['hidden'] is session['feed']
     return {
         'style': pop_from_session('style', 'photon'),
         'password': pop_from_session('password'),
-        'session': dict(s.items()),
-        'session_classes': ' '.join(s.keys()),
+        'session': dict(settings.items()),
+        'session_classes': ' '.join(settings.keys()),
         'hidden': list(session['hidden']),
-        'bookmarks': list(session['bookmarks']),
+        'feed': list(session['feed']),
     }

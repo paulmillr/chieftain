@@ -11,13 +11,22 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponseForbidden
+from api.views import SettingResource, FeedResource, HideResource
 from board.models import DeniedIP
 
-__all__ = ['DenyMiddleware', 'DisableCSRFMiddleware']
+__all__ = ['SessionDefaultsMiddleware', 'DenyMiddleware',
+    'DisableCSRFMiddleware']
 
 
 METHODS = ('GET', 'POST', 'UPDATE', 'DELETE')
 WHITELIST = ()
+
+
+class SessionDefaultsMiddleware(object):
+    def process_request(self, request):
+        for i in [SettingResource, FeedResource, HideResource]:
+            default = type(i.default)()  # prevent errors due to mutability
+            request.session.setdefault(i.storage_name, default)
 
 
 def ip_in(ip, model):

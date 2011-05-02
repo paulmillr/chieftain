@@ -39,6 +39,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'board.middleware.DisableCSRFMiddleware',
+    'board.middleware.SessionDefaultsMiddleware',
     'board.middleware.DenyMiddleware',
 
     # for debugging

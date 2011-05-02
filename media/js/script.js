@@ -25,7 +25,6 @@ if (!Array.indexOf) {
     gettext('Thread');
     gettext('Post');
     gettext('hidden');
-    gettext('bookmark');
     gettext('hide');
     gettext('Replies');
     gettext('New message in thread ');
@@ -397,7 +396,7 @@ board = {
             set = $.settings('hideSectGroup'),
             pass = $.localSettings('password'),
             buttons = {
-                'bookmark': {storageName: 'bookmarks', storeText: true},
+                'bookmark': {storageName: 'feed', storeText: true},
                 'hide': {storageName: 'hidden',
                     onInit: function(data) {
                         if (data.span.hasClass('remove')) {
@@ -490,9 +489,10 @@ board = {
                 span = cont.span,
                 post = cont.post,
                 postId = cont.id,
-                className = this.className.split(' ')[1],
+                className = t.attr('class').split(' ')[1],
+                storageName = t.attr('data-storageName'),
                 current = board.postButtons[className],
-                apiLink = window.api.url + '/' + className  + '/';
+                apiLink = window.api.url + '/' + storageName  + '/';
 
             if (span.hasClass('add')) {  // add
                 span.removeClass('add').addClass('remove');

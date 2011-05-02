@@ -4,5 +4,5 @@ var RecaptchaOptions = {
     custom_theme_widget: 'recaptcha_widget'
 },
     api = {
-        url: '/api',  // URL to klipped API
-    };
+        url: '/api/v1'  // URL to klipped API
+};

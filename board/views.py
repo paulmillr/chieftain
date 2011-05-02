@@ -20,8 +20,8 @@ __all__ = [
 
 
 def index(request):
-    bposts = Post.objects.filter(is_op_post=True, id__in=request.session.get(
-        'bookmarks', []))
+    bookmarks = list(request.session['bookmarks'])
+    bposts = Post.objects.filter(is_op_post=True, id__in=bookmarks)
 
     #Thread.objects.filter
     return render(request, 'index.html', add_sidebar({
