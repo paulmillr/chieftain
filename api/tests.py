@@ -14,6 +14,7 @@ from board.models import Post
 
 USERNAME = 'paul'
 PASSWORD = 'paulpaul'
+API_URL = '/api/v1'
 
 
 class APITest(unittest.TestCase):
@@ -27,7 +28,7 @@ class APITest(unittest.TestCase):
             'section': 'fd',  # this section has 'force_files': false
             'password': PASSWORD,
         }
-        response = self.client.post('/api/post/', data)
+        response = self.client.post(API_URL + '/post/', data)
         eq_(response.status_code, 201)   # HTTP_CREATED
         posts = Post.objects.all()
         eq_(posts.count(), 1)
@@ -37,7 +38,7 @@ class APITest(unittest.TestCase):
     def test_post_delete(self):
         post_id = 1
         params = urlencode({'password': PASSWORD})
-        url = '/api/post/{0}?{1}'.format(post_id, params)
+        url = API_URL + '/post/{0}?{1}'.format(post_id, params)
         response = self.client.delete(url)
         eq_(response.status_code, 200)
         assert not response.content
@@ -45,3 +46,18 @@ class APITest(unittest.TestCase):
         assert p.is_deleted
         response = self.client.get(url)
         eq_(response.status_code, 404)
+
+    def test_user_post_delete(self):
+        params = {'username': 'test', 'password': 'test'}
+        User(**params).save()
+        self.client = Client()
+        self.client.login(**params)
+        self.test_post_delete()
+
+    def test_feed(self):
+        self.client.post('/')
+        # TODO:
+        # * Adding to the feed on post creation
+        # * Adding to the feed on thread creation
+        # * Adding to the feed on bookmark button click
+        pass

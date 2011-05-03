@@ -10,12 +10,13 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 w = WakabaConverter()
 w.convert()
 """
+import re
 import sys
 from datetime import datetime
 from struct import pack, unpack
 from django.core.files import File as DjangoFile
-from django.db import models, connections
-from django.utils.html import strip_tags
+from django.db import models, connections, transaction
+from django.utils.html import strip_tags as strip_html_tags
 from board.models import Thread, Post, File, Section
 from board.tools import get_key
 
@@ -33,6 +34,22 @@ def convert_ip(ip):
     except Exception as e:
         raise ValueError(e)
     return '.'.join(str(i) for i in adr)
+
+SUBST_MAP = (
+    (r'<strong>(.*)</strong>', r'**\1**'),
+    (r'<em>(.*)</em>', r'*\1*'),
+    (r'&gt;', '>'),
+    (r'>>(\d{1,10})</a>', r'>>\1</a>'),
+    (r'<br />', '\n'),
+    (r'<span class="unkfunc">>(.*)</span>', r'>\1'),
+    (r'<span class="spoiler">(.*)</span>', r'%%\1%%'),
+)
+SUBST_MAP = [(re.compile(r), s) for r, s in SUBST_MAP]
+
+def strip_tags(text, allowed_tags=[]):
+    for r, s in SUBST_MAP:
+        text = re.sub(r, s, text)
+    return strip_html_tags(text)
 
 
 def print_flush(text):
@@ -224,18 +241,26 @@ class WakabaConverter(object):
         post.save()
         thread.save()
 
+    @transaction.commit_manually
     def convert_threads(self):
         first_posts = WakabaPost.objects.filter(parent=0).order_by('id')
         for i, p in enumerate(first_posts):
             print_flush('Converted first post {0}'.format(i))
             self.convert_post(p, True)
+            if i % 1000 == 0:
+                transaction.commit()
+        transaction.commit()
         print
 
+    @transaction.commit_manually
     def convert_posts(self):
         posts = WakabaPost.objects.filter(parent__gt=0).order_by('id')
         for i, p in enumerate(posts):
             print_flush('Converted post {0}'.format(i))
             self.convert_post(p)
+            if i % 1000 == 0:
+                transaction.commit()
+        transaction.commit()
         print
 
     def convert(self):

@@ -6,7 +6,7 @@ tests.py
 Created by Paul Bagwell on 2011-04-25.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
-from nose.tools import raises
+from nose.tools import eq_, raises
 from converter import models
 
 
@@ -21,5 +21,11 @@ def invalid_convert_ip_test():
     models.convert_ip(123213123123)
 
 
+def strip_tags_test():
+    text = '<p>hey <strong>guys</strong>, <b><i>how</i> are</b> you?</p>'
+    stripped = 'hey **guys**, how are you?'
+    eq_(models.strip_tags(text), stripped)
+
+
 def convert_test():
-    models
+    pass

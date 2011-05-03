@@ -38,7 +38,6 @@ def session(request):
         settings['is_mod'] = True
         if user.is_superuser:
             settings['is_admin'] = True
-    print session['hidden'] is session['feed']
     return {
         'style': pop_from_session('style', 'photon'),
         'password': pop_from_session('password'),

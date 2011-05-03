@@ -212,9 +212,7 @@ def create_post(request):
     thread.save()
     # add thread to user's feed
     feed_post_id = post.id if new_thread else thread.op_post.id
-    print feed_post_id
     request.session['feed'].add(int(feed_post_id))
-    print request.session['feed']
     return post
 
 
@@ -344,7 +342,7 @@ class PostRootResource(RootModelResource):
             raise ResponseException(status.BAD_REQUEST, {'detail': e.message})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
-        url = 'http://127.0.0.1:8888/api/streamp/{0}'
+        url = 'http://127.0.0.1:8888/api/v1/streamp/{0}'
         data = urlencode({'html': instance.html.encode('utf-8')})
         try:
             urlopen(url.format(instance.thread.id), data)
