@@ -11,6 +11,7 @@ from datetime import datetime
 from hashlib import sha1
 from ipcalc import Network
 from markdown2 import markdown
+from random import randint
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
@@ -40,9 +41,9 @@ MEGABYTE = 2 ** 20
 def get_file_path(base):
     """Builds path to stored static files. Used in File class."""
     def closure(instance, filename):
-        return '{base}/{timestamp}.{ext}'.format(
+        return '{base}/{timestamp}{salt}.{ext}'.format(
             base=base, timestamp=tools.timestamp_now(),
-            ext=instance.type.extension
+            salt=randint(10, 99), ext=instance.type.extension
         )
     return closure
 
