@@ -1,4 +1,5 @@
 Django==1.3
+python-memcached
 ipcalc
 Tornado
 redis
@@ -11,3 +12,4 @@ MySQL-python
 nose
 django-nose
 ipcalc
+httpagentparser

@@ -20,7 +20,7 @@ __all__ = [
 
 
 def index(request):
-    bookmarks = list(request.session['bookmarks'])
+    bookmarks = list(request.session['feed'])
     bposts = Post.objects.filter(is_op_post=True, id__in=bookmarks)
 
     #Thread.objects.filter
