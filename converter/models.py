@@ -19,7 +19,7 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.db import models, connections, transaction
 from django.utils.html import strip_tags as strip_html_tags
-from board.models import Thread, Post, File, Section
+from board.models import Thread, Post, File, FileType, Section
 from board.tools import get_key
 
 
@@ -196,7 +196,8 @@ class WakabaConverter(object):
             s for s in sections if not self.section_map.get(s)
         }
         self.thread_map = {}
-        self.filetype_map = {}
+        fm = FileType.objects.values_list('extension', 'id')
+        self.filetype_map = dict(fm)
         #self.thread_map = self.build_thread_map()
 
     def build_thread_map(self):
@@ -235,15 +236,11 @@ class WakabaConverter(object):
         if wpost.image:  # TODO
             img = os.path.join(settings.WAKABA_PATH, wpost.image)
             extension = '.'.split(wpost.image).pop()
-            try:
-                typ = self.filetype_map[extension]
-            except KeyError:
-                t = FileType.objects.filter(extension)[0]
-                self.filetype_map[extension] = t
+            type_id = self.filetype_map[extension]
             file = File(
                 file=DjangoFile(img), hash=wpost.image_md5,
                 image_width=wpost.image_width, image_height=wpost.image_height,
-                type=
+                type_id=type_id
             )
             if wpost.thumb:
                 thumb = os.path.join(settings.WAKABA_PATH, wpost.thumb)
