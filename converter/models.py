@@ -232,13 +232,13 @@ class WakabaConverter(object):
         post.thread = thread
 
         if wpost.image:  # TODO
-            img = os.path.join(WAKABA_PATH, wpost.image)
+            img = os.path.join(settings.WAKABA_PATH, wpost.image)
             file = File(
                 file=DjangoFile(img), hash=wpost.image_md5,
                 image_width=wpost.image_width, image_height=wpost.image_height
             )
             if wpost.thumb:
-                thumb = os.path.join(WAKABA_PATH, wpost.thumb)
+                thumb = os.path.join(settings.WAKABA_PATH, wpost.thumb)
                 file.thumb = DjangoFile(wpost.thumb)
             file.save()
             post.file = file
