@@ -9,7 +9,7 @@ MANAGERS = ADMINS = (
     ('paul', 'pbagwl@gmail.com'),
 )
 
-REDIS = Redis(**REDIS_INFO)
+#REDIS = Redis(**REDIS_INFO)
 
 #APPEND_SLASH = False
 TIME_ZONE = 'Europe/Kiev'
