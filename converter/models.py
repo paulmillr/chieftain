@@ -233,25 +233,22 @@ class WakabaConverter(object):
             self.thread_map[key] = thread.id
         post.thread = thread
 
-        if wpost.image:  # TODO
+        if wpost.image:
             to = os.path.join(settings.WAKABA_PATH, wpost.section_slug)
             img = os.path.join(to, wpost.image)
             extension = wpost.image.split('.').pop()
             type_id = self.filetype_map[extension]
             file = File(
-                file=DjangoFile(img), hash=wpost.image_md5,
+                file=DjangoFile(open(img)), hash=wpost.image_md5,
                 image_width=wpost.image_width, image_height=wpost.image_height,
                 type_id=type_id
             )
             if wpost.thumb:
                 thumb = os.path.join(to, wpost.thumb)
-                file.thumb = DjangoFile(wpost.thumb)
-            file.save()
-            post.file = file
-            try:
-                post.save(rebuild_cache=False)
-            except ValueError:
-                post.file = None
+                file.thumb = DjangoFile(open(wpost.thumb))
+            if file.file:
+                file.save()
+                post.file = file
         post.save()
         thread.save()
 
