@@ -256,8 +256,8 @@ class WakabaConverter(object):
         for i, p in enumerate(first_posts):
             print_flush('Converted first post {0}'.format(i))
             self.convert_post(p, True)
-            if i % 1000 == 0:
-                transaction.commit()
+            #if i % 1000 == 0:
+            #    transaction.commit()
         transaction.commit()
         print
 
