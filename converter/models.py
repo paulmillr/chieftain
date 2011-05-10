@@ -234,7 +234,8 @@ class WakabaConverter(object):
         post.thread = thread
 
         if wpost.image:  # TODO
-            img = os.path.join(settings.WAKABA_PATH, wpost.image)
+            to = os.path.join(settings.WAKABA_PATH, wpost.section_slug)
+            img = os.path.join(to, wpost.image)
             extension = '.'.split(wpost.image).pop()
             type_id = self.filetype_map[extension]
             file = File(
@@ -243,14 +244,18 @@ class WakabaConverter(object):
                 type_id=type_id
             )
             if wpost.thumb:
-                thumb = os.path.join(settings.WAKABA_PATH, wpost.thumb)
+                thumb = os.path.join(to, wpost.thumb)
                 file.thumb = DjangoFile(wpost.thumb)
             file.save()
             post.file = file
+            try:
+                post.save(rebuild_cache=False)
+            except ValueError:
+                post.file = None
         post.save()
         thread.save()
 
-    @transaction.commit_manually
+    #@transaction.commit_manually
     def convert_threads(self):
         first_posts = WakabaPost.objects.filter(parent=0).order_by('id')
         for i, p in enumerate(first_posts):
@@ -258,18 +263,18 @@ class WakabaConverter(object):
             self.convert_post(p, True)
             #if i % 1000 == 0:
             #    transaction.commit()
-        transaction.commit()
+        #transaction.commit()
         print
 
-    @transaction.commit_manually
+    #@transaction.commit_manually
     def convert_posts(self):
         posts = WakabaPost.objects.filter(parent__gt=0).order_by('id')
         for i, p in enumerate(posts):
             print_flush('Converted post {0}'.format(i))
             self.convert_post(p)
-            if i % 1000 == 0:
-                transaction.commit()
-        transaction.commit()
+            #if i % 1000 == 0:
+            #    transaction.commit()
+        #transaction.commit()
         print
 
     def convert(self):
