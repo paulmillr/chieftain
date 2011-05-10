@@ -35,6 +35,7 @@ RECAPTCHA_PRIVATE_KEY = ''
 SITE_TITLE = u'Два.ч'
 SITE_URL = 'http://2ch.so/'
 FILES_URL = 'http://static.2ch.so/'
+WAKABA_PATH = '/var/2ch/'
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 CACHE_DIR = 'cache'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'files')

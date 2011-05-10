@@ -48,8 +48,8 @@ def handle_uploaded_file(file_instance):
         thumb_dir = make_path('thumbs')
         if not os.path.isdir(thumb_dir):
             os.makedirs(thumb_dir)
-        with tempfile.NamedTemporaryFile(
-            suffix='.{0}'.format(f.type.extension)) as tmp:
+        suffix = '.{0}'.format(f.type.extension)
+        with tempfile.NamedTemporaryFile(suffix=suffix) as tmp:
             img.thumbnail((MAX, MAX), Image.ANTIALIAS)
             img.save(tmp)
             f.thumb = DjangoFile(tmp)

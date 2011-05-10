@@ -10,10 +10,12 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 w = WakabaConverter()
 w.convert()
 """
+import os
 import re
 import sys
 from datetime import datetime
 from struct import pack, unpack
+from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.db import models, connections, transaction
 from django.utils.html import strip_tags as strip_html_tags
@@ -229,12 +231,14 @@ class WakabaConverter(object):
             self.thread_map[key] = thread.id
         post.thread = thread
 
-        if False and wpost.image:  # TODO
+        if wpost.image:  # TODO
+            img = os.path.join(WAKABA_PATH, wpost.image)
             file = File(
-                file=DjangoFile(wpost.image), hash=wpost.image_md5,
+                file=DjangoFile(img), hash=wpost.image_md5,
                 image_width=wpost.image_width, image_height=wpost.image_height
             )
             if wpost.thumb:
+                thumb = os.path.join(WAKABA_PATH, wpost.thumb)
                 file.thumb = DjangoFile(wpost.thumb)
             file.save()
             post.file = file
