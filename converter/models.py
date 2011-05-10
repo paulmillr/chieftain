@@ -196,6 +196,7 @@ class WakabaConverter(object):
             s for s in sections if not self.section_map.get(s)
         }
         self.thread_map = {}
+        self.filetype_map = {}
         #self.thread_map = self.build_thread_map()
 
     def build_thread_map(self):
@@ -233,9 +234,16 @@ class WakabaConverter(object):
 
         if wpost.image:  # TODO
             img = os.path.join(settings.WAKABA_PATH, wpost.image)
+            extension = '.'.split(wpost.image).pop()
+            try:
+                typ = self.filetype_map[extension]
+            except KeyError:
+                t = FileType.objects.filter(extension)[0]
+                self.filetype_map[extension] = t
             file = File(
                 file=DjangoFile(img), hash=wpost.image_md5,
-                image_width=wpost.image_width, image_height=wpost.image_height
+                image_width=wpost.image_width, image_height=wpost.image_height,
+                type=
             )
             if wpost.thumb:
                 thumb = os.path.join(settings.WAKABA_PATH, wpost.thumb)
