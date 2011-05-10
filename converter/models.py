@@ -245,7 +245,7 @@ class WakabaConverter(object):
             )
             if wpost.thumb:
                 thumb = os.path.join(to, wpost.thumb)
-                file.thumb = DjangoFile(open(wpost.thumb))
+                file.thumb = DjangoFile(open(thumb))
             if file.file:
                 file.save()
                 post.file = file
