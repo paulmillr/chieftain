@@ -236,7 +236,7 @@ class WakabaConverter(object):
         if wpost.image:  # TODO
             to = os.path.join(settings.WAKABA_PATH, wpost.section_slug)
             img = os.path.join(to, wpost.image)
-            extension = '.'.split(wpost.image).pop()
+            extension = wpost.image.split('.').pop()
             type_id = self.filetype_map[extension]
             file = File(
                 file=DjangoFile(img), hash=wpost.image_md5,
