@@ -201,8 +201,9 @@ class WakabaConverter(object):
 
     def convert_post(self, wpost, first_post=False):
         """Converts single post."""
-        if wpost.section_slug in self.bad_sections:
-            return False
+        slug = wpost.section_slug
+        if slug in self.bad_sections:
+            raise ConvertError('Section {} does not exist'.format(slug))
         post = Post()
         post.data = ''
         for f in self.fields:
@@ -210,12 +211,9 @@ class WakabaConverter(object):
         if first_post:
             post.is_op_post = True
             thread = Thread()
-            thread.section_id = self.section_map[wpost.section_slug]
+            thread.section_id = self.section_map[slug]
         else:
-            key = '{}_{}'.format(wpost.section_slug, wpost.parent)
-            tid = self.thread_map.get(key)
-            print 'key'
-            print tid
+            tid = self.thread_map.get((slug, wpost.parent))
             try:
                 thread = Thread.objects.get(id=tid)
             except Thread.DoesNotExist:
@@ -223,12 +221,11 @@ class WakabaConverter(object):
         thread.bump = wpost.date
         thread.save(rebuild_cache=False)
         if first_post:
-            key = '{}_{}'.format(wpost.section_slug, wpost.pid)
-            self.thread_map[key] = thread.id
+            self.thread_map[(slug, wpost.pid)] = thread.id
         post.thread = thread
 
         if wpost.image:
-            to = os.path.join(settings.WAKABA_PATH, wpost.section_slug)
+            to = os.path.join(settings.WAKABA_PATH, slug)
             extension = wpost.image.split('.').pop()
             type_id = self.filetype_map.get(extension)
             if not type_id:
