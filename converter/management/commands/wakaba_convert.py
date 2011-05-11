@@ -17,8 +17,4 @@ class Command(BaseCommand):
             i = WakabaInitializer()
             i.convert()
         w = WakabaConverter()
-        if Thread.objects.count():
-            start_point = args[0] if args else 0  # offset of converting
-            w.convert_posts(start_point)
-        else:
-            w.convert()
+        w.convert()

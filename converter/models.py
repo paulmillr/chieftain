@@ -48,6 +48,7 @@ SUBST_MAP = (
 )
 SUBST_MAP = [(re.compile(r), s) for r, s in SUBST_MAP]
 
+
 def strip_tags(text, allowed_tags=[]):
     for r, s in SUBST_MAP:
         text = re.sub(r, s, text)
@@ -63,7 +64,8 @@ class WakabaPost(models.Model):
     """Used as temporary storage of wakaba posts on database convertation.
     This model represents wakaba post with some additions, like:
     - section slug (wakaba doesn't have sections)
-    - some fields renamed (num -> pid, trip -> tripcode) to match chieftain style
+    - some fields renamed (num -> pid, trip -> tripcode) to match chieftain
+    style
     - some fields removed (last_visit, thumb_size etc.)
     """
     pid = models.IntegerField()
