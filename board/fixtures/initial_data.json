@@ -204,6 +204,13 @@
     "model" : "board.filetype",
     "pk" : 26
   },
+  { "fields" : { "extension" : "djvu",
+        "group" : 4,
+        "mime" : "image/x-djvu"
+      },
+    "model" : "board.filetype",
+    "pk" : 27
+  },
   { "fields" : { "anonymity" : true,
         "bumplimit" : 500,
         "default_name" : "Аноним",
