@@ -137,7 +137,7 @@ class WakabaInitializer(object):
 
     def get_table_posts(self, table):
         """Yields wakaba's post dict."""
-        sql = 'SELECT * FROM {0}{1} ORDER BY num'
+        sql = 'SELECT * FROM {}{} ORDER BY num'
         self.cursor.execute(sql.format(self.prefix, table))
         fields = [i[0] for i in self.fields]
         for i in self.cursor.fetchall():
@@ -176,8 +176,8 @@ class WakabaInitializer(object):
         """Converts all wakaba post tables to one klipped WakabaPost table."""
         for i, p in enumerate(self.get_posts()):
             self.convert_post(p)
-            print_flush('Converted post {0}'.format(i))
-        print 'Initialized {0} posts. Trying to convert them...'.format(i)
+            print_flush('Initialized post {}'.format(i))
+        print '\nInitialized {} posts. Trying to convert them...'.format(i)
 
 
 class WakabaConverter(object):
@@ -219,24 +219,25 @@ class WakabaConverter(object):
             thread = Thread()
             thread.section_id = self.section_map[wpost.section_slug]
         else:
-            key = '{0}_{1}'.format(wpost.section_slug, wpost.parent)
+            key = '{}_{}'.format(wpost.section_slug, wpost.parent)
             tid = self.thread_map.get(key)
             try:
                 thread = Thread.objects.get(id=tid)
             except Thread.DoesNotExist:
-                print '\nFailed to convert post {0}'.format(wpost.id)
-                return False
+                raise ConvertError('Thread does not exist')
         thread.bump = wpost.date
         thread.save(rebuild_cache=False)
         if first_post:
-            key = '{0}_{1}'.format(wpost.section_slug, wpost.pid)
+            key = '{}_{}'.format(wpost.section_slug, wpost.pid)
             self.thread_map[key] = thread.id
         post.thread = thread
 
         if wpost.image:
             to = os.path.join(settings.WAKABA_PATH, wpost.section_slug)
             extension = wpost.image.split('.').pop()
-            type_id = self.filetype_map[extension]
+            type_id = self.filetype_map.get(extension)
+            if not type_id:
+                raise ConvertError('Type {} does not exist'.format(extension))
             try:
                 f = DjangoFile(open(os.path.join(to, wpost.image)))
             except IOError:
@@ -265,8 +266,11 @@ class WakabaConverter(object):
         filter_args = {'parent': 0} if first_post else {'parent__gt': 0}
         posts = WakabaPost.objects.filter(**filter_args).order_by('id')[start:]
         for i, p in enumerate(posts):
-            print_flush(tpl.format(i))
-            self.convert_post(p)
+            print_flush(tpl.format(i + start))
+            try:
+                self.convert_post(p)
+            except ConvertError as e:
+                print '\nFailed to convert post {}: {}'.format(i, e)
         print
 
     def convert_threads(self, start=0):
