@@ -192,21 +192,12 @@ class WakabaConverter(object):
     def __init__(self):
         super(WakabaConverter, self).__init__()
         self.section_map = dict(Section.objects.values_list('slug', 'id'))
-        ss = WakabaPost.objects.distinct().values_list('section_slug')
-        sections = [i[0] for i in ss]
-        self.bad_sections = {
-            s for s in sections if not self.section_map.get(s)
-        }
+        self.filetype_map = dict(FileType.objects.values_list('extension',
+            'id'))
         self.thread_map = {}
-        fm = FileType.objects.values_list('extension', 'id')
-        self.filetype_map = dict(fm)
-        #self.thread_map = self.build_thread_map()
-
-    def build_thread_map(self):
-        thread_ids = (i[0] for i in Thread.objects.values_list('id'))
-        wpost_ids = (i[0] for i in
-            WakabaPost.objects.filter(parent=0).values_list('id'))
-        return dict(zip(thread_ids, wpost_ids))
+        sl = WakabaPost.objects.distinct().values_list('section_slug')
+        slugs = [i[0] for i in sl]
+        self.bad_sections = {s for s in slugs if not self.section_map.get(s)}
 
     def convert_post(self, wpost, first_post=False):
         """Converts single post."""
@@ -223,6 +214,8 @@ class WakabaConverter(object):
         else:
             key = '{}_{}'.format(wpost.section_slug, wpost.parent)
             tid = self.thread_map.get(key)
+            print 'key'
+            print tid
             try:
                 thread = Thread.objects.get(id=tid)
             except Thread.DoesNotExist:
@@ -264,16 +257,18 @@ class WakabaConverter(object):
         thread.save()
 
     def convert_posts(self, start=0, first_post=False):
-        tpl = 'Converted first post {}' if first_post else 'Converted post {}'
         filter_args = {'parent': 0} if first_post else {'parent__gt': 0}
         posts = WakabaPost.objects.filter(**filter_args).order_by('id')[start:]
         for i, p in enumerate(posts):
-            print_flush(tpl.format(i + start))
+            i += start
+            if first_post:
+                i = 'f{}'.format(i)
+            print_flush('Converting post {}'.format(i))
             try:
-                self.convert_post(p)
+                self.convert_post(p, first_post)
             except ConvertError as e:
                 print '\nFailed to convert post {}: {}'.format(i, e)
-        print
+        print '\n'
 
     def convert_threads(self, start=0):
         return self.convert_posts(start, True)

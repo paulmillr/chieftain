@@ -9,6 +9,14 @@ DATABASES = {
         'PASSWORD': '',  # Not used with sqlite3.
         'HOST': '',  # Empty string for localhost. Not used with sqlite3.
         'PORT': '',  # Empty string for default. Not used with sqlite3.
+    },
+    'wakaba': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': '',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
     }
 }
 
