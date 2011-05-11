@@ -63,7 +63,7 @@ class WakabaPost(models.Model):
     """Used as temporary storage of wakaba posts on database convertation.
     This model represents wakaba post with some additions, like:
     - section slug (wakaba doesn't have sections)
-    - some fields renamed (num -> pid, trip -> tripcode) to match klipped style
+    - some fields renamed (num -> pid, trip -> tripcode) to match chieftain style
     - some fields removed (last_visit, thumb_size etc.)
     """
     pid = models.IntegerField()
@@ -90,9 +90,9 @@ class WakabaInitializer(object):
     Initializer contains 'fields' field (2 or 3-tuple), that determines
     convertable fields in format:
     * wakaba field name
-    * klipped field name in the temporary model
+    * chieftain field name in the temporary model
     * convert function (optional)
-    Also if klipped field name is None, it won't be converted.
+    Also if chieftain field name is None, it won't be converted.
     """
     fields = (
         ('num', 'pid'),
@@ -155,7 +155,7 @@ class WakabaInitializer(object):
                 yield post
 
     def convert_post(self, raw_post):
-        """Converts wakaba's post dict to the klipped WakabaPost object."""
+        """Converts wakaba's post dict to the chieftain WakabaPost object."""
         post = WakabaPost()
         post.section_slug = raw_post['section_slug']
         for t in self.fields:
@@ -173,7 +173,7 @@ class WakabaInitializer(object):
         post.save()
 
     def convert(self):
-        """Converts all wakaba post tables to one klipped WakabaPost table."""
+        """Converts all wakaba post tables to chieftain WakabaPost table."""
         for i, p in enumerate(self.get_posts()):
             self.convert_post(p)
             print_flush('Initialized post {}'.format(i))
@@ -181,7 +181,7 @@ class WakabaInitializer(object):
 
 
 class WakabaConverter(object):
-    """Converts wakaba database to klipped."""
+    """Converts wakaba database to chieftain."""
     fields = (
         'pid', 'date', 'ip', 'poster', 'tripcode', 'email', 'topic',
         'password', 'message'

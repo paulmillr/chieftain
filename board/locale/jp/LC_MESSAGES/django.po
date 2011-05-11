@@ -1,6 +1,6 @@
-# Japanese translation for klipped imageboard.
+# Japanese translation for chieftain imageboard.
 # Copyright (C) 2011 Paul Bagwell
-# This file is distributed under the same license as the klipped package.
+# This file is distributed under the same license as the chieftain package.
 # FIRST AUTHOR Anonymous, 2011.
 #
 #, fuzzy

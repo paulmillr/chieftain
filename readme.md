@@ -1,12 +1,12 @@
-# Klipped
+# Chieftain
 
-klipped - new generation imageboard.
+chieftain - new generation imageboard.
 
 ## What?
 
-klipped is a new generation imageboard (anonymous forum). It is the fastest chan.
+Chieftain is a new generation imageboard (anonymous forum). It is the fastest chan.
 It has plenty of modern features and modular design.
-klipped is built with HTML5, Python programming language, Django web framework,
+chieftain is built with HTML5, Python programming language, Django web framework,
 Tornado scalable non-blocking web server with use of jQuery javascript library and
 Redis key-value storage.
 
@@ -35,7 +35,7 @@ Redis key-value storage.
 
 ## Dependencies
 
-* You need Python 2.7 to run klipped.
+* You need Python 2.7 to run chieftain.
 * [Redis](http://redis.io/)
 * [GeoIP C API](http://www.maxmind.com/app/c)
 * [GeoIP datasets](http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/)
@@ -43,11 +43,11 @@ Redis key-value storage.
 
 ## Licensing
 
-Klipped is licensed under MIT license. It means that you can copy, distribute,
+chieftain is licensed under MIT license. It means that you can copy, distribute,
 adapt and transmit the work for free, but the copyright notice and license shall 
-be included in all copies or substantial portions of klipped.
+be included in all copies or substantial portions of chieftain.
 
-Copyright (c) 2011 Paul Bagwell, http://klipped.pbagwl.com/.
+Copyright (c) 2011 Paul Bagwell, http://chieftain.pbagwl.com/.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

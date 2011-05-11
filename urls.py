@@ -2,7 +2,7 @@ from django.conf.urls.defaults import include, patterns
 from django.contrib import admin
 admin.autodiscover()
 
-packages = {'packages': ('klipped.board',), }
+packages = {'packages': ('chieftain.board',), }
 
 urlpatterns = patterns('',
     (r'^admin/', include(admin.site.urls)),

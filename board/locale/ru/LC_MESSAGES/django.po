@@ -1,6 +1,6 @@
-# Russian translation for klipped imageboard.
+# Russian translation for chieftain imageboard.
 # Copyright (C) 2011 Paul Bagwell
-# This file is distributed under the same license as the klipped package.
+# This file is distributed under the same license as the chieftain package.
 # FIRST AUTHOR <pbagwl@gmail.com>, 2011.
 #
 #, fuzzy

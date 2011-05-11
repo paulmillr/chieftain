@@ -48,9 +48,9 @@ MIDDLEWARE_CLASSES = (
     #'opt.middlewares.ProfileMiddleware',
 )
 
-AUTH_PROFILE_MODULE = 'klipped.board.User'
+AUTH_PROFILE_MODULE = 'chieftain.board.User'
 
-ROOT_URLCONF = 'klipped.urls'
+ROOT_URLCONF = 'chieftain.urls'
 
 TEMPLATE_DIRS = (
     os.path.join(BASE_DIR, 'templates'),
@@ -74,9 +74,9 @@ INSTALLED_APPS = (
     'django.contrib.admin',
     'djangorestframework',
     'django_nose',
-    'klipped.board',
-    'klipped.converter',
-    'klipped.api',
+    'chieftain.board',
+    'chieftain.converter',
+    'chieftain.api',
 )
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'
