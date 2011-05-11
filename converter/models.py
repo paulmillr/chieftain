@@ -243,10 +243,9 @@ class WakabaConverter(object):
                 pass
             else:
                 file = File(
-                    file=f, hash=wpost.image_md5,
+                    file=f, hash=wpost.image_md5, type_id=type_id,
                     image_width=wpost.image_width,
-                    image_height=wpost.image_height,
-                    type_id=type_id
+                    image_height=wpost.image_height
                 )
                 if wpost.thumb:
                     try:
@@ -258,31 +257,20 @@ class WakabaConverter(object):
                 if file.file:
                     file.save()
                     post.file = file
-            
         post.save()
         thread.save()
 
-    #@transaction.commit_manually
-    def convert_threads(self):
-        first_posts = WakabaPost.objects.filter(parent=0).order_by('id')
-        for i, p in enumerate(first_posts):
-            print_flush('Converted first post {0}'.format(i))
-            self.convert_post(p, True)
-            #if i % 1000 == 0:
-            #    transaction.commit()
-        #transaction.commit()
+    def convert_posts(self, start=0, first_post=False):
+        tpl = 'Converted first post {}' if first_post else 'Converted post {}'
+        filter_args = {'parent': 0} if first_post else {'parent__gt': 0}
+        posts = WakabaPost.objects.filter(**filter_args).order_by('id')[start:]
+        for i, p in enumerate(posts):
+            print_flush(tpl.format(i))
+            self.convert_post(p)
         print
 
-    #@transaction.commit_manually
-    def convert_posts(self):
-        posts = WakabaPost.objects.filter(parent__gt=0).order_by('id')
-        for i, p in enumerate(posts):
-            print_flush('Converted post {0}'.format(i))
-            self.convert_post(p)
-            #if i % 1000 == 0:
-            #    transaction.commit()
-        #transaction.commit()
-        print
+    def convert_threads(self, start=0):
+        return self.convert_posts(start, True)
 
     def convert(self):
         self.convert_threads()

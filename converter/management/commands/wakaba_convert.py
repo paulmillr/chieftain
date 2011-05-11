@@ -7,6 +7,7 @@ Created by Paul Bagwell on 2011-04-16.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.core.management.base import BaseCommand
+from board.models import Thread
 from converter.models import WakabaInitializer, WakabaConverter, WakabaPost
 
 
@@ -16,4 +17,8 @@ class Command(BaseCommand):
             i = WakabaInitializer()
             i.convert()
         w = WakabaConverter()
-        w.convert()
+        if Thread.objects.count():
+            start_point = args[0] if args else 0  # offset of converting
+            w.convert_posts(start_point)
+        else:
+            w.convert()
