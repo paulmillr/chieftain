@@ -99,7 +99,13 @@ $.extend({
             if (value === 'false' || value === false) {
                 value = '';
             }
-            $.post(window.api.url + '/settings/' + name, {'data': value})
+            var type = value === '' ? 'DELETE' : 'POST';
+            $.ajax({
+                type: type,
+                url: window.api.url + '/setting/',
+                data: {'key': name, 'value': value},
+                dataType: 'json'
+            })
             .error(function(xhr) {
                 $.notification('error', gettext('Settings error'));
             });

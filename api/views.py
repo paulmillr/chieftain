@@ -546,7 +546,7 @@ class StorageDictRootResource(StorageRootResource):
     def post(self, request, auth, content):
         data = self.get_data(request)
         try:
-            key = int(content['key'])
+            key = content['key']
             value = content['value']
         except KeyError:
             raise ResponseException(status.BAD_REQUEST)

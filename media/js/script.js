@@ -723,7 +723,7 @@ settings = {
         // those things depend on cookie settings
         var body = $('body'),
             qs = parseQs(),
-            settings = $('.settings').find('input[type="checkbox"], select'),
+            settings = $('#container[role="settings"]').find('input[type="checkbox"], select'),
             style = $('html').attr('id'),
             dn = $('#enableDesktopNotifications').click(function() {
                 $.dNotification.request();
