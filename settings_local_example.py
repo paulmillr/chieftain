@@ -34,14 +34,13 @@ RECAPTCHA_PUBLIC_KEY = ''
 RECAPTCHA_PRIVATE_KEY = ''
 SITE_TITLE = u'Два.ч'
 SITE_URL = 'http://2ch.so/'
-FILES_URL = 'http://static.2ch.so/'
 WAKABA_PATH = '/var/2ch/'
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 CACHE_DIR = 'cache'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'files')
-MEDIA_URL = '{0}files/'.format(FILES_URL)
+MEDIA_URL = '{0}files/'.format(BASE_DIR)
 STATIC_ROOT = os.path.join(BASE_DIR, 'media')
-STATIC_URL = '{0}media/'.format(FILES_URL)
+STATIC_URL = '{0}media/'.format(BASE_DIR)
 SECRET_KEY = 'dsafaweihr8932rwefjiaweji'
 
 PUBSUB = {
