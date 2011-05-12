@@ -3,7 +3,7 @@ try:
     from settings_local import *
 except ImportError:
     print 'Cannot import local settings'
-    
+
 #from redis import Redis
 
 DEBUG = False

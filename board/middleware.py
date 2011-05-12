@@ -21,6 +21,7 @@ __all__ = ['set_session_defaults', 'SessionDefaultsMiddleware',
 METHODS = ('GET', 'POST', 'UPDATE', 'DELETE')
 WHITELIST = ()
 
+
 def set_session_defaults(request):
     for i in [SettingResource, FeedResource, HideResource]:
         default = type(i.default)()  # prevent errors due to mutability
