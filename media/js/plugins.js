@@ -97,7 +97,7 @@ $.extend({
                 default: elem.toggleClass(name); break;
             }
             var type = 'POST',
-                url = window.api.url + '/setting/',
+                url = 'setting/',
                 data = {'key': name, 'value': value};
 
             if (value === 'false' || value === false || value === '') {
@@ -105,12 +105,8 @@ $.extend({
                 type = 'DELETE';
                 url += data.key;
             }
-            $.ajax({
-                type: type,
-                url: url,
-                data: data,
-                dataType: 'json'
-            })
+            type = type.toLowerCase();
+            $.api[type](url, data)
             .error(function(xhr) {
                 $.notification('error', gettext('Settings error'));
             });
@@ -524,26 +520,32 @@ $.extend({
         });
 
         return new MultipartUploader(uri, form);
-    }
-});
+    },
+    api: (function() {
+        var apiBuilder = function(method) {
+            return function(path, data) {
+                if (jQuery.isFunction(data)) {
+        			type = type || callback;
+        			callback = data;
+        			data = undefined;
+        		}
+        		return jQuery.ajax({
+        		    type: method,
+        		    url: window.api.url + path,
+        		    data: data,
+        		    dataType: 'json'
+        		})
+            };
+        };
 
-jQuery.each(["put", "delete"], function( i, method ) {
-	jQuery[ method ] = function( url, data, callback, type ) {
-		// shift arguments if data argument was omitted
-		if ( jQuery.isFunction( data ) ) {
-			type = type || callback;
-			callback = data;
-			data = undefined;
-		}
-
-		return jQuery.ajax({
-			type: method,
-			url: url,
-			data: data,
-			success: callback,
-			dataType: type
-		});
-	};
+        var methods = ['get', 'post', 'put', 'delete'],
+            all = {api: apiBuilder};
+        $.each(methods, function(i, method) {
+            all[method] = apiBuilder(method);
+        });
+        console.log(all);
+        return all;
+    })()
 });
 
 /*

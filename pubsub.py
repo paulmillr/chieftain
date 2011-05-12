@@ -20,8 +20,8 @@ define("port", default=8888, help="run on the given port", type=int)
 class Application(tornado.web.Application):
     def __init__(self):
         handlers = [
-            (r'/api/v1/stream/(\d+)', MessageUpdatesHandler),
-            (r'/api/v1/streamp/(\d+)', MessageNewHandler),
+            (r'/api/1.0/stream/(\d+)', MessageUpdatesHandler),
+            (r'/api/1.0/streamp/(\d+)', MessageNewHandler),
         ]
         tornado.web.Application.__init__(self, handlers)
 

@@ -492,22 +492,18 @@ board = {
                 className = t.attr('class').split(' ')[1],
                 storageName = t.attr('data-storageName'),
                 current = board.postButtons[className],
-                apiLink = window.api.url + '/' + storageName  + '/';
+                apiLink = storageName  + '/';
 
             if (span.hasClass('add')) {  // add
                 span.removeClass('add').addClass('remove');
-                $.ajax({
-                    type: 'POST',
-                    url: apiLink,
-                    data: {value: postId},
-                    dataType: 'json' 
-                }).error(defaultErrorCallback);
+                $.api.post(apiLink, {value: postId})
+                .error(defaultErrorCallback);
                 if (current.onAdd) {
                     current.onAdd(cont);
                 }
             } else {  // remove
                 span.removeClass('remove').addClass('add');
-                $.delete(apiLink + postId).error(defaultErrorCallback);
+                $.api.delete(apiLink + postId).error(defaultErrorCallback);
                 if (current.onRemove) {
                     current.onRemove(cont);
                 }
@@ -515,7 +511,7 @@ board = {
         });
 
         $('.storage-clear-icon').click(function(event) {
-            $.delete(window.api.url + '/' + $(this).attr('data-storagename'));
+            $.api.delete($(this).attr('data-storagename'));
         });
 
         function previewPosts() {
@@ -539,17 +535,13 @@ board = {
                         return p;
                     }
 
-                    $.ajax({
-                        method: 'GET',
-                        url: window.api.url + '/post/' + board + '/' + pid + '?html=1',
-                        dataType: 'json'
+                    $.api.get('post/' + board + '/' + pid + '?html=1')
+                    .success(function(response) {
+                        createPreview(response.html, board, pid, true, prevTree);
                     })
-                        .success(function(response) {
-                            createPreview(response.html, board, pid, true, prevTree);
-                        })
-                        .error(function(xhr) {
-                            $.notification('error', gettext('Post not found'));
-                        });
+                    .error(function(xhr) {
+                        $.notification('error', gettext('Post not found'));
+                    });
                 } else {
                     createPreview($('#post' + pid).html(), board, pid, false, prevTree);
                 }
@@ -644,18 +636,14 @@ board = {
                 delete_all = !!$('#delete_all').attr('checked'),
                 target = !only_files ? t : t.find('.file, .filemeta'),
                 url = !only_files ? 
-                    window.api.url + '/post/' + target.data('id') : 
-                    window.api.url + '/file/' + getFileId(target.find('img')),
+                    window.api.url + 'post/' + target.data('id') : 
+                    window.api.url + 'file/' + getFileId(target.find('img')),
             password = $('#password').val();
 
             url += '?password=' + password;
             url += '&' + $('.removePosts').serialize();
             target.addClass('deleted');
-            $.ajax({
-                type: 'DELETE',
-                url: url,
-                dataType: 'json'
-            })
+            $.api.delete(url)
             .error(function(xhr) {
                 $.notification('error', $.parseJSON(xhr.responseText)['detail']);
                 target.removeClass('deleted');
@@ -959,7 +947,7 @@ style = {
 
         /*$('.threads').delegate('.poll input[type="radio"]', 'click', function() {
             var radio = $(this);
-            $.post(window.api.url + '/vote/', {'choice': this.value})
+            //$.api.post(window.api.url + '/vote/', {'choice': this.value})
             .error(defaultErrorCallback)
             .success(function(data) {
                 var total = 0,
@@ -1280,11 +1268,7 @@ pubsub = {
         if (pubsub.cursor) {
             args.cursor = pubsub.cursor;
         }
-
-        $.ajax(window.api.url + '/stream/'+ curPage.thread, {
-            type: 'POST',
-            dataType: 'json'
-        })
+        $.api.post('stream/'+ curPage.thread)
         .error(function() {
             if (pubsub.sleepTime < pubsub.maxSleepTime) {
                 pubsub.sleepTime *= 2;

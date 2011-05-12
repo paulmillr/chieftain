@@ -7,10 +7,10 @@ Created by Paul Bagwell on 2011-01-28.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.conf.urls.defaults import patterns
-from api.views import *
+from api1.views import *
 
 
-urlpatterns = patterns('api.views',
+urlpatterns = patterns('api1.views',
     (r'^$', 'api'),
     # user settings
     (r'^setting/$', SettingRootResource.as_view()),

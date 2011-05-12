@@ -80,7 +80,7 @@ INSTALLED_APPS = (
     'django_nose',
     'chieftain.board',
     'chieftain.converter',
-    'chieftain.api',
+    'chieftain.api1',
 )
 
 TEST_RUNNER = 'django_nose.NoseTestSuiteRunner'

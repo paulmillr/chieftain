@@ -4,5 +4,5 @@ var RecaptchaOptions = {
     custom_theme_widget: 'recaptcha_widget'
 },
     api = {
-        url: '/api/v1'  // URL to chieftain API
+        url: '/api/1.0/'  // URL to chieftain API
 };

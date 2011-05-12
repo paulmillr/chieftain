@@ -14,7 +14,7 @@ from board.models import Post
 
 USERNAME = 'paul'
 PASSWORD = 'paulpaul'
-API_URL = '/api/v1'
+API_URL = '/api/1.0'
 
 
 class APITest(unittest.TestCase):

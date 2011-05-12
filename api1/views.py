@@ -18,9 +18,10 @@ from djangorestframework import status
 from djangorestframework.resource import Resource
 from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, ResponseException
+from board import models
+from board.shortcuts import add_sidebar
 from board.tools import (get_key, make_tripcode, parse_user_agent,
     handle_uploaded_file)
-from board.models import *
 from modpanel.views import is_mod
 
 __all__ = [
@@ -56,7 +57,7 @@ class ValidationError(Exception):
 
 def api(request):
     """Page, that contains some API examples."""
-    return render(request, 'api.html')
+    return render(request, 'api.html', add_sidebar())
 
 
 def adapt_captcha(request):
@@ -71,7 +72,7 @@ def adapt_captcha(request):
     c = request.session.get('valid_captchas', 0)
     no_captcha = request.session.get('no_captcha', False)
 
-    model = PostFormNoCaptcha if no_captcha else PostForm
+    model = models.PostFormNoCaptcha if no_captcha else models.PostForm
     form = model(request.POST, request.FILES)
     if not form.is_valid():
         raise ValidationError(dict(form.errors))
@@ -114,9 +115,9 @@ def create_post(request):
     post.password = get_key(post.password)
     if new_thread:
         section = Section.objects.get(slug=request.POST['section'])
-        thread = Thread(section=section, bump=post.date)
+        thread = models.Thread(section=section, bump=post.date)
     else:
-        thread = Thread.objects.get(id=request.POST['thread'])
+        thread = models.Thread.objects.get(id=request.POST['thread'])
         if thread.is_closed and not logged_in:
             raise ValidationError(_('This thread is closed, '
                 'you cannot post to it.'))
@@ -181,7 +182,9 @@ def create_post(request):
         post.poster = post.email = post.topic = s * 10
         post.message = (s + u' ') * 50
     if section.type == 4:  # international
-        post.data = {'country_code': GeoIP().country(post.ip)['country_code']}
+        post.data = {
+            'country_code': models.GeoIP().country(post.ip)['country_code']
+        }
     elif section.type == 5:  # show useragent
         ua = request.META['HTTP_USER_AGENT']
         parsed = parse_user_agent(ua)
@@ -202,8 +205,8 @@ def create_post(request):
         post.thread = thread
     post.pid = section.pid_incr()
     if with_files:
-        file_type = FileType.objects.filter(extension=extension)[0]
-        file_instance = File(
+        file_type = models.FileType.objects.filter(extension=extension)[0]
+        file_instance = models.File(
             name=file.name, type=file_type, hash=file_hash,
             file=DjangoFile(file), image_height=0, image_width=0
         )
@@ -228,7 +231,7 @@ def mod_delete_post(request, post):
         posts = post.section().posts().filter(ip=post.ip)
         # remove threads
         op = posts.filter(is_op_post=True).values('pid', 'thread')
-        t = Thread.objects.filter(id__in=[i['thread'] for i in op])
+        t = models.Thread.objects.filter(id__in=[i['thread'] for i in op])
         t.update(is_deleted=True)
         for p in posts:
             p.remove()
@@ -236,28 +239,28 @@ def mod_delete_post(request, post):
 
 class PollRootResource(RootModelResource):
     """A list resource for Poll."""
-    model = Poll
+    model = models.Poll
 
 
 class PollResource(ModelResource):
     """A read resource for Poll."""
-    model = Poll
+    model = models.Poll
 
 
 class ChoiceRootResource(RootModelResource):
     """A list resource for Choice."""
-    model = Choice
+    model = models.Choice
 
 
 class ChoiceResource(ModelResource):
     """A read resource for Choice."""
-    model = Choice
+    model = models.Choice
 
 
 class VoteRootResource(RootModelResource):
     """A list/create resource for Vote."""
     allowed_methods = anon_allowed_methods = ('GET', 'POST')
-    model = Vote
+    model = models.Vote
 
     def post(self, request, auth, *args, **kwargs):
         try:
@@ -282,12 +285,12 @@ class VoteRootResource(RootModelResource):
 
 class VoteResource(ModelResource):
     """A read resource for Vote."""
-    model = Vote
+    model = models.Vote
 
 
 class ThreadRootResource(RootModelResource):
     """A create/list resource for Thread."""
-    model = Thread
+    model = models.Thread
 
     def get(self, request, auth, *args, **kwargs):
         return self.model.objects.filter(**kwargs)[:20]
@@ -297,7 +300,7 @@ class ThreadResource(ModelResource):
     """A read/delete resource for Thread."""
     allowed_methods = ('GET', 'DELETE')
     anon_allowed_methods = ('GET',)
-    model = Thread
+    model = models.Thread
 
     def get(self, request, auth, *args, **kwargs):
         slug = kwargs.get('section__slug')
@@ -321,8 +324,8 @@ class ThreadResource(ModelResource):
 class PostRootResource(RootModelResource):
     """A create/list resource for Post."""
     allowed_methods = anon_allowed_methods = ('GET', 'POST')
-    form = PostFormNoCaptcha
-    model = Post
+    form = models.PostFormNoCaptcha
+    model = models.Post
 
     def get(self, request, auth, *args, **kwargs):
         """Returns list of posts. If ?html option is specified, method
@@ -342,7 +345,7 @@ class PostRootResource(RootModelResource):
             raise ResponseException(status.BAD_REQUEST, {'detail': e.message})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime('%Y-%m-%d %H:%M:%S')
-        url = 'http://127.0.0.1:8888/api/v1/streamp/{0}'
+        url = 'http://127.0.0.1:8888/api/1.0/streamp/{0}'
         data = urlencode({'html': instance.html.encode('utf-8')})
         try:
             urlopen(url.format(instance.thread.id), data)
@@ -359,7 +362,7 @@ class PostRootResource(RootModelResource):
 class PostResource(ModelResource):
     """A read/delete resource for Post."""
     allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
-    model = Post
+    model = models.Post
 
     def get(self, request, auth, *args, **kwargs):
         """Gets post data. If ?html option is specified, method will return
@@ -397,32 +400,32 @@ class PostResource(ModelResource):
 
 class SectionRootResource(RootModelResource):
     """A list resource for Section."""
-    model = Section
+    model = models.Section
 
 
 class SectionResource(ModelResource):
     """A read resource for Section."""
-    model = Section
+    model = models.Section
 
 
 class SectionGroupRootResource(RootModelResource):
     """A list resource for SectionGroup."""
-    model = SectionGroup
+    model = models.SectionGroup
 
 
 class SectionGroupResource(ModelResource):
     """A read resource for SectionGroup."""
-    model = SectionGroup
+    model = models.SectionGroup
 
 
 class FileRootResource(RootModelResource):
     """A list resource for File."""
-    model = File
+    model = models.File
 
 
 class RandomImageRootResource(RootModelResource):
     """A list resource for random images."""
-    model = File
+    model = models.File
     fields = ('id', 'name', 'type', 'size',
         'image_width', 'image_height', 'hash', 'file', 'thumb')
 
@@ -434,7 +437,7 @@ class RandomImageRootResource(RootModelResource):
 class FileResource(ModelResource):
     """A list resource for File."""
     allowed_methods = anon_allowed_methods = ('GET', 'DELETE')
-    model = File
+    model = models.File
 
     def delete(self, request, auth, *args, **kwargs):
         """Deletes attachment."""
@@ -461,22 +464,22 @@ class FileResource(ModelResource):
 
 class FileTypeRootResource(RootModelResource):
     """A list resource for FileType."""
-    model = FileType
+    model = models.FileType
 
 
 class FileTypeResource(ModelResource):
     """A read resource for FileType."""
-    model = FileType
+    model = models.FileType
 
 
 class FileTypeGroupRootResource(RootModelResource):
     """A list resource for FileTypeGroup."""
-    model = FileTypeGroup
+    model = models.FileTypeGroup
 
 
 class FileTypeGroupResource(ModelResource):
     """A read resource for FileTypeGroup."""
-    model = FileTypeGroup
+    model = models.FileTypeGroup
 
 
 class StorageRootResource(Resource):

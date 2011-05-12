@@ -35,7 +35,7 @@
                 event.preventDefault();
                 var banner = $(this);
 
-                $.get(window.api.url + '/file/random_image/1')
+                $.api.get(window.api.url + '/file/random_image/1')
                 .success(function(data) {
                     data = data[0];
                     console.log(media_url + data.file)
@@ -140,8 +140,6 @@
       </div>
       <br class="clear"> 
       <div class="txt-box">{% trans "Welcome text" %}</div> 
-      <div class="txt-box2">Новые разделы: <a href="/hi/">/hi/ - История</a>  и <a href="/sex/">/sex/ - Секс и отношения</a><br> Возвращен /fl/ - Иностранные языки в текстовом варианте.<br> 
-Теперь можно добавлять треды на главную страницу. Для этого надо иметь аккаунт в твиттере и просто нажать кнопку "t" рядом с тредом.</div> 
     </div> 
     <div class="right">
       <h4 class="random">{% trans "Random image" %}<span></span></h4>

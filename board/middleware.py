@@ -11,7 +11,7 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponseForbidden
-from api.views import SettingResource, FeedResource, HideResource
+from api1.views import SettingResource, FeedResource, HideResource
 from board.models import DeniedIP
 
 __all__ = ['set_session_defaults', 'SessionDefaultsMiddleware',
