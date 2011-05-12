@@ -319,7 +319,7 @@ a.file img {
 .post {
     background-color: #ddd;
     border: 1px solid #ccc;
-    overflow: hidden;
+    overflow: auto;
     display: table;
     display: inline-block;
     _zoom: 1;
@@ -330,8 +330,19 @@ a.file img {
     border-radius: 4px;
     max-height: 600px;
 }
-.post.resized {max-height: none;}
-.thread.resized {overflow-x: scroll;}
+.thread .post:first-child {
+    background-color: #eee;
+    border: 0;
+    overflow: visible;
+    display: block;
+    _zoom: 0;
+    margin: 0;
+    padding-top: 0;
+    padding-right: 0;
+    padding-bottom: 0;
+}
+.post.resized, .post.resized:first-child {max-height: none; overflow-x: scroll;}
+.thread.resized {overflow-x: hidden;}
 
 .post.hidden header, .post.hidden .filemeta, .post.hidden .file,
 .post.hidden .message, .post.hidden .answer-map, .post.hidden .skipped {
@@ -412,18 +423,6 @@ blockquote {
     max-height: 300px;
     overflow: auto;
 }*/
-
-.thread .post:first-child {
-    background-color: #eee;
-    border: 0;
-    overflow: visible;
-    display: block;
-    _zoom: 0;
-    margin: 0;
-    padding-top: 0;
-    padding-right: 0;
-    padding-bottom: 0;
-}
 .ie7 .post {float: left;}
 .ie7 .post:first-child {float: none;}
 
