@@ -35,7 +35,7 @@
                 event.preventDefault();
                 var banner = $(this);
 
-                $.api.get(window.api.url + '/file/random_image/1')
+                $.api.get('file/random_image/1')
                 .success(function(data) {
                     data = data[0];
                     console.log(media_url + data.file)

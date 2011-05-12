@@ -636,8 +636,8 @@ board = {
                 delete_all = !!$('#delete_all').attr('checked'),
                 target = !only_files ? t : t.find('.file, .filemeta'),
                 url = !only_files ? 
-                    window.api.url + 'post/' + target.data('id') : 
-                    window.api.url + 'file/' + getFileId(target.find('img')),
+                    'post/' + target.data('id') : 
+                    'file/' + getFileId(target.find('img')),
             password = $('#password').val();
 
             url += '?password=' + password;
@@ -947,7 +947,7 @@ style = {
 
         /*$('.threads').delegate('.poll input[type="radio"]', 'click', function() {
             var radio = $(this);
-            //$.api.post(window.api.url + '/vote/', {'choice': this.value})
+            //$.api.post('/vote/', {'choice': this.value})
             .error(defaultErrorCallback)
             .success(function(data) {
                 var total = 0,
