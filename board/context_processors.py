@@ -26,7 +26,7 @@ def session(request):
     """
     session = request.session
     user = request.user
-    settings = session['settings']
+    settings = session.get('settings', {})
 
     def pop_from_session(key, default=''):
         return settings.pop(key) if settings.get(key) else default
