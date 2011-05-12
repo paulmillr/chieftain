@@ -566,7 +566,8 @@ class StorageDictResource(StorageResource):
 
     def delete(self, request, auth, key):
         data = self.get_data(request)
-        data.setdefault(key, None)
+        if key in data:
+            del data[key]
         request.session.modified = True
         return Response(status.NO_CONTENT)
 

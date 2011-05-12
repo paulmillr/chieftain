@@ -496,7 +496,12 @@ board = {
 
             if (span.hasClass('add')) {  // add
                 span.removeClass('add').addClass('remove');
-                $.post(apiLink, {value: postId}).error(defaultErrorCallback);
+                $.ajax({
+                    type: 'POST',
+                    url: apiLink,
+                    data: {value: postId},
+                    dataType: 'json' 
+                }).error(defaultErrorCallback);
                 if (current.onAdd) {
                     current.onAdd(cont);
                 }
@@ -534,7 +539,11 @@ board = {
                         return p;
                     }
 
-                    $.get(window.api.url + '/post/' + board + '/' + pid + '?html=1')
+                    $.ajax({
+                        method: 'GET',
+                        url: window.api.url + '/post/' + board + '/' + pid + '?html=1',
+                        dataType: 'json'
+                    })
                         .success(function(response) {
                             createPreview(response.html, board, pid, true, prevTree);
                         })
@@ -643,9 +652,9 @@ board = {
             url += '&' + $('.removePosts').serialize();
             target.addClass('deleted');
             $.ajax({
-                'url': url,
-                'dataType': 'json',
-                'type': 'DELETE'
+                type: 'DELETE',
+                url: url,
+                dataType: 'json'
             })
             .error(function(xhr) {
                 $.notification('error', $.parseJSON(xhr.responseText)['detail']);

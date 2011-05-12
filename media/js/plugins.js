@@ -96,14 +96,19 @@ $.extend({
                 case 'style': $('html').attr('id', value); break;
                 default: elem.toggleClass(name); break;
             }
-            if (value === 'false' || value === false) {
+            var type = 'POST',
+                url = window.api.url + '/setting/',
+                data = {'key': name, 'value': value};
+
+            if (value === 'false' || value === false || value === '') {
                 value = '';
+                type = 'DELETE';
+                url += data.key;
             }
-            var type = value === '' ? 'DELETE' : 'POST';
             $.ajax({
                 type: type,
-                url: window.api.url + '/setting/',
-                data: {'key': name, 'value': value},
+                url: url,
+                data: data,
                 dataType: 'json'
             })
             .error(function(xhr) {

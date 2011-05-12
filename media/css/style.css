@@ -38,7 +38,7 @@ a:hover {color:#06f;}
 }
 
 .showSidebar #sidebar {display: block;}
-.showSidebar #container {padding-left: 250px;}
+.showSidebar #container {margin-left: 250px;}
 
 #sidebar h2 {
     font-size: 2em;
