@@ -14,19 +14,22 @@ from django.http import HttpResponseForbidden
 from api.views import SettingResource, FeedResource, HideResource
 from board.models import DeniedIP
 
-__all__ = ['SessionDefaultsMiddleware', 'DenyMiddleware',
-    'DisableCSRFMiddleware']
+__all__ = ['set_session_defaults', 'SessionDefaultsMiddleware',
+    'DenyMiddleware', 'DisableCSRFMiddleware']
 
 
 METHODS = ('GET', 'POST', 'UPDATE', 'DELETE')
 WHITELIST = ()
 
+def set_session_defaults(request):
+    for i in [SettingResource, FeedResource, HideResource]:
+        default = type(i.default)()  # prevent errors due to mutability
+        request.session.setdefault(i.storage_name, default)
+
 
 class SessionDefaultsMiddleware(object):
     def process_request(self, request):
-        for i in [SettingResource, FeedResource, HideResource]:
-            default = type(i.default)()  # prevent errors due to mutability
-            request.session.setdefault(i.storage_name, default)
+        set_session_defaults(request)
 
 
 def ip_in(ip, model):

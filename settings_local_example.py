@@ -1,5 +1,10 @@
 # encoding: utf-8
 import os.path
+
+MANAGERS = ADMINS = (
+    #('Your name', 'your_email@example.com'),
+)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2',

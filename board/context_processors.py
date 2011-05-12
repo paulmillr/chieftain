@@ -7,6 +7,7 @@ Created by Paul Bagwell on 2011-02-07.
 Copyright (c) 2011 Paul Bagwell. All rights reserved.
 """
 from django.conf import settings as _settings
+from board.middleware import set_session_defaults
 
 
 def settings(request):
@@ -24,9 +25,13 @@ def session(request):
        s['test_2'] = 120
        {'session_classes': 'test test2'}
     """
+    # usually this is set by middleware, but
+    # when user logs out, session destroys itself and we need to reinit it
+    if 'settings' not in request.session:
+        set_session_defaults(request)
     session = request.session
+    settings = session['settings']
     user = request.user
-    settings = session.get('settings', {})
 
     def pop_from_session(key, default=''):
         return settings.pop(key) if settings.get(key) else default

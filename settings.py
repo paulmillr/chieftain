@@ -1,12 +1,16 @@
 # encoding: utf-8
-from settings_local import *
-from redis import Redis
+try:
+    from settings_local import *
+except ImportError:
+    print 'Cannot import local settings'
+    
+#from redis import Redis
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 MANAGERS = ADMINS = (
-    ('paul', 'pbagwl@gmail.com'),
+    # ('Your Name', 'your_email@domain.com'),
 )
 
 #REDIS = Redis(**REDIS_INFO)
