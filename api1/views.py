@@ -114,7 +114,7 @@ def create_post(request):
     post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = get_key(post.password)
     if new_thread:
-        section = Section.objects.get(slug=request.POST['section'])
+        section = models.Section.objects.get(slug=request.POST['section'])
         thread = models.Thread(section=section, bump=post.date)
     else:
         thread = models.Thread.objects.get(id=request.POST['thread'])
@@ -124,7 +124,7 @@ def create_post(request):
     section = thread.section
     section_is_feed = (thread.section.type == 3)
 
-    if Wordfilter.objects.scan(post.message):
+    if models.Wordfilter.objects.scan(post.message):
         raise ValidationError(_('Your post contains blacklisted word.'))
     if with_files:  # validate attachments
         file = request.FILES['file']
@@ -142,7 +142,7 @@ def create_post(request):
         del chunk
         file_hash = m.hexdigest()
         # Check if this file already exists
-        #if File.objects.filter(hash=file_hash).count() > 0:
+        #if models.File.objects.filter(hash=file_hash).count() > 0:
         #    raise InvalidFileError(_('This file already exists'))
     else:
         if not post.message:
@@ -264,11 +264,11 @@ class VoteRootResource(RootModelResource):
 
     def post(self, request, auth, *args, **kwargs):
         try:
-            choice = Choice.objects.get(id=request.POST['choice'])
+            choice = models.Choice.objects.get(id=request.POST['choice'])
         except Choice.DoesNotExist:
             raise ResponseException(status.NOT_FOUND)
         ip = request.META['REMOTE_ADDR']
-        check = Vote.objects.filter(ip=ip, poll=choice.poll)
+        check = models.Vote.objects.filter(ip=ip, poll=choice.poll)
         if check:
             vote = check.get()
             vote.choice.vote_count -= 1
@@ -306,9 +306,9 @@ class ThreadResource(ModelResource):
         slug = kwargs.get('section__slug')
         try:
             if not slug:
-                instance = Thread.objects.get(**kwargs)
+                instance = models.Thread.objects.get(**kwargs)
             else:
-                op_post = Post.objects.get(pid=kwargs['id'],
+                op_post = models.Post.objects.get(pid=kwargs['id'],
                     thread__section__slug=kwargs['section__slug'])
                 instance = op_post.thread
         except (Post.DoesNotExist, self.model.DoesNotExist):
