@@ -397,7 +397,7 @@ board = {
             pass = $.localSettings('password'),
             buttons = {
                 'bookmark': {storageName: 'feed', storeText: true},
-                'hide': {storageName: 'hidden',
+                'hide': {storageName: 'hide',
                     onInit: function(data) {
                         if (data.span.hasClass('remove')) {
                             this.onAdd(data);
@@ -492,7 +492,7 @@ board = {
                 className = t.attr('class').split(' ')[1],
                 storageName = t.attr('data-storageName'),
                 current = board.postButtons[className],
-                apiLink = storageName  + '/';
+                apiLink = storageName + '/';
 
             if (span.hasClass('add')) {  // add
                 span.removeClass('add').addClass('remove');
