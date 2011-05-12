@@ -20,7 +20,7 @@ from django.core.files import File as DjangoFile
 from django.db import models, connections, transaction
 from django.utils.html import strip_tags as strip_html_tags
 from board.models import Thread, Post, File, FileType, Section
-from board.tools import get_key
+from board.tools import get_key, print_flush
 
 
 class ConvertError(Exception):
@@ -53,11 +53,6 @@ def strip_tags(text, allowed_tags=[]):
     for r, s in SUBST_MAP:
         text = re.sub(r, s, text)
     return strip_html_tags(text)
-
-
-def print_flush(text):
-    sys.stdout.write('\r' + text)
-    sys.stdout.flush()
 
 
 class WakabaPost(models.Model):

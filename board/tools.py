@@ -25,7 +25,7 @@ from datetime import datetime
 __all__ = [
     'handle_uploaded_file', 'make_tripcode', 'random_text',
     'get_key', 'parse_user_agent', 'make_post_descriptions',
-    'take_first', 'from_timestamp'
+    'take_first', 'from_timestamp', 'print_flush'
 ]
 
 
@@ -114,3 +114,8 @@ def from_timestamp(timestamp):
 
 def timestamp_now():
     return int(time.time() * 100)
+
+
+def print_flush(text):
+    sys.stdout.write('\r' + text)
+    sys.stdout.flush()
