@@ -538,13 +538,11 @@ $.extend({
             };
         };
 
-        var methods = ['get', 'post', 'put', 'delete'],
-            all = {api: apiBuilder};
-        $.each(methods, function(i, method) {
-            all[method] = apiBuilder(method);
+        var methods = {};
+        $.each(['get', 'post', 'put', 'delete'], function(i, method) {
+            methods[method] = apiBuilder(method);
         });
-        console.log(all);
-        return all;
+        return methods;
     })()
 });
 

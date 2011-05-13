@@ -32,7 +32,7 @@
         </ul>
         {% block pages %}{% endblock %}
 
-        <form method="POST" action="/api/posts/" class="removePosts">
+        <form method="POST" action="/api/post/" class="removePosts">
             <button class="button">{% trans 'Delete posts' %}</button>
             <div class="hidden">
                 <p><input type="checkbox" name="only_files" id="only_files">

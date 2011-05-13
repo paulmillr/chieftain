@@ -7,7 +7,7 @@
 
 if (!Array.indexOf) {
 	Array.prototype.indexOf = function(obj) {
-		for(var i=0; i < this.length; i++) {
+		for (var i=0; i < this.length; i++) {
 			if (this[i] == obj) {
 				return i;
 			}
@@ -129,22 +129,21 @@ $.extend(PostArea.prototype, {
 });
 
 function getThreadId(thread) {
-    return thread.attr('id').replace('thread', '');
+    return parseInt(thread.attr('id').replace('thread', ''), 10);
 }
 
 function getPostId(post) {
-    return post.attr('data-id'); // it's faster than .data by ~10 times
+    return parseInt(post.attr('data-id'), 10);
 }
 
 function getPostPid(post) {
-    window.postz = post;
+    var pid;
     if (isjQuery(post)) {
-        var post_id = post.attr('id');
-        return post.attr('id').replace('post', '');
+        pid = post.attr('id').replace('post', '');
     } else {
-        return post.id.replace('post', '');
+        pid = post.id.replace('post', '');
     }
-    
+    return parseInt(pid, 10);
 }
 
 function getPostLinkPid(postlink) {
@@ -396,8 +395,8 @@ board = {
             set = $.settings('hideSectGroup'),
             pass = $.localSettings('password'),
             buttons = {
-                'bookmark': {storageName: 'feed', storeText: true},
-                'hide': {storageName: 'hide',
+                'feed': {storeText: true},
+                'hidden': {
                     onInit: function(data) {
                         if (data.span.hasClass('remove')) {
                             this.onAdd(data);
@@ -423,7 +422,7 @@ board = {
                                     //'('+ post.find('.message').text().split(0, 20) +')' +
                                     ' ' + gettext('hidden') + '.'
                                 ).appendTo(post),
-                            b = post.find('.bookmark, .hide').appendTo(s);
+                            b = post.find('.post-icon').appendTo(s);
                     },
 
                     onRemove: function(data) {
@@ -434,7 +433,7 @@ board = {
                         } else {
                             post = data.post;
                         }
-                        post.find('.bookmark, .hide').appendTo(post.find('header'));
+                        post.find('.post-icon').appendTo(post.find('header'));
                         post.find('.hide-msg').remove();
                         post.removeClass('hidden');
                     }
@@ -456,17 +455,16 @@ board = {
             //console.log(element, element.parent())
         }
 
-        for (var className in buttons) {
-            var button = buttons[className],
-                sname = button.storageName;
+        for (var storageName in buttons) {
+            var button = buttons[storageName];
 
             // Check if current button set is not blocked by user.
-            if ($.settings('disable' + className)) {
+            if ($.settings('disable' + storageName)) {
                 continue;
             }
 
-            board.postButtons[className] = button;
-            $('.threads').addClass('with' + sname);
+            board.postButtons[storageName] = button;
+            $('.threads').addClass('with' + storageName);
         }
 
         $('.bbcodes a').click(function(e) {
@@ -489,9 +487,8 @@ board = {
                 span = cont.span,
                 post = cont.post,
                 postId = cont.id,
-                className = t.attr('class').split(' ')[1],
-                storageName = t.attr('data-storageName'),
-                current = board.postButtons[className],
+                storageName = t.attr('data-storage'),
+                current = board.postButtons[storageName],
                 apiLink = storageName + '/';
 
             if (span.hasClass('add')) {  // add
@@ -511,7 +508,7 @@ board = {
         });
 
         $('.storage-clear-icon').click(function(event) {
-            $.api.delete($(this).attr('data-storagename'));
+            $.api.delete($(this).attr('data-storage'));
         });
 
         function previewPosts() {
@@ -558,7 +555,7 @@ board = {
                             .css({'top': top + 11 +'px', 'left': left + 'px'});
 
                     // remove icons
-                    div.find('.bookmark, .hide, .is_closed, .is_pinned').remove();
+                    div.find('.post-icon, .is_closed, .is_pinned').remove();
                     // we've got post information through API, so
                     // remove not necessary elements
                     if (check.hasClass('post')) {
@@ -1078,10 +1075,12 @@ posts = {
             var post = $(this),
                 id = getPostId(post);
 
-            for (var className in buttons) {
-                var button = buttons[className],
-                    span = post.find('.' + className),
-                    idInStorage = window.session[button.storageName].indexOf(id);
+            for (var storageName in buttons) {
+                var button = buttons[storageName],
+                    span = post.find('.post-icon[data-storage="' + storageName + '"]'),
+                    idInStorage = window.session[storageName].indexOf(id);
+                    window.d = window.session[storageName][0]
+
                 if (idInStorage !== null && idInStorage >= 0) {
                     span.removeClass('add').addClass('remove');
                 }
@@ -1094,6 +1093,9 @@ posts = {
     },
 
     buildAnswersMap: function(map, concat) {
+        if ($.settings('disableAnswersMap')) {
+            return false;
+        }
         for (var i in map) {
             var c = this.cache[i].find('.answer-map'),
                 cacheExists = !!c.length,
@@ -1164,7 +1166,7 @@ ajax = {
                 }
             },
             error: defaultErrorCallback,
-            url: window.api.url + '/post/?html=1',
+            url: window.api.url + 'post/?html=1',
             dataType: 'json'
         });
     },

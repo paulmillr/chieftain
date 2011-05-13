@@ -468,24 +468,24 @@ blockquote {
 .post .tripcode {color: #228854;}
 .post .tripcode:not(:empty):before {content: "!";}
 .post .tripcode.staff {color: #800080;}
-.is_closed, .is_pinned, .bookmark, .hide, .rss, .useragent, .useragent img {
+.is_closed, .is_pinned, .post-icon, .rss, .useragent, .useragent img {
     width: 16px; 
     height: 16px; 
 }
-.is_closed, .is_pinned, .bookmark, .hide, .rss {
+.is_closed, .is_pinned, .post-icon, .rss {
     background-image: url('../images/sprites.png');
     background-repeat: no-repeat;
 }
 
-.bookmark, .hide {display: inline-block; vertical-align: bottom;}
+.post-icon {display: inline-block; vertical-align: bottom;}
 
 .is_closed {background-position: -16px 0;}
 .is_pinned {background-position: -48px 0;}
-.bookmark {background-position: 0 0;}
 .add {opacity: 0.3; filter:alpha(opacity=30);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";}
 .add:hover {opacity: 0.7; filter:alpha(opacity=70);-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";}
 .rss {background-position: -20px -50px;}
-.hide {background-position: -32px 1px;}
+.post-icon[data-storage="feed"] {background-position: 0 0;}
+.post-icon[data-storage="hidden"] {background-position: -32px 1px;}
 .useragent {vertical-align: bottom;}
 
 .underlined {border-bottom: 1px dashed;}
