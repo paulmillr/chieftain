@@ -1086,6 +1086,36 @@
     "model" : "board.section",
     "pk" : 57
   },
+  { "fields" : { "anonymity" : false,
+        "bumplimit" : 500,
+        "default_name" : "Аноним",
+        "description" : "",
+        "filesize_limit" : 5242880,
+        "filetypes" : [ 1 ],
+        "group" : 1,
+        "name" : "Дизайн",
+        "slug" : "de",
+        "threadlimit" : 200,
+        "type" : 1
+      },
+    "model" : "board.section",
+    "pk" : 58
+  },
+  { "fields" : { "anonymity" : false,
+        "bumplimit" : 500,
+        "default_name" : "Аноним",
+        "description" : "",
+        "filesize_limit" : 5242880,
+        "filetypes" : [ 1 ],
+        "group" : 1,
+        "name" : "Здоровье и физкультура",
+        "slug" : "fiz",
+        "threadlimit" : 200,
+        "type" : 1
+      },
+    "model" : "board.section",
+    "pk" : 59
+  },
   { "fields" : { "is_hidden" : false,
         "name" : "Тематика",
         "order" : 1
