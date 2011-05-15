@@ -120,8 +120,8 @@ class WakabaPost(models.Model):
 
 
 class WakabaBan(models.Model):
-    ip = models.IPField()
-    reason = models.CarField(max_length=128)
+    ip = models.IPAddressField()
+    reason = models.CharField(max_length=128)
 
 
 class WakabaInitializer(object):
