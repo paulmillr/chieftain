@@ -10,10 +10,10 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 w = WakabaConverter()
 w.convert()
 """
-import os
+import os.path
 import re
-import sys
 from datetime import datetime
+from htmlentitydefs import name2codepoint
 from struct import pack, unpack
 from django.conf import settings
 from django.core.files import File as DjangoFile
@@ -23,8 +23,15 @@ from board.models import Thread, Post, File, FileType, Section
 from board.tools import get_key, print_flush
 
 
-class ConvertError(Exception):
-    pass
+SUBSTITUTIONS = [(re.compile(r), s) for r, s in (
+    (r'<strong>(.*)</strong>', r'**\1**'),
+    (r'<em>(.*)</em>', r'*\1*'),
+    (r'&gt;', '>'),
+    (r'>>(\d{1,10})</a>', r'>>\1</a>'),
+    (r'<br />', '\n'),
+    (r'<span class="unkfunc">>(.*)</span>', r'>\1'),
+    (r'<span class="spoiler">(.*)</span>', r'%%\1%%'),
+)]
 
 
 def convert_ip(ip):
@@ -37,22 +44,50 @@ def convert_ip(ip):
         raise ValueError(e)
     return '.'.join(str(i) for i in adr)
 
-SUBST_MAP = (
-    (r'<strong>(.*)</strong>', r'**\1**'),
-    (r'<em>(.*)</em>', r'*\1*'),
-    (r'&gt;', '>'),
-    (r'>>(\d{1,10})</a>', r'>>\1</a>'),
-    (r'<br />', '\n'),
-    (r'<span class="unkfunc">>(.*)</span>', r'>\1'),
-    (r'<span class="spoiler">(.*)</span>', r'%%\1%%'),
-)
-SUBST_MAP = [(re.compile(r), s) for r, s in SUBST_MAP]
+
+def unescape(text):
+    """Unescapes HTML entitles to unicode chars.
+
+    Example: &amp; -> &.
+    """
+    def fixup(m):
+        text = m.group(0)
+        if text[:2] == '&#':  # character reference
+            try:
+                if text[:3] == '&#x':
+                    return unichr(int(text[3:-1], 16))
+                else:
+                    return unichr(int(text[2:-1]))
+            except ValueError:
+                pass
+        else:  # named entity
+            try:
+                text = unichr(name2codepoint[text[1:-1]])
+            except KeyError:
+                pass
+        return text  # leave as is
+    return re.sub('&#?\w+;', fixup, text)
 
 
-def strip_tags(text, allowed_tags=[]):
-    for r, s in SUBST_MAP:
+def parse_video(text):
+    """Extracts video URL from wakaba's HTML."""
+    v = (r'<object width="320" height="262"><param name="movie" value="'
+        r'(?P<url>http://www\.youtube\.com/v/(?P<id>[A-Za-z0-9=_-]{11}))">'
+        r'</param><param name="wmode" value="transparent"></param><embed'
+        r' src="\1" type="application/x-shockwave-flash"'
+        r' wmode="transparent" width="320" height="262"></embed></object>')
+    return re.sub(v, r'\g<url>', text)
+
+
+def strip_tags(text):
+    """Converts some HTML tags to Markdown and strips other ones."""
+    for r, s in SUBSTITUTIONS:
         text = re.sub(r, s, text)
-    return strip_html_tags(text)
+    return unescape(strip_html_tags(text))
+
+
+class ConvertError(Exception):
+    pass
 
 
 class WakabaPost(models.Model):
@@ -79,6 +114,14 @@ class WakabaPost(models.Model):
     image_width = models.IntegerField(null=True)
     image_height = models.IntegerField(null=True)
     thumb = models.TextField(null=True)
+    video = models.TextField(null=True)
+    is_pinned = models.BooleanField()
+    is_closed = models.BooleanField()
+
+
+class WakabaBan(models.Model):
+    ip = models.IPField()
+    reason = models.CarField(max_length=128)
 
 
 class WakabaInitializer(object):
@@ -112,6 +155,9 @@ class WakabaInitializer(object):
         ('thumbnail', 'thumb'),
         ('tn_width', None),
         ('tn_height', None),
+        ('video', 'video', parse_video),
+        ('sticky', 'is_pinned', bool),
+        ('closed', 'is_closed', bool),
     )
 
     def __init__(self, prefix='comments_'):
@@ -131,6 +177,15 @@ class WakabaInitializer(object):
             for i in self.cursor.fetchall()
             if i[0].startswith(self.prefix)
         ]
+
+    def get_bans(self):
+        fields = ['ip', 'reason']
+        sql = 'SELECT ival1, comment FROM admin WHERE type = "ipban"'
+        self.cursor.execute()
+        for i in self.cursor.fetchall():
+            i = dict(zip(i, fields))
+            i['ip'] = convert_ip(i['ip'])
+            yield i
 
     def get_table_posts(self, table):
         """Yields wakaba's post dict."""
@@ -171,6 +226,9 @@ class WakabaInitializer(object):
 
     def convert(self):
         """Converts all wakaba post tables to chieftain WakabaPost table."""
+        print 'Initializing wakaba bans'
+        for i in self.get_bans():
+            WakabaBan(**i).save()
         for i, p in enumerate(self.get_posts()):
             self.convert_post(p)
             print_flush('Initialized post {}'.format(i))
@@ -181,7 +239,7 @@ class WakabaConverter(object):
     """Converts wakaba database to chieftain."""
     fields = (
         'pid', 'date', 'ip', 'poster', 'tripcode', 'email', 'topic',
-        'password', 'message'
+        'password',
     )
 
     def __init__(self):
@@ -203,10 +261,14 @@ class WakabaConverter(object):
         post.data = ''
         for f in self.fields:
             setattr(post, f, getattr(wpost, f))
+        # add video to the post
+        post.message = ' '.join((wpost.message, wpost.video))
         if first_post:
             post.is_op_post = True
             thread = Thread()
             thread.section_id = self.section_map[slug]
+            for f in ('is_closed', 'is_pinned'):
+                setattr(thread, f, getattr(wpost, f))
         else:
             tid = self.thread_map.get((slug, wpost.parent))
             try:
@@ -265,6 +327,14 @@ class WakabaConverter(object):
     def convert_threads(self, start=0):
         return self.convert_posts(start, True)
 
+    def convert_bans(self):
+        print 'Converting bans'
+        for ban in WakabaBan.objects.all():
+            b = DeniedIP(ip=ban.ip, reason=ban.reason)
+            b.by_id = 1
+            b.save()
+
     def convert(self):
+        self.convert_bans()
         self.convert_threads()
         self.convert_posts()

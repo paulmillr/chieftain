@@ -22,9 +22,19 @@ def invalid_convert_ip_test():
 
 
 def strip_tags_test():
-    text = '<p>hey <strong>guys</strong>, <b><i>how</i> are</b> you?</p>'
-    stripped = 'hey **guys**, how are you?'
+    text = '<p>hey <strong>guys</strong>, <b><i>how</i> are</b> you & me?</p>'
+    stripped = 'hey **guys**, how are you & me?'
     eq_(models.strip_tags(text), stripped)
+
+
+def parse_video_test():
+    v = ('<object width="320" height="262"><param name="movie"'
+    ' value="http://www.youtube.com/v/8Ampn-5hcZg"></param><param name="wmode"'
+    ' value="transparent"></param><embed'
+    ' src="http://www.youtube.com/v/8Ampn-5hcZg"'
+    ' type="application/x-shockwave-flash" wmode="transparent" width="320"'
+    ' height="262"></embed></object>')
+    assert models.parse_video(v) == 'http://www.youtube.com/v/8Ampn-5hcZg'
 
 
 def convert_test():
