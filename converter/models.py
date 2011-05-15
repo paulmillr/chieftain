@@ -12,6 +12,7 @@ w.convert()
 """
 import os.path
 import re
+import sys
 from datetime import datetime
 from htmlentitydefs import name2codepoint
 from struct import pack, unpack
@@ -19,7 +20,7 @@ from django.conf import settings
 from django.core.files import File as DjangoFile
 from django.db import models, connections, transaction
 from django.utils.html import strip_tags as strip_html_tags
-from board.models import Thread, Post, File, FileType, Section
+from board.models import Thread, Post, File, FileType, Section, DeniedIP
 from board.tools import get_key, print_flush
 
 
@@ -71,6 +72,8 @@ def unescape(text):
 
 def parse_video(text):
     """Extracts video URL from wakaba's HTML."""
+    if not text:
+        return text
     v = (r'<object width="320" height="262"><param name="movie" value="'
         r'(?P<url>http://www\.youtube\.com/v/(?P<id>[A-Za-z0-9=_-]{11}))">'
         r'</param><param name="wmode" value="transparent"></param><embed'
@@ -115,8 +118,8 @@ class WakabaPost(models.Model):
     image_height = models.IntegerField(null=True)
     thumb = models.TextField(null=True)
     video = models.TextField(null=True)
-    is_pinned = models.BooleanField()
-    is_closed = models.BooleanField()
+    is_pinned = models.BooleanField(default=False)
+    is_closed = models.BooleanField(default=False)
 
 
 class WakabaBan(models.Model):
@@ -183,8 +186,13 @@ class WakabaInitializer(object):
         sql = 'SELECT ival1, comment FROM admin WHERE type = "ipban"'
         self.cursor.execute(sql)
         for i in self.cursor.fetchall():
-            i = dict(zip(i, fields))
-            i['ip'] = convert_ip(i['ip'])
+            i = dict(zip(fields, i))
+            try:
+                i['ip'] = convert_ip(i['ip'])
+            except ValueError:  # sometimes ip is None in wakaba db
+                continue
+            if i['reason'] is None:
+                i['reason'] = ''
             yield i
 
     def get_table_posts(self, table):
@@ -218,7 +226,12 @@ class WakabaInitializer(object):
                 wfield, field = t
             if field is None:
                 continue
-            data = raw_post[wfield]
+            # wakaba could have two different table schemas for different
+            # board sections
+            try:
+                data = raw_post[wfield]
+            except KeyError:
+                continue
             if is_convertable:
                 data = convert_fn(data)
             setattr(post, field, data)
@@ -239,7 +252,7 @@ class WakabaConverter(object):
     """Converts wakaba database to chieftain."""
     fields = (
         'pid', 'date', 'ip', 'poster', 'tripcode', 'email', 'topic',
-        'password',
+        'password', 'message',
     )
 
     def __init__(self):
@@ -262,7 +275,8 @@ class WakabaConverter(object):
         for f in self.fields:
             setattr(post, f, getattr(wpost, f))
         # add video to the post
-        post.message = ' '.join((wpost.message, wpost.video))
+        if wpost.video:
+            post.message += ' {}'.format(wpost.video)
         if first_post:
             post.is_op_post = True
             thread = Thread()

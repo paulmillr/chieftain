@@ -9,17 +9,17 @@ Copyright (c) 2011 Paul Bagwell. All rights reserved.
 import os
 import re
 import httpagentparser
-import random
 import string
-import tempfile
-import time
-from PIL import Image
-from django.core.files import File as DjangoFile
-from hashlib import sha1
-from string import maketrans
+import sys
 from crypt import crypt
-from django.conf import settings
 from datetime import datetime
+from hashlib import sha1
+from PIL import Image
+from random import choice
+from tempfile import NamedTemporaryFile
+from time import time
+from django.conf import settings
+from django.core.files import File as DjangoFile
 
 
 __all__ = [
@@ -49,7 +49,7 @@ def handle_uploaded_file(file_instance):
         if not os.path.isdir(thumb_dir):
             os.makedirs(thumb_dir)
         suffix = '.{0}'.format(f.type.extension)
-        with tempfile.NamedTemporaryFile(suffix=suffix) as tmp:
+        with NamedTemporaryFile(suffix=suffix) as tmp:
             img.thumbnail((MAX, MAX), Image.ANTIALIAS)
             img.save(tmp)
             f.thumb = DjangoFile(tmp)
@@ -66,7 +66,7 @@ def make_tripcode(text):
     trip = unicode(trip).encode('shift-jis')
     salt = trip + 'H.'
     salt = re.sub('/[^\.-z]/', '.', salt[1:3])
-    salt = salt.translate(maketrans(':;<=>?@[\]^_`', 'ABCDEFGabcdef'))
+    salt = salt.translate(string.maketrans(':;<=>?@[\]^_`', 'ABCDEFGabcdef'))
     return crypt(trip, salt)[-10:]
 
 
@@ -85,7 +85,7 @@ def make_post_descriptions(posts):
 
 def random_text(length=10):
     return ''.join(
-        random.choice(string.ascii_uppercase + string.digits)
+        choice(string.ascii_uppercase + string.digits)
         for x in range(length)
     )
 
@@ -113,7 +113,7 @@ def from_timestamp(timestamp):
 
 
 def timestamp_now():
-    return int(time.time() * 100)
+    return int(time() * 100)
 
 
 def print_flush(text):
