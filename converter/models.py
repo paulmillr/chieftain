@@ -181,7 +181,7 @@ class WakabaInitializer(object):
     def get_bans(self):
         fields = ['ip', 'reason']
         sql = 'SELECT ival1, comment FROM admin WHERE type = "ipban"'
-        self.cursor.execute()
+        self.cursor.execute(sql)
         for i in self.cursor.fetchall():
             i = dict(zip(i, fields))
             i['ip'] = convert_ip(i['ip'])
