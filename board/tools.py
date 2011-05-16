@@ -70,16 +70,22 @@ def make_tripcode(text):
     return crypt(trip, salt)[-10:]
 
 
+def strip_text(text, max_length=90):
+    return text[:max_length] + u'...' if len(text) > max_length else text
+
+
 def make_post_descriptions(posts):
     """Takes Post QuerySet and generates description to all posts."""
     posts = posts.values('thread__section__name', 'thread__section__slug',
-        'pid', 'topic', 'message'
+        'id', 'pid', 'topic', 'message'
     )
+
     for post in posts:
         post['link'] = '/{slug}/{pid}'.format(
             slug=post['thread__section__slug'], pid=post['pid'])
-        post['description'] = (post['topic'] or post['message'] or
-            '>>{0}'.format(post['pid']))
+        post['description'] = strip_text(
+            post['topic'] or post['message'] or '>>{0}'.format(post['pid'])
+        )
         yield post
 
 

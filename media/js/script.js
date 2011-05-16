@@ -4,41 +4,41 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  */
+(function() {
+"use strict";
+
+// pre-localize messages because of django bug
+gettext('Reason');
+gettext('Reply');
+gettext('Message is too long.');
+gettext('Full text');
+gettext('Thread');
+gettext('Post');
+gettext('hidden');
+gettext('hide');
+gettext('Replies');
+gettext('New message in thread ');
+gettext('Post not found');
+
+// Recaptcha focus bug
+if (typeof Recaptcha !== 'undefined') {
+    Recaptcha.focus_response_field = function() {};
+}
+
+if (!window.console) {
+    window.console = {log: function() {}};
+}
 
 if (!Array.indexOf) {
 	Array.prototype.indexOf = function(obj) {
 		for (var i=0; i < this.length; i++) {
-			if (this[i] == obj) {
+			if (this[i] === obj) {
 				return i;
 			}
 		}
 		return null;
 	};
 }
-
-(function() {
-    // pre-localize messages because of django bug
-    gettext('Reason');
-    gettext('Reply');
-    gettext('Message is too long.');
-    gettext('Full text');
-    gettext('Thread');
-    gettext('Post');
-    gettext('hidden');
-    gettext('hide');
-    gettext('Replies');
-    gettext('New message in thread ');
-    gettext('Post not found');
-
-    // Recaptcha focus bug
-    if (typeof Recaptcha !== 'undefined') {
-        Recaptcha.focus_response_field = function() {};
-    }
-
-    if (!window.console) {
-        window.console = {log: function() {}};
-    }
-})();
 
 var curPage = (function() {
     // page detector
@@ -133,17 +133,11 @@ function getThreadId(thread) {
 }
 
 function getPostId(post) {
-    return parseInt(post.attr('data-id'), 10);
+    return parseInt(post.attr('id').replace('post', ''), 10);
 }
 
 function getPostPid(post) {
-    var pid;
-    if (isjQuery(post)) {
-        pid = post.attr('id').replace('post', '');
-    } else {
-        pid = post.id.replace('post', '');
-    }
-    return parseInt(pid, 10);
+    return parseInt(isjQuery(post) ? post.attr('data-pid') : post['data-pid'], 10);
 }
 
 function getPostLinkPid(postlink) {
@@ -386,7 +380,7 @@ function defaultErrorCallback(response) {
     $.notification('error', errorText);
 }
 
-board = {
+var board = {
     queryString: parseQs(),
     postButtons: {},
 
@@ -504,6 +498,22 @@ board = {
                 if (current.onRemove) {
                     current.onRemove(cont);
                 }
+            }
+        });
+        
+        $('#container[role="storage"]').delegate('.post-icon', 'click', function() {
+            event.preventDefault();
+            var t = $(this),
+                postId = getPostId(t.closest('tr')),
+                storageName = t.attr('data-storage'),
+                apiLink = storageName + '/';
+            if (t.hasClass('add')) {
+                t.removeClass('add').addClass('remove');
+                $.api.post(apiLink, {value: postId})
+                .error(defaultErrorCallback);
+            } else {
+                t.removeClass('remove').addClass('add');
+                $.api.delete(apiLink + postId).error(defaultErrorCallback);
             }
         });
 
@@ -710,9 +720,9 @@ board = {
             $('#list-group' + set[i]).slideToggle(0);
         }
     }
-}
+};
 
-settings = {
+var settings = {
     init: function() {
         // those things depend on cookie settings
         var body = $('body'),
@@ -782,7 +792,7 @@ settings = {
 }
 
 
-style = {
+var style = {
     //votedPolls: new BoardStorage('polls'),
 
     init: function() {
@@ -880,7 +890,7 @@ style = {
 
         $('.button').click(function() {
             $(this).toggleClass('active');
-        })
+        });
 
         $('.expandImages').click(function(event) {
             event.preventDefault();
@@ -999,17 +1009,12 @@ style = {
         $('html').attr('id', style);
 
         if (style === 'klipton') {
-            function removeSel() {
+            $('.thread').click(function(event) {
                 $('.postlist').remove();
                 $('.selected').removeClass('selected');
-                return false;
-            }
-            $('.thread').click(function(event) {
                 if ($(this).hasClass('selected')) {
-                    removeSel();
                     return false;
                 }
-                removeSel();
                 $(this).addClass('selected');
                 var s = $('<section/>').addClass('postlist').appendTo('#main'),
                     p = $(this).find('.post').clone();
@@ -1020,9 +1025,9 @@ style = {
         
         $('.kTabs').tabs();
     }
-}
+};
 
-posts = {
+var posts = {
     map: {},
     data: {},
     cache: {},
@@ -1131,18 +1136,18 @@ posts = {
             }
         }
     }
-}
+};
 
-hotkeys = {
+var hotkeys = {
     init: function() {
         $('.newpost input, .newpost textarea').keydown('shift+return', function(event) {
             $('.newpost').submit();
             return false;
         });
     }
-}
+};
 
-ajax = {
+var ajax = {
     validCaptchas: 0,
     quickReplied: false,
 
@@ -1225,14 +1230,14 @@ ajax = {
             }
         });
     }
-}
+};
 
 /**
  * Realtime publish-subscribe system.
  * 
  * Uses long polling to check for new posts.
  */
-pubsub = {
+var pubsub = {
     sleepTime: 500,
     maxSleepTime: 1000 * 60 * 15,
     cursor: null,
@@ -1309,7 +1314,7 @@ pubsub = {
             window.setTimeout(pubsub.poll, 0);
         });
     }    
-}
+};
 
 $(function() {
     board.init();
@@ -1320,3 +1325,4 @@ $(function() {
     ajax.init();
     pubsub.init();
 });
+})();

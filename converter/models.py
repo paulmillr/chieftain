@@ -79,7 +79,7 @@ def parse_video(text):
         r'</param><param name="wmode" value="transparent"></param><embed'
         r' src="\1" type="application/x-shockwave-flash"'
         r' wmode="transparent" width="320" height="262"></embed></object>')
-    return re.sub(v, r'\g<url>', text)
+    return re.sub(v, r'http://www.youtube.com/watch?v=\g<id>', text)
 
 
 def strip_tags(text):
@@ -120,6 +120,9 @@ class WakabaPost(models.Model):
     video = models.TextField(null=True)
     is_pinned = models.BooleanField(default=False)
     is_closed = models.BooleanField(default=False)
+
+    def __unicode__(self):
+        return u'{}/{}'.format(self.section_slug, self.pid)
 
 
 class WakabaBan(models.Model):
@@ -276,7 +279,11 @@ class WakabaConverter(object):
             setattr(post, f, getattr(wpost, f))
         # add video to the post
         if wpost.video:
-            post.message += ' {}'.format(wpost.video)
+            try:
+                post.message += u' {}'.format(wpost.video)
+            except UnicodeEncodeError:
+                raise ConvertError('Cannot add video to the post {}'.format(
+                    wpost.id))
         if first_post:
             post.is_op_post = True
             thread = Thread()

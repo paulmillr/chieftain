@@ -1,16 +1,17 @@
 {% extends "base.html" %}
 {% load i18n %}
-{% block title %}{% trans "Storage" %}{% endblock %}
+{% block title %}{% trans "Feed" %}{% endblock %}
 {% block role %}storage{% endblock %}
 {% block content %}
-<section class="storageTabs kTabs">
-    <ul>
-        <li>
-            <a href="?section=feed">{% trans "Feed" %}</a>
-        </li>
-        <li>
-            <a href="?section=hidden">{% trans "Hidden threads" %}</a>
-        </li>
-    </ul>
+<section class="storage">
+    <table class="storageTable">
+        {% for post in posts %}
+            <tr id="post{{ post.id }}">
+                <td><span class="post-icon remove" data-storage="feed" title="{% trans 'Remove from feed' %}"></span></td>
+                <td class="location"><a href="{{ post.link }}">/{{ post.thread__section__name }}/</a></td>
+                <td class="info">{{ post.description }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 </section>
 {% endblock %}

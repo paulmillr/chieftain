@@ -8,7 +8,7 @@
         <tr>
             <td><input type="checkbox" name="checkedPosts"></td>
             <td class="location"><a href="{{ p.link }}">/{{ p.thread__section__name }}/</a></td>
-            <td class="info">{{ p.message }}</td>
+            <td class="info">{{ p.description }}</td>
         </tr>
     {% endfor %}
 </table>

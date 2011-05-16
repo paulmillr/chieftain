@@ -55,15 +55,11 @@ def search(request, section_slug, page):
         'section': section}))
 
 
-def storage(request):
-    section = request.GET.get('section')
-    if section:
-        session_posts = request.session.get(section, {})
-        posts = Post.objects.filter(id__in=session_posts)
-        return render(request, 'storage_tab.html', {
-            'posts': make_post_descriptions(posts)
-        })
-    return render(request, 'storage.html', add_sidebar())
+def storage(request, name='feed'):
+    section = request.GET.get('section', name)
+    session_posts = request.session.get(section, {})
+    posts = make_post_descriptions(Post.objects.filter(id__in=session_posts))
+    return render(request, 'storage.html', add_sidebar({'posts': posts}))
 
 
 def section(request, section_slug, page):
