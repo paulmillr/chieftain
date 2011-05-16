@@ -4,8 +4,36 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  */
-(function() {
+(function(window, jQuery, undefined) {
 "use strict";
+
+var chief = {
+    api: (function() {
+        var url = '/api/1.0/',  // URL to chieftain API
+            apiBuilder = function(method) {
+            return function(path, data) {
+                if (jQuery.isFunction(data)) {
+        			type = type || callback;
+        			callback = data;
+        			data = undefined;
+        		}
+        		return jQuery.ajax({
+        		    type: method,
+        		    url: url + path,
+        		    data: data,
+        		    dataType: 'json'
+        		})
+            };
+        };
+
+        var methods = {};
+        $.each(['get', 'post', 'put', 'delete'], function(i, method) {
+            methods[method] = apiBuilder(method);
+        });
+        methods.url = url;
+        return methods;
+    })()
+};
 
 // pre-localize messages because of django bug
 gettext('Reason');
@@ -53,7 +81,7 @@ var curPage = (function() {
         case 'threads':
             data.section = window.location.href.split('/')[3];
             break;
-        case 'thread': 
+        case 'thread':
             data.section = window.location.href.split('/')[3];
             data.type = 'thread';
             data.cache.thread = $('.thread');
@@ -380,7 +408,8 @@ function defaultErrorCallback(response) {
     $.notification('error', errorText);
 }
 
-var board = {
+$.extend(chief, {
+board: {
     queryString: parseQs(),
     postButtons: {},
 
@@ -457,7 +486,7 @@ var board = {
                 continue;
             }
 
-            board.postButtons[storageName] = button;
+            chief.board.postButtons[storageName] = button;
             $('.threads').addClass('with' + storageName);
         }
 
@@ -482,19 +511,19 @@ var board = {
                 post = cont.post,
                 postId = cont.id,
                 storageName = t.attr('data-storage'),
-                current = board.postButtons[storageName],
+                current = chief.board.postButtons[storageName],
                 apiLink = storageName + '/';
 
             if (span.hasClass('add')) {  // add
                 span.removeClass('add').addClass('remove');
-                $.api.post(apiLink, {value: postId})
+                chief.api.post(apiLink, {value: postId})
                 .error(defaultErrorCallback);
                 if (current.onAdd) {
                     current.onAdd(cont);
                 }
             } else {  // remove
                 span.removeClass('remove').addClass('add');
-                $.api.delete(apiLink + postId).error(defaultErrorCallback);
+                chief.api.delete(apiLink + postId).error(defaultErrorCallback);
                 if (current.onRemove) {
                     current.onRemove(cont);
                 }
@@ -509,16 +538,16 @@ var board = {
                 apiLink = storageName + '/';
             if (t.hasClass('add')) {
                 t.removeClass('add').addClass('remove');
-                $.api.post(apiLink, {value: postId})
+                chief.api.post(apiLink, {value: postId})
                 .error(defaultErrorCallback);
             } else {
                 t.removeClass('remove').addClass('add');
-                $.api.delete(apiLink + postId).error(defaultErrorCallback);
+                chief.api.delete(apiLink + postId).error(defaultErrorCallback);
             }
         });
 
         $('.storage-clear-icon').click(function(event) {
-            $.api.delete($(this).attr('data-storage'));
+            chief.api.delete($(this).attr('data-storage'));
         });
 
         function previewPosts() {
@@ -532,17 +561,19 @@ var board = {
                     prevTree = post.hasClass('post-preview') ? post.parent() : false,
                     timestamp = getCurrentTimestamp(),
                     id = 'preview-' + pid + '-' + timestamp,
-                    top = event.clientY + (document.documentElement.scrollTop || document.body.scrollTop)
-                    left = event.clientX + (document.documentElement.scrollLeft || document.body.scrollLeft) - document.documentElement.clientLeft + 1;
+                    doc = document.documentElement,
+                    body = document.body,
+                    top = event.clientY + (doc.scrollTop || body.scrollTop),
+                    left = event.clientX + (doc.scrollLeft || body.scrollLeft) - doc.clientLeft + 1;
 
                 if (globalLink) {
                     //console.log('Searching the post', board, pid);
-                    var p = $('#post' + pid);
+                    var p = $('.post[data-pid="' + pid + '"]');
                     if (p.length) {
                         return p;
                     }
 
-                    $.api.get('post/' + board + '/' + pid + '?html=1')
+                    chief.api.get('post/' + board + '/' + pid + '?html=1')
                     .success(function(response) {
                         createPreview(response.html, board, pid, true, prevTree);
                     })
@@ -650,7 +681,7 @@ var board = {
             url += '?password=' + password;
             url += '&' + $('.removePosts').serialize();
             target.addClass('deleted');
-            $.api.delete(url)
+            chief.api.delete(url)
             .error(function(xhr) {
                 $.notification('error', $.parseJSON(xhr.responseText)['detail']);
                 target.removeClass('deleted');
@@ -720,9 +751,9 @@ var board = {
             $('#list-group' + set[i]).slideToggle(0);
         }
     }
-};
+},
 
-var settings = {
+settings: {
     init: function() {
         // those things depend on cookie settings
         var body = $('body'),
@@ -789,10 +820,9 @@ var settings = {
             $(this).toggleClass('nsfw');
         });
     }
-}
+},
 
-
-var style = {
+style: {
     //votedPolls: new BoardStorage('polls'),
 
     init: function() {
@@ -927,14 +957,14 @@ var style = {
                         return false;
                     }
                     // Hide posts, that don't have answers
-                    if (!(pid in window.posts.map)) {
+                    if (!(pid in chief.posts.map)) {
                         return true;
                     }
 
                     // Hide posts with answers count less than value
-                    return window.posts.map[pid].length < value;
+                    return chief.posts.map[pid].length < value;
             });
-            console.log(window.posts.map);
+            console.log(chief.posts.map);
             console.log('Filtered posts with %s answers.', value);
             console.log(filtered);
             filtered.hide();
@@ -954,7 +984,7 @@ var style = {
 
         /*$('.threads').delegate('.poll input[type="radio"]', 'click', function() {
             var radio = $(this);
-            //$.api.post('/vote/', {'choice': this.value})
+            //chief.api.post('/vote/', {'choice': this.value})
             .error(defaultErrorCallback)
             .success(function(data) {
                 var total = 0,
@@ -1025,9 +1055,9 @@ var style = {
         
         $('.kTabs').tabs();
     }
-};
+},
 
-var posts = {
+posts: {
     map: {},
     data: {},
     cache: {},
@@ -1074,7 +1104,7 @@ var posts = {
     
     initButtons: function() {
         var posts = $('.thread .post:first-child'),
-            buttons = board.postButtons;
+            buttons = chief.board.postButtons;
 
         posts.each(function() {
             var post = $(this),
@@ -1084,7 +1114,6 @@ var posts = {
                 var button = buttons[storageName],
                     span = post.find('.post-icon[data-storage="' + storageName + '"]'),
                     idInStorage = window.session[storageName].indexOf(id);
-                    window.d = window.session[storageName][0]
 
                 if (idInStorage !== null && idInStorage >= 0) {
                     span.removeClass('add').addClass('remove');
@@ -1136,18 +1165,18 @@ var posts = {
             }
         }
     }
-};
+},
 
-var hotkeys = {
+hotkeys: {
     init: function() {
         $('.newpost input, .newpost textarea').keydown('shift+return', function(event) {
             $('.newpost').submit();
             return false;
         });
     }
-};
+},
 
-var ajax = {
+ajax: {
     validCaptchas: 0,
     quickReplied: false,
 
@@ -1171,7 +1200,7 @@ var ajax = {
                 }
             },
             error: defaultErrorCallback,
-            url: window.api.url + 'post/?html=1',
+            url: chief.api.url + 'post/?html=1',
             dataType: 'json'
         });
     },
@@ -1230,14 +1259,14 @@ var ajax = {
             }
         });
     }
-};
+},
 
 /**
  * Realtime publish-subscribe system.
  * 
  * Uses long polling to check for new posts.
  */
-var pubsub = {
+pubsub: {
     sleepTime: 500,
     maxSleepTime: 1000 * 60 * 15,
     cursor: null,
@@ -1262,7 +1291,7 @@ var pubsub = {
         $(document).mousemove(function(event) {
             $('title').text(pageTitle);
             $(document).unbind('mousemove');
-            pubsub.newMsgs = 0;
+            chief.pubsub.newMsgs = 0;
         });
 
         if ($.dNotification.check()) {
@@ -1272,29 +1301,29 @@ var pubsub = {
 
     poll: function() {
         var args = {};
-        if (pubsub.cursor) {
-            args.cursor = pubsub.cursor;
+        if (chief.pubsub.cursor) {
+            args.cursor = chief.pubsub.cursor;
         }
-        $.api.post('stream/'+ curPage.thread)
+        chief.api.post('stream/'+ curPage.thread)
         .error(function() {
-            if (pubsub.sleepTime < pubsub.maxSleepTime) {
-                pubsub.sleepTime *= 2;
+            if (chief.pubsub.sleepTime < chief.pubsub.maxSleepTime) {
+                chief.pubsub.sleepTime *= 2;
             } else {
-                pubsub.sleepTime = pubsub.maxSleepTime;
+                chief.pubsub.sleepTime = chief.pubsub.maxSleepTime;
             }
 
             //console.log('Poll error; sleeping for', pubsub.sleepTime, 'ms');
-            window.setTimeout(pubsub.poll, pubsub.sleepTime);
+            window.setTimeout(chief.pubsub.poll, chief.pubsub.sleepTime);
         })
         .success(function(response) {
             if (!response.posts) {
                 return false;
             }
-            pubsub.cursor = response.cursor;
+            chief.pubsub.cursor = response.cursor;
             var posts = response.posts,
                 text;
 
-            pubsub.cursor = posts[posts.length - 1].id;
+            chief.pubsub.cursor = posts[posts.length - 1].id;
             //console.log(posts.length, 'new msgs');
             for (var i=0; i < posts.length; i++) {
                 var p = $(posts[i]),
@@ -1307,22 +1336,26 @@ var pubsub = {
                         });
 
                 post.find('.tripcode:contains("!")').addClass('staff');
-                window.posts.init(post);
+                chief.posts.init(post);
             }
             text = post.find('.message').text();
-            pubsub.showNewPostNotification(text, curPage.section, curPage.first);
-            window.setTimeout(pubsub.poll, 0);
+            chief.pubsub.showNewPostNotification(text, curPage.section, curPage.first);
+            window.setTimeout(chief.pubsub.poll, 0);
         });
     }    
-};
+}
+});
+
+window.chief = chief;
 
 $(function() {
-    board.init();
-    settings.init();
-    style.init()
-    posts.init();
-    hotkeys.init();
-    ajax.init();
-    pubsub.init();
+    chief.board.init();
+    chief.settings.init();
+    chief.style.init()
+    chief.posts.init();
+    chief.hotkeys.init();
+    chief.ajax.init();
+    chief.pubsub.init();
 });
-})();
+
+})(window, jQuery);

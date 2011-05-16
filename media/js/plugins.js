@@ -520,30 +520,7 @@ $.extend({
         });
 
         return new MultipartUploader(uri, form);
-    },
-    api: (function() {
-        var apiBuilder = function(method) {
-            return function(path, data) {
-                if (jQuery.isFunction(data)) {
-        			type = type || callback;
-        			callback = data;
-        			data = undefined;
-        		}
-        		return jQuery.ajax({
-        		    type: method,
-        		    url: window.api.url + path,
-        		    data: data,
-        		    dataType: 'json'
-        		})
-            };
-        };
-
-        var methods = {};
-        $.each(['get', 'post', 'put', 'delete'], function(i, method) {
-            methods[method] = apiBuilder(method);
-        });
-        return methods;
-    })()
+    }
 });
 
 /*
