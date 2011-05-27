@@ -10,7 +10,7 @@ from collections import Counter
 from datetime import datetime
 from hashlib import sha1
 from ipcalc import Network
-from markdown2 import markdown
+from dmark import DMark
 from random import randint
 from django import forms
 from django.conf import settings
@@ -391,8 +391,7 @@ class Post(models.Model):
 
     def rebuild_cache(self):
         """Regenerates html cache of post."""
-        self.message_html = markdown(self.message, extras=['safe', 'videos',
-            'code-friendly', 'code-color']).encode('utf-8')
+        self.message_html = DMark().convert(self.message).encode('utf-8')
         self.html = render_to_string('post.html', {'post': self})
 
 

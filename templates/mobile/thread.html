@@ -1,6 +1,6 @@
 {% extends "mobile/base.html" %}
 {% load i18n %}
-{% load md2 %}
+{% load dmark %}
 
 {% block title %}-
     {% trans "Thread" %} 
@@ -16,7 +16,7 @@
     {% for post in thread.posts %}
         <div class="post">
             <strong class="number"><a href="{{ post.pid }}">#{{ post.pid }}</a></strong>
-            <div class="message">{% autoescape off %}{{ post.message|markdown2:"safe,videos,code-friendly,code-color" }}{% endautoescape %}</div>
+            <div class="message">{% autoescape off %}{{ post.message|dmark }}{% endautoescape %}</div>
         </div>
     {% endfor %}
 </div>

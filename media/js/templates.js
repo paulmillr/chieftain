@@ -1,4 +1,4 @@
-{% load i18n settings md2 %}
+{% load i18n settings dmark %}
 <article class="post" id="post${post.pid}" data-id="${post.id}">
     <header>
         {{if post.data}}
