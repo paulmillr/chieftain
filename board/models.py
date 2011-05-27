@@ -34,7 +34,7 @@ __all__ = [
     'SectionFeed', 'ThreadFeed', 'DeniedIP', 'Wordfilter',
 ]
 
-DAY = 86400  # seconds in day
+DAY = 86400  # seconds in a day
 MEGABYTE = 2 ** 20
 
 
@@ -233,6 +233,9 @@ class Thread(models.Model):
     is_closed = models.BooleanField(_('Is closed'), default=False)
     poll = models.OneToOneField('Poll', verbose_name=_('Poll'), blank=True,
         null=True)
+    # basically, this needs to be stored in some sort of cache
+    # but because of star location, we'll use sql.
+    # sorry for the denormalization
     html = models.TextField(blank=True)
     objects = ThreadManager()
     deleted_objects = DeletedThreadManager()
@@ -340,7 +343,7 @@ class Post(models.Model):
     password = models.CharField(_('Password'), max_length=64, blank=True)
     message = models.TextField(_('Message'), blank=True)
     message_html = models.TextField(blank=True)
-    html = models.TextField(blank=True)
+    html = models.TextField(blank=True)  # again, sort of cache
     objects = PostManager()
     deleted_objects = DeletedPostManager()
 

@@ -1,6 +1,4 @@
-# Chieftain
-
-chieftain - new generation imageboard.
+# Chieftain by Paul Bagwell
 
 ## What?
 
@@ -8,7 +6,7 @@ Chieftain is a new generation imageboard (anonymous forum). It is the fastest ch
 It has plenty of modern features and modular design.
 chieftain is built with HTML5, Python programming language, Django web framework,
 Tornado scalable non-blocking web server with use of jQuery javascript library and
-Redis key-value storage.
+Memcached caching system.
 
 ## Features
 
@@ -27,19 +25,14 @@ Redis key-value storage.
 * Mobile and smartphone versions
 * Wakaba database converter
 
-
-### Planned for first release
-
-* Mobile and smartphone versions
-* HTML5 oekaki
-
 ## Dependencies
 
 * You need Python 2.7 to run chieftain.
-* [Redis](http://redis.io/)
+* [Redis](http://redis.io/) or [Memcached](http://memcached.org/)
 * [GeoIP C API](http://www.maxmind.com/app/c)
 * [GeoIP datasets](http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/)
-* All python dependencies are listed in the file pip-req.txt
+* All python dependencies are listed in the file pip-req.txt and can be
+installed with command pip install -r pip-req.txt.
 
 ## Licensing
 

@@ -4,8 +4,6 @@ try:
 except ImportError:
     print 'Cannot import local settings'
 
-#from redis import Redis
-
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
@@ -13,7 +11,6 @@ MANAGERS = ADMINS = (
     # ('Your Name', 'your_email@domain.com'),
 )
 
-#REDIS = Redis(**REDIS_INFO)
 
 #APPEND_SLASH = False
 TIME_ZONE = 'Europe/Kiev'
