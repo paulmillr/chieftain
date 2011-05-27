@@ -4,7 +4,7 @@
  * http://www.opensource.org/licenses/mit-license.php
  * http://www.gnu.org/licenses/gpl.html
  */
-(function(window, jQuery, undefined) {
+(function(window, $, undefined) {
 "use strict";
 
 var chief = {
@@ -157,11 +157,11 @@ $.extend(PostArea.prototype, {
 });
 
 function getThreadId(thread) {
-    return parseInt(thread.attr('id').replace('thread', ''), 10);
+    return parseInt(thread.attr('data-id'), 10);
 }
 
 function getPostId(post) {
-    return parseInt(post.attr('id').replace('post', ''), 10);
+    return parseInt(post.attr('data-id'), 10);
 }
 
 function getPostPid(post) {

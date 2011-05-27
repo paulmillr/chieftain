@@ -1,5 +1,5 @@
 {% load i18n settings md2 split %}
-<article class="post" id="post{{ post.id }}" data-pid="{{ post.pid }}">
+<article class="post" id="post{{ post.pid }}" data-id="{{ post.id }}" data-pid="{{ post.pid }}">
     <header>
         {% if post.data %}
             {% if post.data.country %}
