@@ -192,11 +192,11 @@ class DMark():
             return pygments.highlight(code, lexer, formatter)
         # If the first line of the code block starts with :::,
         # treat this as language name declaration.
-        return re.sub('<pre>(?::::(.+?)\\n)?(.*?)</pre>', _19c469, text)
+        return re.sub(r'<pre>(?::::(.+?)\n)?(.*?)</pre>', _19c469, text, 0, re.S)
 
     def convert(self, text):
         """Transform the text into HTML and then apply some fixes to it."""
-        text = "".join(self.parse(text))
+        text = u"".join(self.parse(text))
         return self.posttransform(text)
 
 if __name__ == "__main__":
