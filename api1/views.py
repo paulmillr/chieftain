@@ -1,27 +1,25 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-views.py
-
-Created by Paul Bagwell on 2011-03-15.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
-from datetime import datetime
-from hashlib import md5
 from urllib import urlencode
 from urllib2 import urlopen, URLError
+from hashlib import md5
+from datetime import datetime
+
 from django.shortcuts import render
 from django.contrib.gis.utils import GeoIP
 from django.core.files import File as DjangoFile
 from django.utils.translation import ugettext as _
+
 from djangorestframework import status
 from djangorestframework.resource import Resource
-from djangorestframework.modelresource import ModelResource, RootModelResource
 from djangorestframework.response import Response, ResponseException
+from djangorestframework.modelresource import ModelResource, RootModelResource
+
 from board import models
 from board.shortcuts import add_sidebar
-from board.tools import (get_key, make_tripcode, parse_user_agent,
-    handle_uploaded_file)
+from board.tools import (
+    make_tripcode, parse_user_agent,
+    get_key, handle_uploaded_file
+)
+
 from modpanel.views import is_mod
 
 __all__ = [
@@ -48,191 +46,216 @@ __all__ = [
 
 
 class ValidationError(Exception):
-    """This error is raised if content, created by user is sort of invalid.
-    Note: we cannot use django.forms.ValidationError because we need
-    to serialize error.
+    """
+        The error raised when content created by user is invalid.
+        NOTE: django.forms.ValidationError is unusable here
+              because we need to serialize the exception.
     """
     pass
 
 
 def api(request):
-    """Page, that contains some API examples."""
+    """Render the page that contains some API usage examples."""
     return render(request, 'api.html', add_sidebar())
 
 
 def adapt_captcha(request):
-    """Disables captcha, depending on some conditions.
-
-    Captcha is disabled if:
-    - User entered three valid captchas.
-    - User is logged in.
-
-    Returns post form. That form has or has not captcha field.
     """
-    c = request.session.get('valid_captchas', 0)
-    no_captcha = request.session.get('no_captcha', False)
+        Disable captcha if ANY of these conditions are met:
+            - user has entered three valid captchas in a row;
+            - user is logged in.
+
+        Returns the post form which MAY have a captcha field in it.
+    """
+    correct    = request.session.get('valid_captchas', 0)
+    no_captcha = request.session.get('no_captcha', False) \
+              or request.user.is_authenticated()
 
     model = models.PostFormNoCaptcha if no_captcha else models.PostForm
-    form = model(request.POST, request.FILES)
+    form  = model(request.POST, request.FILES)
+
     if not form.is_valid():
         raise ValidationError(dict(form.errors))
 
-    if request.user.is_authenticated():
-        no_captcha = True
+    if no_captcha:
+        correct -= 1
+        request.session['no_captcha'] = bool(correct)
     else:
-        if no_captcha:
-            c -= 1  # decrease allowed no-captcha posts
-            if c == 0:
-                request.session['no_captcha'] = False
-        else:
-            c += 1  # increase valid captchas counter
-            if c == 3:
-                request.session['no_captcha'] = True
-                c = 20
-        request.session['valid_captchas'] = c
+        correct += 1
+        if correct == 3:
+            request.session['no_captcha'] = True
+            correct = 20
+    request.session['valid_captchas'] = correct
+
     return form
 
 
 def create_post(request):
-    """Makes various changes on new post creation.
-
-       If there is no POST['thread'] specified, it will create
-       new thread.
     """
-    # TODO: divide this function into two smaller.
-    # create_post doesn't need to be depended on request because we want
-    # to reuse it in the wakaba converter
-    new_thread = not request.POST.get('thread')
-    with_files = bool(request.FILES.get('file'))
-    logged_in = request.user.is_authenticated()
-    # generate form, based on captcha settings
+        Create a post from the form data the user has sent.
+        This post will also begin a new thread if there were no
+        'thread' field in the request.
+    """
+    user    = request.user.is_authenticated() and request.user
+    files   = request.FILES.get('file', [])
+    thread  = request.POST.get('thread')
+    section = request.POST['section'] if not thread else ''
+
     form = adapt_captcha(request)
-    # init Post model
     post = form.save(commit=False)
+    return finish_post(
+        post, user, thread, files, section,
+        request.META.get('REMOTE_ADDR', '127.0.0.1'),
+        request.META['HTTP_USER_AGENT'],
+        request.session['feed']
+    )
+
+
+def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
+    # Set some common attributes.
+    post.ip = ip
     post.date = datetime.now()
-    post.is_op_post = new_thread
-    post.ip = request.META.get('REMOTE_ADDR') or '127.0.0.1'
     post.password = get_key(post.password)
-    if new_thread:
-        section = models.Section.objects.get(slug=request.POST['section'])
-        thread = models.Thread(section=section, bump=post.date)
-    else:
-        thread = models.Thread.objects.get(id=request.POST['thread'])
-        if thread.is_closed and not logged_in:
-            raise ValidationError(_('This thread is closed, '
-                'you cannot post to it.'))
-    section = thread.section
-    section_is_feed = (thread.section.type == 3)
+    post.is_op_post = bool(thread)
 
     if models.Wordfilter.objects.scan(post.message):
         raise ValidationError(_('Your post contains blacklisted word.'))
-    if with_files:  # validate attachments
-        file = request.FILES['file']
-        allowed = section.allowed_filetypes()
-        extension = allowed.get(file.content_type)
+
+    if not thread:
+        section  = models.Section.objects.get(slug=section)
+        thread_o = models.Thread(section=section, bump=post.date)
+    else:
+        thread_o = models.Thread.objects.get(id=thread)
+        section  = thread_o.section
+        if thread_o.is_closed and not user:
+            raise ValidationError(
+                _('This thread is closed, you cannot post to it.')
+            )
+
+    section_is_feed = section.type == 3
+
+    if files:
+        allowed   = section.allowed_filetypes()
+        extension = allowed.get(files.content_type)
         if not extension:
             raise InvalidFileError(_('Invalid file type'))
+
         lim = section.filesize_limit
-        if lim != 0 and file.size > lim:
+        if files.size > lim > 0:
             raise InvalidFileError(_('Too big file'))
 
         m = md5()
-        for chunk in file.chunks():
-            m.update(chunk)
-        del chunk
-        file_hash = m.hexdigest()
-        # Check if this file already exists
-        #if models.File.objects.filter(hash=file_hash).count() > 0:
+        map(m.update, files.chunks())
+        # TODO: Check if this file already exists.
+        #       (Is this really needed at all?)
+        #if models.File.objects.filter(hash=m.hexdigest()).count() > 0:
         #    raise InvalidFileError(_('This file already exists'))
+
+        filetype = models.FileType.objects.filter(extension=extension)[0]
+        post.file = handle_uploaded_file(
+            models.File(
+                name=files.name, type=filetype, hash=m.hexdigest(),
+                file=DjangoFile(files), image_height=0, image_width=0
+            )
+        )
     else:
         if not post.message:
-            raise ValidationError(_('Enter post message or attach '
-                'a file to your post'))
-        elif new_thread:
+            raise ValidationError(
+                _('Enter post message or attach a file to your post')
+            )
+        elif not thread:
             if section.force_files:
-                raise ValidationError(_('You need to '
-                    'upload file to create new thread.'))
-            elif section_is_feed and not logged_in:
-                raise NotAuthenticatedError(_('Authentication required to '
-                    'create threads in this section'))
-    if (post.email.lower() != 'sage' and (new_thread or
-        thread.posts().count() < section.bumplimit)):
-        thread.bump = post.date
-    if '!' in post.poster:  # make user signature
-        if ('!OP' in post.poster and not new_thread and
-            post.password == thread.op_post.password):
-            post.poster = ''
-            post.tripcode = '!OP'
-        elif '!name' in post.poster and logged_in:
-            post.poster = ''
-            if request.user.is_superuser:
-                username = '!{0}'.format(request.user.username)
-            else:
-                username = '!Mod'
-            post.tripcode = username
-    elif '#' in post.poster:  # make tripcode
-        s = post.poster.split('#')
-        post.tripcode = make_tripcode(s.pop())
-        post.poster = s[0]
+                raise ValidationError(
+                    _('You need to upload file to create new thread.')
+                )
+            elif section_is_feed and not user:
+                raise NotAuthenticatedError(
+                    _(
+                        'Authentication required to '
+                        'create threads in this section'
+                    )
+                )
 
+    # Bump the thread.
+    if  post.email.lower() != 'sage' \
+    and thread and thread_o.posts().count() < section.bumplimit:
+        thread_o.bump = post.date
+
+    # Parse the signature.
+    author, sign = (post.poster.split('!', 1) + [''])[:2]
+
+    if sign == 'OP' and thread and post.password == thread_o.op_post.password:
+        post.tripcode = '!OP'
+
+    if sign == 'name' and user:
+        post.tripcode = \
+            '!{}'.format(user.username) if user.is_superuser else '!Mod'
+
+    # Parse the tripcode.
+    author, tripcode = (author.split('#', 1) + [''])[:2]
+    if tripcode:
+        post.tripcode = make_tripcode(tripcode)
+    post.poster = author
+
+    # Force-set the author name on some boards.
     if not post.poster or section.anonymity:
         post.poster = section.default_name
+
+    # XXX Fuck those easter eggs.
     if post.email == 'mvtn'.encode('rot13'):  # easter egg o/
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10
         post.message = (s + u' ') * 50
-    if section.type == 4:  # international
+
+
+    if section.type == 4:
+        # 4 == /int/ - International
+        # Assign the country code to this post.
         post.data = {
             'country_code': models.GeoIP().country(post.ip)['country_code']
         }
-    elif section.type == 5:  # show useragent
-        ua = request.META['HTTP_USER_AGENT']
-        parsed = parse_user_agent(ua)
-        v = ''
-        b = parsed.get('browser') or {'name': 'Unknown', 'version': ''}
-        os = parsed.get('os') or {'name': 'Unknown'}
-        if parsed.get('flavor'):
-            v = parsed['flavor'].get('version') or ''
-        post.data = {'useragent': {
-            'name': b['name'],
-            'version': b['version'],
-            'os_name': os,
-            'os_version': v,
-            'raw': ua,
-        }}
-    if new_thread:
-        thread.save(rebuild_cache=False)
-        post.thread = thread
+    elif section.type == 5:
+        # 5 == /bugs/ - Bugtracker
+        # Display the user's browser name derived from HTTP User-Agent.
+        parsed   = parse_user_agent(useragent)
+        browser  = parsed.get('browser', {'name': 'Unknown', 'version': ''})
+        platform = parsed.get('os', {'name': 'Unknown'})
+
+        browser['os_name'] = platform['name']
+        browser['os_version'] = parsed.get('flavor', {}).get('version', '')
+        browser['raw'] = useragent
+        post.data = {'useragent': browser}
+
+
+    if not thread:
+        thread_o.save(rebuild_cache=False)
+        post.thread = thread_o
     post.pid = section.pid_incr()
-    if with_files:
-        file_type = models.FileType.objects.filter(extension=extension)[0]
-        file_instance = models.File(
-            name=file.name, type=file_type, hash=file_hash,
-            file=DjangoFile(file), image_height=0, image_width=0
-        )
-        post.file = handle_uploaded_file(file_instance)
     post.save()
-    thread.save()
-    # add thread to user's feed
-    feed_post_id = post.id if new_thread else thread.op_post.id
-    request.session['feed'].add(int(feed_post_id))
+    thread_o.save()
+
+    if feed is not None:
+        thread_id = int(thread or post.id)
+        feed.add(thread_id)
     return post
 
 
 def mod_delete_post(request, post):
     if request.GET.get('ban_ip'):
-        r = request.GET.get('ban_reason')
-        if not r:
-            raise ResponseException(status.BAD_REQUEST, {
-                'detail': _('You need to enter ban reason')})
-        d = DeniedIP(ip=post.ip, reason=r, by=request.user)
-        d.save()
+        reason = request.GET.get('ban_reason')
+        if not reason:
+            raise ResponseException(status.BAD_REQUEST,
+                {'detail': _('You need to enter ban reason')}
+            )
+        ip = DeniedIP(ip=post.ip, reason=r, by=request.user)
+        ip.save()
+
     if request.GET.get('delete_all'):
         posts = post.section().posts().filter(ip=post.ip)
-        # remove threads
         op = posts.filter(is_op_post=True).values('pid', 'thread')
         t = models.Thread.objects.filter(id__in=[i['thread'] for i in op])
         t.update(is_deleted=True)
+
         for p in posts:
             p.remove()
 
