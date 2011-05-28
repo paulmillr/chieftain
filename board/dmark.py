@@ -70,6 +70,9 @@ class DMark():
         "%%": "span class='spoiler'"  # %%hidden text%%
     }
 
+    def __init__(self):
+        self.youtube_limit = 1
+
     def open(self, tag):
         """Construct an opening tag."""
         return "<{}>".format(self.tags[tag])
@@ -80,10 +83,24 @@ class DMark():
 
     def linkify(self, line):
         """Transform everything that looks like a link into anchors."""
+        # Youtube videos, up to a maximum of 1 per message.
+        def _19ab14(match):
+            if self.youtube_limit > 0:
+                self.youtube_limit -= 1
+                return (
+                    r'<iframe width="425" height="349" '
+                    r'frameborder="0" allowfullscreen '
+                    r'src="http&#58;//youtube.com/embed/{}"></iframe>'
+                ).format(match.group(1))
+            return match.group()
+        line = re.sub(
+            r'http://(?:www\.)?youtube\.com/watch\?v=([a-z0-9_-]+)',
+            _19ab14, line, 1, re.I
+        )
         # http://link/ and www.link
         def _19ab9f(match):
             url, proto = match.groups()[:2]
-            for char in ("*", "-", "%", '"', '.'):
+            for char in ("*", "-", "%", '"'):
                 url = url.replace(char, "&#{};".format(ord(char)))
             href = url if proto else 'http://' + url
             return '<a href="{}">{}</a>'.format(href, url)
