@@ -56,10 +56,10 @@ _VIDEOS = {
             ' width="533" height="300" frameborder="0"></iframe>'
         ),
     re.compile(
-        r'(http://(?:vkontakte\.ru|vk\.com)/video_ext\.php\?oid=\d+&id=\d+'
+        r'http://(?:vkontakte\.ru|vk\.com)/(video_ext\.php\?oid=\d+&id=\d+'
         r'&hash=[a-f\d]+(?:&hd=\d)?)', re.I):
         (
-            '<iframe src="{0}" width="607" '
+            '<iframe src="http&#58;//vkontakte.ru/{0}" width="607" '
             'height="360" frameborder="0"></iframe>'
         ),
 }
