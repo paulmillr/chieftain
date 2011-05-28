@@ -29,6 +29,41 @@ except ImportError:
 # https://github.com/facebook/tornado/blob/master/tornado/escape.py
 _URL_RE = re.compile(r"""\b((?:([\w-]+):(/{1,3})|www[.])(?:(?:(?:[^\s&()]|&amp;|&quot;)*(?:[^!"#$%&'()*+,.:;<=>?@\[\]^`{|}~\s]))|(?:\((?:[^\s&()]|&amp;|&quot;)*\)))+)""")
 
+# Supported video and audio hosting sites.
+_VIDEOS = {
+    re.compile(
+        r'http://(?:www\.)?youtube\.com/'
+        r'watch\?v=([a-z0-9_-]+)[&=\d\w]?', re.I):
+        (
+            '<iframe width="425" height="349" '
+            'frameborder="0" allowfullscreen '
+            'src="http&#58;//youtube.com/embed/{}"></iframe>'
+        ),
+    re.compile(r'http://rutube\.ru/tracks/\d+.html\?v=([a-z0-9]{32})', re.I):
+        (
+            '<object width="320" height="262"><param name="movie"'
+            ' value="http&#58;//video.rutube.ru/{0}"></param>'
+            '<param name="wmode" value="window"></param>'
+            '<param name="allowfullscreen" value="true"></param>'
+            '<embed src="http&#58;//video.rutube.ru/{0}'
+            'type="application/x-shockwave-flash" wmode="window" '
+            'width="320" height="262"'
+            'allowfullscreen="true" ></embed></object>'
+        ),
+    re.compile(r'http://(?:www\.)?vimeo\.com/(\d+)/?', re.I):
+        (
+            '<iframe src="http&#58;//player.vimeo.com/video/{}"'
+            ' width="533" height="300" frameborder="0"></iframe>'
+        ),
+    re.compile(
+        r'(http://(?:vkontakte\.ru|vk\.com)/video_ext\.php\?oid=\d+&id=\d+'
+        r'&hash=[a-f\d]+(?:&hd=\d)?)', re.I):
+        (
+            '<iframe src="{0}" width="607" '
+            'height="360" frameborder="0"></iframe>'
+        ),
+}
+
 
 class DMark():
     # Parser states:
@@ -87,16 +122,10 @@ class DMark():
         def _19ab14(match):
             if self.youtube_limit > 0:
                 self.youtube_limit -= 1
-                return (
-                    r'<iframe width="425" height="349" '
-                    r'frameborder="0" allowfullscreen '
-                    r'src="http&#58;//youtube.com/embed/{}"></iframe>'
-                ).format(match.group(1))
+                return _VIDEOS[regex].format(*match.groups())
             return match.group()
-        line = re.sub(
-            r'http://(?:www\.)?youtube\.com/watch\?v=([a-z0-9_-]+)',
-            _19ab14, line, 1, re.I
-        )
+        for regex in _VIDEOS:
+            line = regex.sub(_19ab14, line, 1)
         # http://link/ and www.link
         def _19ab9f(match):
             url, proto = match.groups()[:2]
