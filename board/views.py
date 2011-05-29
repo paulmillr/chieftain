@@ -1,4 +1,3 @@
-# encoding: utf-8
 from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils.translation import ugettext_lazy as _
@@ -18,7 +17,6 @@ def index(request):
 
     #Thread.objects.filter
     return render(request, 'index.html', add_sidebar({
-        'popular': Post.objects.popular(10),
         'bookmarks': make_post_descriptions(bposts),
         'random_images': File.objects.random_images()[:3],
     }))

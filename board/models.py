@@ -79,35 +79,6 @@ class PostManager(models.Manager):
         return super(PostManager, self).get_query_set().filter(
             is_deleted=False)
 
-    def popular(self, limit=10):
-        """Gets most popular board threads.
-
-        Popularity is calculated by thread post count.
-        Each section can have only two popular threads.
-        This method returns list of post dicts with 'description' value,
-        that contains post title / text / link.
-        """
-        # Aggregate thread posts.
-        threads = Thread.objects.post_count().order_by('-post__count').values(
-            'id', 'section', 'post__count')[:limit * 10]
-        thread_ids = []
-        counter = Counter()
-
-        # Select two threads from each section.
-        for t in threads:
-            if len(thread_ids) >= limit:
-                break
-            if counter[t['section']] < 2:
-                thread_ids.append(t['id'])
-                counter[t['section']] += 1
-
-        # Get post information.
-        posts = Post.objects.filter(thread__in=thread_ids,
-            is_op_post=True)[:limit]
-
-        # Filter post information.
-        return tools.make_post_descriptions(posts.reverse())
-
 
 class DeletedPostManager(models.Manager):
     def get_query_set(self):
