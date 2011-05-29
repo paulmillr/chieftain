@@ -1,13 +1,4 @@
-#!/usr/bin/env python
 # encoding: utf-8
-"""
-fields.py
-
-Snippet taken from http://djangosnippets.org/snippets/1653/.
-
-Created by Paul Bagwell on 2011-02-07.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from datetime import datetime
 from django import forms
 from django.conf import settings

@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-views.py
-
-Created by Paul Bagwell on 2011-03-02.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from django.core.paginator import Paginator
 from django.shortcuts import render, redirect, get_object_or_404
 from board.models import Post, Section

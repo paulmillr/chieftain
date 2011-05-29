@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-admin.py
-
-Created by Paul Bagwell on 2011-01-13.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from django.contrib import admin
 from board import models
 

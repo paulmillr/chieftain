@@ -1,12 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-views.py
-
-Created by Paul Bagwell on 2011-02-22.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
-
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import render
 from board.models import Wordfilter, DeniedIP

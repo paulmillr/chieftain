@@ -1,12 +1,4 @@
 #!/usr/bin/env python
-# encoding: utf-8
-"""
-pubsub.py
-
-Created by Paul Bagwell on 2011-02-24.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
-
 import logging
 import tornado.ioloop
 import tornado.options
@@ -14,7 +6,7 @@ import tornado.web
 import json
 from tornado.options import define, options
 
-define("port", default=8888, help="run on the given port", type=int)
+define('port', default=8888, help='run on the given port', type=int)
 
 
 class Application(tornado.web.Application):

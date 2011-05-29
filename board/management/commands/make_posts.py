@@ -1,11 +1,4 @@
-#!/usr/bin/env python
 # encoding: utf-8
-"""
-make_posts.py
-
-Created by Paul Bagwell on 2011-04-16.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 #from board.models import Post, Thread
 from datetime import datetime
 from random import random

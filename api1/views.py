@@ -67,12 +67,12 @@ def adapt_captcha(request):
 
         Returns the post form which MAY have a captcha field in it.
     """
-    correct    = request.session.get('valid_captchas', 0)
+    correct = request.session.get('valid_captchas', 0)
     no_captcha = request.session.get('no_captcha', False) \
               or request.user.is_authenticated()
 
     model = models.PostFormNoCaptcha if no_captcha else models.PostForm
-    form  = model(request.POST, request.FILES)
+    form = model(request.POST, request.FILES)
 
     if not form.is_valid():
         raise ValidationError(dict(form.errors))
@@ -96,9 +96,9 @@ def create_post(request):
         This post will also begin a new thread if there were no
         'thread' field in the request.
     """
-    user    = request.user.is_authenticated() and request.user
-    files   = request.FILES.get('file', [])
-    thread  = request.POST.get('thread')
+    user = request.user.is_authenticated() and request.user
+    files = request.FILES.get('file', [])
+    thread = request.POST.get('thread')
     section = request.POST['section'] if not thread else ''
 
     form = adapt_captcha(request)
@@ -122,11 +122,11 @@ def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
         raise ValidationError(_('Your post contains blacklisted word.'))
 
     if not thread:
-        section  = models.Section.objects.get(slug=section)
+        section = models.Section.objects.get(slug=section)
         thread_o = models.Thread(section=section, bump=post.date)
     else:
         thread_o = models.Thread.objects.get(id=thread)
-        section  = thread_o.section
+        section = thread_o.section
         if thread_o.is_closed and not user:
             raise ValidationError(
                 _('This thread is closed, you cannot post to it.')
@@ -135,7 +135,7 @@ def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
     section_is_feed = section.type == 3
 
     if files:
-        allowed   = section.allowed_filetypes()
+        allowed = section.allowed_filetypes()
         extension = allowed.get(files.content_type)
         if not extension:
             raise InvalidFileError(_('Invalid file type'))
@@ -177,8 +177,8 @@ def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
                 )
 
     # Bump the thread.
-    if  post.email.lower() != 'sage' \
-    and thread and thread_o.posts().count() < section.bumplimit:
+    if (post.email.lower() != 'sage'
+    and thread and thread_o.posts().count() < section.bumplimit):
         thread_o.bump = post.date
 
     # Parse the signature.
@@ -188,8 +188,10 @@ def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
         post.tripcode = '!OP'
 
     if sign == 'name' and user:
-        post.tripcode = \
-            '!{}'.format(user.username) if user.is_superuser else '!Mod'
+        if user.is_superuser:
+            post.tripcode = '!{}'.format(user.username)
+        else:
+            post.tripcode = '!Mod'
 
     # Parse the tripcode.
     author, tripcode = (author.split('#', 1) + [''])[:2]
@@ -201,12 +203,10 @@ def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
     if not post.poster or section.anonymity:
         post.poster = section.default_name
 
-    # XXX Fuck those easter eggs.
     if post.email == 'mvtn'.encode('rot13'):  # easter egg o/
         s = u'\u5350'
         post.poster = post.email = post.topic = s * 10
         post.message = (s + u' ') * 50
-
 
     if section.type == 4:
         # 4 == /int/ - International
@@ -217,15 +217,14 @@ def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
     elif section.type == 5:
         # 5 == /bugs/ - Bugtracker
         # Display the user's browser name derived from HTTP User-Agent.
-        parsed   = parse_user_agent(useragent)
-        browser  = parsed.get('browser', {'name': 'Unknown', 'version': ''})
+        parsed = parse_user_agent(useragent)
+        browser = parsed.get('browser', {'name': 'Unknown', 'version': ''})
         platform = parsed.get('os', {'name': 'Unknown'})
 
         browser['os_name'] = platform['name']
         browser['os_version'] = parsed.get('flavor', {}).get('version', '')
         browser['raw'] = useragent
         post.data = {'useragent': browser}
-
 
     if not thread:
         thread_o.save(rebuild_cache=False)

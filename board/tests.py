@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-tests.py
-
-Created by Paul Bagwell on 2011-03-26.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from nose.tools import raises
 from board.models import Post
 from board.tools import make_post_descriptions, make_tripcode

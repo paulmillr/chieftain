@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-truncate.py
-
-Created by Paul Bagwell on 2011-04-16.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 import os
 import shutil
 from django.conf import settings

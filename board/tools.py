@@ -1,11 +1,4 @@
-#!/usr/bin/env python
 # encoding: utf-8
-"""
-tools.py
-
-Created by Paul Bagwell on 2011-01-30.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 import os
 import re
 import httpagentparser

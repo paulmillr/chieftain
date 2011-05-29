@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-urls.py
-
-Created by Paul Bagwell on 2011-02-15.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from django.conf.urls.defaults import patterns
 
 urlpatterns = patterns('modpanel.views',

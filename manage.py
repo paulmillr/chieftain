@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-manage.py
-
-Created by Paul Bagwell on 2011-01-13.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from django.core.management import execute_manager
 try:
     import settings  # Assumed to be in the same directory.
@@ -18,5 +10,5 @@ except ImportError:
         an ImportError somehow.)\n" % __file__)
     sys.exit(1)
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     execute_manager(settings)

@@ -1,11 +1,4 @@
-#!/usr/bin/env python
 # encoding: utf-8
-"""
-models.py
-
-Created by Paul Bagwell on 2011-01-13.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from collections import Counter
 from datetime import datetime
 from hashlib import sha1

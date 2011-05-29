@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-shortcuts.py
-
-Created by Paul Bagwell on 2011-02-22.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 import codecs
 from django.core.paginator import InvalidPage, EmptyPage
 from django.http import Http404

@@ -1,13 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-middleware.py
-
-Some source code taken from https://github.com/justquick/django-ban/.
-
-Created by Paul Bagwell on 2011-01-30.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponseForbidden

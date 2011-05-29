@@ -1,11 +1,3 @@
-#!/usr/bin/env python
-# encoding: utf-8
-"""
-rebuild_cache.py
-
-Created by Paul Bagwell on 2011-04-16.
-Copyright (c) 2011 Paul Bagwell. All rights reserved.
-"""
 import shutil
 from django.core.cache import cache
 from django.core.management.base import BaseCommand
