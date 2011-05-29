@@ -14,4 +14,4 @@
 	Language: Russian
 	Standarts: HTML5, CSS3, PEP8
 	Software: Python, Django, Tornado
-	Tools: Textmate, Transmit, ipython, Chrome, 
+	Tools: Textmate, Transmit, ipython, Chrome,

@@ -2,7 +2,7 @@
  * Modernizr v1.6
  * http://www.modernizr.com
  *
- * Developed by: 
+ * Developed by:
  * - Faruk Ates  http://farukat.es/
  * - Paul Irish  http://paulirish.com/
  *

@@ -37,7 +37,7 @@ installed with command pip install -r pip-req.txt.
 ## Licensing
 
 chieftain is licensed under MIT license. It means that you can copy, distribute,
-adapt and transmit the work for free, but the copyright notice and license shall 
+adapt and transmit the work for free, but the copyright notice and license shall
 be included in all copies or substantial portions of chieftain.
 
 Copyright (c) 2011 Paul Bagwell, http://chieftain.pbagwl.com/.

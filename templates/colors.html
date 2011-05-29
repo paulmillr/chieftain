@@ -15,7 +15,7 @@
     <script src="http://static.2ch.pbagwl.com/media/js/script.js"></script>
 </head>
 <body>
-    
+
 <div class="create">
     <input type="text" name="canvas-x" value="700" id="canvas-x">
     <input type="text" name="canvas-y" value="350" id="canvas-y">
@@ -23,7 +23,7 @@
 <div class="drawers">
     <canvas id="drawing" width="740" height="370"></canvas>
     <canvas id="color-picker" width="371" height="370"></canvas>
-</div>    
+</div>
 Текущий цвет: <div id="color-selected" style="background-color: #000;"></div>
     <!--<div id="color-current"></div>-->
 
@@ -50,31 +50,31 @@
     $('#canvas-x').change(function(event) {
         $('#drawing').attr('width', this.value);
     });
-    
+
     $('#canvas-y').change(function(event) {
         $('#drawing').attr('height', this.value);
     });
-    
-    
+
+
     var d = new $.drawer('drawing', '#canvas-z', function(data) {
         var inp = $('<input/>', {type : 'hidden', 'name' : 'imageElement', 'id' : 'imageElement'});
         inp.appendTo('head');
         inp.val(data);
     }),
-        cp = new $.colorPicker('http://static.2ch.pbagwl.com/media/images/color-picker.png', 
+        cp = new $.colorPicker('http://static.2ch.pbagwl.com/media/images/color-picker.png',
         'color-picker', 'color-current', function(color) {
         var alpha = d.color.data[3];
         d.color.data = color.data;
         d.color.data[3] = alpha;
         $('#color-selected').css({backgroundColor : d.color.rgba});
     });
-    
+
     $('#paint-width').change(function(event) {
         var val = Math.round(this.value*10)/10;
         $('#'+this.id+'-v').text(val)
         d.width = val;
     });
-    
+
     $('#opac').change(function(event) {
         var val = Math.round(this.value*100)/100;
         d.color.alpha = val;

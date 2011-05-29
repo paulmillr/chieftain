@@ -141,7 +141,7 @@ $.extend(PostArea.prototype, {
             var begin = textarea.value.substr(0, textarea.selectionStart),
                 selection = textarea.value.substr(textarea.selectionStart, textarea.selectionEnd - textarea.selectionStart),
                 end = textarea.value.substr(textarea.selectionEnd);
-            textarea.selectionEnd = textarea.selectionEnd + size; 
+            textarea.selectionEnd = textarea.selectionEnd + size;
             if (eachLine) {
                 selection = selection.split('\n');
                 selection = $.map(selection, function(x) {
@@ -210,7 +210,7 @@ function PostContainer(span, post) {
 
 /**
  * Simple color container class.
- * 
+ *
  * Used for storage of canvas data.
  */
 function ColorContainer(red, green, blue, alpha) {
@@ -367,7 +367,7 @@ function parseQs() {
         parsed = {}, tmp;
 
     for (var i=0; i < d.length; i++) {
-        tmp = d[i].split('='); 
+        tmp = d[i].split('=');
         parsed[tmp[0]] = tmp[1];
     }
 
@@ -404,7 +404,7 @@ function defaultErrorCallback(response) {
         }
         errorText = tmp.join('<br/>');
     }
-    
+
     $.notification('error', errorText);
 }
 
@@ -505,7 +505,7 @@ board: {
 
         $('.threads').delegate('.post-icon', 'click', function(event) {
             event.preventDefault();
-            var t = $(this), 
+            var t = $(this),
                 cont = new PostContainer(t, t.closest('.post')),
                 span = cont.span,
                 post = cont.post,
@@ -529,7 +529,7 @@ board: {
                 }
             }
         });
-        
+
         $('#container[role="storage"]').delegate('.post-icon', 'click', function() {
             event.preventDefault();
             var t = $(this),
@@ -673,8 +673,8 @@ board: {
                 ban_ip = !!$('#ban_ip').attr('checked'),
                 delete_all = !!$('#delete_all').attr('checked'),
                 target = !only_files ? t : t.find('.file, .filemeta'),
-                url = !only_files ? 
-                    'post/' + target.data('id') : 
+                url = !only_files ?
+                    'post/' + target.data('id') :
                     'file/' + getFileId(target.find('img')),
             password = $('#password').val();
 
@@ -1052,7 +1052,7 @@ style: {
                 return false;
             });
         }
-        
+
         $('.kTabs').tabs();
     }
 },
@@ -1063,7 +1063,7 @@ posts: {
     cache: {},
 
     init: function(selector) {
-        var posts = selector && typeof selector !== 'function' ? 
+        var posts = selector && typeof selector !== 'function' ?
                 isjQuery(selector) ? selector : $(selector) : $('.post'),
             map = {};
         this.cache = {};
@@ -1097,11 +1097,11 @@ posts: {
                 }
             }
         }
-        
+
         this.initButtons();
         this.buildAnswersMap(map, true);
     },
-    
+
     initButtons: function() {
         var posts = $('.thread .post:first-child'),
             buttons = chief.board.postButtons;
@@ -1184,7 +1184,7 @@ ajax: {
         if (!$('#password').val()) {
             $('#password').val(randomString(8));
         }
-        
+
         $('.newpost form').ajaxForm({
             //target: 'body',
             success: function(response) {
@@ -1192,7 +1192,7 @@ ajax: {
                 if (typeof response === 'string') {
                     response = $.parseJSON(response);
                 }
-                
+
                 if (response['field-errors'] || response['errors'] || response['detail']) {
                     defaultErrorCallback(response);
                 } else {
@@ -1234,7 +1234,7 @@ ajax: {
 
         var newpost = $('.newpost');
         if (newpost.parent().hasClass('thread')) {
-            var b = $.settings('bottomForm') && curPage.type === 'thread' ? 
+            var b = $.settings('bottomForm') && curPage.type === 'thread' ?
                 '.actions' : '#main';
             newpost.insertBefore(b);
         }
@@ -1263,7 +1263,7 @@ ajax: {
 
 /**
  * Realtime publish-subscribe system.
- * 
+ *
  * Uses long polling to check for new posts.
  */
 pubsub: {
@@ -1276,7 +1276,7 @@ pubsub: {
         if (curPage.type !== 'thread' || $.settings('disablePubSub')) {
             return false;
         }
-        
+
         this.poll();
     },
 
@@ -1342,7 +1342,7 @@ pubsub: {
             chief.pubsub.showNewPostNotification(text, curPage.section, curPage.first);
             window.setTimeout(chief.pubsub.poll, 0);
         });
-    }    
+    }
 }
 });
 

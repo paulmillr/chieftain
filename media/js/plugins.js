@@ -120,7 +120,7 @@ $.extend({
 
     /**
      * HTML5 Local storage jquery class.
-     * 
+     *
      * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
@@ -153,7 +153,7 @@ $.extend({
 
     /**
      * Canvas color picker class.
-     * 
+     *
      * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
@@ -161,7 +161,7 @@ $.extend({
      * @param {String} canvas Canvas element ID
      * @param {String} current Background color of this element will change
      * on moving across.
-     * @param {Function} callback Function, that would be executed 
+     * @param {Function} callback Function, that would be executed
      * after clicking on the picker.
      */
     colorPicker: function(image, canvas, current, callback) {
@@ -199,7 +199,7 @@ $.extend({
 
     /**
      * Canvas drawer class.
-     * 
+     *
      * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
@@ -262,7 +262,7 @@ $.extend({
     /**
      * Copyright 2010 (c) akquinet.
      *
-     * jQuery notification plugin is based on code of jquery.toastmessage, 
+     * jQuery notification plugin is based on code of jquery.toastmessage,
      * modified by Paul Bagwell.
      *
      * Licensed under the Apache License, Version 2.0 (the "License");
@@ -284,7 +284,7 @@ $.extend({
             sticky: false, // should the notification item be sticky or not?
             type: 'notice', // notice, warning, error, success
             position: 'top-right', // top-right, center, middle-bottom etc
-            closeText: '', // text which will be shown as close button, 
+            closeText: '', // text which will be shown as close button,
                            // set to '' when you want to introduce an image via css
             close: null // callback function when the message is closed
         };
@@ -309,18 +309,18 @@ $.extend({
 
         function show(options) {
             var localSettings = $.extend(defaultSettings, options),
-                notificationWrapAll = (!$('.notification-container').length) ? 
+                notificationWrapAll = (!$('.notification-container').length) ?
                     $('<div/>').addClass('notification-container')
                     .addClass('notification-position-' + localSettings.position)
-                    .appendTo('body') 
-                    : $('.notification-container'), 
-                notificationItemOuter = $('<div/>').addClass('notification-item-wrapper'), 
+                    .appendTo('body')
+                    : $('.notification-container'),
+                notificationItemOuter = $('<div/>').addClass('notification-item-wrapper'),
                 notificationItemInner = $('<div/>').hide()
                     .addClass('notification-item notification-type-' + localSettings.type)
                     .appendTo(notificationWrapAll)
                     .html('<p>' + localSettings.text + '</p>')
                     .animate(localSettings.inEffect, localSettings.inEffectDuration)
-                    .wrap(notificationItemOuter), 
+                    .wrap(notificationItemOuter),
                 notificationItemClose = $('<div/>')
                     .addClass('notification-item-close')
                     .prependTo(notificationItemInner)
@@ -351,14 +351,14 @@ $.extend({
         }
 
         return show({
-            'text': message, 
+            'text': message,
             'type': type || 'notice'
         });
     },
 
     /**
      * jQuery desktop notification class.
-     * 
+     *
      * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
@@ -390,7 +390,7 @@ $.extend({
         check: function() {
             return (this.checkSupport() && this.n.checkPermission() === 0);
         },
-        
+
         checkSupport: function() {
             return !!this.n;
         }
@@ -398,7 +398,7 @@ $.extend({
 
     /**
      * jQuery multipart uploader class.
-     * 
+     *
      * Copyright (c) 2011, Paul Bagwell <pbagwl.com>.
      * Licensed under the MIT license:
      * http://www.opensource.org/licenses/mit-license.php
@@ -540,16 +540,16 @@ jQuery.hotkeys = {
 	specialKeys: {
 		8: "backspace", 9: "tab", 13: "return", 16: "shift", 17: "ctrl", 18: "alt", 19: "pause",
 		20: "capslock", 27: "esc", 32: "space", 33: "pageup", 34: "pagedown", 35: "end", 36: "home",
-		37: "left", 38: "up", 39: "right", 40: "down", 45: "insert", 46: "del", 
+		37: "left", 38: "up", 39: "right", 40: "down", 45: "insert", 46: "del",
 		96: "0", 97: "1", 98: "2", 99: "3", 100: "4", 101: "5", 102: "6", 103: "7",
-		104: "8", 105: "9", 106: "*", 107: "+", 109: "-", 110: ".", 111 : "/", 
-		112: "f1", 113: "f2", 114: "f3", 115: "f4", 116: "f5", 117: "f6", 118: "f7", 119: "f8", 
+		104: "8", 105: "9", 106: "*", 107: "+", 109: "-", 110: ".", 111 : "/",
+		112: "f1", 113: "f2", 114: "f3", 115: "f4", 116: "f5", 117: "f6", 118: "f7", 119: "f8",
 		120: "f9", 121: "f10", 122: "f11", 123: "f12", 144: "numlock", 145: "scroll", 191: "/", 224: "meta"
 	},
 
 	shiftNums: {
-		"`": "~", "1": "!", "2": "@", "3": "#", "4": "$", "5": "%", "6": "^", "7": "&", 
-		"8": "*", "9": "(", "0": ")", "-": "_", "=": "+", ";": ": ", "'": "\"", ",": "<", 
+		"`": "~", "1": "!", "2": "@", "3": "#", "4": "$", "5": "%", "6": "^", "7": "&",
+		"8": "*", "9": "(", "0": ")", "-": "_", "=": "+", ";": ": ", "'": "\"", ",": "<",
 		".": ">",  "/": "?",  "\\": "|"
 	}
 };
@@ -636,11 +636,11 @@ $.fn.hasScrollBar = function() {
  */
 (function($) {
 	$.fn.horizontalBarGraph = function(options) {
-	
+
 		var opts = $.extend({}, $.fn.horizontalBarGraph.defaults, options);
-		
+
 		this.children("dt,dd").each(function(i) {
-		
+
 			var el = $(this);
 			if(el.is("dt")) {
 				el.css({display: "block", float: "left", clear: "left"}).addClass("hbg-label"); return;
@@ -649,9 +649,9 @@ $.fn.hasScrollBar = function() {
 			}
 			setBarHover(el, opts);
 		});
-		
+
 		tryShowTitle(this);
-		
+
 		if(opts.animated) {
 			createShowButton(opts, this).insertBefore(this);
 		}
@@ -661,19 +661,19 @@ $.fn.hasScrollBar = function() {
 		if(opts.hoverColors.length) {
 			setHoverColors(this.children("dd"), opts);
 		}
-		
+
 		scaleGraph(this);
-		
+
 		return this;
 	};
-	
+
 	function scaleGraph(graph) {
 		var maxWidth = 0;
 		graph.children("dt").each(function() {
 			maxWidth = Math.max($(this).width(), maxWidth);
 		}).css({width: maxWidth+"px"});
 	}
-	
+
 	function setBarHover(bar, opts) {
 		bar.hover(function() {
 			bar.addClass("hbg-bar-hover");
@@ -681,7 +681,7 @@ $.fn.hasScrollBar = function() {
 			bar.removeClass("hbg-bar-hover");
 		});
 	}
-	
+
 	function createShowButton(opts, graph) {
 		var button = $("<span />").text(opts.button).addClass("hbg-show-button");
 		button.click(function() {
@@ -689,20 +689,20 @@ $.fn.hasScrollBar = function() {
 		});
 		return button;
 	}
-	
+
 	function createBar(e, opts) {
 		var val = e.text();
 		e.css({marginLeft: e.prev().is("dt") ? "5px" : "0px", width: Math.floor(val/opts.interval)+"px"});
 		e.html($("<span/>").html(val).addClass("hbg-value"));
 		applyOptions(e, opts);
 	}
-	
+
 	function createTitle(e, opts) {
 		var title = e.text();
 		e.prev().attr("title", title);
 		e.remove();
 	}
-	
+
 	function tryShowTitle(graph) {
 		var title = graph.attr("title");
 		if(title) {
@@ -710,15 +710,15 @@ $.fn.hasScrollBar = function() {
 			graph.css({overflow: "hidden"});
 		}
 	}
-	
+
 	function setColors(bars, opts) {
 		var i = 0;
-		bars.each(function() { 
+		bars.each(function() {
 			var c = i++ % opts.colors.length;
 			$(this).css({backgroundColor: opts.colors[c]});
 		});
 	}
-	
+
 	function setHoverColors(bars, opts) {
 		var i = 0;
 		bars.each(function(i) {
@@ -732,16 +732,16 @@ $.fn.hasScrollBar = function() {
 			});
 		});
 	}
-	
+
 	function applyOptions(e, opts) {
 		e.css({float: "left"}).addClass("hbg-bar");
 		if(opts.animated) { e.hide(); }
 	}
-	
+
 	function isTitleDD(e) {
 		return (e.is(":even") && e.prev().is("dd"));
 	}
-	
+
 	$.fn.horizontalBarGraph.defaults = {
 		interval: 1,
 		hasTitles: false,
@@ -750,7 +750,7 @@ $.fn.hasScrollBar = function() {
 		colors: [],
 		hoverColors: []
 	};
-	
+
 })(jQuery);
 
 /*

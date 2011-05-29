@@ -34,7 +34,7 @@
                     {{ field.errors }}
                 </div>
                 {% endfor %}
-                <div class="clearing"></div>    
+                <div class="clearing"></div>
                 <input type="submit" value="POST" />
             </form>
         </div>
@@ -51,10 +51,10 @@
                     {{ field.label_tag }}:
                     {{ field }}
                     {{ field.help_text }}
-                    {{ field.errors }}                
+                    {{ field.errors }}
                 </div>
                 {% endfor %}
-                <div class="clearing"></div>    
+                <div class="clearing"></div>
                 <input type="submit" value="PUT" />
             </form>
         </div>
@@ -73,7 +73,7 @@
 
 {% comment %}
     <pre><b>{{ response.status }} {{ response.status_text }}</b>
-        {% autoescape off %}        
+        {% autoescape off %}
         {% for key, val in response.headers.items %}<b>{{ key }}:</b> {{ val|urlize_quoted_links }}
         {% endfor %}
         {{ content|urlize_quoted_links }}</pre>

@@ -2,7 +2,7 @@
 {% load i18n dmark %}
 
 {% block title %}-
-    {% trans "Thread" %} 
+    {% trans "Thread" %}
     /{{ thread.section.slug }}/{{ thread.op_post.pid }}
 {% endblock %}
 
@@ -12,7 +12,7 @@
         <a href="." target="_webapp" class="home">{% trans "Back" %}</a>
         <h1>{{ thread.section.name }}</h1>
     </div>
-    
+
     <ul id="threads" class="rounded">
         {% for post in thread.posts %}
             <li id="{{ post.pid }}" data-id="{{ post.id }}" class="post">

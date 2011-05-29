@@ -459,7 +459,7 @@ blockquote {
     Author: Paul Bagwell
  */
 
-.number a {color: inherit; text-decoration: none;} 
+.number a {color: inherit; text-decoration: none;}
 .dashed {border: 1px dashed;}
 .stats {border: 1px dashed; padding: 0 5px;}
 #container + iframe {display: none;} /* Recaptcha bug */
@@ -469,8 +469,8 @@ blockquote {
 .post .tripcode:not(:empty):before {content: "!";}
 .post .tripcode.staff {color: #800080;}
 .is_closed, .is_pinned, .post-icon, .rss, .useragent, .useragent img {
-    width: 16px; 
-    height: 16px; 
+    width: 16px;
+    height: 16px;
 }
 .is_closed, .is_pinned, .post-icon, .rss {
     background-image: url('../images/sprites.png');
@@ -493,7 +493,7 @@ blockquote {
 .spoiler:hover {color: #333;}
 
 
-/* yeah 
+/* yeah
 #container > b { display: block; position: fixed; top: 50%; left: -1em; width: 1em; height: 100%; z-index: -1; background: #f60; -webkit-transform: scale(1.5) rotate(-45deg); -webkit-transform-origin: 20% 0%; -moz-transform: scale(1.5) rotate(-45deg); -moz-transform-origin: 20% 0%; border: 1px dotted #f60; }
 #container > b.border-b { -webkit-transform: scale(1.5) rotate(45deg); -webkit-transform-origin: 80% 0%; -moz-transform: scale(1.5) rotate(45deg); -moz-transform-origin: 80% 0%; left: auto; right: -1em; }
 #container > b.border-c { -webkit-transform: scale(1.5) rotate(-45deg); -webkit-transform-origin: 20% 0%; -moz-transform: scale(1.5) rotate(-45deg); -moz-transform-origin: 20% 0%; left: 2em; top: 0; }

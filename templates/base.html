@@ -1,5 +1,5 @@
 {% load i18n %}{% load macros %}
-<!DOCTYPE html>  
+<!DOCTYPE html>
 <!--[if lt IE 8 ]> <html lang="ru" id="{{ style }}" class="ie7"> <![endif]-->
 <!--[if IE 8 ]>    <html lang="ru" id="{{ style }}" class="ie8"> <![endif]-->
 <!--[if (gte IE 9)|!(IE)]><!--> <html lang="ru" id="{{ style }}"> <!--<![endif]-->
@@ -48,7 +48,7 @@
         {% if thread and not session.bottomForm or not thread %}
             {% block newpost %}{% endblock %}
         {% endif %}
-        
+
         <section id="main">
             {% block content %}{% endblock %}
         </section>
@@ -64,7 +64,7 @@
     <script src="{{ STATIC_URL }}js/plugins.js?v=21"></script>
     <script src="{{ STATIC_URL }}js/script.js?v=54"></script>
     <!--
-    <script src="{{ STATIC_URL }}js/profiling/yahoo-profiling.min.js"></script>   
+    <script src="{{ STATIC_URL }}js/profiling/yahoo-profiling.min.js"></script>
     <script src="{{ STATIC_URL }}js/profiling/config.js"></script>
     -->
     <!--[if lt IE 7 ]>
