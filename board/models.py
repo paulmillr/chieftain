@@ -1,34 +1,33 @@
 # encoding: utf-8
-from collections import Counter
-from datetime import datetime
+from random import randint
 from hashlib import sha1
+from datetime import datetime
+
 from ipcalc import Network
 from dmark import DMark
-from random import randint
+
 from django import forms
 from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.syndication.views import Feed
 from django.core.cache import cache
 from django.db import models
-from django.db.models.aggregates import Count
-from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
+
 from board import fields, tools
 
 __all__ = [
-    'DAY', 'cached',
+    'cached',
+    'Post', 'Thread', 'Section', 'SectionGroup',
+    'File', 'FileType', 'FileTypeGroup',
     'PostManager', 'SectionManager', 'SectionGroupManager',
     'Poll', 'Choice', 'Vote',
-    'Thread', 'Post', 'File', 'FileTypeGroup', 'FileType', 'Section',
-    'SectionGroup', 'UserProfile', 'PostForm', 'PostFormNoCaptcha',
-    'SectionFeed', 'ThreadFeed', 'DeniedIP', 'Wordfilter',
+    'UserProfile',
+    'PostFormNoCaptcha', 'PostForm', 'Wordfilter', 'DeniedIP',
+    'SectionFeed', 'ThreadFeed',
 ]
-
-DAY = 86400  # seconds in a day
-MEGABYTE = 2 ** 20
 
 
 def get_file_path(base):
@@ -41,15 +40,15 @@ def get_file_path(base):
     return closure
 
 
-def cached(seconds=900, key=None):
+def cached(seconds=15 * 60, key=None):
     """Cache the result of a function call."""
     def do_cache(f):
         def closure(*args, **kwargs):
-            if key:
-                cache_key = key
-            else:
-                cache_key = sha1(f.__module__ + f.__name__ +
-                    str(args) + str(kwargs)).hexdigest()
+            cache_key = key or sha1(
+                f.__module__ + f.__name__ +
+                str(args) + str(kwargs)
+            ).hexdigest()
+
             result = cache.get(cache_key)
             if result is None:
                 result = f(*args, **kwargs)
@@ -59,46 +58,35 @@ def cached(seconds=900, key=None):
     return do_cache
 
 
-class ThreadManager(models.Manager):
+class _DeletionMixIn(object):
     def get_query_set(self):
-        return super(ThreadManager, self).get_query_set().filter(
-            is_deleted=False)
-
-    def post_count(self):
-        return self.annotate(Count('post')).order_by('-post__count')
+        return super(_DeletionMixIn, self).get_query_set() \
+               .filter(is_deleted='Deleted' in self.__class__.__name__)
 
 
-class DeletedThreadManager(models.Manager):
-    def get_query_set(self):
-        return super(DeletedThreadManager, self).get_query_set().filter(
-            is_deleted=True)
+class ThreadManager(_DeletionMixIn, models.Manager):
+    pass
 
 
-class PostManager(models.Manager):
-    def get_query_set(self):
-        return super(PostManager, self).get_query_set().filter(
-            is_deleted=False)
+class DeletedThreadManager(ThreadManager):
+    pass
 
 
-class DeletedPostManager(models.Manager):
-    def get_query_set(self):
-        return super(DeletedPostManager, self).get_query_set().filter(
-            is_deleted=True)
+class PostManager(_DeletionMixIn, models.Manager):
+    pass
 
 
-class FileManager(models.Manager):
-    def get_query_set(self):
-        return super(FileManager, self).get_query_set().filter(
-            is_deleted=False)
+class DeletedPostManager(PostManager):
+    pass
 
+
+class FileManager(_DeletionMixIn, models.Manager):
     def random_images(self):
         return self.filter(image_width__gt=200).order_by('?')
 
 
-class DeletedFileManager(models.Manager):
-    def get_query_set(self):
-        return super(DeletedFileManager, self).get_query_set().filter(
-            is_deleted=True)
+class DeletedFileManager(FileManager):
+    pass
 
 
 class SectionManager(models.Manager):
@@ -107,7 +95,7 @@ class SectionManager(models.Manager):
 
 class SectionGroupManager(models.Manager):
     """Manager for SectionGroup."""
-    @cached(DAY, 'sections')
+    @cached(24 * 60 * 60, 'sections')
     def tree(self):
         """
            Gets list of board sections.
@@ -192,9 +180,9 @@ class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
     bump = models.DateTimeField(_('Bump date'), blank=True, db_index=True)
-    is_deleted = models.BooleanField(_('Is deleted'), default=False)
     is_pinned = models.BooleanField(_('Is pinned'), default=False)
     is_closed = models.BooleanField(_('Is closed'), default=False)
+    is_deleted = models.BooleanField(_('Is deleted'), default=False)
     poll = models.OneToOneField('Poll', verbose_name=_('Poll'), blank=True,
         null=True)
     # basically, this needs to be stored in some sort of cache
@@ -236,9 +224,8 @@ class Thread(models.Model):
     def posts_html(self):
         return self.posts().values('html', 'ip')
 
-    def count(self):
+    def count(self, limit=5):
         """Returns dict, that contains info about thread files and posts."""
-        limit = 5
         ps = self.posts()
         total = ps.count()
         if total <= limit:
@@ -448,7 +435,7 @@ class Section(models.Model):
     force_files = models.BooleanField(
         _('Force to post file on thread creation'), default=True)
     filesize_limit = models.PositiveIntegerField(_('Filesize limit'),
-        default=MEGABYTE * 5)
+        default=2 ** 20 * 5)
     anonymity = models.BooleanField(_('Force anonymity'), default=False)
     default_name = models.CharField(_('Default poster name'), max_length=64,
         default=_('Anonymous'))
@@ -667,11 +654,10 @@ class SectionFeed(Feed):
 class ThreadFeed(Feed):
     """Thread posts RSS feed. Contains all posts in thread."""
     def get_object(self, request, section_slug, op_post):
-        try:
-            post = Post.objects.get(thread__section__slug=section_slug,
-                pid=op_post, is_op_post=True)
-        except Post.DoesNotExist:
-            raise Http404
+        post = get_object_or_404(Post,
+            thread__section__slug=section_slug,
+            pid=op_post, is_op_post=True
+        )
         t = post.thread
         self.slug = section_slug
         self.op_post = op_post

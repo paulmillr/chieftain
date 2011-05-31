@@ -1,20 +1,17 @@
-# encoding: utf-8
-#from board.models import Post, Thread
+from random import randint
 from datetime import datetime
-from random import random
+
 from django.core.management.base import BaseCommand
 
 
 def rand():
-    return str(int(random() * 100000) % 50000)
+    return randint(0, 50000)
 
 
-def make_posts(section='au', threads=100, posts=200):
-    # >>> wipe(50000, 'b')
-    # 50000 posts in 0:34:54.923063
+def make_posts(section, threads=100, posts=200):
     start = datetime.now()
-
-    print '{0} posts in {1}'.format(posts, datetime.now() - start)
+    # ...
+    print('{0} posts in {1}'.format(posts, datetime.now() - start))
 
 
 class Command(BaseCommand):

@@ -1,20 +1,19 @@
 from board.dmark import DMark
-from django import template
-from django.utils.encoding import force_unicode
+from django.template import Library
 from django.utils.safestring import mark_safe
 
-register = template.Library()
+register = Library()
 
 
+@register.filter
 def dmark(value):
     """
-    Runs DMark over a given value.
+        Run DMark over a given value.
 
-    Syntax::
+        Syntax::
 
-        {{ value|dmark }}
+            {{ value|dmark }}
     """
-    return mark_safe(DMark().convert(force_unicode(value)))
+    return mark_safe(DMark().convert(value))
 
 dmark.is_safe = True
-register.filter(dmark)

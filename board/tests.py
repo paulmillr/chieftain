@@ -1,6 +1,4 @@
-from nose.tools import raises
-from board.models import Post
-from board.tools import make_post_descriptions, make_tripcode
+from board.tools import make_tripcode
 
 
 def post_description_test():

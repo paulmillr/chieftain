@@ -9,24 +9,13 @@ def settings(request):
 
 
 def session(request):
-    """Returns str of session settings keys.
-
-       Example:
-       s = request.session['settings']
-       s['test'] = 551
-       s['test_2'] = 120
-       {'session_classes': 'test test2'}
-    """
     # usually this is set by middleware, but
     # when user logs out, session destroys itself and we need to reinit it
     if 'settings' not in request.session:
         set_session_defaults(request)
+    user = request.user
     session = request.session
     settings = session['settings']
-    user = request.user
-
-    def pop_from_session(key, default=''):
-        return settings.pop(key) if settings.get(key) else default
 
     if session.get('no_captcha'):
         settings['no_captcha'] = True
@@ -36,10 +25,10 @@ def session(request):
         if user.is_superuser:
             settings['is_admin'] = True
     return {
-        'style': pop_from_session('style', 'photon'),
-        'password': pop_from_session('password'),
-        'session': dict(settings.items()),
-        'session_classes': ' '.join(settings.keys()),
+        'style': settings.pop('style', 'photon'),
+        'password': settings.pop('password', ''),
+        'session': settings.copy(),
+        'session_classes': ' '.join(settings),
         'hidden': list(session['hidden']),
         'feed': list(session['feed']),
     }

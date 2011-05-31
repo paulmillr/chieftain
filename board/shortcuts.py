@@ -1,9 +1,11 @@
 import codecs
-from django.core.paginator import InvalidPage, EmptyPage
+
 from django.http import Http404
 from django.template import RequestContext
 from django.template.loader import render_to_string
-from board.models import SectionGroup  # block recursive import
+from django.core.paginator import InvalidPage, EmptyPage
+
+from board.models import SectionGroup
 
 __all__ = ['get_page_or_404', 'add_sidebar', 'render_to_file']
 
