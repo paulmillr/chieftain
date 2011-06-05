@@ -116,7 +116,7 @@ def finish_post(post, user, thread, files, section, ip, useragent, feed=None):
     post.ip = ip
     post.date = datetime.now()
     post.password = get_key(post.password)
-    post.is_op_post = bool(thread)
+    post.is_op_post = not thread
 
     if models.Wordfilter.objects.scan(post.message):
         raise ValidationError(_('Your post contains blacklisted word.'))
