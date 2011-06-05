@@ -13,13 +13,6 @@ urlpatterns = patterns('api1.views', (r'^$', 'api'),
     (r'^hidden/$', HideRootResource.as_view()),
     (r'^hidden/(?P<key>[\d]+)?$', HideResource.as_view()),
 
-    (r'^poll/$', PollRootResource.as_view()),
-    (r'^poll/(?P<id>\d+)$', PollResource.as_view()),
-    (r'^choice/$', ChoiceRootResource.as_view()),
-    (r'^choice/(?P<id>\d+)$', ChoiceResource.as_view()),
-    (r'^vote/$', VoteRootResource.as_view()),
-    (r'^vote/(?P<id>\d+)', VoteResource.as_view()),
-
     (r'^thread/$', ThreadRootResource.as_view()),
     (r'^thread/(?P<section__slug>\w+)/$', ThreadRootResource.as_view()),
     (r'^thread/(?P<id>\d+)$', ThreadResource.as_view()),

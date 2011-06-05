@@ -92,9 +92,6 @@ def thread(request, section_slug, op_post):
     post = get_object_or_404(Post, thread__section__slug=section_slug,
         pid=op_post, is_deleted=False)
     thread = post.thread
-    if thread.poll_id:
-        ip = request.META['REMOTE_ADDR']
-        thread.poll.vote_data = thread.poll.get_vote_data(ip)
     if not post.is_op_post:
         return redirect('/{0}/{1}#post{2}'.format(
             thread.section, thread.op_post.pid, post.pid))

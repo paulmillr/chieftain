@@ -25,9 +25,6 @@ from modpanel.views import is_mod
 __all__ = [
     'ValidationError', 'api',
     'create_post', 'mod_delete_post',
-    'PollRootResource', 'PollResource',
-    'ChoiceRootResource', 'ChoiceResource',
-    'VoteRootResource', 'VoteResource',
     'ThreadRootResource', 'ThreadResource',
     'PostRootResource', 'PostResource',
     'SectionRootResource', 'SectionResource',
@@ -257,57 +254,6 @@ def mod_delete_post(request, post):
 
         for p in posts:
             p.remove()
-
-
-class PollRootResource(RootModelResource):
-    """A list resource for Poll."""
-    model = models.Poll
-
-
-class PollResource(ModelResource):
-    """A read resource for Poll."""
-    model = models.Poll
-
-
-class ChoiceRootResource(RootModelResource):
-    """A list resource for Choice."""
-    model = models.Choice
-
-
-class ChoiceResource(ModelResource):
-    """A read resource for Choice."""
-    model = models.Choice
-
-
-class VoteRootResource(RootModelResource):
-    """A list/create resource for Vote."""
-    allowed_methods = anon_allowed_methods = ('GET', 'POST')
-    model = models.Vote
-
-    def post(self, request, auth, *args, **kwargs):
-        try:
-            choice = models.Choice.objects.get(id=request.POST['choice'])
-        except Choice.DoesNotExist:
-            raise ResponseException(status.NOT_FOUND)
-        ip = request.META['REMOTE_ADDR']
-        check = models.Vote.objects.filter(ip=ip, poll=choice.poll)
-        if check:
-            vote = check.get()
-            vote.choice.vote_count -= 1
-            vote.choice.save()
-            vote.choice = choice
-            vote.poll = choice.poll
-        else:
-            vote = Vote(poll=choice.poll, choice=choice, ip=ip)
-        vote.save()
-        choice.vote_count += 1
-        choice.save()
-        return Response(status.CREATED, choice.poll.choices().values())
-
-
-class VoteResource(ModelResource):
-    """A read resource for Vote."""
-    model = models.Vote
 
 
 class ThreadRootResource(RootModelResource):

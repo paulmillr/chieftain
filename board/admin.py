@@ -2,17 +2,6 @@ from django.contrib import admin
 from board import models
 
 
-class ChoiceInline(admin.TabularInline):
-    model = models.Choice
-    extra = 3
-    exclude = ('vote_count',)
-
-
-class PollAdmin(admin.ModelAdmin):
-    list_display = ('question', 'expires')
-    inlines = [ChoiceInline]
-
-
 class ThreadAdmin(admin.ModelAdmin):
     """Admin controller for threads."""
     exclude = ('html',)
@@ -26,9 +15,6 @@ class PostAdmin(admin.ModelAdmin):
 class DeniedIPAdmin(admin.ModelAdmin):
     search_fields = ('ip',)
 
-admin.site.register(models.Poll, PollAdmin)
-admin.site.register(models.Choice)
-admin.site.register(models.Vote)
 admin.site.register(models.Thread, ThreadAdmin)
 admin.site.register(models.Post, PostAdmin)
 admin.site.register(models.File)

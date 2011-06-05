@@ -823,8 +823,6 @@ settings: {
 },
 
 style: {
-    //votedPolls: new BoardStorage('polls'),
-
     init: function() {
         var style = $.settings('style');
         checkForSidebarScroll();
@@ -981,30 +979,6 @@ style: {
                 posts.show();
             }
         });
-
-        /*$('.threads').delegate('.poll input[type="radio"]', 'click', function() {
-            var radio = $(this);
-            //chief.api.post('/vote/', {'choice': this.value})
-            .error(defaultErrorCallback)
-            .success(function(data) {
-                var total = 0,
-                    info = [],
-                    item,
-                    length,
-                    poll = radio.closest('dl'),
-                    pollId = parseInt(poll.attr('id').replace('poll', ''))
-
-                for (var i=0; i < data.length; i++) {
-                    item = data[i];
-                    length = item.vote_count > 0 ? total / item.vote_count : 0;
-                    $('#vote-result' + item.id).text(item.vote_count);
-                }
-
-                $('.hbg-title').remove()
-                style.votedPolls.set(pollId, radio.attr('value'));
-                poll.horizontalBarGraph({interval: 0.1});
-            });
-        });*/
 
         // strip long posts at section page
         $('.post .message').each(function() {

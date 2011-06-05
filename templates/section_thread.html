@@ -20,21 +20,6 @@
             <div class="sliderInfo"><span class="sliderVal"></span>{% trans "reply count" %}</div>
         </span>
     </section>
-    {% if thread.poll_id %}
-        <section class="poll{% if thread.poll.vote_data %} voted{% endif %}">
-            {{ thread.poll.vote_data.id }}
-            <div class="hbg-title">{{ thread.poll.question }}</div>
-            <dl id="poll{{ thread.poll_id }}" title="{{ thread.poll.question }}">
-                {% for choice in thread.poll.choice_set.all %}
-                <dt id="vote-info{{ choice.id }}">
-                    <input type="radio" name="choice" value="{{ choice.id }}">
-                    {{ choice.name }}
-                </dt>
-                <dd id="vote-result{{ choice.id }}"></dd>
-                {% endfor %}
-            </dl>
-        </section>
-    {% endif %}
     <section class="thread" id="thread{{ thread.id }}">
         {% autoescape off %}
         {% for post in thread.posts_html %}

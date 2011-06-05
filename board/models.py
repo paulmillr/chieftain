@@ -23,7 +23,6 @@ __all__ = [
     'Post', 'Thread', 'Section', 'SectionGroup',
     'File', 'FileType', 'FileTypeGroup',
     'PostManager', 'SectionManager', 'SectionGroupManager',
-    'Poll', 'Choice', 'Vote',
     'UserProfile',
     'PostFormNoCaptcha', 'PostForm', 'Wordfilter', 'DeniedIP',
     'SectionFeed', 'ThreadFeed',
@@ -119,63 +118,6 @@ class WordfilterManager(models.Manager):
         return any(word in message for word in self.words())
 
 
-class Poll(models.Model):
-    """Thread polls."""
-    question = models.CharField(_('Question'), max_length=200)
-    expires = models.DateTimeField(_('Expire date'))
-
-    allowed_fields = ('id', 'question', ('choices', ('name', 'vote_count')))
-
-    class Meta:
-        verbose_name = _('Poll')
-        verbose_name_plural = _('Polls')
-
-    def __unicode__(self):
-        return self.question
-
-    def choices(self):
-        return self.choice_set.all()
-
-    def get_vote_data(self, ip):
-        f = Vote.objects.filter(ip=ip, poll=self)
-        if not f:
-            return False
-        return f.get()
-
-
-class Choice(models.Model):
-    """Thread poll answers."""
-    name = models.CharField(_('Choice name'), max_length=100)
-    poll = models.ForeignKey('Poll', verbose_name=_('Poll'))
-    vote_count = models.PositiveIntegerField(_('Vote count'), default=0)
-
-    allowed_fields = ('id', 'name', 'vote_count', ('poll', ('question',)))
-
-    class Meta:
-        verbose_name = _('Poll choice')
-        verbose_name_plural = _('Poll choices')
-
-    def __unicode__(self):
-        return u'{0} - {1}'.format(self.poll, self.name)
-
-
-class Vote(models.Model):
-    """Thread poll votes."""
-    poll = models.ForeignKey('Poll', verbose_name=_('Poll'), blank=True,
-        null=True)
-    choice = models.ForeignKey('Choice', verbose_name=_('Choice'))
-    ip = models.IPAddressField(_('IP'), blank=True)
-
-    allowed_fields = ('id', 'choice')
-
-    class Meta:
-        verbose_name = _('Poll vote')
-        verbose_name_plural = _('Poll votes')
-
-    def __unicode__(self):
-        return u'{0}, {1}'.format(self.choice, self.ip)
-
-
 class Thread(models.Model):
     """Groups of posts."""
     section = models.ForeignKey('Section')
@@ -183,8 +125,6 @@ class Thread(models.Model):
     is_pinned = models.BooleanField(_('Is pinned'), default=False)
     is_closed = models.BooleanField(_('Is closed'), default=False)
     is_deleted = models.BooleanField(_('Is deleted'), default=False)
-    poll = models.OneToOneField('Poll', verbose_name=_('Poll'), blank=True,
-        null=True)
     # basically, this needs to be stored in some sort of cache
     # but because of star location, we'll use sql.
     # sorry for the denormalization
