@@ -60,7 +60,7 @@ def cached(seconds=15 * 60, key=None):
 class _DeletionMixIn(object):
     def get_query_set(self):
         return super(_DeletionMixIn, self).get_query_set() \
-               .filter(is_deleted='Deleted' in self.__class__.__name__)
+               .filter(is_deleted=('Deleted' in self.__class__.__name__))
 
 
 class ThreadManager(_DeletionMixIn, models.Manager):
