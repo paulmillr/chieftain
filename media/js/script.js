@@ -27,7 +27,7 @@ var chief = {
         };
 
         var methods = {};
-        $.each(['get', 'post', 'put', 'delete'], function(i, method) {
+        $.each(['get', 'post', 'put', 'del'], function(i, method) {
             methods[method] = apiBuilder(method);
         });
         methods.url = url;
@@ -523,7 +523,7 @@ board: {
                 }
             } else {  // remove
                 span.removeClass('remove').addClass('add');
-                chief.api.delete(apiLink + postId).error(defaultErrorCallback);
+                chief.api.del(apiLink + postId).error(defaultErrorCallback);
                 if (current.onRemove) {
                     current.onRemove(cont);
                 }
@@ -542,12 +542,12 @@ board: {
                 .error(defaultErrorCallback);
             } else {
                 t.removeClass('remove').addClass('add');
-                chief.api.delete(apiLink + postId).error(defaultErrorCallback);
+                chief.api.del(apiLink + postId).error(defaultErrorCallback);
             }
         });
 
         $('.storage-clear-icon').click(function(event) {
-            chief.api.delete($(this).attr('data-storage'));
+            chief.api.del($(this).attr('data-storage'));
         });
 
         function previewPosts() {
@@ -681,41 +681,41 @@ board: {
             url += '?password=' + password;
             url += '&' + $('.removePosts').serialize();
             target.addClass('deleted');
-            chief.api.delete(url)
-            .error(function(xhr) {
-                $.notification('error', $.parseJSON(xhr.responseText)['detail']);
-                target.removeClass('deleted');
-            })
-            .success(function(data) {
-                if (only_files) {
-                    slideRemove(target);
-                    return true;
-                }
-
-                // Deleting all user posts.
-                if (delete_all) {
-                    var t = target.find('.ip').text(),
-                        d = $('.ip').filter(function() {
-                        return $(this).text() === t;
-                    }).each(function() {
-                        var post = $(this).closest('.post');
-                        post.addClass('deleted');
-                        slideRemove(post);
-                    });
-                }
-
-                // post is not first in thread
-                if (target.prev().length !== 0) {
-                    slideRemove(target.add(target.find('img')));
-                } else {
-                    if (curPage.type === 'thread') {
-                        window.location.href = './';
+            chief.api.del(url)
+                .error(function(xhr) {
+                    $.notification('error', $.parseJSON(xhr.responseText)['detail']);
+                    target.removeClass('deleted');
+                })
+                .success(function(data) {
+                    if (only_files) {
+                        slideRemove(target);
+                        return true;
                     }
-                    var thread = target.parent();
-                    thread.children().addClass('deleted');
-                    slideRemove(thread);
-                }
-            });
+
+                    // Deleting all user posts.
+                    if (delete_all) {
+                        var t = target.find('.ip').text(),
+                            d = $('.ip').filter(function() {
+                            return $(this).text() === t;
+                        }).each(function() {
+                            var post = $(this).closest('.post');
+                            post.addClass('deleted');
+                            slideRemove(post);
+                        });
+                    }
+
+                    // post is not first in thread
+                    if (target.prev().length !== 0) {
+                        slideRemove(target.add(target.find('img')));
+                    } else {
+                        if (curPage.type === 'thread') {
+                            window.location.href = './';
+                        }
+                        var thread = target.parent();
+                        thread.children().addClass('deleted');
+                        slideRemove(thread);
+                    }
+                });
         });
 
         $('.thread').delegate('.edit', 'click', function(event) {
