@@ -1,4 +1,6 @@
+from django.conf import settings
 from django.conf.urls.defaults import include, patterns
+from django.conf.urls.static import static
 from django.contrib import admin
 admin.autodiscover()
 
@@ -13,3 +15,8 @@ urlpatterns = patterns('',
     (r'^mobile/', include('mobile.urls')),
     (r'^', include('board.urls')),
 )
+
+for item in ['STATIC', 'MEDIA']:
+    url = getattr(settings, item + '_URL')
+    root = getattr(settings, item + '_ROOT')
+    urlpatterns += static(url, document_root=root)

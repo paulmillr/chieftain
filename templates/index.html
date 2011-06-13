@@ -2,164 +2,164 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>{{ settings.SITE_TITLE }} &mdash; {% trans "Main page" %}</title>
-    <link rel="stylesheet" href="{{ STATIC_URL }}css/index.css" media="all">
-    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.js"></script>
-    <script src="{{ STATIC_URL }}js/preload.js?v=13"></script>
-    <script src="{{ STATIC_URL }}js/plugins.js?v=19"></script>
-    <script>
-        var media_url = '{{ settings.MEDIA_URL }}';
-        $(function() {
-            $('.mpHiderandom .random span').toggleClass('minimized');
-            $('.mpHidebookmarks .bookmarks span').toggleClass('minimized');
-            $('.wellcome p').click(function() {
-                $('.wellcome').hide('fast');
-            });
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <title>{{ settings.SITE_TITLE }} &mdash; {% trans "Main page" %}</title>
+  <link rel="stylesheet" href="{{ STATIC_URL }}css/index.css" media="all">
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.js"></script>
+  <script src="{{ STATIC_URL }}js/preload.js?v=13"></script>
+  <script src="{{ STATIC_URL }}js/plugins.js?v=19"></script>
+  <script>
+    var media_url = '{{ settings.MEDIA_URL }}';
+    $(function() {
+      $('.mpHiderandom .random span').toggleClass('minimized');
+      $('.mpHidebookmarks .bookmarks span').toggleClass('minimized');
+      $('.wellcome p').click(function() {
+        $('.wellcome').hide('fast');
+      });
 
-            $('h4 span').click(function() {
-                var span = $(this);
-                span.toggleClass('minimized');
-                span.parent().parent().find('ul, .banner')
-                .slideToggle('fast', function() {
-                    $.settings('mpHide' + span.parent().attr('class'), span.hasClass('minimized'));
-                });
-            });
-
-            $('.set-d').click(function() {
-                $('.set-box').slideToggle('fast');
-            });
-
-            $('.banner').click(function(event) {
-                event.preventDefault();
-                var banner = $(this);
-
-                $.api.get('file/random_image/1')
-                .success(function(data) {
-                    data = data[0];
-                    banner.find('img').attr('src', media_url + data.file);
-                    banner.find('a').attr('href', media_url + data.thumb);
-                });
-
-                banner.find('a')
-            });
+      $('h4 span').click(function() {
+        var span = $(this);
+        span.toggleClass('minimized');
+        span.parent().parent().find('ul, .banner')
+        .slideToggle('fast', function() {
+          $.settings('mpHide' + span.parent().attr('class'), span.hasClass('minimized'));
         });
-    </script>
+      });
+
+      $('.set-d').click(function() {
+        $('.set-box').slideToggle('fast');
+      });
+
+      $('.banner').click(function(event) {
+        event.preventDefault();
+        var banner = $(this);
+
+        $.api.get('file/random_image/1')
+        .success(function(data) {
+          data = data[0];
+          banner.find('img').attr('src', media_url + data.file);
+          banner.find('a').attr('href', media_url + data.thumb);
+        });
+
+        banner.find('a')
+      });
+    });
+  </script>
 </head>
 <body class="{{ session_classes }}">
 <div class="center">
   <header>
-    <div class="head"><a href="/" class="logo">{{ settings.SITE_TITLE }}</a>
-      <div class="wellcome">
-        {% trans "Welcome back" %} </div>
-    </div>
+  <div class="head"><a href="/" class="logo">{{ settings.SITE_TITLE }}</a>
+    <div class="wellcome">
+    {% trans "Welcome back" %} </div>
+  </div>
   </header>
   <div class="box1">
-    <nav>
-      <div class="nav">
-        <div class="nl">
-            <h3>{{ navigation.0.name }}</h3>
-            <ul>
-            {% for section in navigation.0.sections|slice:":13" %}
-              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
-            {% endfor %}
-            </ul>
-            <ul>
-            {% for section in navigation.0.sections|slice:"13:" %}
-                <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
-            {% endfor %}
-            </ul>
-            <br class="clear">
-        </div>
-        <div class="nr">
-          <div class="nr2">
-            <h3>{{ navigation.1.name }}</h3>
-            <ul>
-            {% for section in navigation.1.sections %}
-              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
-            {% endfor %}
-            </ul>
-            <h3>{{ navigation.2.name }}</h3>
-            <ul>
-            {% for section in navigation.2.sections %}
-              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
-            {% endfor %}
-            </ul>
-          </div>
-          <div class="nr3">
-            <h3>{{ navigation.3.name }}<img src="{{ STATIC_URL }}images/18.gif" width="30" height="22" class="yo18"></h3>
-            <ul>
-            {% for section in navigation.3.sections %}
-              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
-            {% endfor %}
-            </ul>
-            <h3>{{ navigation.4.name }}</h3>
-            <ul>
-            {% for section in navigation.4.sections %}
-              <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
-            {% endfor %}
-            </ul>
-          </div>
-          <br class="clear">
-        </div>
-        <br class="clear">
+  <nav>
+    <div class="nav">
+    <div class="nl">
+      <h3>{{ navigation.0.name }}</h3>
+      <ul>
+      {% for section in navigation.0.sections|slice:":13" %}
+        <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
+      {% endfor %}
+      </ul>
+      <ul>
+      {% for section in navigation.0.sections|slice:"13:" %}
+        <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
+      {% endfor %}
+      </ul>
+      <br class="clear">
+    </div>
+    <div class="nr">
+      <div class="nr2">
+      <h3>{{ navigation.1.name }}</h3>
+      <ul>
+      {% for section in navigation.1.sections %}
+        <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
+      {% endfor %}
+      </ul>
+      <h3>{{ navigation.2.name }}</h3>
+      <ul>
+      {% for section in navigation.2.sections %}
+        <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
+      {% endfor %}
+      </ul>
       </div>
-    </nav>
-  </div>
-  <div class="main">
-    <div class="left">
-      <div class="pop2">
-          <h4 class="feed">{% trans "Feed" %}<span></span></h4>
-          <ul>
-          {% for p in bookmarks %}
-            <li><a href="{{ p.link }}">/{{ p.thread__section__name }}/</a>&nbsp;&mdash;
-            {% if p.message|length > 100 %}
-                {{p.message|slice:":100"}}...
-            {% else %}
-                {{ p.message }}
-            {% endif %}
-            </li>
-          {% endfor %}
-          </ul>
+      <div class="nr3">
+      <h3>{{ navigation.3.name }}<img src="{{ STATIC_URL }}images/18.gif" width="30" height="22" class="yo18"></h3>
+      <ul>
+      {% for section in navigation.3.sections %}
+        <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
+      {% endfor %}
+      </ul>
+      <h3>{{ navigation.4.name }}</h3>
+      <ul>
+      {% for section in navigation.4.sections %}
+        <li><a href="/{{ section.slug }}/">{{ section.name }}</a></li>
+      {% endfor %}
+      </ul>
       </div>
       <br class="clear">
-      <div class="txt-box">{% trans "Welcome text" %}</div>
-    </div>
-    <div class="right">
-      <h4 class="random">{% trans "Random image" %}<span></span></h4>
-      {% for f in random_images %}
-      <div class="banner">
-          <a href="{{ f.file.url }}"><img src="{{ f.thumb.url }}" id="file{{ f.id }}" width="126" height="80"></a>
-      </div>
-      {% endfor %}
     </div>
     <br class="clear">
+    </div>
+  </nav>
+  </div>
+  <div class="main">
+  <div class="left">
+    <div class="pop2">
+      <h4 class="feed">{% trans "Feed" %}<span></span></h4>
+      <ul>
+      {% for p in bookmarks %}
+      <li><a href="{{ p.link }}">/{{ p.thread__section__name }}/</a>&nbsp;&mdash;
+      {% if p.message|length > 100 %}
+        {{p.message|slice:":100"}}...
+      {% else %}
+        {{ p.message }}
+      {% endif %}
+      </li>
+      {% endfor %}
+      </ul>
+    </div>
+    <br class="clear">
+    <div class="txt-box">{% trans "Welcome text" %}</div>
+  </div>
+  <div class="right">
+    <h4 class="random">{% trans "Random image" %}<span></span></h4>
+    {% for f in random_images %}
+    <div class="banner">
+      <a href="{{ f.file.url }}"><img src="{{ f.thumb.url }}" id="file{{ f.id }}" width="126" height="80"></a>
+    </div>
+    {% endfor %}
+  </div>
+  <br class="clear">
   </div>
   <footer>
-    <div class="foot">
-        [<a href="/">главная</a>]
-        [<a href="/faq.html">FAQ</a>]
-        [<a href="/contacts.html">контакты</a>]
-        [<a href="http://2ch.userecho.com/">идеи и предложения</a>]
-        [<a href="http://www.so-slow.com/">so slow</a>]
-        [<a href="http://twitter.com/2ch_ru">twitter</a>]
-        [<a href="http://www.formspring.me/2chabu">formsping</a>]
-        [<a href="/index2.html">версия с фреймом</a>]
-        <div class="copyright">
-            {% trans "Runs on" %} <a href="http://chieftain.pbagwl.com/">chieftain</a>
-        </div>
+  <div class="foot">
+    [<a href="/">главная</a>]
+    [<a href="/faq.html">FAQ</a>]
+    [<a href="/contacts.html">контакты</a>]
+    [<a href="http://2ch.userecho.com/">идеи и предложения</a>]
+    [<a href="http://www.so-slow.com/">so slow</a>]
+    [<a href="http://twitter.com/2ch_ru">twitter</a>]
+    [<a href="http://www.formspring.me/2chabu">formsping</a>]
+    [<a href="/index2.html">версия с фреймом</a>]
+    <div class="copyright">
+      {% trans "Runs on" %} <a href="http://chieftain.pbagwl.com/">chieftain</a>
     </div>
+  </div>
 </footer>
 </div>
 <script type='text/javascript'>
 var _ues = {host: '2ch.userecho.com', forum: '1773', lang: 'ru', tab_show: false};
 (function() {
-    var _ue = document.createElement('script');
-    _ue.type = 'text/javascript';
-    _ue.async = true;
-    _ue.src = ('https:' == document.location.protocol ? 'https://s3.amazonaws.com/' : 'http://') + 'cdn.userecho.com/js/widget-1.4.gz.js';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(_ue, s);
+  var _ue = document.createElement('script');
+  _ue.type = 'text/javascript';
+  _ue.async = true;
+  _ue.src = ('https:' == document.location.protocol ? 'https://s3.amazonaws.com/' : 'http://') + 'cdn.userecho.com/js/widget-1.4.gz.js';
+  var s = document.getElementsByTagName('script')[0];
+  s.parentNode.insertBefore(_ue, s);
 })();
 </script>
 </body>

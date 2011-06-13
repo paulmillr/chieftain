@@ -9,8 +9,8 @@
 {% for group in navigation %}
 {% if not group.is_hidden %}
 <ul data-id="{{ group.id }}" class="group">
-    {% for section in group.sections %}
-    <li><a href="{{ section.slug }}/">{{ section.slug }} - {{ section.name }}</a></li>{% endfor %}
+  {% for section in group.sections %}
+  <li><a href="{{ section.slug }}/">{{ section.slug }} - {{ section.name }}</a></li>{% endfor %}
 </ul>
 {% endif %}
 {% endfor %}

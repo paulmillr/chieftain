@@ -4,27 +4,27 @@
 {% block role %}thread{% endblock %}
 
 {% block newpost %}
-    {% include "form.html" %}
+  {% include "form.html" %}
 {% endblock %}
 
 {% block threads %}
-    <section class="tools">
-        <button class="button expandImages">{% trans "Expand images" %}</button>
-        <span class="filterPosts">
-            <button class="button">{% trans "Filter posts" %}</button>
-            <span class="filterParams">
-                <input type="checkbox" name="filterImages" id="filterImages">
-                <label for="filterImages">{% trans "with images" %}</label>
-            </span>
-            <div class="slider"></div>
-            <div class="sliderInfo"><span class="sliderVal"></span>{% trans "reply count" %}</div>
-        </span>
-    </section>
-    <section class="thread" id="thread{{ thread.id }}">
-        {% autoescape off %}
-        {% for post in thread.posts_html %}
-            {{ post.html }}
-        {% endfor %}
-        {% endautoescape %}
-    </section>
+  <section class="tools">
+    <button class="button expandImages">{% trans "Expand images" %}</button>
+    <span class="filterPosts">
+      <button class="button">{% trans "Filter posts" %}</button>
+      <span class="filterParams">
+        <input type="checkbox" name="filterImages" id="filterImages">
+        <label for="filterImages">{% trans "with images" %}</label>
+      </span>
+      <div class="slider"></div>
+      <div class="sliderInfo"><span class="sliderVal"></span>{% trans "reply count" %}</div>
+    </span>
+  </section>
+  <section class="thread" id="thread{{ thread.id }}">
+    {% autoescape off %}
+    {% for post in thread.posts_html %}
+      {{ post.html }}
+    {% endfor %}
+    {% endautoescape %}
+  </section>
 {% endblock %}

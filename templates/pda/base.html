@@ -1,59 +1,59 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8" />
-        <title>{{ settings.SITE_TITLE }} {% block title %}{% endblock %}</title>
-        <style type="text/css" media="screen">@import "{{ STATIC_URL }}css/jqtouch.css";</style>
-        <style type="text/css" media="screen">@import "{{ STATIC_URL }}css/apple/theme.css";</style>
-        <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico">
-        <script src="//ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js" charset="utf-8"></script>
-        <script src="{{ STATIC_URL }}js/jqtouch.js" charset="utf-8"></script>
-        <script type="text/javascript" charset="utf-8">
-            var jQT = new $.jQTouch({
-                icon: '{{ STATIC_URL }}icon.png',
-                icon4: '{{ STATIC_URL }}icon.png',
-                addGlossToIcon: false,
-                //startupScreen: 'jqt_startup.png',
-                statusBar: 'blue',
-                preloadImages: [
-                    '{{ STATIC_URL }}css/apple/img/activeButton.png',
-                    '{{ STATIC_URL }}css/apple/img/backButton.png',
-                    '{{ STATIC_URL }}css/apple/img/grayButton.png',
-                    '{{ STATIC_URL }}css/apple/img/greenButton.png',
-                    '{{ STATIC_URL }}css/apple/img/redButton.png',
-                    '{{ STATIC_URL }}css/apple/img/whiteButton.png',
-                    '{{ STATIC_URL }}css/apple/img/loading.gif'
-                    ]
-            });
-        </script>
-        <style type="text/css" media="screen">
-            #jqt.fullscreen #home .info {
-                display: none;
-            }
-            div#jqt #about {
-                padding: 100px 10px 40px;
-                text-shadow: rgba(255, 255, 255, 0.3) 0px -1px 0;
-                font-size: 13px;
-                text-align: center;
-                background: #161618;
-            }
-            div#jqt #about p {
-                color: #aaa;
-                margin-bottom: 8px;
-            }
-            div#jqt #about a {
-                color: #fff;
-                font-weight: bold;
-                text-decoration: none;
-            }
-            #threads img {margin: 0 10px 10px 0; float: left;}
-            #threads .file {display: inline;}
-            #threads li {clear: both;}
-            .post .number {float: left; margin-right: 5px; color: #f60;}
-            .post .number:before {content: "#";}
-        </style>
+  <head>
+    <meta charset="UTF-8" />
+    <title>{{ settings.SITE_TITLE }} {% block title %}{% endblock %}</title>
+    <style type="text/css" media="screen">@import "{{ STATIC_URL }}css/jqtouch.css";</style>
+    <style type="text/css" media="screen">@import "{{ STATIC_URL }}css/apple/theme.css";</style>
+    <link rel="shortcut icon" href="{{ STATIC_URL }}favicon.ico">
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.6.1/jquery.min.js" charset="utf-8"></script>
+    <script src="{{ STATIC_URL }}js/libs/jqtouch.js" charset="utf-8"></script>
+    <script type="text/javascript" charset="utf-8">
+      var jQT = new $.jQTouch({
+        icon: '{{ STATIC_URL }}icon.png',
+        icon4: '{{ STATIC_URL }}icon.png',
+        addGlossToIcon: false,
+        //startupScreen: 'jqt_startup.png',
+        statusBar: 'blue',
+        preloadImages: [
+          '{{ STATIC_URL }}css/apple/img/activeButton.png',
+          '{{ STATIC_URL }}css/apple/img/backButton.png',
+          '{{ STATIC_URL }}css/apple/img/grayButton.png',
+          '{{ STATIC_URL }}css/apple/img/greenButton.png',
+          '{{ STATIC_URL }}css/apple/img/redButton.png',
+          '{{ STATIC_URL }}css/apple/img/whiteButton.png',
+          '{{ STATIC_URL }}css/apple/img/loading.gif'
+          ]
+      });
+    </script>
+    <style type="text/css" media="screen">
+      #jqt.fullscreen #home .info {
+        display: none;
+      }
+      div#jqt #about {
+        padding: 100px 10px 40px;
+        text-shadow: rgba(255, 255, 255, 0.3) 0px -1px 0;
+        font-size: 13px;
+        text-align: center;
+        background: #161618;
+      }
+      div#jqt #about p {
+        color: #aaa;
+        margin-bottom: 8px;
+      }
+      div#jqt #about a {
+        color: #fff;
+        font-weight: bold;
+        text-decoration: none;
+      }
+      #threads img {margin: 0 10px 10px 0; float: left;}
+      #threads .file {display: inline;}
+      #threads li {clear: both;}
+      .post .number {float: left; margin-right: 5px; color: #f60;}
+      .post .number:before {content: "#";}
+    </style>
 </head>
 <body>
-    {% block content %}{% endblock %}
+  {% block content %}{% endblock %}
 </body>
 </html>

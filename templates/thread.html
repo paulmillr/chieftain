@@ -1,5 +1,5 @@
 <section class="thread" id="thread{{ thread.id }}" data-id="{{ thread.id }}">
-    {% for post in thread.last_posts %}
-        {% include "post.html" %}
-    {% endfor %}
+  {% for post in thread.last_posts %}
+    {% include "post.html" %}
+  {% endfor %}
 </section>

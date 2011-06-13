@@ -4,11 +4,11 @@
 {% block role %}threads{% endblock %}
 
 {% block threads %}
-    {% autoescape off %}
-    {% for thread in threads %}
-    <section class="thread" id="thread{{ thread.id }}">
-        {{ thread.html }}
-    </section>
-    {% endfor %}
-    {% endautoescape %}
+  {% autoescape off %}
+  {% for thread in threads %}
+  <section class="thread" id="thread{{ thread.id }}">
+    {{ thread.html }}
+  </section>
+  {% endfor %}
+  {% endautoescape %}
 {% endblock %}

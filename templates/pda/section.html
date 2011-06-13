@@ -5,25 +5,25 @@
 
 {% block content %}
 <div id="posts">
-    <div class="toolbar">
-        <a href="../" target="_webapp" class="home">{% trans "Back" %}</a>
-        <h1>{{ section.name }}</h1>
-    </div>
+  <div class="toolbar">
+    <a href="../" target="_webapp" class="home">{% trans "Back" %}</a>
+    <h1>{{ section.name }}</h1>
+  </div>
 
-    <ul id="threads" class="rounded">
-        <!--<li><input type="text" name="message" placeholder="Создать новую тему" id="message"></li>-->
-        {% for post in section.op_posts %}
-            <li id="{{ post.pid }}" data-id="{{ post.id }}" class="post">
-                <div class="number">{{ post.pid }}</div>
-                {% for file in post.files %}
-                    <a href="{{ post.pid }}" target="_webapp" class="file"><img src="{{ MEDIA_URL }}{{ file.thumb }}" alt="{{ file.hash }}"></a>
-                {% endfor %}
-                <div class="message">{% autoescape off %}
-                    {{ post.message_html }}
-                {% endautoescape %}</div>
-            </li>
+  <ul id="threads" class="rounded">
+    <!--<li><input type="text" name="message" placeholder="Создать новую тему" id="message"></li>-->
+    {% for post in section.op_posts %}
+      <li id="{{ post.pid }}" data-id="{{ post.id }}" class="post">
+        <div class="number">{{ post.pid }}</div>
+        {% for file in post.files %}
+          <a href="{{ post.pid }}" target="_webapp" class="file"><img src="{{ MEDIA_URL }}{{ file.thumb }}" alt="{{ file.hash }}"></a>
         {% endfor %}
-        <li><a class="individual" href="load">{% trans "load more" %}</a></li>
-    </ul>
+        <div class="message">{% autoescape off %}
+          {{ post.message_html }}
+        {% endautoescape %}</div>
+      </li>
+    {% endfor %}
+    <li><a class="individual" href="load">{% trans "load more" %}</a></li>
+  </ul>
 </div>
 {% endblock %}

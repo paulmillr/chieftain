@@ -3,21 +3,21 @@
 {% load dmark %}
 
 {% block title %}-
-    {% trans "Thread" %}
-    /{{ thread.section.slug }}/{{ thread.op_post.pid }}
+  {% trans "Thread" %}
+  /{{ thread.section.slug }}/{{ thread.op_post.pid }}
 {% endblock %}
 
 {% block content %}
 <div id="posts">
-    <div class="toolbar">
-        <a href="." class="home">{% trans "Back" %}</a>
-        <h1>{{ settings.SITE_TITLE }} - {{ thread.section.name }}</h1>
+  <div class="toolbar">
+    <a href="." class="home">{% trans "Back" %}</a>
+    <h1>{{ settings.SITE_TITLE }} - {{ thread.section.name }}</h1>
+  </div>
+  {% for post in thread.posts %}
+    <div class="post">
+      <strong class="number"><a href="{{ post.pid }}">#{{ post.pid }}</a></strong>
+      <div class="message">{% autoescape off %}{{ post.message|dmark }}{% endautoescape %}</div>
     </div>
-    {% for post in thread.posts %}
-        <div class="post">
-            <strong class="number"><a href="{{ post.pid }}">#{{ post.pid }}</a></strong>
-            <div class="message">{% autoescape off %}{{ post.message|dmark }}{% endautoescape %}</div>
-        </div>
-    {% endfor %}
+  {% endfor %}
 </div>
 {% endblock %}

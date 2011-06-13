@@ -2,28 +2,28 @@
 {% load i18n dmark %}
 
 {% block title %}-
-    {% trans "Thread" %}
-    /{{ thread.section.slug }}/{{ thread.op_post.pid }}
+  {% trans "Thread" %}
+  /{{ thread.section.slug }}/{{ thread.op_post.pid }}
 {% endblock %}
 
 {% block content %}
 <div id="page-1">
-    <div class="toolbar">
-        <a href="." target="_webapp" class="home">{% trans "Back" %}</a>
-        <h1>{{ thread.section.name }}</h1>
-    </div>
+  <div class="toolbar">
+    <a href="." target="_webapp" class="home">{% trans "Back" %}</a>
+    <h1>{{ thread.section.name }}</h1>
+  </div>
 
-    <ul id="threads" class="rounded">
-        {% for post in thread.posts %}
-            <li id="{{ post.pid }}" data-id="{{ post.id }}" class="post">
-                <div class="number">{{ post.pid }}</div>
-                {% for file in post.files %}
-                    <a href="{{ settings.MEDIA_URL }}{{ file.file }}" class="file"><img src="{{ settings.MEDIA_URL }}{{ file.thumb }}" alt="{{ file.hash }}"></a>
-                {% endfor %}
-                <div class="message">{% autoescape off %}{{ post.message_html }}{% endautoescape %}</div>
-            </li>
+  <ul id="threads" class="rounded">
+    {% for post in thread.posts %}
+      <li id="{{ post.pid }}" data-id="{{ post.id }}" class="post">
+        <div class="number">{{ post.pid }}</div>
+        {% for file in post.files %}
+          <a href="{{ settings.MEDIA_URL }}{{ file.file }}" class="file"><img src="{{ settings.MEDIA_URL }}{{ file.thumb }}" alt="{{ file.hash }}"></a>
         {% endfor %}
-        <li><input type="text" name="message" placeholder="{% trans 'Reply' %}" id="message"></li>
-    </ul>
+        <div class="message">{% autoescape off %}{{ post.message_html }}{% endautoescape %}</div>
+      </li>
+    {% endfor %}
+    <li><input type="text" name="message" placeholder="{% trans 'Reply' %}" id="message"></li>
+  </ul>
 </div>
 {% endblock %}

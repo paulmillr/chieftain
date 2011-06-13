@@ -41,7 +41,7 @@ def handle_uploaded_file(file_instance):
         thumb_dir = make_path('thumbs')
         if not os.path.isdir(thumb_dir):
             os.makedirs(thumb_dir)
-        suffix = '.{0}'.format(f.type.extension)
+        suffix = '.{}'.format(f.type.extension)
         with NamedTemporaryFile(suffix=suffix) as tmp:
             img.thumbnail((MAX, MAX), Image.ANTIALIAS)
             img.save(tmp)
@@ -70,14 +70,14 @@ def strip_text(text, max_length=90):
 def make_post_descriptions(posts):
     """Takes Post QuerySet and generates description to all posts."""
     posts = posts.values('thread__section__name', 'thread__section__slug',
-        'id', 'pid', 'topic', 'message'
-    )
+                         'id', 'pid', 'topic', 'message')
 
     for post in posts:
         post['link'] = '/{slug}/{pid}'.format(
-            slug=post['thread__section__slug'], pid=post['pid'])
+            slug=post['thread__section__slug'], pid=post['pid']
+        )
         post['description'] = strip_text(
-            post['topic'] or post['message'] or '>>{0}'.format(post['pid'])
+            post['topic'] or post['message'] or '>>{}'.format(post['pid'])
         )
         yield post
 
@@ -85,12 +85,11 @@ def make_post_descriptions(posts):
 def random_text(length=10):
     return ''.join(
         choice(string.ascii_uppercase + string.digits)
-        for x in range(length)
+        for x in xrange(length)
     )
 
 
 def get_key(text):
-    """Generates key for passwords etc."""
     try:
         return sha1(text).hexdigest()
     except (UnicodeEncodeError, TypeError):
@@ -101,9 +100,9 @@ def parse_user_agent(user_agent):
     return httpagentparser.detect(user_agent)
 
 
-def take_first(list):
-    """Returns first elements of list."""
-    return [i[0] for i in list]
+def take_first(iterable):
+    """Returns first element of iterable."""
+    return [i[0] for i in iterable]
 
 
 def from_timestamp(timestamp):

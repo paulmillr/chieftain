@@ -73,7 +73,7 @@ def threads(request, section_slug):
     return render(request, 'section_threads.html', add_sidebar({
         'threads': section.op_posts(),
         'section': section,
-        'form': PostForm()
+        'form': PostForm(),
     }))
 
 
@@ -93,8 +93,9 @@ def thread(request, section_slug, op_post):
         pid=op_post, is_deleted=False)
     thread = post.thread
     if not post.is_op_post:
-        return redirect('/{0}/{1}#post{2}'.format(
-            thread.section, thread.op_post.pid, post.pid))
+        return redirect('/{}/{}#post{}'.format(
+            thread.section, thread.op_post.pid, post.pid
+        ))
     return render(request, 'section_thread.html', add_sidebar({
         'thread': thread,
         'form': PostForm(),

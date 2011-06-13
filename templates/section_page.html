@@ -5,22 +5,22 @@
 
 {% block pages %}
 <ul class="pagination">
-    {% for page in threads.paginator.page_range %}
-        <li>
-        {% if page != threads.number %}
-            <a href="page{{ page }}">{{ page }}</a>
-        {% else %}
-            <span>{{ page }}</span>
-        {% endif %}
-        </li>
-    {% endfor %}
+  {% for page in threads.paginator.page_range %}
+    <li>
+    {% if page != threads.number %}
+      <a href="page{{ page }}">{{ page }}</a>
+    {% else %}
+      <span>{{ page }}</span>
+    {% endif %}
+    </li>
+  {% endfor %}
 </ul>
 {% endblock %}
 
 {% block threads %}
-    {% autoescape off %}
-    {% for thread in threads.object_list %}
-        {{ thread.html }}
-    {% endfor %}
-    {% endautoescape %}
+  {% autoescape off %}
+  {% for thread in threads.object_list %}
+    {{ thread.html }}
+  {% endfor %}
+  {% endautoescape %}
 {% endblock %}

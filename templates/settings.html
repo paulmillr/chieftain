@@ -4,105 +4,105 @@
 {% block role %}settings{% endblock %}
 {% block content %}
 <section class="settingsTabs kTabs">
-    <ul>
-        <li><a href="#styles">{% trans "Style" %}</a></li>
-        <li><a href="#features">{% trans "Features" %}</a></li>
-        <li><a href="#various">{% trans "Various" %}</a></li>
-    </ul>
-    <div id="styles">
-        <dl>
-            <dt>
-                <label for="style">{% trans "Board style" %}</label>
-                <select name="style" id="style" size="1">
-                    <option value="photon">Photon</option>
-                    <option value="dvach">Dvach</option>
-                    <!--<option value="neutron">Neutron</option>
-                    <option value="klipton">Klipton (alpha)</option>-->
-                </select>
-            </dt>
-        </dl>
-    </div>
-    <div id="features">
-        <dl>
-            <dt>
-                <input type="checkbox" name="newForm" id="newForm">
-                <label for="newForm">{% trans "New style form" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="bottomForm" id="bottomForm">
-                <label for="bottomForm">{% trans "Move form to the bottom" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="hardHide" id="hardHide">
-                <label for="hardHide">{% trans "Hard posts hide" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="miniForm" id="miniForm">
-                <label for="miniForm">{% trans "Minimalistic form" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="showBBCodes" id="showBBCodes">
-                <label for="showBBCodes">{% trans "Show markup panel" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="radio" name="enableDesktopNotifications" id="enableDesktopNotifications">
-                <label for="enableDesktopNotifications">{% trans "Enable desktop notifications" %}</label>
-            </dt>
-        </dl>
-    </div>
-    <div id="various">
-        <dl>
-            <dt>
-                <input type="checkbox" name="disableQuickReply" id="disableQuickReply">
-                <label for="disableQuickReply">{% trans "Disable quick reply" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="showSidebar" id="showSidebar">
-                <label for="showSidebar">{% trans "Show sidebar" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="hideNav" id="hideNav">
-                <label for="hideNav">{% trans "Hide navigation" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="hideSectBanner" id="hideSectBanner">
-                <label for="hideSectBanner">{% trans "Hide sections banner" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="disablePubSub" id="disablePubSub">
-                <label for="disablePubSub">{% trans "Disable post autoload" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="disablePostsPreview" id="disablePostsPreview">
-                <label for="disablePostsPreview">{% trans "Disable posts preview" %}</label>
-            </dt>
-        </dl>
-        <dl>
-            <dt>
-                <input type="checkbox" name="disableAnswersMap" id="disableAnswersMap">
-                <label for="disableAnswersMap">{% trans "Disable answers map" %}</label>
-            </dt>
-        </dl>
-    </div>
+  <ul>
+    <li><a href="#styles">{% trans "Style" %}</a></li>
+    <li><a href="#features">{% trans "Features" %}</a></li>
+    <li><a href="#various">{% trans "Various" %}</a></li>
+  </ul>
+  <div id="styles">
+    <dl>
+      <dt>
+        <label for="style">{% trans "Board style" %}</label>
+        <select name="style" id="style" size="1">
+          <option value="photon">Photon</option>
+          <option value="dvach">Dvach</option>
+          <!--<option value="neutron">Neutron</option>
+          <option value="klipton">Klipton (alpha)</option>-->
+        </select>
+      </dt>
+    </dl>
+  </div>
+  <div id="features">
+    <dl>
+      <dt>
+        <input type="checkbox" name="newForm" id="newForm">
+        <label for="newForm">{% trans "New style form" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="bottomForm" id="bottomForm">
+        <label for="bottomForm">{% trans "Move form to the bottom" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="hardHide" id="hardHide">
+        <label for="hardHide">{% trans "Hard posts hide" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="miniForm" id="miniForm">
+        <label for="miniForm">{% trans "Minimalistic form" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="showBBCodes" id="showBBCodes">
+        <label for="showBBCodes">{% trans "Show markup panel" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="radio" name="enableDesktopNotifications" id="enableDesktopNotifications">
+        <label for="enableDesktopNotifications">{% trans "Enable desktop notifications" %}</label>
+      </dt>
+    </dl>
+  </div>
+  <div id="various">
+    <dl>
+      <dt>
+        <input type="checkbox" name="disableQuickReply" id="disableQuickReply">
+        <label for="disableQuickReply">{% trans "Disable quick reply" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="showSidebar" id="showSidebar">
+        <label for="showSidebar">{% trans "Show sidebar" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="hideNav" id="hideNav">
+        <label for="hideNav">{% trans "Hide navigation" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="hideSectBanner" id="hideSectBanner">
+        <label for="hideSectBanner">{% trans "Hide sections banner" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="disablePubSub" id="disablePubSub">
+        <label for="disablePubSub">{% trans "Disable post autoload" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="disablePostsPreview" id="disablePostsPreview">
+        <label for="disablePostsPreview">{% trans "Disable posts preview" %}</label>
+      </dt>
+    </dl>
+    <dl>
+      <dt>
+        <input type="checkbox" name="disableAnswersMap" id="disableAnswersMap">
+        <label for="disableAnswersMap">{% trans "Disable answers map" %}</label>
+      </dt>
+    </dl>
+  </div>
 </section>
 {% endblock %}

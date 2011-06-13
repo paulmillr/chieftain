@@ -5,12 +5,12 @@
 <h2><a href="." class="goBack">Назад</a></h2>
 <p>{% autoescape off %}
 {% if details %}
-    {{ details }}
+  {{ details }}
 {% else %}
-    {% for k, error in errors.items %}
-        {{ k }}
-        {{ error }}
-    {% endfor %}
+  {% for k, error in errors.items %}
+    {{ k }}
+    {{ error }}
+  {% endfor %}
 {% endif %}
 {% endautoescape %}</p>
 {% endblock %}

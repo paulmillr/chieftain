@@ -1,21 +1,21 @@
 {% load i18n %}
 <nav>
-    <ul class="pagination">
-        <li><a href="/" title="">{% trans "Main page" %}</a></li>
-        <li><a href="/faq" title="">{% trans "FAQ" %}</a></li>
-        <li><a href="#nsfw" class="toggleNsfw" title="{% trans 'Not Safe For Work' %}">{% trans "NSFW" %}</a></li>
-        <li><a href="/settings" title="">{% trans "Settings" %}</a></li>
-        <li><a href="/feed">{% trans "Feed" %}</a></li>
-        <li><a href="/mobile/">{% trans "Mobile version" %}</a></li>
-        <li><a href="/pda/">{% trans "PDA version" %}</a></li>
-        <!--<li><a href="#bookmarks" id="bookmarks" title="">Закладки</a></li>-->
-    </ul>
-    {% for group in navigation %}
-    {% if not group.is_hidden %}
-    <ul data-id="{{ group.id }}" class="pagination">
-        {% for section in group.sections %}
-        <li><a href="/{{ section.slug }}/" title="{{ section.name }}">{{ section.slug }}</a></li>{% endfor %}
-    </ul>
-    {% endif %}
-    {% endfor %}
+  <ul class="pagination">
+    <li><a href="/" title="">{% trans "Main page" %}</a></li>
+    <li><a href="/faq" title="">{% trans "FAQ" %}</a></li>
+    <li><a href="#nsfw" class="toggleNsfw" title="{% trans 'Not Safe For Work' %}">{% trans "NSFW" %}</a></li>
+    <li><a href="/settings" title="">{% trans "Settings" %}</a></li>
+    <li><a href="/feed">{% trans "Feed" %}</a></li>
+    <li><a href="/mobile/">{% trans "Mobile version" %}</a></li>
+    <li><a href="/pda/">{% trans "PDA version" %}</a></li>
+    <!--<li><a href="#bookmarks" id="bookmarks" title="">Закладки</a></li>-->
+  </ul>
+  {% for group in navigation %}
+  {% if not group.is_hidden %}
+  <ul data-id="{{ group.id }}" class="pagination">
+    {% for section in group.sections %}
+    <li><a href="/{{ section.slug }}/" title="{{ section.name }}">{{ section.slug }}</a></li>{% endfor %}
+  </ul>
+  {% endif %}
+  {% endfor %}
 </nav>

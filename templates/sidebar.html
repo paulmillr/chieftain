@@ -1,27 +1,27 @@
 {% load i18n %}
 <aside id="sidebar">
-    <nav>
-        <h2><a href="/">{{ settings.SITE_TITLE }}</a></h2>
-        <a href="#hide" title="{% trans 'Hide sidebar' %}" class="hidelink">{% trans 'Hide' %}</a>
-        {% for group in navigation %}
-            {% if not group.is_hidden %}
-            <h3 id="sect-group{{ group.id }}">{{ group.name }}</h3>
-            <ul id="list-group{{ group.id }}">
-                {% for section in group.sections %}
-                    <li><a href="/{{ section.slug }}/" title="{{ section.name }}">{{ section.name }}</a></li>
-                {% endfor %}
-            </ul>
-            {% endif %}
+  <nav>
+    <h2><a href="/">{{ settings.SITE_TITLE }}</a></h2>
+    <a href="#hide" title="{% trans 'Hide sidebar' %}" class="hidelink">{% trans 'Hide' %}</a>
+    {% for group in navigation %}
+      {% if not group.is_hidden %}
+      <h3 id="sect-group{{ group.id }}">{{ group.name }}</h3>
+      <ul id="list-group{{ group.id }}">
+        {% for section in group.sections %}
+          <li><a href="/{{ section.slug }}/" title="{{ section.name }}">{{ section.name }}</a></li>
         {% endfor %}
+      </ul>
+      {% endif %}
+    {% endfor %}
 
-        <h3>{% trans "Links" %}</h3>
-        <ul>
-            <li><a href="/faq">{% trans "FAQ" %}</a></li>
-            <li><a href="/settings">{% trans "Settings" %}</a></li>
-            <li><a href="/mobile/">{% trans "Mobile version" %}</a></li>
-            <li><a href="/pda/">{% trans "PDA version" %}</a></li>
-            <li><a href="/feed">{% trans "Feed" %}</a></li>
-            <li><a href="http://www.so-slow.com/">Спидометр имиджбордов So-Slow</a></li>
-        </ul>
-    </nav>
+    <h3>{% trans "Links" %}</h3>
+    <ul>
+      <li><a href="/faq">{% trans "FAQ" %}</a></li>
+      <li><a href="/settings">{% trans "Settings" %}</a></li>
+      <li><a href="/mobile/">{% trans "Mobile version" %}</a></li>
+      <li><a href="/pda/">{% trans "PDA version" %}</a></li>
+      <li><a href="/feed">{% trans "Feed" %}</a></li>
+      <li><a href="http://www.so-slow.com/">Спидометр имиджбордов So-Slow</a></li>
+    </ul>
+  </nav>
 </aside>

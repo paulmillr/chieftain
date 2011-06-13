@@ -4,14 +4,14 @@
 {% block role %}storage{% endblock %}
 {% block content %}
 <section class="storage">
-    <table class="storageTable">
-        {% for post in posts %}
-            <tr data-id="{{ post.id }}" data-pid="{{ post.pid }}">
-                <td><span class="post-icon remove" data-storage="feed" title="{% trans 'Remove from feed' %}"></span></td>
-                <td class="location"><a href="{{ post.link }}">/{{ post.thread__section__name }}/</a></td>
-                <td class="info">{{ post.description }}</td>
-            </tr>
-        {% endfor %}
-    </table>
+  <table class="storageTable">
+    {% for post in posts %}
+      <tr data-id="{{ post.id }}" data-pid="{{ post.pid }}">
+        <td><span class="post-icon remove" data-storage="feed" title="{% trans 'Remove from feed' %}"></span></td>
+        <td class="location"><a href="{{ post.link }}">/{{ post.thread__section__name }}/</a></td>
+        <td class="info">{{ post.description }}</td>
+      </tr>
+    {% endfor %}
+  </table>
 </section>
 {% endblock %}
