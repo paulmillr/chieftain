@@ -1,4 +1,4 @@
-# Chieftain by Paul Bagwell
+# Chieftain by Paul Miller
 
 ## What?
 
@@ -40,7 +40,7 @@ chieftain is licensed under MIT license. It means that you can copy, distribute,
 adapt and transmit the work for free, but the copyright notice and license shall
 be included in all copies or substantial portions of chieftain.
 
-Copyright (c) 2011 Paul Bagwell, http://chieftain.pbagwl.com/.
+Copyright (c) 2011 Paul Miller, http://paulmillr.github.com/chieftain.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

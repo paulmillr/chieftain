@@ -1,17 +1,10 @@
 /* TEAM */
-	Chef: Abu
-	Contact: admin [at] 2ch.so
-	Twitter: @2chso
-	From: Moscow, Russia
-
-	Developer, HTML5+CSS guy: Paul Bagwell
-	Site: pbagwl.com
-	Twitter: @pbagwl
+	Developer, HTML5+CSS guy: Paul Miller
 	From: Ukraine
 
 /* SITE */
-	Last update: 2011/05
-	Language: Russian
+	Last update: 2011/06
+	Language: English
 	Standarts: HTML5, CSS3, PEP8
 	Software: Python, Django, Tornado
-	Tools: Textmate, Transmit, ipython, Chrome,
+	Tools: Textmate, Transmit, ipython, Chrome

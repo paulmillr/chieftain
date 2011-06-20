@@ -3,7 +3,6 @@
 
 {% block content %}
 {% load urlize_quoted_links %}{% load add_query_param %}
-<span class="api"><a href="http://chieftain.pbagwl.com/">chieftain</a></span>
 <span class="auth">{% if user.is_active %}Welcome, {{ user }}.{% if logout_url %} <a href='{{ logout_url }}'>Log out</a>{% endif %}{% else %}Not logged in {% if login_url %}<a href='{{ login_url }}'>Log in</a>{% endif %}{% endif %}</span>
 <h1>{{ resource.name }}</h1>
 <p>{{ resource.description|linebreaksbr }}</p>
