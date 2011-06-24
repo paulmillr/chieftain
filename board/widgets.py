@@ -6,17 +6,17 @@ from django.utils.safestring import mark_safe
 from django.conf import settings
 from recaptcha.client import captcha
 
-__all__ = ['captcha', 'ReCaptcha']
+__all__ = ["captcha", "ReCaptcha"]
 
 
 class ReCaptcha(forms.widgets.Widget):
-    recaptcha_challenge_name = 'recaptcha_challenge_field'
-    recaptcha_response_name = 'recaptcha_response_field'
+    recaptcha_challenge_name = "recaptcha_challenge_field"
+    recaptcha_response_name = "recaptcha_response_field"
 
     def render(self, name, value, attrs=None):
-        return mark_safe(u'{0}'.format(
-            captcha.displayhtml(settings.RECAPTCHA_PUBLIC_KEY)
-        ))
+        return mark_safe(
+            unicode(captcha.displayhtml(settings.RECAPTCHA_PUBLIC_KEY))
+        )
 
     def value_from_datadict(self, data, files, name):
         return [data.get(self.recaptcha_challenge_name, None),

@@ -20,7 +20,7 @@
       <div class="sliderInfo"><span class="sliderVal"></span>{% trans "reply count" %}</div>
     </span>
   </section>
-  <section class="thread" id="thread{{ thread.id }}">
+  <section class="thread" data-id="{{ thread.id }}">
     {% autoescape off %}
     {% for post in thread.posts_html %}
       {{ post.html }}

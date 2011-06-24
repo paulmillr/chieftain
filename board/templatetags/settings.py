@@ -6,4 +6,4 @@ register = Library()
 
 @register.simple_tag
 def setting(name):
-    return unicode(getattr(settings, name))
+    return unicode(getattr(settings, name, ""))

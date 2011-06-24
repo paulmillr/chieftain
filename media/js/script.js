@@ -97,6 +97,7 @@ var curPage = (function() {
   return data;
 })();
 
+
 function isjQuery(object) {
   return object instanceof jQuery;
 }
@@ -301,7 +302,7 @@ function defaultErrorCallback(response) {
   var errorText = '';
   var tmp = [];
   var text, label;
-  //console.log('Response', response, ', errors', errors);
+  //console.log('Response', response, ', errors', errors, typeof errors);
   if (typeof errors === 'string') {
     errorText = errors;
   } else {
@@ -317,7 +318,7 @@ function defaultErrorCallback(response) {
     errorText = tmp.join('<br/>');
   }
 
-  $.notification('error', errorText);
+  $.notification(errorText, 'error');
 }
 
 $.extend(app, {
@@ -961,8 +962,8 @@ posts: {
       var pid = getPostPid($post);
 
       // Initialize answers map.
-      for (var j = 0, ll = links.length; j < ll; j++) {
-        var href = getPostLinkPid(links[j]);
+      for (var j = 0, ll = $links.length; j < ll; j++) {
+        var href = getPostLinkPid($links[j]);
         var targetSelector = '#post' + href;
         var $target = $(targetSelector);
 

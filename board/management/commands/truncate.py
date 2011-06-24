@@ -15,7 +15,7 @@ class Command(BaseCommand):
             model.deleted_objects.all().delete()
         cache.clear()
 
-        for dir in ('section', 'thumbs'):
+        for dir in ("section", "thumbs"):
             dir = os.path.join(settings.MEDIA_ROOT, dir)
             shutil.rmtree(dir, ignore_errors=True)
-        shutil.rmtree('cache', ignore_errors=True)
+        shutil.rmtree("cache", ignore_errors=True)

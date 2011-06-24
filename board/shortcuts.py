@@ -7,7 +7,7 @@ from django.core.paginator import InvalidPage, EmptyPage
 
 from board.models import SectionGroup
 
-__all__ = ['get_page_or_404', 'add_sidebar', 'render_to_file']
+__all__ = ["get_page_or_404", "add_sidebar", "render_to_file"]
 
 
 def get_page_or_404(paginator, page):
@@ -25,5 +25,5 @@ def add_sidebar(context={}):
 
 def render_to_file(template, filename, request, context):
     """Renders template to filename."""
-    with codecs.open(filename, 'w', 'utf-8') as f:
+    with codecs.open(filename, "w", "utf-8") as f:
         f.write(render_to_string(template, context, RequestContext(request)))

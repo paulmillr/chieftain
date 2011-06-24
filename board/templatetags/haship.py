@@ -11,6 +11,6 @@ def strip(ip):
 
 
 @register.filter
-def haship(value, arg=''):
-    ip = value.split('.')
-    return mark_safe('.'.join([strip(str(ip[:2]))] + ip[2:]))
+def haship(value, arg=""):
+    ip = value.split(".")
+    return mark_safe(".".join([strip(str(ip[:2]))] + ip[2:]))

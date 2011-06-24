@@ -11,7 +11,7 @@ from board.models import Thread, Post
 class Command(BaseCommand):
     def handle(self, *args, **options):
         """Rebuild the cache."""
-        shutil.rmtree('cache', ignore_errors=True)
+        shutil.rmtree("cache", ignore_errors=True)
         for obj in chain(Thread.objects.all(), Post.objects.all()):
             obj.save()
         cache.clear()

@@ -6,12 +6,12 @@ from api1.views import SettingResource, FeedResource, HideResource
 from board.models import DeniedIP
 
 __all__ = [
-    'set_session_defaults', 'SessionDefaultsMiddleware',
-    'DenyMiddleware', 'DisableCSRFMiddleware'
+    "set_session_defaults", "SessionDefaultsMiddleware",
+    "DenyMiddleware", "DisableCSRFMiddleware"
 ]
 
 
-METHODS = ('GET', 'POST', 'UPDATE', 'DELETE')
+METHODS = ("GET", "POST", "UPDATE", "DELETE")
 WHITELIST = ()
 
 
@@ -31,7 +31,7 @@ def ip_in(ip, model):
     try:
         for i in model.objects.all():
             if ip in i.network():
-                return i.reason or ''
+                return i.reason or ""
     except ValueError:
         pass
     return False
@@ -43,13 +43,13 @@ def get_ip(request):
        Contains proxy handling involving HTTP_X_FORWARDED_FOR
        and multiple addresses.
     """
-    ip = request.META['REMOTE_ADDR']
-    if not ip or ip == '127.0.0.1' and 'HTTP_X_FORWARDED_FOR' in request.META:
-        ip = request.META['HTTP_X_FORWARDED_FOR']
-    return ip.split(', ')[0] or request.META['REMOTE_ADDR']
+    ip = request.META["REMOTE_ADDR"]
+    if not ip or ip == "127.0.0.1" and "HTTP_X_FORWARDED_FOR" in request.META:
+        ip = request.META["HTTP_X_FORWARDED_FOR"]
+    return ip.split(", ")[0] or request.META["REMOTE_ADDR"]
 
 
-def forbid(request, reason=''):
+def forbid(request, reason=""):
     """
         Forbids a user to access the site
         Cleans up their session (if it exists)
@@ -58,8 +58,8 @@ def forbid(request, reason=''):
     """
     request.session.clear()
     return HttpResponseForbidden(
-        render_to_string('banned.html',
-            {'reason': reason},
+        render_to_string("banned.html",
+            {"reason": reason},
             context_instance=RequestContext(request)
         )
     )

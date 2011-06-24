@@ -11,9 +11,9 @@ def rand():
 def make_posts(section, threads=100, posts=200):
     start = datetime.now()
     # ...
-    print('{0} posts in {1}'.format(posts, datetime.now() - start))
+    print("{} posts in {}".format(posts, datetime.now() - start))
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        make_posts(options['section'], options['posts'], options['thread'])
+        make_posts(options["section"], options["posts"], options["thread"])

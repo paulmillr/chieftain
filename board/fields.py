@@ -9,12 +9,12 @@ from django.utils.translation import ugettext_lazy as _
 
 from .widgets import ReCaptcha, captcha
 
-__all__ = ['ReCaptchaField', 'JSONField']
+__all__ = ["ReCaptchaField", "JSONField"]
 
 
 class ReCaptchaField(forms.CharField):
     default_error_messages = {
-        'captcha_invalid': _(u'Invalid captcha')
+        "captcha_invalid": _(u"Invalid captcha")
     }
 
     def __init__(self, *args, **kwargs):
@@ -36,7 +36,7 @@ class ReCaptchaField(forms.CharField):
         )
         if not result.is_valid:
             raise forms.util.ValidationError(
-                self.error_messages['captcha_invalid']
+                self.error_messages["captcha_invalid"]
             )
 
         return values[0]
@@ -45,11 +45,11 @@ class ReCaptchaField(forms.CharField):
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, datetime):
-            return obj.strftime('%Y-%m-%d %H:%M:%S')
+            return obj.strftime("%Y-%m-%d %H:%M:%S")
         elif isinstance(obj, datetime.date):
-            return obj.strftime('%Y-%m-%d')
+            return obj.strftime("%Y-%m-%d")
         elif isinstance(obj, datetime.time):
-            return obj.strftime('%H:%M:%S')
+            return obj.strftime("%H:%M:%S")
         return super(JSONEncoder, self).default(self, obj)
 
 
@@ -63,7 +63,7 @@ class JSONField(models.TextField):
         return json.loads(str, encoding=settings.DEFAULT_CHARSET)
 
     def db_type(self):
-        return 'text'
+        return "text"
 
     def save(self, model_instance):
         value = getattr(model_instance, self.attname, None)
@@ -79,13 +79,13 @@ class JSONField(models.TextField):
         self.class_name = cls
         super(JSONField, self).contribute_to_class(cls, name)
         models.signals.post_init.connect(self.post_init)
-        setattr(cls, 'get_%s_json' % self.name, self.save)
-        setattr(cls, 'set_%s_json' % self.name, self.load)
+        setattr(cls, "get_{}_json".format(self.name), self.save)
+        setattr(cls, "set_{}_json".format(self.name), self.load)
 
     def post_init(self, **kwargs):
-        if ('sender' in kwargs
-        and 'instance' in kwargs
-        and kwargs['sender'] == self.class_name
-        and hasattr(kwargs['instance'], self.attname)):
-            value = self.value_from_object(kwargs['instance'])
-            self.load(kwargs['instance'], value or 'null')
+        if ("sender" in kwargs
+        and "instance" in kwargs
+        and kwargs["sender"] == self.class_name
+        and hasattr(kwargs["instance"], self.attname)):
+            value = self.value_from_object(kwargs["instance"])
+            self.load(kwargs["instance"], value or "null")
