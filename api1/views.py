@@ -1,3 +1,4 @@
+import logging
 from urllib import urlencode
 from urllib2 import urlopen, URLError
 from hashlib import md5
@@ -318,11 +319,7 @@ class PostRootResource(RootModelResource):
         try:
             urlopen(url.format(instance.thread.id), data)
         except URLError:
-            raise ResponseException(status.INTERNAL_SERVER_ERROR, {
-                "detail": u"{}: {}".format(
-                    _("Server error"), _("can't refresh messages")
-                )
-            })
+            logging.warning("Can't refresh messages in pubsub.")
         self.model.allowed_fields.append("html")
         return Response(status.CREATED, instance)
 
