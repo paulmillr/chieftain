@@ -4,9 +4,8 @@ Tornado
 redis
 recaptcha-client
 PIL
--e git+http://github.com/paulmillr/djangorestframework.git#egg=djangorestframework
-http://geolite.maxmind.com/download/geoip/api/python/GeoIP-Python-1.2.4.tar.gz
-MySQL-python
+djangorestframework
+http://geolite.maxmind.com/download/geoip/api/python/GeoIP-Python-1.2.7.tar.gz
 nose
 django-nose
 ipcalc

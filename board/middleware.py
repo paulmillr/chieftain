@@ -2,7 +2,7 @@ from django.template import RequestContext
 from django.template.loader import render_to_string
 from django.http import HttpResponseForbidden
 
-from api1.views import SettingResource, FeedResource, HideResource
+from api1.views import SettingView, FeedView, HideView
 from board.models import DeniedIP
 
 __all__ = [
@@ -16,7 +16,7 @@ WHITELIST = ()
 
 
 def set_session_defaults(request):
-    for res in (SettingResource, FeedResource, HideResource):
+    for res in (SettingView, FeedView, HideView):
         default = type(res.default)()  # prevent errors due to mutability
         request.session.setdefault(res.storage_name, default)
 

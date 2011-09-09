@@ -130,11 +130,6 @@ class Thread(models.Model):
     objects = ThreadManager()
     deleted_objects = DeletedThreadManager()
 
-    allowed_fields = (
-        "id", "section_id", "bump", "is_pinned",
-        "is_closed", "html",
-    )
-
     class Meta:
         verbose_name = _("Thread")
         verbose_name_plural = _("Threads")
@@ -236,12 +231,6 @@ class Post(models.Model):
     objects = PostManager()
     deleted_objects = DeletedPostManager()
 
-    allowed_fields = [
-        "id", "pid", "poster", "tripcode", "topic", "is_op_post",
-        "date", "message", "email", "data", "file",
-        ("thread", ("id", ("section", ("id", "slug")))),
-    ]
-
     class Meta:
         verbose_name = _("Post")
         verbose_name_plural = _("Posts")
@@ -300,9 +289,6 @@ class File(models.Model):
     objects = FileManager()
     deleted_objects = DeletedFileManager()
 
-    allowed_fields = ("id", "post", "name", "type", "size",
-        "image_width", "image_height", "hash", "file", "thumb")
-
     class Meta:
         verbose_name = _("File")
         verbose_name_plural = _("Files")
@@ -328,8 +314,6 @@ class FileType(models.Model):
     mime = models.CharField(_("MIME"), max_length=250)
     group = models.ForeignKey("FileTypeGroup", verbose_name=_("Group"))
 
-    allowed_fields = ("id", "category_id", "type", "extension")
-
     class Meta:
         verbose_name = _("File type")
         verbose_name_plural = _("File types")
@@ -342,8 +326,6 @@ class FileTypeGroup(models.Model):
     """Category of files"""
     name = models.CharField(_("Name"), max_length=32)
     default_image = models.ImageField(upload_to="default/")
-
-    allowed_fields = ("id", "name")
 
     class Meta:
         verbose_name = _("File type group")
@@ -386,11 +368,6 @@ class Section(models.Model):
     objects = SectionManager()
 
     ONPAGE = 20
-    allowed_fields = (
-        "id", "last_post_pid", "bumplimit", "description",
-        "filesize_limit", "default_name", "anonymity", "threadlimit",
-        "group_id", "type", "slug", "name"
-    )
 
     class Meta:
         verbose_name = _("Section")
@@ -469,7 +446,6 @@ class SectionGroup(models.Model):
     order = models.SmallIntegerField(_("Order"))
     is_hidden = models.BooleanField(_("Is hidden"), default=False)
     objects = SectionGroupManager()
-    allowed_fields = ("id", "name", "order", "is_hidden")
 
     class Meta:
         verbose_name = _("Section group")

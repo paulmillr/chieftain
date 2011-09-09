@@ -10,9 +10,8 @@ from django.core.files import File as DjangoFile
 from django.utils.translation import ugettext as _
 
 from djangorestframework import status
-from djangorestframework.resource import Resource
-from djangorestframework.response import Response, ResponseException
-from djangorestframework.modelresource import ModelResource, RootModelResource
+from djangorestframework.response import Response, ErrorResponse
+from djangorestframework.views import View
 
 from board import models
 from board.shortcuts import add_sidebar
@@ -22,25 +21,6 @@ from board.tools import (
 )
 
 from modpanel.views import is_mod
-
-__all__ = [
-    "ValidationError", "api",
-    "create_post", "mod_delete_post",
-    "ThreadRootResource", "ThreadResource",
-    "PostRootResource", "PostResource",
-    "SectionRootResource", "SectionResource",
-    "FileRootResource", "FileResource",
-    "RandomImageRootResource",
-    "FileTypeRootResource", "FileTypeResource",
-    "FileTypeGroupRootResource", "FileTypeGroupResource",
-    "SectionGroupRootResource", "SectionGroupResource",
-    "StorageRootResource", "StorageResource",
-    "StorageDictRootResource", "StorageDictResource",
-    "StorageSetRootResource", "StorageSetResource",
-    "SettingRootResource", "SettingResource",
-    "FeedRootResource", "FeedResource",
-    "HideRootResource", "HideResource",
-]
 
 
 class ValidationError(Exception):
@@ -241,7 +221,7 @@ def mod_delete_post(request, post):
     if request.GET.get("ban_ip"):
         reason = request.GET.get("ban_reason")
         if not reason:
-            raise ResponseException(status.BAD_REQUEST,
+            raise ErrorResponse(status.BAD_REQUEST,
                 {"detail": _("You need to enter ban reason")}
             )
         ip = DeniedIP(ip=post.ip, reason=r, by=request.user)
@@ -257,21 +237,8 @@ def mod_delete_post(request, post):
             p.remove()
 
 
-class ThreadRootResource(RootModelResource):
-    """A create/list resource for Thread."""
-    model = models.Thread
-
-    def get(self, request, auth, *args, **kwargs):
-        return self.model.objects.filter(**kwargs)[:20]
-
-
-class ThreadResource(ModelResource):
-    """A read/delete resource for Thread."""
-    allowed_methods = ("GET", "DELETE")
-    anon_allowed_methods = ("GET",)
-    model = models.Thread
-
-    def get(self, request, auth, *args, **kwargs):
+class ThreadInstanceView(View):
+    def get(self, request, *args, **kwargs):
         slug = kwargs.get("section__slug")
         try:
             if not slug:
@@ -281,22 +248,17 @@ class ThreadResource(ModelResource):
                     thread__section__slug=kwargs["section__slug"])
                 instance = op_post.thread
         except (Post.DoesNotExist, self.model.DoesNotExist):
-            raise ResponseException(status.NOT_FOUND)
+            raise ErrorResponse(status.NOT_FOUND)
         res = {f: getattr(instance, f) for f in self.fields}
         # remove nested fields
-        fields = [f for f in list(PostResource.fields)
+        fields = [f for f in list(self.resource.fields)
             if isinstance(f, str) and f != "files"]
         res["posts"] = instance.posts().values(*fields)
         return res
 
 
-class PostRootResource(RootModelResource):
-    """A create/list resource for Post."""
-    allowed_methods = anon_allowed_methods = ("GET", "POST")
-    form = models.PostFormNoCaptcha
-    model = models.Post
-
-    def get(self, request, auth, *args, **kwargs):
+class PostListOrCreateView(View):
+    def get(self, request, *args, **kwargs):
         """Returns list of posts. If ?html option is specified, method
         will return only posts html without any other fields.
         TODO: implement pagination.
@@ -306,12 +268,12 @@ class PostRootResource(RootModelResource):
             return qs.values("html")
         return qs
 
-    def post(self, request, auth, content, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         """Checks post for errors and returns new post instance."""
         try:
             instance = create_post(request)
         except ValidationError as e:
-            raise ResponseException(status.BAD_REQUEST, {"detail": e.message})
+            raise ErrorResponse(status.BAD_REQUEST, {"detail": e.message})
         # django sends date with microseconds. We don't want it.
         instance.date = instance.date.strftime("%Y-%m-%d %H:%M:%S")
         url = "http://127.0.0.1:8888/api/1.0/streamp/{}"
@@ -320,16 +282,13 @@ class PostRootResource(RootModelResource):
             urlopen(url.format(instance.thread.id), data)
         except URLError:
             logging.warning("Can't refresh messages in pubsub.")
-        self.model.allowed_fields.append("html")
+        self.model.fields.append("html")
         return Response(status.CREATED, instance)
 
 
-class PostResource(ModelResource):
+class PostInstanceView(View):
     """A read/delete resource for Post."""
-    allowed_methods = anon_allowed_methods = ("GET", "DELETE")
-    model = models.Post
-
-    def get(self, request, auth, *args, **kwargs):
+    def get(self, request, *args, **kwargs):
         """Gets post data. If ?html option is specified, method will return
         only post html without any other fields.
         """
@@ -339,14 +298,14 @@ class PostResource(ModelResource):
                 return {"html": post.html}
             return post
         except self.model.DoesNotExist:
-            raise ResponseException(status.NOT_FOUND)
+            raise ErrorResponse(status.NOT_FOUND)
 
-    def delete(self, request, auth, *args, **kwargs):
+    def delete(self, request, *args, **kwargs):
         """Deletes post."""
         try:
             post = self.model.objects.get(id=kwargs["id"])
         except self.model.DoesNotExist:
-            raise ResponseException(status.NOT_FOUND)
+            raise ErrorResponse(status.NOT_FOUND)
         key = get_key(request.GET["password"])
         if post.password == key:
             post.remove()
@@ -354,7 +313,7 @@ class PostResource(ModelResource):
             mod_delete_post(request, post)
             post.remove()
         else:
-            raise ResponseException(status.FORBIDDEN, content={
+            raise ErrorResponse(status.FORBIDDEN, content={
                 "detail": u"{0}{1}. {2}".format(
                     _("Error on deleting post #"), post.pid,
                     _("Password mismatch")
@@ -363,53 +322,13 @@ class PostResource(ModelResource):
         return Response(status.NO_CONTENT)
 
 
-class SectionRootResource(RootModelResource):
-    """A list resource for Section."""
-    model = models.Section
-
-
-class SectionResource(ModelResource):
-    """A read resource for Section."""
-    model = models.Section
-
-
-class SectionGroupRootResource(RootModelResource):
-    """A list resource for SectionGroup."""
-    model = models.SectionGroup
-
-
-class SectionGroupResource(ModelResource):
-    """A read resource for SectionGroup."""
-    model = models.SectionGroup
-
-
-class FileRootResource(RootModelResource):
-    """A list resource for File."""
-    model = models.File
-
-
-class RandomImageRootResource(RootModelResource):
-    """A list resource for random images."""
-    model = models.File
-    fields = ("id", "name", "type", "size", "image_width",
-              "image_height", "hash", "file", "thumb")
-
-    def get(self, request, auth, *args, **kwargs):
-        count = kwargs.get("count", 3)
-        return self.model.objects.random_images()[:count]
-
-
-class FileResource(ModelResource):
-    """A list resource for File."""
-    allowed_methods = anon_allowed_methods = ("GET", "DELETE")
-    model = models.File
-
-    def delete(self, request, auth, *args, **kwargs):
+class FileInstanceView(View):
+    def delete(self, request, *args, **kwargs):
         """Deletes attachment."""
         try:
             file = self.model.objects.get(**kwargs)
         except self.model.DoesNotExist:
-            raise ResponseException(status.NOT_FOUND)
+            raise ErrorResponse(status.NOT_FOUND)
 
         key = get_key(request.GET["password"])
         if file.post.password == key:
@@ -418,7 +337,7 @@ class FileResource(ModelResource):
             mod_delete_post(request, file.post)
             file.remove()
         else:
-            raise ResponseException(status.FORBIDDEN, content={
+            raise ErrorResponse(status.FORBIDDEN, content={
                 "detail": u"{}{}. {}".format(
                     _("Error on deleting file #"), file.post.pid,
                     _("Password mismatch")
@@ -427,31 +346,13 @@ class FileResource(ModelResource):
         return Response(status.NO_CONTENT)
 
 
-class FileTypeRootResource(RootModelResource):
-    """A list resource for FileType."""
-    model = models.FileType
+class RandomImageView(View):
+    def get(self, request, *args, **kwargs):
+        count = kwargs.get("count", 3)
+        return self.model.objects.random_images()[:count]
 
 
-class FileTypeResource(ModelResource):
-    """A read resource for FileType."""
-    model = models.FileType
-
-
-class FileTypeGroupRootResource(RootModelResource):
-    """A list resource for FileTypeGroup."""
-    model = models.FileTypeGroup
-
-
-class FileTypeGroupResource(ModelResource):
-    """A read resource for FileTypeGroup."""
-    model = models.FileTypeGroup
-
-
-class StorageRootResource(Resource):
-    """Base storage create/list/flush resource. Storage is a dict or set,
-    located in the django session database.
-    """
-    allowed_methods = anon_allowed_methods = ("GET", "POST", "DELETE")
+class StorageRootView(View):
     storage_name = ""
     default = {}
 
@@ -470,34 +371,32 @@ class StorageRootResource(Resource):
         return Response(status.NO_CONTENT)
 
 
-class StorageResource(StorageRootResource):
-    """Base storage read/delete resource."""
-    allowed_methods = anon_allowed_methods = ("GET", "DELETE")
-
-    def get(self, request, auth, key):
-        raise ResponseException(status.NOT_IMPLEMENTED)
+class StorageView(StorageRootView):
+    """Base storage read/delete View."""
+    def get(self, request, key):
+        raise ErrorResponse(status.NOT_IMPLEMENTED)
 
 
-class StorageSetRootResource(StorageRootResource):
-    """Storage create/list/flush resource, that uses set to store data."""
+class StorageSetRootView(StorageRootView):
+    """Storage create/list/flush View, that uses set to store data."""
     default = set()
 
-    def post(self, request, auth, content):
+    def post(self, request):
         data = self.get_data(request)
         try:
-            value = int(content["value"])
+            value = int(self.CONTENT["value"])
         except (KeyError, TypeError):
-            raise ResponseException(status.BAD_REQUEST)
+            raise ErrorResponse(status.BAD_REQUEST)
         data.add(value)
         request.session.modified = True
         return Response(status.CREATED, data)
 
 
-class StorageSetResource(StorageResource):
-    """Storage read/delete resource, that uses set to store data."""
+class StorageSetView(StorageView):
+    """Storage read/delete View, that uses set to store data."""
     default = set()
 
-    def delete(self, request, auth, key):
+    def delete(self, request, key):
         data = self.get_data(request)
         key = int(key)
         if key in data:
@@ -506,33 +405,31 @@ class StorageSetResource(StorageResource):
         return Response(status.NO_CONTENT)
 
 
-class StorageDictRootResource(StorageRootResource):
-    """Storage create/list/flush resource, that uses dict to store data."""
-    allowed_methods = anon_allowed_methods = ("GET", "POST", "DELETE")
+class StorageDictRootView(StorageRootView):
+    """Storage create/list/flush View, that uses dict to store data."""
     default = {}
 
-    def post(self, request, auth, content):
+    def post(self, request):
         data = self.get_data(request)
         try:
-            key = content["key"]
-            value = content["value"]
+            key = self.CONTENT["key"]
+            value = self.CONTENT["value"]
         except KeyError:
-            raise ResponseException(status.BAD_REQUEST)
+            raise ErrorResponse(status.BAD_REQUEST)
         data[key] = value
         request.session.modified = True
         return Response(status.CREATED, data)
 
 
-class StorageDictResource(StorageResource):
-    """Storage read/delete resource, that uses dict to store data."""
-    allowed_methods = anon_allowed_methods = ("GET", "DELETE")
+class StorageDictView(StorageView):
+    """Storage read/delete View, that uses dict to store data."""
     default = {}
 
-    def get(self, request, auth, key):
+    def get(self, request, key):
         data = self.get_data(request)
         return Response(status.OK, data.get(key))
 
-    def delete(self, request, auth, key):
+    def delete(self, request, key):
         data = self.get_data(request)
         if key in data:
             del data[key]
@@ -540,25 +437,25 @@ class StorageDictResource(StorageResource):
         return Response(status.NO_CONTENT)
 
 
-class SettingRootResource(StorageDictRootResource):
+class SettingRootView(StorageDictRootView):
     storage_name = "settings"
 
 
-class SettingResource(StorageDictResource):
+class SettingView(StorageDictView):
     storage_name = "settings"
 
 
-class FeedRootResource(StorageSetRootResource):
+class FeedRootView(StorageSetRootView):
     storage_name = "feed"
 
 
-class FeedResource(StorageSetResource):
+class FeedView(StorageSetView):
     storage_name = "feed"
 
 
-class HideRootResource(StorageSetRootResource):
+class HideRootView(StorageSetRootView):
     storage_name = "hidden"
 
 
-class HideResource(StorageSetResource):
+class HideView(StorageSetView):
     storage_name = "hidden"
