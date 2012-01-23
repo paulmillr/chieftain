@@ -633,7 +633,7 @@ board: {
             var thread_id = getThreadId(n.parent());
             var input = '<input type="hidden" value="' + thread_id + '" id="thread" name="thread" />';
             $('.newpost form').append(input);
-            ajax.quickReplied = true;
+            app.ajax.quickReplied = true;
           }
         }
         textArea.insert('>>' + e.target.innerHTML + ' ');
@@ -1081,23 +1081,23 @@ ajax: {
         if (response['field-errors'] || response['errors'] || response['detail']) {
           defaultErrorCallback(response);
         } else {
-          ajax.success(response)
+          app.ajax.success(response)
         }
       },
       error: defaultErrorCallback,
-      url: $.api.url + 'post/?html=1',
+      url: $.api.url + 'post/?html=1&_accept=application/json',
       dataType: 'json'
     });
   },
 
   success: function(data) {
     //console.log(data);
-    if (curPage.type !== 'thread' && !ajax.quickReplied) { // redirect
+    if (curPage.type !== 'thread' && !app.ajax.quickReplied) { // redirect
       window.location.href = './' + data.pid;
       return true;
     }
 
-    if (ajax.quickReplied || $.settings('disablePubSub')) {
+    if (app.ajax.quickReplied || $.settings('disablePubSub')) {
       //console.log('Received post html', data.html);
       var $html = $(data.html);
       var $html = $([$html[0], $html[2]]);
@@ -1109,9 +1109,9 @@ ajax: {
       initPosts($post);
     }
 
-    if (ajax.quickReplied) {
+    if (app.ajax.quickReplied) {
       $('input[name="thread"]').remove();
-      ajax.quickReplied = false;
+      app.ajax.quickReplied = false;
     }
 
     if (++this.validCaptchas > 2) {

@@ -15,7 +15,7 @@ MANAGERS = ADMINS = (
 
 #APPEND_SLASH = False
 TIME_ZONE = "Europe/Kiev"
-LANGUAGE_CODE = "ru"
+LANGUAGE_CODE = "en"
 
 SITE_ID = 1
 USE_I18N = True

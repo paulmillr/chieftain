@@ -263,7 +263,7 @@ class PostListOrCreateView(View):
         will return only posts html without any other fields.
         TODO: implement pagination.
         """
-        qs = self.model.objects.filter(**kwargs).reverse()[:20]
+        qs = self.resource.model.objects.filter(**kwargs).reverse()[:20]
         if request.GET.get("html"):
             return qs.values("html")
         return qs
@@ -282,7 +282,7 @@ class PostListOrCreateView(View):
             urlopen(url.format(instance.thread.id), data)
         except URLError:
             logging.warning("Can't refresh messages in pubsub.")
-        self.model.fields.append("html")
+        self.resource.fields.append("html")
         return Response(status.CREATED, instance)
 
 

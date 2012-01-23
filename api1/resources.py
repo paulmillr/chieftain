@@ -19,7 +19,7 @@ class PostResource(ModelResource):
     fields = [
         "id", "pid", "poster", "tripcode", "topic", "is_op_post",
         "date", "message", "email", "data", "file",
-        ("thread", ("id", ("section", ("id", "slug")))),
+        #("thread", ("id", ("section", ("id", "slug")))),
     ]
 
 

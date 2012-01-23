@@ -24,10 +24,14 @@ Memcached caching system.
 ## Dependencies
 * You'll need Python 2.7 to run chieftain.
 * [Redis](http://redis.io/) or [Memcached](http://memcached.org/)
-* [GeoIP C API](http://www.maxmind.com/app/c)
-* [GeoIP datasets](http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/)
+* [GeoIP C API](http://www.maxmind.com/app/c): http://geolite.maxmind.com/download/geoip/api/c/GeoIP-1.4.8.tar.gz.
+* (optional) [GeoIP datasets](http://geolite.maxmind.com/download/geoip/database/GeoLiteCountry/)
 * All python dependencies are listed in the file pip-req.txt and can be
 installed with command pip install -r pip-req.txt.
+
+## Getting started
+* Rename `settings_local_example.py` to `settings_local.py` and fill it with your database settings.
+* 
 
 ## Contributing
 * [Website](http://paulmillr.com/chieftain/)

@@ -7,16 +7,16 @@ MANAGERS = ADMINS = (
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.mysql",  # Add "postgresql_psycopg2",
+        "ENGINE": "django.db.backends.sqlite3",  # Add "postgresql_psycopg2",
             #"postgresql", "mysql", "sqlite3" or "oracle".
-        "NAME": "",  # Or path to database file if using sqlite3.
-        "USER": "",  # Not used with sqlite3.
-        "PASSWORD": "",  # Not used with sqlite3.
+        "NAME": "sqlite3",  # Or path to database file if using sqlite3.
+        "USER": "root",  # Not used with sqlite3.
+        "PASSWORD": "root",  # Not used with sqlite3.
         "HOST": "",  # Empty string for localhost. Not used with sqlite3.
         "PORT": "",  # Empty string for default. Not used with sqlite3.
     },
     "wakaba": {
-        "ENGINE": "django.db.backends.mysql",
+        "ENGINE": "django.db.backends.sqlite3",
         "NAME": "",
         "USER": "",
         "PASSWORD": "",
@@ -42,12 +42,12 @@ REDIS_INFO = {
 }
 
 GEOIP_PATH = "/var/geoip/"
-DISABLE_CAPTCHA = False
+DISABLE_CAPTCHA = True
 RECAPTCHA_PUBLIC_KEY = ""
 RECAPTCHA_PRIVATE_KEY = ""
-SITE_TITLE = u"Вождь"
-SITE_URL = "http://2ch.so/"
-WAKABA_PATH = "/var/2ch/"
+SITE_TITLE = u"Chieftain"
+SITE_URL = "http://127.0.0.1:8000/"
+WAKABA_PATH = "/var/wakaba/"
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 CACHE_DIR = "cache"
 MEDIA_ROOT = os.path.join(BASE_DIR, "files")
