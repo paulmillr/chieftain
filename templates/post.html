@@ -26,7 +26,7 @@
     <span class="number"><a href="{{thread.op_post.pid|default:""}}#post{{ post.pid }}">{{ post.pid }}</a></span>
     {% if thread and post.is_op_post %}
       <span class="replylink">
-        <a href="{{thread.op_post.pid|default:""}}#post{{ post.pid }}">Ответ</a>
+        <a href="{{thread.op_post.pid|default:""}}#post{{ post.pid }}">{% trans "Answer" %}</a>
       </span>
     {% endif %}
     {% if post.is_op_post %}

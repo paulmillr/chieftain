@@ -1,5 +1,5 @@
 {% load i18n %}<div class="newpost">
-  <form novalidate method="post" enctype="multipart/form-data">
+  <form novalidate method="post" enctype="multipart/form-data" action="http://127.0.0.1:8000/api/1.0/post/?html=1">
     <fieldset>
       <dl class="username-d">
         <dt><label for="username">{{ form.poster.label }}</label></dt>
@@ -68,7 +68,6 @@
   </form>
   <div class="info">
     <ul>
-      <li><a href="/bugs/">О багах писать сюда</a></li>
       {% if section.description %}<li class="sectionDescription">{{ section.description }}</li>{% endif %}
     </ul>
   </div>
