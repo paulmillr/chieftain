@@ -14,6 +14,7 @@ Memcached caching system.
 * Post search
 * AJAX
 * Answer maps & previews
+* RSS
 * Bookmarks
 * Customizable styles
 * Advanced moderation and administration tools
@@ -41,7 +42,7 @@ installed with command pip install -r pip-req.txt.
 ## Licensing
 The MIT License.
 
-Copyright (c) 2011 Paul Miller
+Copyright (c) Paul Miller (http://paulmillr.com)
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
