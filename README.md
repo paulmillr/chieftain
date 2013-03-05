@@ -22,6 +22,19 @@ Memcached caching system.
 * Mobile and smartphone versions
 * Wakaba database converter
 
+![](http://paulmillr.com/chieftain/img/screenshots/home.png)
+
+![](http://paulmillr.com/chieftain/img/screenshots/feed.png)
+
+![](http://paulmillr.com/chieftain/img/screenshots/thread.png)
+
+![](http://paulmillr.com/chieftain/img/screenshots/settings.png)
+
+![](http://paulmillr.com/chieftain/img/screenshots/pda.png)
+
+![](http://paulmillr.com/chieftain/img/screenshots/mobile.png)
+
+
 ## Dependencies
 * You'll need Python 2.7 to run chieftain.
 * [Redis](http://redis.io/) or [Memcached](http://memcached.org/)
