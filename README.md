@@ -22,17 +22,13 @@ Memcached caching system.
 * Mobile and smartphone versions
 * Wakaba database converter
 
-![](http://paulmillr.com/chieftain/img/screenshots/home.png)
+![home](https://f.cloud.github.com/assets/574696/1546776/b5170736-4d8c-11e3-9924-79f3014552eb.png)
+![settings](https://f.cloud.github.com/assets/574696/1546777/b53ef2f0-4d8c-11e3-9e82-a21b5480fad2.png)
+![mobile](https://f.cloud.github.com/assets/574696/1546778/b54101d0-4d8c-11e3-8d9a-775c57bc88fa.png)
+![pda](https://f.cloud.github.com/assets/574696/1546779/b542ee00-4d8c-11e3-90d1-5a5f9a74c14f.png)
+![thread](https://f.cloud.github.com/assets/574696/1546780/b5438d1a-4d8c-11e3-9b65-ea7d1ce684d9.png)
+![feed](https://f.cloud.github.com/assets/574696/1546781/b543b88a-4d8c-11e3-91a4-22f1e7c7baa7.png)
 
-![](http://paulmillr.com/chieftain/img/screenshots/feed.png)
-
-![](http://paulmillr.com/chieftain/img/screenshots/thread.png)
-
-![](http://paulmillr.com/chieftain/img/screenshots/settings.png)
-
-![](http://paulmillr.com/chieftain/img/screenshots/pda.png)
-
-![](http://paulmillr.com/chieftain/img/screenshots/mobile.png)
 
 
 ## Dependencies
